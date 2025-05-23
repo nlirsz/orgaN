@@ -1,0 +1,628 @@
+/* Reset & Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&family=Poppins:wght@300;400;500;600;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Cores e Destaques Aprimorados - Variáveis CSS */
+:root {
+    --primary-color: #9b59b6; /* Roxo principal */
+    --secondary-color: #64b5f6; /* Azul claro secundário */
+    --accent-color: #00f260; /* Verde elétrico para detalhes (ex: "comprado") */
+    --card-background: #2a2a2a; /* Fundo dos cards */
+    --card-shadow-light: 0 4px 12px rgba(0, 0, 0, 0.4); /* Sombra suave para cards */
+    --card-shadow-hover: 0 6px 15px rgba(0, 0, 0, 0.5); /* Sombra mais intensa no hover */
+    --text-light: #e0e0e0;
+    --text-dark: #111;
+    --border-color: #3a3a3a;
+    --gradient-purple: linear-gradient(90deg, #9b59b6, #8e44ad);
+    --gradient-blue: linear-gradient(90deg, #5c8fe7, #9bbcfe);
+    --gradient-add-button: linear-gradient(90deg, #006eff, #006effed); /* Gradiente específico para o botão Adicionar */
+    --gradient-save-button: linear-gradient(90deg, #28a745, #218838); /* Gradiente para botões de salvar/confirmar */
+}
+
+html, body {
+    font-family: 'Poppins', sans-serif;
+    color: var(--text-light);
+    background: linear-gradient(135deg, #0d0d0d 0%, #171717 100%);
+    min-height: 100vh;
+    height: 100%;
+    margin: 0 auto;
+    padding: 0;
+    overflow-x: hidden;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Dashboard Layout */
+.dashboard {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar (Desktop) */
+.sidebar {
+    width: 90px;
+    background: #1c1c1c;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 0;
+    box-shadow: 6px 0 20px rgba(0, 0, 0, 0.4), inset -1px 0 0 rgba(255, 255, 255, 0.05);
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    transition: width 0.3s ease;
+}
+
+.logo {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 40px;
+    border-radius: 55px;
+    object-fit: contain;
+    box-shadow: 0 0 5px var(--primary-color), 0 0 10px var(--primary-color);
+    transition: all 0.3s ease;
+}
+
+.logo:hover {
+    transform: scale(1.05);
+}
+
+.nav-btn {
+    background: none;
+    border: none;
+    color: #888;
+    font-size: 28px;
+    padding: 12px;
+    margin-bottom: 25px;
+    cursor: pointer;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: radial-gradient(circle, var(--primary-color) 0%, transparent 70%);
+    transition: width 0.3s ease, height 0.3s ease, opacity 0.3s ease;
+    opacity: 0;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+}
+
+.nav-btn.active,
+.nav-btn:hover {
+    color: var(--primary-color);
+    background: rgba(155, 89, 182, 0.1);
+    box-shadow: 0 0 15px var(--primary-color);
+}
+
+.nav-btn:hover::before {
+    width: 100px;
+    height: 100px;
+}
+
+/* Content */
+.content {
+    flex: 1;
+    padding: 40px 60px;
+    overflow-y: auto;
+    color: var(--text-light);
+}
+
+.content h1, /* Removido, pois não usado diretamente nos exemplos */
+.content h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 2.0em; /* Ajustado para um visual mais equilibrado */
+    color: #ffffff;
+    margin-bottom: 30px;
+    text-align: center;
+    font-weight: 700;
+    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    letter-spacing: -0.02em;
+}
+
+/* Tab Content (Container principal das seções) */
+.tab-content {
+    max-width: 1200px;
+    margin: 0 auto 30px;
+    background: transparent; /* Fundo transparente para seções, o container product-form-container terá seu próprio */
+    border-radius: 15px;
+    /* box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4); Sombra pode ser opcional aqui se os elementos internos tiverem */
+    padding: 30px;
+    /* border: 1px solid rgba(255, 255, 255, 0.05); Borda pode ser opcional */
+}
+
+
+/* Forms - Geral */
+.product-form-container,
+.finance-form-container { /* Aplicado a ambos os formulários */
+    background: #1e1e1e;
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 30px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+}
+
+
+.finance-form-container h3 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.4em;
+    color: var(--secondary-color);
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+
+
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 18px;
+    position: relative;
+}
+
+.form-group::before { /* Parece não ser usado, pode ser removido */
+    display: none;
+}
+
+.form-group label { /* Não usado explicitamente nos exemplos, mas bom ter */
+    color: #bbb;
+    font-size: 0.8em;
+    font-weight: 500;
+    margin-bottom: 0;
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 400;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    font-size: 0.9em;
+    background: #2b2b2b;
+    color: var(--text-light);
+    transition: all 0.3s ease;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+    min-height: 42px;
+    box-sizing: border-box;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: #999;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(155, 89, 182, 0.3), inset 0 1px 3px rgba(0, 0, 0, 0.4);
+    background: #333;
+}
+
+/* Botão Adicionar Produto */
+#add-product-btn {
+    width: 100%;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 10px;
+    background: var(--gradient-add-button);
+    color: #fff;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1.1em;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 15px rgba(0, 110, 255, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-top: 20px;
+}
+
+#add-product-btn:hover {
+    background: linear-gradient(90deg, #0056b3, #004c9a); /* Ajuste para tom mais escuro no hover */
+    transform: translateY(-3px);
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 110, 255, 0.6);
+}
+
+/* Botões de Ação do Formulário (Atualizar, Cancelar) */
+.form-group.action-buttons {
+    flex-direction: row;
+    justify-content: space-around;
+    margin-top: 20px;
+    gap: 10px;
+}
+
+.form-group.action-buttons button {
+    flex: 1;
+    max-width: 200px; /* Aumentado um pouco para acomodar texto mais longo */
+    padding: 12px 20px;
+    font-size: 1em;
+    border-radius: 8px;
+    border:none;
+    color: white;
+    cursor: pointer;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background 0.2s ease-in-out;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+/* Botão Atualizar */
+#update-product-btn {
+    background: var(--gradient-save-button); /* Verde */
+}
+#update-product-btn:hover {
+    filter: brightness(1.1);
+}
+
+/* Botão Cancelar */
+#cancel-edit-btn {
+    background: linear-gradient(90deg, #dc3545, #c82333); /* Vermelho */
+}
+#cancel-edit-btn:hover {
+    filter: brightness(1.1);
+}
+
+
+/* Lists (Produtos e Histórico) */
+#product-list,
+#history-list {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0 0 0; /* Adicionado margin-top */
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
+}
+
+#product-list li,
+#history-list li {
+    background: var(--card-background);
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    /* margin-top: 30px; Removido, pois gap e margin-top na ul cuidam disso */
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#product-list li:hover,
+#history-list li:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.6), 0 0 20px var(--primary-color); /* Sombra roxa no hover */
+    background: linear-gradient(45deg, #3a3a3a, #2c2c2c); /* Gradiente sutil no hover */
+}
+
+.product-image,
+.history-image {
+    width: 100%;
+    max-width: 160px;
+    height: 160px;
+    object-fit: contain; /* Alterado para contain para ver a imagem inteira */
+    border-radius: 10px;
+    margin-bottom: 15px;
+    background-color: #3a3a3a; /* Fundo caso a imagem não carregue ou tenha transparência */
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    cursor: pointer; /* Para indicar que é clicável (modal) */
+}
+
+.info {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 10px;
+    background: rgba(0,0,0,0.2); /* Fundo mais sutil */
+    border-radius: 10px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+    margin-bottom: 15px; /* Aumentado espaço */
+    flex-grow: 1;
+}
+
+.product-name,
+.history-name {
+    font-size: 1.1em; /* Ajustado */
+    font-weight: 600;
+    color: var(--secondary-color);
+    text-decoration: none;
+    margin-bottom: 8px;
+    word-break: break-word; /* Para nomes longos */
+    line-height: 1.3em;
+    transition: color .2s;
+}
+
+.product-name:hover,
+.history-name:hover {
+    text-decoration: underline;
+    color: var(--primary-color);
+}
+
+.product-price,
+.history-price {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.6em; /* Ajustado */
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 10px;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.actions {
+    display: flex;
+    justify-content: space-around;
+    gap: 8px; /* Reduzido gap */
+    margin-top: auto;
+    width: 100%;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1); /* Linha mais visível */
+    align-items: center;
+}
+
+.actions button {
+    background: rgba(255,255,255,0.05); /* Fundo sutil */
+    border: 1px solid #444;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.0em; /* Reduzido para caber melhor */
+    color: #aaa; /* Cor mais clara */
+    padding: 8px;
+    transition: all 0.3s ease;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.2);
+    width: 42px; /* Ajustado */
+    height: 42px; /* Ajustado */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.actions button:hover {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+    background: rgba(155, 89, 182, 0.15);
+    box-shadow: 0 0 10px rgba(155, 89, 182, 0.4), inset 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.actions button.buy-btn { /* Estilo específico para o botão de comprar da lista de produtos */
+    background: var(--gradient-blue);
+    color: var(--text-dark);
+    border: none;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.3), 0 0 10px rgba(92,166,231,0.4);
+}
+.actions button.buy-btn:hover {
+    filter: brightness(1.15);
+    transform: translateY(-1px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.4), 0 0 15px rgba(92,127,231,0.6);
+}
+
+.actions button.google-search-btn:hover {
+    color: #4285F4; /* Cor do Google */
+    border-color: #4285F4;
+    background: rgba(66, 133, 244, 0.15);
+    box-shadow: 0 0 10px rgba(66, 133, 244, 0.4), inset 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.total {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.6em; /* Ajustado */
+    font-weight: 700;
+    margin-top: 30px; /* Reduzido */
+    text-align: right; /* Alinhado à direita para um visual mais de "soma" */
+    padding-right: 10px;
+    color: #ffffff;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* --- Seção de Finanças --- */
+.finance-form-container {
+    margin-bottom: 40px;
+}
+
+#add-finance-entry-btn {
+    width: 100%;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 10px;
+    background: var(--gradient-save-button); /* Gradiente verde para salvar */
+    color: #fff;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1.1em;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 15px rgba(40, 167, 69, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-top: 20px;
+}
+#add-finance-entry-btn:hover {
+    filter: brightness(1.1);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.5), 0 0 20px rgba(40, 167, 69, 0.6);
+}
+
+.finance-summary {
+    background: var(--card-background);
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+}
+.finance-summary h3 {
+    font-family: 'Space Grotesk', sans-serif;
+    color: var(--secondary-color);
+    margin-bottom: 15px;
+    font-size: 1.3em;
+}
+.finance-summary p {
+    font-size: 1.1em;
+    color: var(--text-light);
+}
+#finance-total-balance {
+    font-weight: bold;
+    color: var(--accent-color);
+}
+
+.finance-list-container h3 {
+    font-family: 'Space Grotesk', sans-serif;
+    color: var(--secondary-color);
+    margin-bottom: 15px;
+    font-size: 1.3em;
+    text-align: center;
+}
+
+#finance-list {
+    list-style: none;
+    padding: 0;
+}
+
+#finance-list li {
+    background: #2f2f2f;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    border-left: 5px solid var(--primary-color); /* Destaque lateral */
+}
+
+#finance-list li .finance-item-details span {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 0.9em;
+}
+#finance-list li .finance-item-details strong {
+    color: var(--text-light);
+}
+#finance-list li .finance-item-details .revenue { color: #28a745; }
+#finance-list li .finance-item-details .expenses { color: #dc3545; }
+#finance-list li .finance-item-details .balance { color: var(--secondary-color); }
+
+#finance-list li .finance-item-actions button {
+    background: none;
+    border: 1px solid #555;
+    color: #999;
+    padding: 6px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+#finance-list li .finance-item-actions button:hover {
+    color: #dc3545; /* Cor para excluir */
+    border-color: #dc3545;
+}
+
+/* Estilos para os botões de ação nos itens da lista de finanças */
+#finance-list li .finance-item-actions {
+    display: flex; /* Garante que os botões fiquem na mesma linha */
+    gap: 8px;     /* Espaço entre os botões */
+    align-items: center;
+}
+
+#finance-list li .finance-item-actions button {
+    background: none;
+    border: 1px solid #555;
+    color: #999;
+    padding: 6px 8px; /* Ajuste o padding se necessário */
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9em; /* Ajuste o tamanho da fonte/ícone */
+    line-height: 1; /* Ajuda no alinhamento do ícone */
+}
+
+#finance-list li .finance-item-actions button:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+/* Específico para o botão de deletar, se quiser cor diferente no hover */
+#finance-list li .finance-item-actions button.delete-finance-btn:hover {
+    color: #dc3545; 
+    border-color: #dc3545;
+}
+
+
+/* ... (Restante do CSS, incluindo media queries, se não for muito extenso.
+       As media queries originais são boas e podem ser mantidas.
+       Apenas garanta que os novos elementos de finanças sejam responsivos também.) ... */
+
+/* Ajustes para Media Queries (manter os originais e adicionar/ajustar para finanças se necessário) */
+@media (max-width: 900px) {
+    .content { padding: 30px; }
+    .content h2 { font-size: 1.8em; }
+    .tab-content { padding: 20px; }
+    #product-list, #history-list {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+    }
+    .finance-form-container, .finance-summary { padding: 15px; }
+    .chart-container { width: 100%; height: 30vh; }
+
+}
+
+@media (max-width: 600px) {
+    .dashboard { flex-direction: column; }
+    .sidebar {
+        /* ... estilos da sidebar mobile ... */
+        width: 100%; height: 70px; flex-direction: row; justify-content: space-around;
+        padding: 5px 0; box-shadow: 0 -3px 15px rgba(0,0,0,0.4);
+        position: fixed; bottom: 0; left: 0; z-index: 1000;
+        border-top: 1px solid rgba(255,255,255,0.08); border-right: none;
+    }
+    .sidebar .logo { display: none; }
+    .nav-btn { margin-bottom: 0; font-size: 22px; width: 50px; height: 50px; }
+
+    .content { padding: 15px; padding-bottom: 90px; /* Espaço para sidebar no rodapé */ }
+    .content h2 { font-size: 1.5em; }
+    .tab-content { padding: 15px; }
+    
+    .product-form-container, .finance-form-container { padding: 15px; }
+    .form-group input { font-size: 0.9em; min-height: 40px;}
+    #add-product-btn, #add-finance-entry-btn { font-size: 1em; padding: 10px 15px;}
+    .form-group.action-buttons button { font-size: 0.9em; padding: 10px;}
+
+    #product-list, #history-list { grid-template-columns: 1fr; gap: 15px; }
+    #product-list li, #history-list li { padding: 15px; }
+    
+    .actions button { width: 38px; height: 38px; font-size: 0.9em; }
+    
+    .total { font-size: 1.4em; }
+
+    .finance-summary { padding: 15px; }
+    #finance-list li { flex-direction: column; align-items: flex-start; gap: 10px; }
+    #finance-list li .finance-item-actions { margin-top: 10px; }
+    .chart-container { width: 100%; height: 30vh; }
+}

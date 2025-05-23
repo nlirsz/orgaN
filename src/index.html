@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dashboard Financeiro & Produtos</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
+</head>
+<body>
+    <div class="dashboard">
+        <nav class="sidebar">
+            <img src="logo.png" alt="Logo" class="logo" />
+
+            <button class="nav-btn active" data-tab="products" title="Produtos">
+                <i class="fa fa-box"></i>
+            </button>
+            <button class="nav-btn" data-tab="history" title="Histórico de Compras">
+                <i class="fa fa-clock-rotate-left"></i>
+            </button>
+            <button class="nav-btn" data-tab="finances" title="Finanças">
+                <i class="fa fa-chart-line"></i> <!-- Ícone para Finanças -->
+            </button>
+        </nav>
+
+        <main class="content">
+            <!-- Seção de Produtos -->
+            <section id="products" class="tab-content">
+                <h2>Lista de Desejos de Produtos</h2>
+                <div class="product-form-container">
+                    <div class="form-group">
+                        <input type="text" id="product-link" placeholder="Link do produto (para busca automática)" />
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="product-name" placeholder="Nome do produto" />
+                    </div>
+                    <div class="form-group">
+                        <input type="number" step="0.01" id="product-price" placeholder="Preço (R$)" />
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="product-image" placeholder="URL da imagem" />
+                    </div>
+                    
+                    <button id="add-product-btn"><i class="fa fa-plus"></i> Adicionar Produto</button>
+                </div>
+
+                <div class="form-group action-buttons" style="display:none;">
+                    <button id="update-product-btn"><i class="fa fa-check"></i> Atualizar Produto</button>
+                    <button id="cancel-edit-btn"><i class="fa fa-ban"></i> Cancelar Edição</button>
+                </div>
+
+                <ul id="product-list"></ul>
+                <p class="total">Total pendente: R$ <span id="total-products">0.00</span></p>
+            </section>
+
+            <!-- Seção de Histórico de Compras -->
+            <section id="history" class="tab-content" style="display:none;">
+                <h2>Histórico de Compras</h2>
+                <ul id="history-list"></ul>
+                <p class="total">Total gasto: R$ <span id="total-history">0.00</span></p>
+            </section>
+
+            <!-- Nova Seção de Finanças -->
+            <section id="finances" class="tab-content" style="display:none;">
+                <h2>Dashboard Financeiro</h2>
+                
+                <div class="finance-form-container">
+                    <h3>Adicionar/Editar Registro Financeiro Mensal</h3>
+                    <input type="hidden" id="finance-entry-id"> <!-- Adicionar este -->
+                    <div class="form-group">
+                        <input type="month" id="finance-month" />
+                    </div>
+                    <div class="form-group">
+                        <input type="number" step="0.01" id="finance-revenue" placeholder="Receita Total (R$)" />
+                    </div>
+                    <div class="form-group">
+                        <input type="number" step="0.01" id="finance-expenses" placeholder="Gastos Totais (R$)" />
+                    </div>
+                    <button id="add-finance-entry-btn"><i class="fa fa-save"></i> Salvar Registro</button>
+                    <button id="cancel-finance-edit-btn" style="display:none;"><i class="fa fa-ban"></i> Cancelar Edição</button> <!-- Adicionar este -->
+                </div>
+
+
+                <div class="finance-summary">
+                    <h3>Resumo Financeiro</h3>
+                    <p>Saldo Acumulado Total: R$ <span id="finance-total-balance">0.00</span></p>
+                    <!-- Placeholder para gráfico -->
+                    <!-- Placeholder para gráfico -->
+                    <div class="chart-container" style="position: relative; height: 40vh; margin-top: 20px;"> 
+                        <!-- REMOVIDO width: 80vw; DAQUI -->
+                        <canvas id="finance-chart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="finance-list-container">
+                    <h3>Registros Mensais</h3>
+                    <ul id="finance-list">
+                        <!-- Itens da lista de finanças serão inseridos aqui -->
+                    </ul>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="renderer.js"></script>
+</body>
+</html>
