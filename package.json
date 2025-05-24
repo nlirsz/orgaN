@@ -6,6 +6,7 @@
   "main": "src/main.js",
   "scripts": {
     "start": "electron-forge start",
+    "start:api": "node src/index.js",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
@@ -15,9 +16,21 @@
   "author": "nicol",
   "license": "MIT",
   "dependencies": {
+    "@google-cloud/vertexai": "^1.10.0",
+    "@google/generative-ai": "^0.24.1",
+    "axios": "^1.9.0",
+    "bcryptjs": "^3.0.2",
+    "cheerio": "^1.0.0",
     "chokidar": "^4.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
     "electron-squirrel-startup": "^1.0.1",
+    "express": "^5.1.0",
     "finance-dashboard": "file:",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.16.0",
+    "mongoose": "^8.15.0",
+    "puppeteer": "^24.9.0",
     "sqlite3": "^5.1.7"
   },
   "devDependencies": {

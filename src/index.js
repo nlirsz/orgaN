@@ -1,51 +1,40 @@
-const { app, BrowserWindow } = require('electron');
-const path = require('node:path');
+// Importa os pacotes necessários
+const express = require('express');
+const cors = require('cors');
+require('dotenv').config(); // Carrega as variáveis de ambiente do arquivo .env
 
-// Handle creating/removing shortcuts on Windows when installing/uninstalling.
-if (require('electron-squirrel-startup')) {
-  app.quit();
-}
+// Importa a função de conexão com o banco de dados
+const connectDB = require('./database');
 
-const createWindow = () => {
-  // Create the browser window.
-  const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
-    webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
-    },
-  });
+// Cria a aplicação Express
+const app = express();
 
-  // and load the index.html of the app.
-  mainWindow.loadFile(path.join(__dirname, 'index.html'));
+// Conecta ao MongoDB
+connectDB();
 
-  // Open the DevTools.
-  mainWindow.webContents.openDevTools();
-};
+// Middlewares Essenciais
+// Habilita o CORS para permitir requisições de diferentes origens (importante para o desenvolvimento)
+app.use(cors());
+// Habilita o Express a entender JSON no corpo das requisições
+app.use(express.json());
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
-  createWindow();
-
-  // On OS X it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow();
-    }
-  });
+// Rota de Teste - para verificar se o servidor está no ar
+app.get('/', (req, res) => {
+    res.send('API do Finance Dashboard está funcionando!');
 });
 
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
+// Define e usa as rotas da API
+// Todas as rotas definidas em 'products.js' serão acessíveis a partir de '/api/products'
+app.use('/api/products', require('./api/products'));
+// Adicione outras rotas aqui no futuro (ex: app.use('/api/auth', require('./api/auth'));)
+
+// Define a porta do servidor
+const PORT = process.env.PORT || 3000;
+
+// Inicia o servidor e o faz "escutar" por requisições na porta definida
+app.listen(PORT, () => {
+    console.log(`Servidor da API rodando na porta ${PORT}`);
 });
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and import them here.
+// Exporta o app para ser usado pelo Vercel (se necessário)
+module.exports = app;
