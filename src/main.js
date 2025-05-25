@@ -1,165 +1,93 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+// src/main.js
+const { app, BrowserWindow } = require('electron');
 const path = require('path');
-const chokidar = require('chokidar'); // Para live reload
-
-// Importar funções do banco de dados
-const dbManager = require('./database'); // Alterado para dbManager para clareza
+const chokidar = require('chokidar'); // Para live reload, opcional mas útil
 
 let mainWindow;
 
 function createWindow() {
     mainWindow = new BrowserWindow({
-        width: 1200, // Aumentado para acomodar melhor o layout
-        height: 800, // Aumentado
+        width: 1280, // Ajustado para um tamanho comum
+        height: 820,
         webPreferences: {
-            // nodeIntegration: true, // Mantenha false por segurança
-            // contextIsolation: false, // Mantenha true por segurança
-            preload: path.join(__dirname, 'preload.js'),
-            // Habilitar devTools por padrão em desenvolvimento
-            devTools: !app.isPackaged,
-        }
+            preload: path.join(__dirname, 'preload.js'), // Essencial para expor APIs seguras ao renderer
+            contextIsolation: true,  // Recomendado: true
+            nodeIntegration: false,  // Recomendado: false (o renderer não precisa de acesso direto ao Node.js)
+            devTools: !app.isPackaged, // Habilita DevTools em desenvolvimento
+        },
+        icon: path.join(__dirname, 'assets', 'icons', 'icon.png') // Exemplo de caminho para ícone
     });
 
+    // Carrega o index.html do seu aplicativo.
+    // __dirname aponta para a pasta atual (onde main.js está, ou seja, src/)
     mainWindow.loadFile(path.join(__dirname, 'index.html'));
 
-    // Open the DevTools.
-    if (!app.isPackaged) { // Abre DevTools apenas se não estiver empacotado
+    // Abre o DevTools automaticamente se não estiver em produção (empacotado)
+    if (!app.isPackaged) {
         mainWindow.webContents.openDevTools();
     }
 
-    // Live reload ao modificar arquivos no diretório do projeto
-    if (!app.isPackaged) {
-        chokidar.watch(__dirname, { ignored: /(^|[\/\\])\../ }).on('change', (filePath) => {
-            console.log(`Arquivo modificado: ${filePath}. Recarregando...`);
+    // Configuração de Live Reload (opcional, mas útil para desenvolvimento)
+    // Ignora node_modules e arquivos ocultos
+    if (!app.isPackaged && chokidar) {
+        const watcher = chokidar.watch(path.join(__dirname, '..'), { // Observa a pasta raiz do projeto
+            ignored: [
+                /(^|[\/\\])\../, // Arquivos ocultos
+                path.join(__dirname, '..', 'node_modules', '**'), // node_modules
+                path.join(__dirname, '..', '.git', '**') // .git
+            ], 
+            persistent: true,
+            ignoreInitial: true // Não dispara na primeira varredura
+        });
+
+        watcher.on('change', (filePath) => {
+            console.log(`Arquivo modificado: ${filePath}. Recarregando janela principal...`);
             if (mainWindow && !mainWindow.isDestroyed()) {
                 mainWindow.webContents.reloadIgnoringCache();
             }
         });
+        console.log('Chokidar live reload ativado.');
+    } else if (!app.isPackaged) {
+        console.warn('Chokidar não encontrado ou app está empacotado. Live reload desativado.');
     }
+
+
+    mainWindow.on('closed', () => {
+        mainWindow = null;
+    });
 }
 
-// --- Manipuladores IPC para o Banco de Dados ---
-// Produtos
-ipcMain.handle('db:get-products', async () => {
-    try {
-        return await dbManager.listarProdutos();
-    } catch (error) {
-        console.error('IPC Error - db:get-products:', error);
-        throw error; // Re-throw para que o renderer possa tratar
-    }
-});
-ipcMain.handle('db:add-product', async (event, product) => {
-    try {
-        return await dbManager.adicionarProduto(product);
-    } catch (error) {
-        console.error('IPC Error - db:add-product:', error);
-        throw error;
-    }
-});
-ipcMain.handle('db:update-product', async (event, product) => {
-    try {
-        return await dbManager.atualizarProduto(product);
-    } catch (error) {
-        console.error('IPC Error - db:update-product:', error);
-        throw error;
-    }
-});
-ipcMain.handle('db:delete-product', async (event, productId) => {
-    try {
-        return await dbManager.removerProduto(productId);
-    } catch (error) {
-        console.error('IPC Error - db:delete-product:', error);
-        throw error;
-    }
-});
-
-// Histórico
-ipcMain.handle('db:get-history', async () => {
-    try {
-        return await dbManager.listarHistorico();
-    } catch (error) {
-        console.error('IPC Error - db:get-history:', error);
-        throw error;
-    }
-});
-ipcMain.handle('db:add-to-history', async (event, product) => {
-    try {
-        return await dbManager.adicionarAoHistorico(product);
-    } catch (error) {
-        console.error('IPC Error - db:add-to-history:', error);
-        throw error;
-    }
-});
-ipcMain.handle('db:delete-from-history', async (event, productId) => {
-    try {
-        return await dbManager.removerDoHistorico(productId);
-    } catch (error) {
-        console.error('IPC Error - db:delete-from-history:', error);
-        throw error;
-    }
-});
-
-// Finanças
-ipcMain.handle('db:get-finances', async () => {
-    try {
-        return await dbManager.listarFinancas();
-    } catch (error) {
-        console.error('IPC Error - db:get-finances:', error);
-        throw error;
-    }
-});
-ipcMain.handle('db:add-finance-entry', async (event, entry) => {
-    try {
-        return await dbManager.adicionarRegistroFinanceiro(entry);
-    } catch (error) {
-        console.error('IPC Error - db:add-finance-entry:', error);
-        throw error;
-    }
-});
-ipcMain.handle('db:delete-finance-entry', async (event, entryId) => {
-    try {
-        return await dbManager.removerRegistroFinanceiro(entryId);
-    } catch (error) {
-        console.error('IPC Error - db:delete-finance-entry:', error);
-        throw error;
-    }
-});
-
-// Handler para obter o caminho userData
-ipcMain.on('get-user-data-path', (event) => {
-    event.returnValue = app.getPath('userData');
-});
-
-
-// --- Ciclo de Vida do App Electron ---
+// Este método será chamado quando o Electron terminar a inicialização
+// e estiver pronto para criar janelas do navegador.
+// Algumas APIs só podem ser usadas depois que este evento ocorre.
 app.whenReady().then(() => {
     createWindow();
 
     app.on('activate', () => {
+        // No macOS, é comum recriar uma janela no aplicativo quando o
+        // ícone do dock é clicado e não há outras janelas abertas.
         if (BrowserWindow.getAllWindows().length === 0) {
             createWindow();
         }
     });
 });
 
+// Encerra quando todas as janelas são fechadas, exceto no macOS. Lá, é comum
+// para aplicativos e sua barra de menu permanecerem ativos até que o usuário
+// saia explicitamente com Cmd + Q.
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
-        // Fechar a conexão com o banco de dados antes de sair
-        dbManager.db.close((err) => {
-            if (err) {
-                console.error("Erro ao fechar o banco de dados", err.message);
-            } else {
-                console.log("Conexão com o banco de dados SQLite fechada.");
-            }
-            app.quit();
-        });
+        app.quit();
     }
 });
 
-// Este trecho if (require('electron-squirrel-startup')) app.quit();
-// geralmente vai no início do arquivo se você estiver usando electron-forge ou similar
-// para lidar com eventos de instalação no Windows. Se não estiver usando, pode ser omitido.
-// Se for necessário, coloque-o antes de qualquer outra lógica do app.
-// if (require('electron-squirrel-startup')) {
-//   app.quit();
-// }
+// Neste arquivo, você pode incluir o resto do código específico do
+// processo principal do seu aplicativo. Você também pode colocar manipulações
+// de IPC aqui se precisar de alguma comunicação do renderer para o main
+// que não seja diretamente relacionada a chamadas de API (ex: abrir diálogo de arquivo).
+// Para a arquitetura atual, não precisamos dos handlers IPC de banco de dados aqui.
+
+// Se você planeja usar electron-builder ou electron-forge para empacotar:
+if (require('electron-squirrel-startup')) {
+     app.quit();
+}

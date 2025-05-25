@@ -1,44 +1,28 @@
 const mongoose = require('mongoose');
 
-const ProductSchema = new mongoose.Schema({
-    userId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User', // Referencia o seu modelo de Usuário, se tiver um
-        required: true,
-    },
-    originalURL: {
+const productSchema = new mongoose.Schema({
+    name: { type: String, required: [true, "Nome do produto é obrigatório"] },
+    price: { type: Number, required: [true, "Preço do produto é obrigatório"], min: [0.01, "Preço deve ser positivo"] },
+    image: { type: String }, // URL da imagem
+    brand: { type: String },
+    description: { type: String },
+    urlOrigin: { type: String, required: [true, "URL de origem do produto é obrigatória"] },
+    userId: { type: String, required: [true, "ID do usuário é obrigatório"] }, // No futuro, pode ser mongoose.Schema.Types.ObjectId referenciando um User model
+    status: {
         type: String,
-        required: true,
+        enum: {
+            values: ['pendente', 'comprado', 'descartado'],
+            message: '{VALUE} não é um status suportado. Use pendente, comprado ou descartado.'
+        },
+        default: 'pendente',
     },
-    name: {
-        type: String,
-        required: true,
-    },
-    price: {
-        type: Number,
-        default: null, // Permite que o preço seja nulo se não for encontrado
-    },
-    imageUrl: {
-        type: String,
-    },
-    description: {
-        type: String,
-    },
-    brand: {
-        type: String,
-    },
-    availability: {
-        type: Boolean,
-        default: false,
-    },
-    processingError: {
-        type: String, // Para guardar mensagens de erro do Gemini, se houver
-        default: null,
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now,
-    },
+    purchasedAt: { type: Date } // Data em que o produto foi marcado como comprado
+}, { 
+    timestamps: true // Adiciona createdAt e updatedAt automaticamente
 });
 
-module.exports = mongoose.model('Product', ProductSchema);
+// Adicionar um índice composto pode ser útil para queries comuns
+productSchema.index({ userId: 1, status: 1 });
+productSchema.index({ userId: 1, createdAt: -1 });
+
+module.exports = mongoose.model('Product', productSchema);

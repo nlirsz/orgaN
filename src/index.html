@@ -3,71 +3,77 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Dashboard Financeiro & Produtos</title>
+    <title>OrgaN - Dashboard & Produtos</title>
     <link rel="stylesheet" href="style.css" />
+    <!-- Font Awesome para ícones -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <!-- Chart.js (se for usar gráficos no futuro) -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
 </head>
 <body>
     <div class="dashboard">
         <nav class="sidebar">
-            <img src="logo.png" alt="Logo" class="logo" />
+            <!-- Seu logo. Certifique-se que o arquivo logo.png existe na pasta raiz ou ajuste o caminho -->
+            <img src="logo.png" alt="Logo OrgaN" class="logo" />
 
-            <button class="nav-btn active" data-tab="products" title="Produtos">
+            <!-- IDs adicionados para corresponder ao renderer.js -->
+            <button id="pendingTab" class="nav-btn active" title="Produtos Pendentes">
                 <i class="fa fa-box"></i>
             </button>
-            <button class="nav-btn" data-tab="history" title="Histórico de Compras">
+            <button id="purchasedTab" class="nav-btn" title="Histórico de Compras">
                 <i class="fa fa-clock-rotate-left"></i>
             </button>
-            <button class="nav-btn" data-tab="finances" title="Finanças">
-                <i class="fa fa-chart-line"></i> <!-- Ícone para Finanças -->
+            <button id="financialTab" class="nav-btn" title="Finanças">
+                <i class="fa fa-chart-line"></i>
             </button>
         </nav>
 
         <main class="content">
-            <!-- Seção de Produtos -->
-            <section id="products" class="tab-content">
-                <h2>Lista de Desejos de Produtos</h2>
-                <div class="product-form-container">
-                    <div class="form-group">
-                        <input type="text" id="product-link" placeholder="Link do produto (para busca automática)" />
-                    </div>
-                    <div class="form-group">
-                        <input type="text" id="product-name" placeholder="Nome do produto" />
-                    </div>
-                    <div class="form-group">
-                        <input type="number" step="0.01" id="product-price" placeholder="Preço (R$)" />
-                    </div>
-                    <div class="form-group">
-                        <input type="text" id="product-image" placeholder="URL da imagem" />
-                    </div>
-                    
-                    <button id="add-product-btn"><i class="fa fa-plus"></i> Adicionar Produto</button>
-                </div>
+            <!-- Indicador de Carregamento e Mensagem de Erro (Globais) -->
+            <div id="loadingIndicator" style="display: none; text-align: center; padding: 20px; position: fixed; top: 10px; left: 50%; transform: translateX(-50%); background-color: rgba(0,0,0,0.7); color: white; border-radius: 5px; z-index: 1001;">
+                Carregando...
+            </div>
+            <div id="errorMessage" style="display: none; color: white; background-color: #d32f2f; border: 1px solid #c62828; padding: 10px; margin-top: 10px; margin-bottom:10px; border-radius: 4px; text-align: center;">
+                <!-- Mensagens de erro aparecerão aqui -->
+            </div>
 
-                <div class="form-group action-buttons" style="display:none;">
-                    <button id="update-product-btn"><i class="fa fa-check"></i> Atualizar Produto</button>
-                    <button id="cancel-edit-btn"><i class="fa fa-ban"></i> Cancelar Edição</button>
+            <!-- Seção de Produtos Pendentes -->
+            <!-- ID alterado de "products" para "pendingContent" -->
+            <section id="pendingContent" class="tab-content">
+                <h2>Lista de Desejos (Pendentes)</h2>
+                
+                <!-- Formulário de Adicionar Produto -->
+                <div class="add-product-form">
+                    <input type="text" id="productUrl" placeholder="Cole a URL do produto aqui" class="product-url-input"/>
+                    <button id="addProductBtn" class="add-product-button">
+                        <i class="fa fa-plus"></i> Adicionar Produto da URL
+                    </button>
                 </div>
-
-                <ul id="product-list"></ul>
-                <p class="total">Total pendente: R$ <span id="total-products">0.00</span></p>
+                
+                <!-- ID alterado de "product-list" para "productListPending" e usando div para grid -->
+                <div id="productListPending" class="product-grid">
+                    <!-- Cards de produtos pendentes serão inseridos aqui pelo renderer.js -->
+                </div>
             </section>
 
             <!-- Seção de Histórico de Compras -->
-            <section id="history" class="tab-content" style="display:none;">
+            <!-- ID alterado de "history" para "purchasedContent" -->
+            <section id="purchasedContent" class="tab-content" style="display:none;">
                 <h2>Histórico de Compras</h2>
-                <ul id="history-list"></ul>
-                <p class="total">Total gasto: R$ <span id="total-history">0.00</span></p>
+                <!-- ID alterado de "history-list" para "productListPurchased" e usando div para grid -->
+                <div id="productListPurchased" class="product-grid">
+                    <!-- Cards de produtos comprados serão inseridos aqui pelo renderer.js -->
+                </div>
             </section>
 
-            <!-- Nova Seção de Finanças -->
-            <section id="finances" class="tab-content" style="display:none;">
+            <!-- Seção de Finanças -->
+            <!-- ID alterado de "finances" para "financialContent" -->
+            <section id="financialContent" class="tab-content" style="display:none;">
                 <h2>Dashboard Financeiro</h2>
                 
                 <div class="finance-form-container">
                     <h3>Adicionar/Editar Registro Financeiro Mensal</h3>
-                    <input type="hidden" id="finance-entry-id"> <!-- Adicionar este -->
+                    <input type="hidden" id="finance-entry-id">
                     <div class="form-group">
                         <input type="month" id="finance-month" />
                     </div>
@@ -78,17 +84,13 @@
                         <input type="number" step="0.01" id="finance-expenses" placeholder="Gastos Totais (R$)" />
                     </div>
                     <button id="add-finance-entry-btn"><i class="fa fa-save"></i> Salvar Registro</button>
-                    <button id="cancel-finance-edit-btn" style="display:none;"><i class="fa fa-ban"></i> Cancelar Edição</button> <!-- Adicionar este -->
+                    <button id="cancel-finance-edit-btn" style="display:none;"><i class="fa fa-ban"></i> Cancelar Edição</button>
                 </div>
-
 
                 <div class="finance-summary">
                     <h3>Resumo Financeiro</h3>
                     <p>Saldo Acumulado Total: R$ <span id="finance-total-balance">0.00</span></p>
-                    <!-- Placeholder para gráfico -->
-                    <!-- Placeholder para gráfico -->
-                    <div class="chart-container" style="position: relative; height: 40vh; margin-top: 20px;"> 
-                        <!-- REMOVIDO width: 80vw; DAQUI -->
+                    <div class="chart-container" style="position: relative; height:40vh; margin-top: 20px;">
                         <canvas id="finance-chart"></canvas>
                     </div>
                 </div>
@@ -103,6 +105,7 @@
         </main>
     </div>
 
+    <!-- Script principal do renderer -->
     <script src="renderer.js"></script>
 </body>
 </html>
