@@ -2,80 +2,64 @@
 const express = require('express');
 const router = express.Router();
 const Product = require('../models/Product');
+const { scrapeProductDetails } = require('./scrape-gemini');
 
-console.log("[products.js] Tentando importar de './scrape-gemini'...");
-const scrapeGeminiModule = require('./scrape-gemini'); // Importa o módulo inteiro primeiro
-
-console.log("[products.js] Conteúdo do módulo scrapeGeminiModule:", scrapeGeminiModule);
-console.log("[products.js] Tipo de scrapeGeminiModule:", typeof scrapeGeminiModule);
-
-// Agora tenta desestruturar e verifica
-const scrapeProductDetails = scrapeGeminiModule.scrapeProductDetails; 
-// OU const { scrapeProductDetails } = scrapeGeminiModule; (equivalente se scrapeGeminiModule for o objeto module.exports)
-
-
-console.log("[products.js] Tipo de scrapeProductDetails (após importação/desestruturação):", typeof scrapeProductDetails);
-
-if (typeof scrapeProductDetails !== 'function') {
-    console.error("***********************************************************************************");
-    console.error("[products.js] ERRO CRÍTICO AO IMPORTAR: scrapeProductDetails NÃO é uma função!");
-    console.error("Verifique o arquivo 'scrape-gemini.js' e sua exportação 'module.exports'.");
-    console.error("Conteúdo recebido de require('./scrape-gemini'):", scrapeGeminiModule);
-    console.error("***********************************************************************************");
-    // Você pode até querer impedir o servidor de iniciar ou a rota de funcionar se esta dependência crítica falhar
-}
-
-// Rota POST /api/products
-router.post('/', async (req, res) => {
-    const { url, userId } = req.body;
-
-    if (!url) return res.status(400).json({ message: 'URL do produto é obrigatória.' });
-    if (!userId) return res.status(400).json({ message: 'userId é obrigatório.' });
-
-    console.log(`[API /products POST] URL: ${url}, UserID: ${userId}`);
-
-    if (typeof scrapeProductDetails !== 'function') { // Verificação final antes da chamada
-        console.error("[API /products POST] Falha: scrapeProductDetails ainda não é uma função no momento da chamada.");
-        return res.status(500).json({ message: 'Erro interno crítico: Serviço de scraping indisponível.' });
+// Rota POST /api/products/scrape-url - Apenas para scraping (NOVO)
+router.post('/scrape-url', async (req, res) => {
+    const { url } = req.body;
+    if (!url) {
+        return res.status(400).json({ message: 'URL é obrigatória.' });
     }
 
     try {
-        console.log("[API /products POST] Chamando scrapeProductDetails...");
-        const productDetails = await scrapeProductDetails(url); // Linha 19 (ou próxima, dependendo dos logs)
-        console.log("[API /products POST] Detalhes de scrapeProductDetails:", productDetails);
-        
-        if (!productDetails || productDetails.price === null || typeof productDetails.price === 'undefined' || !productDetails.name) {
-            console.error('[API /products POST] Detalhes insuficientes (nome/preço):', productDetails);
-            return res.status(422).json({ message: 'Não foi possível extrair nome/preço da URL.' });
+        const productDetails = await scrapeProductDetails(url);
+        if (!productDetails || !productDetails.name || !productDetails.price) {
+             return res.status(422).json({ message: 'Não foi possível extrair nome/preço da URL.' });
         }
-        
+        res.status(200).json(productDetails);
+    } catch (error) {
+        console.error('[API /scrape-url] Erro:', error.message);
+        res.status(502).json({ message: error.message || 'Erro ao comunicar com o serviço de extração.' });
+    }
+});
+
+
+// Rota POST /api/products - Salva o produto (AJUSTADO)
+router.post('/', async (req, res) => {
+    // A rota agora espera todos os detalhes, pré-validados pelo frontend
+    const { name, price, image, brand, description, urlOrigin, userId, status } = req.body;
+
+    // Validação básica
+    if (!name || !price || !urlOrigin || !userId) {
+        return res.status(400).json({ message: 'Campos obrigatórios (nome, preço, urlOrigin, userId) estão faltando.' });
+    }
+
+    try {
         const newProduct = new Product({
-            name: productDetails.name,
-            price: parseFloat(productDetails.price),
-            image: productDetails.image,
-            brand: productDetails.brand,
-            description: productDetails.description,
-            urlOrigin: url,
-            userId: userId,
-            status: 'pendente',
+            name,
+            price: parseFloat(price),
+            image,
+            brand,
+            description,
+            urlOrigin,
+            userId,
+            status: status || 'pendente',
         });
 
         const savedProduct = await newProduct.save();
-        console.log('[API /products POST] Produto salvo:', savedProduct._id);
         res.status(201).json(savedProduct);
 
     } catch (error) {
-        console.error('[API /products POST] Erro ao adicionar produto:', error.message); // Log da mensagem de erro
-        // console.error(error.stack); // Log do stack trace completo se precisar
-        res.status(502).json({ 
-            message: error.message || 'Erro ao comunicar com o serviço de extração.', 
-            details: error.cause ? error.cause.toString() : (error.details || error.toString())
+        console.error('[API /products POST] Erro ao adicionar produto:', error.message);
+        res.status(500).json({ 
+            message: 'Erro ao salvar o produto no banco de dados.', 
+            details: error.toString()
         });
     }
 });
 
-// ... (suas outras rotas GET, PATCH, PUT, DELETE como antes) ...
-// GET /api/products - Listar produtos com filtro opcional de status
+
+// GET /api/products - Listar produtos (ORIGINAL MANTIDO)
 router.get('/', async (req, res) => {
     const { status, userId } = req.query;
 
@@ -92,9 +76,7 @@ router.get('/', async (req, res) => {
     }
 
     try {
-        // console.log(`[API] Buscando produtos para UserID=${userId} com query:`, query);
         const products = await Product.find(query).sort({ createdAt: -1 });
-        // console.log(`[API] Encontrados ${products.length} produtos.`);
         res.json(products);
     } catch (error) {
         console.error('[API] Erro ao buscar produtos:', error);
@@ -102,7 +84,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-// GET /api/products/:id - Obter um produto específico
+// GET /api/products/:id - Obter um produto específico (ORIGINAL MANTIDO)
 router.get('/:id', async (req, res) => {
     const { userId } = req.query; 
     if (!userId) {
@@ -123,7 +105,7 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-// PATCH /api/products/:id/purchase - Marcar produto como comprado
+// PATCH /api/products/:id/purchase - Marcar produto como comprado (ORIGINAL MANTIDO)
 router.patch('/:id/purchase', async (req, res) => {
     const { userId } = req.body; 
     if (!userId) {
@@ -139,7 +121,6 @@ router.patch('/:id/purchase', async (req, res) => {
         if (!product) {
             return res.status(404).json({ message: 'Produto não encontrado ou não pertence a este usuário.' });
         }
-        // console.log(`[API] Produto ${product._id} marcado como comprado para UserID=${userId}`);
         res.json(product);
     } catch (error) {
         console.error(`[API] Erro ao marcar produto ${req.params.id} como comprado:`, error);
@@ -150,7 +131,7 @@ router.patch('/:id/purchase', async (req, res) => {
     }
 });
 
-// PUT /api/products/:id - Atualizar um produto
+// PUT /api/products/:id - Atualizar um produto (ORIGINAL MANTIDO)
 router.put('/:id', async (req, res) => {
     const { userId, name, price, brand, description } = req.body;
     if (!userId) {
@@ -182,7 +163,6 @@ router.put('/:id', async (req, res) => {
         if (!product) {
             return res.status(404).json({ message: 'Produto não encontrado ou não pertence a este usuário.' });
         }
-        // console.log(`[API] Produto ${product._id} atualizado para UserID=${userId}`);
         res.json(product);
     } catch (error) {
         console.error(`[API] Erro ao atualizar produto ${req.params.id}:`, error);
@@ -196,7 +176,7 @@ router.put('/:id', async (req, res) => {
     }
 });
 
-// DELETE /api/products/:id - Excluir um produto
+// DELETE /api/products/:id - Excluir um produto (ORIGINAL MANTIDO)
 router.delete('/:id', async (req, res) => {
     const { userId } = req.body; 
     if (!userId) {
@@ -207,7 +187,6 @@ router.delete('/:id', async (req, res) => {
         if (result.deletedCount === 0) {
             return res.status(404).json({ message: 'Produto não encontrado ou não pertence a este usuário.' });
         }
-        // console.log(`[API] Produto ${req.params.id} excluído para UserID=${userId}`);
         res.status(204).send(); 
     } catch (error) {
         console.error(`[API] Erro ao excluir produto ${req.params.id}:`, error);
@@ -217,6 +196,5 @@ router.delete('/:id', async (req, res) => {
         res.status(500).json({ message: 'Erro interno do servidor.' });
     }
 });
-
 
 module.exports = router;

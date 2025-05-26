@@ -1,695 +1,379 @@
-// Elementos da UI - Serão null se não encontrados, verificado no DOMContentLoaded
-const productUrlInput = document.getElementById('productUrl');
-const addProductBtn = document.getElementById('addProductBtn');
-const productListPending = document.getElementById('productListPending');
-const productListPurchased = document.getElementById('productListPurchased');
-const loadingIndicator = document.getElementById('loadingIndicator');
-const errorMessageDiv = document.getElementById('errorMessage');
+document.addEventListener('DOMContentLoaded', () => {
 
-// Abas
-const pendingTab = document.getElementById('pendingTab');
-const purchasedTab = document.getElementById('purchasedTab');
-const financialTab = document.getElementById('financialTab');
-const pendingContent = document.getElementById('pendingContent');
-const purchasedContent = document.getElementById('purchasedContent');
-const financialContent = document.getElementById('financialContent');
+    // --- VARIÁVEIS GLOBAIS E CONFIGURAÇÃO ---
+    const API_BASE_URL = 'http://localhost:3000/api';
+    let currentUserId = '66452182570e88024d2d4411'; // Provisório
+    let scrapedProductData = null;
+    let financeChartInstance = null;
+    let editingFinanceId = null;
 
-// Elementos Financeiros (necessários para a nova aba financeira)
-const financeMonthInput = document.getElementById('finance-month');
-const financeRevenueInput = document.getElementById('finance-revenue');
-const financeExpensesInput = document.getElementById('finance-expenses');
-const addFinanceEntryBtn = document.getElementById('add-finance-entry-btn');
-const cancelFinanceEditBtn = document.getElementById('cancel-finance-edit-btn');
-const financeList = document.getElementById('finance-list');
-const financeTotalBalance = document.getElementById('finance-total-balance');
-const financeChartCanvas = document.getElementById('finance-chart');
+    // --- SELETORES DE ELEMENTOS ---
+    const getElem = (id) => document.getElementById(id);
 
-let financeChartInstance = null; // Para guardar a instância do Chart.js
+    // Abas e Navegação
+    const sidebar = document.querySelector('.sidebar');
+    const tabContents = document.querySelectorAll('.tab-content');
 
-const API_BASE_URL = 'http://localhost:3000/api';
-const USER_ID = "hardcoded-test-user"; // TODO: Substituir por autenticação real
+    // Produtos
+    const pendingList = getElem('pending-products-list');
+    const purchasedList = getElem('purchased-products-list');
+    const verifyUrlBtn = getElem('verifyUrlBtn');
+    const productUrlInput = getElem('productUrlInput');
+    const verifiedProductInfoDiv = getElem('verifiedProductInfo');
+    
+    // Finanças
+    const financeMonthInput = getElem('financeMonth');
+    const financeRevenueInput = getElem('financeRevenue');
+    const financeExpensesInput = getElem('financeExpenses');
+    const addFinanceEntryBtn = getElem('add-finance-entry-btn');
+    const cancelFinanceEditBtn = getElem('cancel-finance-edit-btn');
+    const financeList = getElem('finance-list');
+    const totalBalanceElem = getElem('finance-total-balance');
+    const financeChartCanvas = getElem('financialChart');
+    
+    // Modais
+    const detailsModal = getElem('details-modal');
+    const detailsModalContent = getElem('modal-product-details-content'); // Div interna do modal de detalhes
+    const editModal = getElem('edit-product-modal');
+    const editForm = getElem('edit-product-form');
+    const editProductIdInput = getElem('edit-product-id');
+    const editProductNameInput = getElem('edit-product-name');
+    const editProductPriceInput = getElem('edit-product-price');
 
-// --- Funções Auxiliares ---
-function showLoading(show = true) {
-    if (loadingIndicator) {
-        loadingIndicator.style.display = show ? 'block' : 'none';
-    } else if (show) {
-        console.warn("Tentativa de mostrar loading, mas loadingIndicator não foi encontrado.");
-    }
-}
+    // --- LÓGICA DE NAVEGAÇÃO (ABAS) ---
+    if (sidebar && tabContents.length > 0) {
+        sidebar.addEventListener('click', (e) => {
+            const navBtn = e.target.closest('.nav-btn');
+            if (!navBtn) return;
+            const tabId = navBtn.dataset.tab;
 
-function showError(message) {
-    if (errorMessageDiv) {
-        errorMessageDiv.textContent = message;
-        errorMessageDiv.style.display = message ? 'block' : 'none';
-    } else {
-        console.error("Div de erro não encontrada. Mensagem de erro: ", message);
-        if (message) alert(`ERRO: ${message}`); // Último recurso
-    }
-    if (message) console.error(message); // Log no console também
-}
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            navBtn.classList.add('active');
 
-async function handleApiResponse(response) {
-    // --- CORREÇÃO: Tratamento robusto de erros HTTP ---
-    if (!response.ok) {
-        let errorBody = '';
-        try {
-            // Tenta ler o corpo da resposta como texto para pegar a mensagem de erro do backend
-            errorBody = await response.text();
-            // Se o corpo for um JSON de erro, tenta parseá-lo
-            try {
-                const jsonError = JSON.parse(errorBody);
-                errorBody = jsonError.message || JSON.stringify(jsonError);
-            } catch (e) {
-                // Não é JSON, então mantém o texto puro
+            tabContents.forEach(tab => {
+                tab.classList.toggle('active', tab.id === `${tabId}-tab`);
+            });
+
+            if (tabId === 'finance' && financeChartCanvas) {
+                fetchAndRenderFinances(); // Recarrega dados da aba de finanças
             }
-        } catch (e) {
-            // Não foi possível ler o corpo da resposta
-            errorBody = 'Não foi possível ler o corpo da resposta do servidor.';
-        }
-        throw new Error(`Erro do servidor! Status: ${response.status} (${response.statusText}), Detalhes: ${errorBody}`);
-    }
-    // --- FIM CORREÇÃO ---
-
-    if (response.status === 204) { // No Content
-        return null;
-    }
-    return response.json();
-}
-
-// --- Renderização de Produtos (Pending e Purchased) ---
-function renderProducts(products, containerElement) {
-    if (!containerElement) {
-        // Isso é uma verificação de segurança, mas os elementos já deveriam estar lá via DOMContentLoaded
-        console.error(`Erro Crítico: Tentativa de renderizar produtos, mas o elemento container não foi fornecido ou não encontrado.`);
-        showError(`Erro interno: Não foi possível atualizar a lista de produtos na interface.`);
-        return;
+        });
     }
 
-    containerElement.innerHTML = '';
-    if (!products || products.length === 0) {
-        containerElement.innerHTML = '<p>Nenhum produto encontrado.</p>';
-        return;
-    }
+    // --- FUNÇÕES DE PRODUTOS ---
+    const createProductCard = (product) => {
+        const card = document.createElement('li');
+        card.className = 'product-card';
+        card.dataset.productId = product._id;
+        card.dataset.productJson = JSON.stringify(product); 
 
-    products.forEach(product => {
-        const productCard = document.createElement('div');
-        productCard.classList.add('product-card');
-        const price = typeof product.price === 'number' ? product.price.toFixed(2) : 'N/A';
-        
-        productCard.innerHTML = `
-            <img src="${product.image || 'img/placeholder.png'}" alt="${product.name}" class="product-image" onerror="this.onerror=null;this.src='img/placeholder.png';">
-            <div class="product-info">
-                <h4>${product.name || 'Nome indisponível'}</h4>
-                <p class="product-price">R$ ${price}</p>
-                <p class="product-brand">Marca: ${product.brand || 'N/A'}</p>
-                <p class="product-description">${product.description ? product.description.substring(0, 100) + (product.description.length > 100 ? '...' : '') : 'Sem descrição'}</p>
-                <a href="${product.urlOrigin}" target="_blank" class="product-link">Ver produto original</a>
+        const formattedPrice = `R$ ${parseFloat(product.price).toFixed(2)}`;
+        card.innerHTML = `
+            <div class="card-image-container">
+                <img src="${product.image || 'https://via.placeholder.com/200x150?text=Sem+Imagem'}" alt="${product.name}" class="card-image">
             </div>
-            <div class="product-actions">
-                ${product.status === 'pendente' ?
-                `<button onclick="markAsPurchased('${product._id}')" class="action-btn purchase-btn">Marcar como Comprado</button>` :
-                '<span class="status-purchased">Comprado em: '+ (product.purchasedAt ? new Date(product.purchasedAt).toLocaleDateString() : 'Data N/A') +'</span>'
-            }
-                <button onclick="editProduct('${product._id}')" class="action-btn edit-btn">Editar</button>
-                <button onclick="deleteProduct('${product._id}')" class="action-btn delete-btn">Excluir</button>
+            <div class="card-content">
+                <span class="card-title">${product.name}</span>
+                <span class="card-price">${formattedPrice}</span>
+            </div>
+            <div class="card-actions">
+                ${product.status === 'pendente' ? '<i class="fas fa-check-circle action-purchase" title="Marcar como Comprado"></i>' : ''}
+                <i class="fas fa-edit action-edit" title="Editar"></i>
+                <i class="fas fa-trash-alt action-delete" title="Excluir"></i>
             </div>
         `;
-        containerElement.appendChild(productCard);
-    });
-}
+        return card;
+    };
 
-// --- Renderização de Finanças ---
-async function loadAndRenderFinanceEntries() {
-    if (!financeList || !financeTotalBalance || !financeChartCanvas) {
-        console.error("loadAndRenderFinanceEntries: Elementos da UI de finanças não encontrados.");
-        showError("Erro interno: Elementos da dashboard financeira ausentes.");
-        return;
-    }
-    showLoading();
-    showError('');
-    try {
-        // Supondo que você terá um endpoint para finanças também
-        // Por enquanto, vamos simular dados ou usar o localStorage como no seu copy 2.js
-        // Se você tiver uma API de finanças, você faria:
-        // const response = await fetch(`${API_BASE_URL}/finances?userId=${USER_ID}`);
-        // const financeEntries = await handleApiResponse(response);
-        
-        // SIMULAÇÃO DE DADOS OU BUSCA DO LOCALSTORAGE (como no seu renderer copy 2.js)
-        let financeEntries = JSON.parse(localStorage.getItem("finances_local")) || [];
-        
-        financeList.innerHTML = "";
-        let accumulatedBalance = 0;
-
-        // Garante que financeEntries é um array, mesmo que localStorage esteja corrompido
-        if (!Array.isArray(financeEntries)) {
-            console.warn("Finances no localStorage não é um array. Resetando.");
-            financeEntries = [];
-            localStorage.setItem("finances_local", JSON.stringify([])); // Limpa localStorage
-        }
-        
-        const sortedFinances = [...financeEntries].sort((a, b) => {
-            // Ordena por mês/ano para o gráfico
-            const dateAValid = a.mes_ano && typeof a.mes_ano === 'string' && a.mes_ano.match(/^\d{4}-\d{2}$/);
-            const dateBValid = b.mes_ano && typeof b.mes_ano === 'string' && b.mes_ano.match(/^\d{4}-\d{2}$/);
-            if (!dateAValid && !dateBValid) return 0;
-            if (!dateAValid) return 1; // Coloca inválidos no final
-            if (!dateBValid) return -1; // Coloca inválidos no final
-            const dateA = new Date(a.mes_ano + "-02"); // Adiciona "-02" para evitar problemas de fuso horário com o último dia do mês
-            const dateB = new Date(b.mes_ano + "-02");
-            return dateA - dateB;
-        });
-
-        const chartLabels = [];
-        const chartRevenueData = [];
-        const chartExpensesData = [];
-        const chartAccumulatedBalanceData = [];
-        let currentAccumulatedForChart = 0;
-
-        sortedFinances.forEach((entry, index) => {
-            const li = document.createElement("li");
-            li.dataset.index = index; // Para referência, se for necessário editar/deletar via índice local
-
-            const monthYearDateValid = entry.mes_ano && typeof entry.mes_ano === 'string' && entry.mes_ano.match(/^\d{4}-\d{2}$/);
-            const formattedMonthYear = monthYearDateValid ? 
-                new Date(entry.mes_ano + "-02").toLocaleDateString('pt-BR', { month: 'long', year: 'numeric', timeZone: 'UTC' }) : 
-                "Mês Inválido";
+    const fetchAndRenderProducts = async () => {
+        if (!pendingList || !purchasedList) return;
+        try {
+            const response = await fetch(`${API_BASE_URL}/products?userId=${currentUserId}`);
+            if (!response.ok) throw new Error(`Erro ao buscar produtos: ${response.statusText}`);
+            const products = await response.json();
             
-            const revenue = parseFloat(entry.receita || 0);
-            const expenses = parseFloat(entry.gastos || 0);
-            const balance = revenue - expenses;
-            accumulatedBalance += balance; 
-            currentAccumulatedForChart += balance;
+            pendingList.innerHTML = '';
+            purchasedList.innerHTML = '';
+            products.forEach(product => {
+                const card = createProductCard(product);
+                if (product.status === 'pendente') pendingList.appendChild(card);
+                else if (product.status === 'comprado') purchasedList.appendChild(card);
+            });
+        } catch (error) { console.error("Erro em fetchAndRenderProducts:", error); }
+    };
+    
+    // --- FUNÇÕES DE FINANÇAS ---
+    const renderFinanceChart = (entries) => {
+        if (financeChartInstance) financeChartInstance.destroy();
+        if (!financeChartCanvas) return;
 
-            // Adicionar dados para o gráfico
-            if (monthYearDateValid) { // Use o formato curto para o rótulo do gráfico
-                chartLabels.push(new Date(entry.mes_ano + "-02").toLocaleDateString('pt-BR', { month: 'short', year: 'numeric', timeZone: 'UTC' }));
-                chartRevenueData.push(revenue);
-                chartExpensesData.push(expenses);
-                chartAccumulatedBalanceData.push(currentAccumulatedForChart);
-            }
+        const labels = entries.map(e => e.mes_ano).sort();
+        const sortedEntries = [...entries].sort((a,b) => a.mes_ano.localeCompare(b.mes_ano));
+        const revenueData = sortedEntries.map(e => e.receita);
+        const expensesData = sortedEntries.map(e => e.gastos);
 
+        const ctx = financeChartCanvas.getContext('2d');
+        financeChartInstance = new Chart(ctx, {
+            type: 'line', 
+            data: {
+                labels: labels,
+                datasets: [
+                    { label: 'Receita', data: revenueData, borderColor: 'rgba(75, 192, 192, 1)', backgroundColor: 'rgba(75, 192, 192, 0.2)', fill: true, tension: 0.4 },
+                    { label: 'Gastos', data: expensesData, borderColor: 'rgba(255, 99, 132, 1)', backgroundColor: 'rgba(255, 99, 132, 0.2)', fill: true, tension: 0.4 }
+                ]
+            },
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+        });
+    };
+
+    const fetchAndRenderFinances = async () => {
+        if (!financeList || !totalBalanceElem) return;
+        
+        // TODO: Substituir por chamada real à API de finanças
+        const mockFinances = [
+            { _id: '1', mes_ano: '2025-01', receita: 5000, gastos: 3500 },
+            { _id: '2', mes_ano: '2025-02', receita: 5500, gastos: 4000 },
+            { _id: '3', mes_ano: '2025-03', receita: 6000, gastos: 3800 },
+        ];
+        
+        financeList.innerHTML = '';
+        let totalBalance = 0;
+        
+        mockFinances.forEach(entry => {
+            const balance = entry.receita - entry.gastos;
+            totalBalance += balance;
+            const li = document.createElement('li');
+            li.dataset.financeId = entry._id;
             li.innerHTML = `
                 <div class="finance-item-details">
-                    <span><strong>Mês/Ano:</strong> ${formattedMonthYear}</span>
-                    <span class="revenue"><strong>Receita:</strong> R$ ${revenue.toFixed(2)}</span>
-                    <span class="expenses"><strong>Gastos:</strong> R$ ${expenses.toFixed(2)}</span>
-                    <span class="balance"><strong>Saldo do Mês:</strong> R$ ${balance.toFixed(2)}</span>
-                </div>
-                <div class="finance-item-actions">
-                    <button onclick="setupFinanceEdit(${index})" title="Editar Registro"><i class="fa fa-pen"></i></button>
-                    <button onclick="deleteFinanceEntry(${index})" class="delete-finance-btn" title="Excluir Registro"><i class="fa fa-trash"></i></button>
+                    <strong>${entry.mes_ano}</strong>
+                    <span>Receita: <span class="revenue">R$ ${entry.receita.toFixed(2)}</span></span>
+                    <span>Gastos: <span class="expenses">R$ ${entry.gastos.toFixed(2)}</span></span>
+                    <span>Balanço: <span class="balance">R$ ${balance.toFixed(2)}</span></span>
                 </div>
             `;
             financeList.appendChild(li);
         });
 
-        financeTotalBalance.textContent = accumulatedBalance.toFixed(2);
-        renderOrUpdateFinanceChart({
-            labels: chartLabels,
-            revenue: chartRevenueData,
-            expenses: chartExpensesData,
-            accumulatedBalance: chartAccumulatedBalanceData
-        });
-
-    } catch (error) {
-        console.error('Erro ao carregar registros financeiros:', error);
-        showError(`Erro ao carregar finanças: ${error.message}`);
-        if(financeList) financeList.innerHTML = `<p class="error-message">Não foi possível carregar os registros financeiros. ${error.message}</p>`;
-    } finally {
-        showLoading(false);
-    }
-}
-
-function renderOrUpdateFinanceChart(chartData) {
-    if (typeof Chart === 'undefined') {
-        console.warn("Chart.js não está carregado. O gráfico financeiro não será renderizado.");
-        if (financeChartCanvas) financeChartCanvas.style.display = 'none'; // Esconder o canvas se Chart.js não existe
-        return;
-    }
-    if (!financeChartCanvas) {
-        console.error("Elemento canvas do gráfico de finanças não encontrado!");
-        return;
-    }
-    financeChartCanvas.style.display = 'block'; // Garantir que o canvas está visível
-
-    const data = {
-        labels: chartData.labels,
-        datasets: [
-            {
-                label: 'Receita Mensal',
-                data: chartData.revenue,
-                borderColor: 'rgba(75, 192, 192, 1)',
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                fill: false,
-                tension: 0.3 // Curvatura da linha
-            },
-            {
-                label: 'Gastos Mensais',
-                data: chartData.expenses,
-                borderColor: 'rgba(255, 99, 132, 1)',
-                backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                fill: false,
-                tension: 0.3
-            },
-            {
-                label: 'Saldo Acumulado',
-                data: chartData.accumulatedBalance,
-                borderColor: 'rgba(54, 162, 235, 1)',
-                backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                type: 'line', // Linha para o saldo acumulado
-                fill: false,
-                tension: 0.3
-            }
-        ]
+        if(totalBalanceElem) totalBalanceElem.textContent = `R$ ${totalBalance.toFixed(2)}`;
+        renderFinanceChart(mockFinances);
     };
 
-    const config = {
-        type: 'line', // Tipo padrão, mas datasets individuais podem ter type diferente
-        data: data,
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                x: {
-                    ticks: { color: '#E0E0E0' },
-                    grid: { color: 'rgba(224, 224, 224, 0.1)' }
-                },
-                y: {
-                    beginAtZero: false,
-                    title: { display: true, text: 'Valor (R$)', color: '#E0E0E0' },
-                    ticks: { color: '#E0E0E0' },
-                    grid: { color: 'rgba(224, 224, 224, 0.1)' }
-                }
-            },
-            plugins: {
-                legend: {
-                    position: 'top',
-                    labels: { color: '#E0E0E0' }
-                },
-                title: {
-                    display: true,
-                    text: 'Evolução Financeira Mensal',
-                    color: '#E0E0E0'
-                }
-            }
-        }
-    };
+    // --- LÓGICA DE EVENTOS ---
 
-    if (financeChartInstance) {
-        financeChartInstance.data = data;
-        financeChartInstance.options = config.options;
-        financeChartInstance.update();
-        console.log("Gráfico de finanças atualizado.");
-    } else {
-        financeChartInstance = new Chart(financeChartCanvas, config);
-        console.log("Gráfico de finanças criado.");
-    }
-}
-
-let editingFinanceIndex = -1; // Para rastrear qual entrada de finanças está sendo editada
-
-function setupFinanceEdit(index) {
-    let financeEntries = JSON.parse(localStorage.getItem("finances_local")) || [];
-    const entry = financeEntries[index];
-    if (entry && financeMonthInput && financeRevenueInput && financeExpensesInput && addFinanceEntryBtn && cancelFinanceEditBtn) {
-        financeMonthInput.value = entry.mes_ano;
-        financeRevenueInput.value = parseFloat(entry.receita).toFixed(2);
-        financeExpensesInput.value = parseFloat(entry.gastos).toFixed(2);
-        editingFinanceIndex = index; // Armazena o índice para atualização
-        addFinanceEntryBtn.textContent = 'Atualizar Registro';
-        cancelFinanceEditBtn.style.display = 'inline-block'; // Mostra o botão de cancelar
-    } else {
-        console.error("Erro ao configurar edição financeira ou entrada não encontrada.");
-    }
-}
-
-function clearFinanceForm() {
-    if (financeMonthInput && financeRevenueInput && financeExpensesInput && addFinanceEntryBtn && cancelFinanceEditBtn) {
-        financeMonthInput.value = '';
-        financeRevenueInput.value = '';
-        financeExpensesInput.value = '';
-        editingFinanceIndex = -1; // Reseta o índice
-        addFinanceEntryBtn.textContent = 'Salvar Registro';
-        cancelFinanceEditBtn.style.display = 'none'; // Esconde o botão de cancelar
-    }
-}
-
-function addOrUpdateFinanceEntry() {
-    if (!financeMonthInput || !financeRevenueInput || !financeExpensesInput || !addFinanceEntryBtn) {
-        showError("Um ou mais campos de finanças não foram encontrados.");
-        return;
-    }
-
-    const mes_ano = financeMonthInput.value;
-    const receita = parseFloat(financeRevenueInput.value);
-    const gastos = parseFloat(financeExpensesInput.value);
-
-    if (!mes_ano || !mes_ano.match(/^\d{4}-\d{2}$/)) {
-        showError("Por favor, preencha o Mês/Ano no formato AAAA-MM (ex: 2023-12).");
-        return;
-    }
-    if (isNaN(receita) || isNaN(gastos)) {
-        showError("Por favor, preencha valores numéricos válidos para Receita e Gastos.");
-        return;
-    }
-
-    const newEntry = { mes_ano, receita, gastos };
-    let financeEntries = JSON.parse(localStorage.getItem("finances_local")) || [];
-
-    if (editingFinanceIndex >= 0 && editingFinanceIndex < financeEntries.length) {
-        financeEntries[editingFinanceIndex] = newEntry; // Atualiza a entrada existente
-        console.log("Registro financeiro atualizado:", newEntry);
-    } else {
-        financeEntries.push(newEntry); // Adiciona nova entrada
-        console.log("Novo registro financeiro adicionado:", newEntry);
-    }
-    localStorage.setItem("finances_local", JSON.stringify(financeEntries));
-    loadAndRenderFinanceEntries(); // Recarrega e renderiza a lista e o gráfico
-    clearFinanceForm();
-}
-
-function deleteFinanceEntry(index) {
-    if (!confirm('Tem certeza que deseja excluir este registro financeiro?')) return;
-
-    let financeEntries = JSON.parse(localStorage.getItem("finances_local")) || [];
-    if (index >= 0 && index < financeEntries.length) {
-        financeEntries.splice(index, 1);
-        localStorage.setItem("finances_local", JSON.stringify(financeEntries));
-        console.log("Registro financeiro excluído no índice:", index);
-        loadAndRenderFinanceEntries();
-        if (editingFinanceIndex === index) { // Se a entrada excluída era a que estava sendo editada
-            clearFinanceForm();
-        }
-    } else {
-        console.error("Índice de registro financeiro inválido para exclusão:", index);
-    }
-}
-
-
-// --- Funções da API para Produtos ---
-async function addProduct() {
-    if (!productUrlInput) {
-        showError("Campo de URL do produto não encontrado.");
-        return;
-    }
-    const url = productUrlInput.value.trim();
-    if (!url) {
-        showError('Por favor, insira a URL do produto.');
-        return;
-    }
-
-    showLoading();
-    showError('');
-
-    try {
-        const response = await fetch(`${API_BASE_URL}/products`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', },
-            body: JSON.stringify({ url: url, userId: USER_ID }),
-        });
-        const newProduct = await handleApiResponse(response); // Usa o handler atualizado
-        console.log('Produto adicionado:', newProduct);
-        if (productUrlInput) productUrlInput.value = '';
-        await loadAndRenderPendingProducts();
-        showTab('pending'); // Volta para a aba de pendentes
-    } catch (error) {
-        console.error('Erro ao adicionar produto:', error);
-        showError(`Erro ao adicionar produto: ${error.message}`);
-    } finally {
-        showLoading(false);
-    }
-}
-
-async function loadAndRenderPendingProducts() {
-    if (!productListPending) {
-        showError("Erro crítico: Elemento da lista de produtos pendentes não encontrado na página.");
-        console.error("loadAndRenderPendingProducts chamado, mas productListPending é null.");
-        return;
-    }
-    showLoading();
-    showError('');
-    try {
-        const response = await fetch(`${API_BASE_URL}/products?status=pendente&userId=${USER_ID}`);
-        const products = await handleApiResponse(response);
-        renderProducts(products, productListPending);
-    } catch (error) {
-        console.error('Erro ao carregar produtos pendentes:', error);
-        showError(`Erro ao carregar produtos pendentes: ${error.message}`);
-        if(productListPending) productListPending.innerHTML = `<p class="error-message">Não foi possível carregar os produtos pendentes. ${error.message}</p>`;
-    } finally {
-        showLoading(false);
-    }
-}
-
-async function loadAndRenderPurchasedProducts() {
-    if (!productListPurchased) {
-        showError("Erro crítico: Elemento da lista de produtos comprados não encontrado na página.");
-        console.error("loadAndRenderPurchasedProducts chamado, mas productListPurchased é null.");
-        return;
-    }
-    showLoading();
-    showError('');
-    try {
-        const response = await fetch(`${API_BASE_URL}/products?status=comprado&userId=${USER_ID}`);
-        const products = await handleApiResponse(response);
-        renderProducts(products, productListPurchased);
-    } catch (error) {
-        console.error('Erro ao carregar produtos comprados:', error);
-        showError(`Erro ao carregar produtos comprados: ${error.message}`);
-        if(productListPurchased) productListPurchased.innerHTML = `<p class="error-message">Não foi possível carregar o histórico de compras. ${error.message}</p>`;
-    } finally {
-        showLoading(false);
-    }
-}
-
-window.markAsPurchased = async function(productId) {
-    if (!confirm('Deseja marcar este produto como comprado?')) return;
-
-    showLoading();
-    showError('');
-    try {
-        const response = await fetch(`${API_BASE_URL}/products/${productId}/purchase`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId: USER_ID })
-        });
-        await handleApiResponse(response);
-        console.log(`Produto ${productId} marcado como comprado.`);
-        await loadAndRenderPendingProducts();
-        await loadAndRenderPurchasedProducts();
-        showTab('pending'); // Mantém o usuário na aba de pendentes ou o direciona
-    } catch (error) {
-        console.error(`Erro ao marcar produto ${productId} como comprado:`, error);
-        showError(`Erro ao marcar produto como comprado: ${error.message}`);
-    } finally {
-        showLoading(false);
-    }
-}
-
-window.deleteProduct = async function(productId) {
-    if (!confirm('Tem certeza que deseja excluir este produto? Esta ação é irreversível.')) return;
-
-    showLoading();
-    showError('');
-    try {
-        const response = await fetch(`${API_BASE_URL}/products/${productId}`, {
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId: USER_ID })
-        });
-        await handleApiResponse(response);
-        console.log(`Produto ${productId} excluído.`);
-        
-        // Recarrega a lista da aba atualmente ativa
-        if (pendingContent && pendingContent.style.display === 'block') {
-            await loadAndRenderPendingProducts();
-        } else if (purchasedContent && purchasedContent.style.display === 'block') {
-            await loadAndRenderPurchasedProducts();
-        } else {
-            // Fallback: se não sabe qual aba ativa, recarrega pendentes
-            await loadAndRenderPendingProducts();
-        }
-
-    } catch (error) {
-        console.error(`Erro ao excluir produto ${productId}:`, error);
-        showError(`Erro ao excluir produto: ${error.message}`);
-    } finally {
-        showLoading(false);
-    }
-}
-
-async function getProductById(productId) {
-    showLoading();
-    showError('');
-    try {
-        const response = await fetch(`${API_BASE_URL}/products/${productId}?userId=${USER_ID}`);
-        return await handleApiResponse(response);
-    } catch (error) {
-        console.error(`Erro ao buscar produto ${productId}:`, error);
-        showError(`Erro ao buscar dados do produto para edição: ${error.message}`);
-        return null;
-    } finally {
-        showLoading(false);
-    }
-}
-
-window.editProduct = async function(productId) {
-    showError('');
-    const productToEdit = await getProductById(productId);
-    if (!productToEdit) {
-        showError("Produto não encontrado para edição.");
-        return;
-    }
-
-    // Usando prompts simples para demonstração. Em um app real, use um modal/formulário de edição.
-    const newName = prompt("Novo nome do produto:", productToEdit.name);
-    const newPriceStr = prompt("Novo preço do produto (ex: 29.99):", productToEdit.price);
-    const newBrand = prompt("Nova marca do produto:", productToEdit.brand || "");
-    const newDescription = prompt("Nova descrição do produto:", productToEdit.description || "");
-
-    // Se o usuário cancelar qualquer prompt, interrompe a edição
-    if (newName === null || newPriceStr === null || newBrand === null || newDescription === null) {
-        showError("Edição cancelada.");
-        return;
-    }
-
-    const newPrice = parseFloat(newPriceStr);
-    if (isNaN(newPrice) || newPrice <= 0) {
-        showError("Preço inválido. Por favor, insira um número positivo.");
-        return;
-    }
-    
-    const updateData = {
-        name: newName, 
-        price: newPrice, 
-        brand: newBrand, 
-        description: newDescription,
-        userId: USER_ID
-    };
-
-    showLoading();
-    try {
-        const response = await fetch(`${API_BASE_URL}/products/${productId}`, {
-            method: 'PUT', // Ou PATCH, dependendo da sua API
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(updateData)
-        });
-        await handleApiResponse(response);
-        console.log(`Produto ${productId} atualizado.`);
-        
-        // Recarrega a lista correta após a atualização
-        if (productToEdit.status === 'pendente') {
-            await loadAndRenderPendingProducts();
-        } else if (productToEdit.status === 'comprado') {
-            await loadAndRenderPurchasedProducts();
-        }
-        showError('Produto atualizado com sucesso!'); // Feedback de sucesso
-    } catch (error) {
-       console.error(`Erro ao editar produto ${productId}:`, error);
-       showError(`Erro ao editar produto: ${error.message}`);
-    } finally {
-        showLoading(false);
-    }
-}
-
-
-// --- Navegação por Abas ---
-function showTab(tabName) {
-    // Esconder todos os conteúdos e remover a classe 'active'
-    [pendingContent, purchasedContent, financialContent].forEach(el => {
-        if (el) el.style.display = 'none';
-    });
-    [pendingTab, purchasedTab, financialTab].forEach(el => {
-        if (el) el.classList.remove('active');
-    });
-
-    showError(''); // Limpa mensagens de erro ao trocar de aba
-
-    // Mostrar o conteúdo da aba selecionada e adicionar 'active'
-    if (tabName === 'pending') {
-        if (pendingContent) pendingContent.style.display = 'block';
-        if (pendingTab) pendingTab.classList.add('active');
-        loadAndRenderPendingProducts();
-    } else if (tabName === 'purchased') {
-        if (purchasedContent) purchasedContent.style.display = 'block';
-        if (purchasedTab) purchasedTab.classList.add('active');
-        loadAndRenderPurchasedProducts();
-    } else if (tabName === 'financial') {
-        if (financialContent) financialContent.style.display = 'block';
-        if (financialTab) financialTab.classList.add('active');
-        loadAndRenderFinanceEntries(); // Carrega e renderiza finanças
-    }
-}
-
-// --- Inicialização ---
-document.addEventListener('DOMContentLoaded', () => {
-    // Adiciona event listeners para os botões e inputs após o DOM estar carregado
-    if (addProductBtn) {
-        addProductBtn.addEventListener('click', addProduct);
-    } else {
-        console.error("Elemento 'addProductBtn' não encontrado no DOM.");
-    }
-    
-    // Listener para o input de URL para buscar detalhes
-    if (productUrlInput) {
-        productUrlInput.addEventListener('change', async () => {
+    // Verificar URL
+    if (verifyUrlBtn && productUrlInput && verifiedProductInfoDiv) {
+        verifyUrlBtn.addEventListener('click', async () => {
             const url = productUrlInput.value.trim();
-            if (url) {
-                showLoading();
-                showError('');
-                try {
-                    // Chamada para a API do backend para extrair detalhes
-                    // A API do backend já usa scrape-gemini, então chamamos o endpoint do backend
-                    const response = await fetch(`${API_BASE_URL}/products/extract-details`, { // Exemplo de endpoint, ajuste se for diferente
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ url: url })
-                    });
-                    const data = await handleApiResponse(response);
-                    
-                    // Preenche os campos do formulário (você pode precisar adicionar esses inputs no seu HTML ou usar um modal de edição)
-                    // Atualmente, este renderer.js não tem campos para preencher além da URL.
-                    // Se você tiver um modal de edição ou formulário de adição com esses campos, você os preencheria aqui.
-                    console.log("Detalhes extraídos da URL:", data);
-                    // Exemplo: se tivesse productNameInput, productPriceInput, etc.
-                    // if (document.getElementById('productName')) document.getElementById('productName').value = data.name || '';
-                    // if (document.getElementById('productPrice')) document.getElementById('productPrice').value = data.price || '';
-                    // if (document.getElementById('productImage')) document.getElementById('productImage').value = data.image || '';
-                    showError(`Detalhes extraídos: ${data.name} - R$ ${data.price}. Agora você pode adicionar.`);
+            if (!url) return alert('Por favor, insira uma URL.');
+            verifyUrlBtn.disabled = true;
+            verifyUrlBtn.textContent = 'Verificando...';
+            try {
+                const response = await fetch(`${API_BASE_URL}/products/scrape-url`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url }),
+                });
+                if (!response.ok) throw new Error((await response.json()).message);
+                scrapedProductData = await response.json();
+                
+                // Preenche a div de informações verificadas
+                const verifiedImg = getElem('verifiedProductImage');
+                const verifiedName = getElem('verifiedProductName');
+                const verifiedPrice = getElem('verifiedProductPrice');
 
-                } catch (error) {
-                    console.error('Erro ao extrair detalhes da URL:', error);
-                    showError(`Não foi possível extrair detalhes da URL: ${error.message}. Por favor, verifique o link.`);
-                } finally {
-                    showLoading(false);
+                if(verifiedImg) verifiedImg.src = scrapedProductData.image || 'https://via.placeholder.com/100?text=Sem+Imagem';
+                if(verifiedName) verifiedName.textContent = scrapedProductData.name || 'Nome não encontrado';
+                if(verifiedPrice) verifiedPrice.textContent = scrapedProductData.price ? `R$ ${parseFloat(scrapedProductData.price).toFixed(2)}` : 'Preço não encontrado';
+                
+                // Adiciona o botão de "Adicionar Produto" se ele não existir
+                if (!getElem('finalAddProductBtn')) {
+                    const addButton = document.createElement('button');
+                    addButton.id = 'finalAddProductBtn';
+                    addButton.className = 'primary-btn';
+                    addButton.textContent = 'Adicionar Produto à Lista';
+                    verifiedProductInfoDiv.appendChild(addButton);
                 }
+                verifiedProductInfoDiv.classList.remove('hidden');
+            } catch (error) { 
+                alert(`Erro na verificação: ${error.message}`);
+                verifiedProductInfoDiv.classList.add('hidden'); 
             }
+            finally { verifyUrlBtn.disabled = false; verifyUrlBtn.textContent = 'Verificar'; }
         });
     }
 
-    // Event Listeners para botões de aba
-    if (pendingTab) pendingTab.addEventListener('click', () => showTab('pending'));
-    if (purchasedTab) purchasedTab.addEventListener('click', () => showTab('purchased'));
-    if (financialTab) financialTab.addEventListener('click', () => showTab('financial'));
+    // Adicionar Produto (após verificação) - Listener na div que contém o botão
+    if(verifiedProductInfoDiv) {
+        verifiedProductInfoDiv.addEventListener('click', async (e) => {
+            if (e.target.id !== 'finalAddProductBtn') return;
+            if (!scrapedProductData) return alert('Dados do produto não encontrados.');
+            
+            const productToAdd = {
+                name: scrapedProductData.name, price: parseFloat(scrapedProductData.price),
+                image: scrapedProductData.image, brand: scrapedProductData.brand,
+                description: scrapedProductData.description, urlOrigin: productUrlInput.value.trim(),
+                userId: currentUserId, status: 'pendente' 
+            };
+            try {
+                const response = await fetch(`${API_BASE_URL}/products`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(productToAdd),
+                });
+                if (!response.ok) throw new Error((await response.json()).message);
+                productUrlInput.value = '';
+                verifiedProductInfoDiv.classList.add('hidden');
+                verifiedProductInfoDiv.innerHTML = ''; // Limpa para o próximo
+                scrapedProductData = null;
+                fetchAndRenderProducts();
+            } catch (error) { alert(`Erro ao adicionar: ${error.message}`); }
+        });
+    }
 
-    // Event Listeners para formulário de finanças
-    if (addFinanceEntryBtn) addFinanceEntryBtn.addEventListener('click', addOrUpdateFinanceEntry);
-    if (cancelFinanceEditBtn) cancelFinanceEditBtn.addEventListener('click', clearFinanceForm);
+    // Delegação de eventos no conteúdo principal para ações dos cards
+    document.querySelector('.content').addEventListener('click', async (e) => {
+        const target = e.target;
+        const card = target.closest('.product-card');
+        
+        if (!card) return; 
 
+        const productId = card.dataset.productId;
+        const productData = JSON.parse(card.dataset.productJson);
 
-    // Exibe a aba de pendentes por padrão na inicialização
-    if (pendingTab && pendingContent && productListPending) {
-        showTab('pending');
-    } else {
-        showError("Erro crítico: Elementos essenciais da aba inicial não foram encontrados. Verifique o HTML.");
-        console.error("Não foi possível inicializar a aba 'pending' devido a elementos ausentes.");
+        // Ação de Excluir
+        if (target.classList.contains('action-delete')) {
+            e.stopPropagation(); 
+            if (!confirm('Tem certeza que deseja excluir este produto?')) return;
+            try {
+                const response = await fetch(`${API_BASE_URL}/products/${productId}`, {
+                    method: 'DELETE', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: currentUserId }) 
+                });
+                if (!response.ok) throw new Error(`Erro ao excluir: ${response.statusText}`);
+                card.remove();
+            } catch (error) { alert(error.message); }
+        }
+        // Marcar como Comprado
+        else if (target.classList.contains('action-purchase')) {
+            e.stopPropagation();
+            try {
+                const response = await fetch(`${API_BASE_URL}/products/${productId}/purchase`, {
+                    method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: currentUserId })
+                });
+                if (!response.ok) throw new Error(`Erro ao marcar comprado: ${response.statusText}`);
+                fetchAndRenderProducts(); 
+            } catch (error) { alert(error.message); }
+        }
+        // Editar (Abrir Modal)
+        else if (target.classList.contains('action-edit')) {
+            e.stopPropagation();
+            if (editModal && editForm && editProductIdInput && editProductNameInput && editProductPriceInput) {
+                editProductIdInput.value = productData._id;
+                editProductNameInput.value = productData.name;
+                editProductPriceInput.value = productData.price;
+                // Adicione outros campos se existirem no seu modal de edição
+                // Ex: getElem('edit-product-brand').value = productData.brand || '';
+                editModal.classList.add('active');
+            } else {
+                console.error("Elementos do modal de edição não encontrados.");
+            }
+        }
+        // Clique no Card para ver Detalhes (se não foi um ícone de ação)
+        else {
+             if (detailsModal && detailsModalContent) {
+                detailsModalContent.innerHTML = `
+                    <img id="modal-product-image" src="${productData.image || 'https://via.placeholder.com/300x200?text=Sem+Imagem'}" alt="${productData.name}">
+                    <h3 id="modal-product-name">${productData.name}</h3>
+                    <p><strong>Preço Atual:</strong> R$ ${parseFloat(productData.price).toFixed(2)}</p>
+                    <p><strong>Marca:</strong> ${productData.brand || 'N/A'}</p>
+                    <p><strong>Status:</strong> ${productData.status}</p>
+                    <p><strong>Descrição:</strong> ${productData.description || 'N/A'}</p>
+                    <a href="${productData.urlOrigin}" target="_blank" class="product-link">Ver na Loja</a>
+                `;
+                detailsModal.classList.add('active');
+            }
+        }
+    });
+
+    // Salvar Edição do Produto
+    if (editForm) {
+        editForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!editProductIdInput || !editProductNameInput || !editProductPriceInput) return;
+
+            const productId = editProductIdInput.value;
+            const updatedData = {
+                name: editProductNameInput.value,
+                price: parseFloat(editProductPriceInput.value),
+                userId: currentUserId
+                // Adicione outros campos aqui se o seu formulário de edição tiver mais
+            };
+            try {
+                const response = await fetch(`${API_BASE_URL}/products/${productId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updatedData)
+                });
+                if (!response.ok) throw new Error(`Erro ao atualizar: ${response.statusText}`);
+                if(editModal) editModal.classList.remove('active');
+                fetchAndRenderProducts();
+            } catch (error) { alert(error.message); }
+        });
+    }
+
+    // Fechar Modais
+    document.querySelectorAll('.modal-overlay').forEach(modal => {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal || e.target.classList.contains('close-modal')) {
+                modal.classList.remove('active');
+            }
+        });
+    });
+    
+    // Adicionar/Editar Registro Financeiro
+    if(addFinanceEntryBtn && financeMonthInput && financeRevenueInput && financeExpensesInput) {
+        addFinanceEntryBtn.addEventListener('click', () => {
+            const month = financeMonthInput.value;
+            const revenue = parseFloat(financeRevenueInput.value) || 0;
+            const expenses = parseFloat(financeExpensesInput.value) || 0;
+
+            if (!month) return alert("Selecione o mês e ano.");
+            
+            console.log(`Registro Financeiro: Mês=${month}, Receita=${revenue}, Gastos=${expenses}`);
+            // TODO: Implementar lógica de salvar/atualizar na API de Finanças
+            // Exemplo: se for salvar um novo:
+            // const financeData = { mes_ano: month, receita: revenue, gastos: expenses, userId: currentUserId };
+            // fetch(`${API_BASE_URL}/finances`, { method: 'POST', headers:{...}, body: JSON.stringify(financeData) })
+            // .then(...)
+            // .then(() => fetchAndRenderFinances());
+            
+            // Limpar campos
+            financeMonthInput.value = '';
+            financeRevenueInput.value = '';
+            financeExpensesInput.value = '';
+            // if(cancelFinanceEditBtn) cancelFinanceEditBtn.classList.add('hidden');
+            // addFinanceEntryBtn.textContent = 'Salvar Registro';
+        });
+    }
+
+    // --- INICIALIZAÇÃO ---
+    fetchAndRenderProducts();
+    
+    // Define a aba de produtos como ativa por padrão e carrega finanças se ela for ativada
+    const initialActiveTabButton = document.querySelector('.sidebar .nav-btn.active') || document.querySelector('.sidebar .nav-btn');
+    if (initialActiveTabButton) {
+        const initialTabId = initialActiveTabButton.dataset.tab;
+        const initialTabContent = getElem(`${initialTabId}-tab`);
+        
+        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+        initialActiveTabButton.classList.add('active');
+        
+        tabContents.forEach(tab => tab.classList.remove('active'));
+        if (initialTabContent) initialTabContent.classList.add('active');
+
+        if (initialTabId === 'finance') {
+            fetchAndRenderFinances();
+        }
     }
 });
-
-// Expor funções globalmente para serem acessíveis do HTML (onclick)
-window.markAsPurchased = markAsPurchased;
-window.deleteProduct = deleteProduct;
-window.editProduct = editProduct; // Já exposto
-window.setupFinanceEdit = setupFinanceEdit; // Expõe para o HTML
-window.deleteFinanceEntry = deleteFinanceEntry; // Expõe para o HTML

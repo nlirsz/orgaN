@@ -1,110 +1,122 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html>
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>OrgaN - Dashboard & Produtos</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>orgaN</title>
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net;" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="style.css" />
-    <!-- Font Awesome para ícones -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
-    <!-- Chart.js (se for usar gráficos no futuro) -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
 </head>
 <body>
     <div class="dashboard">
-        <nav class="sidebar">
-            <!-- Seu logo. Certifique-se que o arquivo logo.png existe na pasta raiz ou ajuste o caminho -->
-            <img src="logo.png" alt="Logo OrgaN" class="logo" />
-
-                <button id="pendingTab" class="nav-btn active" title="Produtos Pendentes">
-                    <i class="fa fa-box"></i>
-                </button>
-                <button id="purchasedTab" class="nav-btn" title="Histórico de Compras">
-                    <i class="fa fa-clock-rotate-left"></i>
-                </button>
-                <button id="financialTab" class="nav-btn" title="Finanças">
-                    <i class="fa fa-chart-line"></i>
-                </button>
-        </nav>
+        <aside class="sidebar">
+            <img src="https://i.imgur.com/Kz4g38w.png" alt="Logo" class="logo" />
+            <nav>
+                <button class="nav-btn active" data-tab="products" title="Produtos"><i class="fas fa-box-open"></i><span>Produtos</span></button>
+                <button class="nav-btn" data-tab="history" title="Histórico"><i class="fas fa-history"></i><span>Histórico</span></button>
+                <button class="nav-btn" data-tab="finance" title="Finanças"><i class="fas fa-chart-pie"></i><span>Finanças</span></button>
+            </nav>
+        </aside>
 
         <main class="content">
-            <!-- Indicador de Carregamento e Mensagem de Erro (Globais) -->
-            <div id="loadingIndicator" style="display: none; text-align: center; padding: 20px; position: fixed; top: 10px; left: 50%; transform: translateX(-50%); background-color: rgba(0,0,0,0.7); color: white; border-radius: 5px; z-index: 1001;">
-                Carregando...
-            </div>
-            <div id="errorMessage" style="display: none; color: white; background-color: #d32f2f; border: 1px solid #c62828; padding: 10px; margin-top: 10px; margin-bottom:10px; border-radius: 4px; text-align: center;">
-                <!-- Mensagens de erro aparecerão aqui -->
-            </div>
-
-            <!-- Seção de Produtos Pendentes -->
-            <!-- ID alterado de "products" para "pendingContent" -->
-            <section id="pendingContent" class="tab-content">
-                <h2>Lista de Desejos (Pendentes)</h2>
-                
-                <!-- Formulário de Adicionar Produto -->
-                <div class="add-product-form">
-                    <input type="text" id="productUrl" placeholder="Cole a URL do produto aqui" class="product-url-input"/>
-                    <button id="addProductBtn" class="add-product-button">
-                        <i class="fa fa-plus"></i> Adicionar Produto da URL
-                    </button>
+            <section id="products-tab" class="tab-content active">
+                <h2>Adicionar e Gerenciar Produtos</h2>
+                <div class="form-container">
+                    <h3>Adicionar Novo Produto</h3>
+                    <div id="scrape-form" class="input-group">
+                        <input type="url" id="productUrlInput" placeholder="Cole a URL do produto">
+                        <button id="verifyUrlBtn">Verificar</button>
+                    </div>
+                    <div id="verifiedProductInfo" class="hidden">
+                        <h4>Detalhes Verificados:</h4>
+                        <img id="verifiedProductImage" src="#" alt="Imagem do Produto Verificado">
+                        <p><strong>Nome:</strong> <span id="verifiedProductName"></span></p>
+                        <p><strong>Preço:</strong> <span id="verifiedProductPrice"></span></p>
+                        <button id="finalAddProductBtn" class="primary-btn">Adicionar Produto à Lista</button>
+                    </div>
                 </div>
-                
-                <!-- ID alterado de "product-list" para "productListPending" e usando div para grid -->
-                <div id="productListPending" class="product-grid">
-                    <!-- Cards de produtos pendentes serão inseridos aqui pelo renderer.js -->
+                <div class="product-list-container">
+                    <h3>Pendentes</h3>
+                    <ul id="pending-products-list" class="product-grid"></ul>
                 </div>
             </section>
 
-            <!-- Seção de Histórico de Compras -->
-            <!-- ID alterado de "history" para "purchasedContent" -->
-            <section id="purchasedContent" class="tab-content" style="display:none;">
+            <section id="history-tab" class="tab-content">
                 <h2>Histórico de Compras</h2>
-                <!-- ID alterado de "history-list" para "productListPurchased" e usando div para grid -->
-                <div id="productListPurchased" class="product-grid">
-                    <!-- Cards de produtos comprados serão inseridos aqui pelo renderer.js -->
+                <div class="product-list-container">
+                    <ul id="purchased-products-list" class="product-grid"></ul>
                 </div>
             </section>
-
-            <!-- Seção de Finanças -->
-            <!-- ID alterado de "finances" para "financialContent" -->
-            <section id="financialContent" class="tab-content" style="display:none;">
+            
+            <section id="finance-tab" class="tab-content">
                 <h2>Dashboard Financeiro</h2>
-                
                 <div class="finance-form-container">
-                    <h3>Adicionar/Editar Registro Financeiro Mensal</h3>
-                    <input type="hidden" id="finance-entry-id">
-                    <div class="form-group">
-                        <input type="month" id="finance-month" />
+                    <h3>Registro Mensal</h3>
+                     <div class="form-group">
+                        <label for="financeMonth">Mês/Ano</label>
+                        <input type="month" id="financeMonth" required>
                     </div>
                     <div class="form-group">
-                        <input type="number" step="0.01" id="finance-revenue" placeholder="Receita Total (R$)" />
+                        <label for="financeRevenue">Receita (R$)</label>
+                        <input type="number" id="financeRevenue" placeholder="Ex: 5000.00" step="0.01">
                     </div>
                     <div class="form-group">
-                        <input type="number" step="0.01" id="finance-expenses" placeholder="Gastos Totais (R$)" />
+                        <label for="financeExpenses">Gastos (R$)</label>
+                         <input type="number" id="financeExpenses" placeholder="Ex: 3500.00" step="0.01">
                     </div>
-                    <button id="add-finance-entry-btn"><i class="fa fa-save"></i> Salvar Registro</button>
-                    <button id="cancel-finance-edit-btn" style="display:none;"><i class="fa fa-ban"></i> Cancelar Edição</button>
+                    <div class="form-group action-buttons">
+                        <button id="add-finance-entry-btn">Salvar Registro</button>
+                        <button id="cancel-finance-edit-btn" class="hidden">Cancelar Edição</button>
+                    </div>
                 </div>
 
                 <div class="finance-summary">
-                    <h3>Resumo Financeiro</h3>
-                    <p>Saldo Acumulado Total: R$ <span id="finance-total-balance">0.00</span></p>
-                    <div class="chart-container" style="position: relative; height:40vh; margin-top: 20px;">
-                        <canvas id="finance-chart"></canvas>
-                    </div>
+                    <h3>Resumo Geral</h3>
+                    <p>Balanço Total: <strong id="finance-total-balance">R$ 0.00</strong></p>
                 </div>
                 
-                <div class="finance-list-container">
-                    <h3>Registros Mensais</h3>
+                <div class="chart-container">
+                    <canvas id="financialChart"></canvas>
+                </div>
+
+                 <div class="finance-list-container">
+                    <h3>Histórico de Registros</h3>
                     <ul id="finance-list">
-                        <!-- Itens da lista de finanças serão inseridos aqui -->
-                    </ul>
+                        </ul>
                 </div>
             </section>
         </main>
     </div>
 
-    <!-- Script principal do renderer -->
+    <div id="details-modal" class="modal-overlay hidden">
+        <div class="modal-content details-modal-content">
+            <span class="close-modal">&times;</span>
+            <div id="modal-product-details-content">
+                </div>
+        </div>
+    </div>
+
+    <div id="edit-product-modal" class="modal-overlay hidden">
+        <div class="modal-content edit-modal-content">
+            <span class="close-modal">&times;</span>
+            <h3>Editar Produto</h3>
+            <form id="edit-product-form">
+                <input type="hidden" id="edit-product-id">
+                <div class="form-group">
+                    <label for="edit-product-name">Nome</label>
+                    <input type="text" id="edit-product-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-product-price">Preço (R$)</label>
+                    <input type="number" id="edit-product-price" step="0.01" required>
+                </div>
+                <button type="submit" class="primary-btn">Salvar Alterações</button>
+            </form>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="renderer.js"></script>
 </body>
 </html>
