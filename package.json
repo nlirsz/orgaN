@@ -26,7 +26,6 @@
     "dotenv": "^16.5.0",
     "electron-squirrel-startup": "^1.0.1",
     "express": "^5.1.0",
-    "finance-dashboard": "file:",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.16.0",
     "mongoose": "^8.15.0",

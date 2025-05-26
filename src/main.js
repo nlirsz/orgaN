@@ -1,5 +1,5 @@
 // src/main.js
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron'); // Adicionado ipcMain
 const path = require('path');
 const chokidar = require('chokidar'); // Para live reload, opcional mas útil
 
@@ -62,6 +62,11 @@ function createWindow() {
 // Algumas APIs só podem ser usadas depois que este evento ocorre.
 app.whenReady().then(() => {
     createWindow();
+
+    // Adicionado: Handler para 'get-user-data-path' do preload.js
+    ipcMain.on('get-user-data-path', (event) => {
+        event.returnValue = app.getPath('userData');
+    });
 
     app.on('activate', () => {
         // No macOS, é comum recriar uma janela no aplicativo quando o
