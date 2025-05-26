@@ -3,42 +3,96 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>orgaN</title>
+    <title>OrgaN</title>
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net;" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <div class="dashboard">
+    <div class="dashboard-layout">
         <aside class="sidebar">
-            <img src="https://i.imgur.com/Kz4g38w.png" alt="Logo" class="logo" />
-            <nav>
-                <button class="nav-btn active" data-tab="products" title="Produtos"><i class="fas fa-box-open"></i><span>Produtos</span></button>
-                <button class="nav-btn" data-tab="history" title="Histórico"><i class="fas fa-history"></i><span>Histórico</span></button>
-                <button class="nav-btn" data-tab="finance" title="Finanças"><i class="fas fa-chart-pie"></i><span>Finanças</span></button>
+            <div class="sidebar-header">
+                <img src="https://i.imgur.com/Kz4g38w.png" alt="Logo" class="logo" />
+                <span class="sidebar-title">OrgaN</span>
+            </div>
+            <nav class="sidebar-nav">
+                <button class="nav-btn active" data-tab="dashboard-main" title="Painel Principal">
+                    <i class="fas fa-tachometer-alt"></i><span class="nav-text">Dashboard</span>
+                </button>
+                <button class="nav-btn" data-tab="products" title="Meus Produtos">
+                    <i class="fas fa-box-open"></i><span class="nav-text">Produtos</span>
+                </button>
+                <button class="nav-btn" data-tab="add-product" title="Adicionar Produto">
+                    <i class="fas fa-plus-circle"></i><span class="nav-text">Adicionar</span>
+                </button>
+                <button class="nav-btn" data-tab="history" title="Histórico de Compras">
+                    <i class="fas fa-history"></i><span class="nav-text">Histórico</span>
+                </button>
+                <button class="nav-btn" data-tab="finance" title="Finanças">
+                    <i class="fas fa-chart-pie"></i><span class="nav-text">Finanças</span>
+                </button>
             </nav>
+            <div class="sidebar-footer">
+                 <button class="nav-btn" data-tab="settings" title="Configurações">
+                    <i class="fas fa-cog"></i><span class="nav-text">Config.</span>
+                </button>
+            </div>
         </aside>
 
-        <main class="content">
-            <section id="products-tab" class="tab-content active">
-                <h2>Adicionar e Gerenciar Produtos</h2>
-                <div class="form-container">
-                    <h3>Adicionar Novo Produto</h3>
-                    <div id="scrape-form" class="input-group">
-                        <input type="url" id="productUrlInput" placeholder="Cole a URL do produto">
-                        <button id="verifyUrlBtn">Verificar</button>
+        <main class="main-content-area">
+            <section id="dashboard-main-tab" class="tab-content active">
+                <h2>Painel Principal</h2>
+                <div class="dashboard-summary-cards">
+                    <div class="summary-card">
+                        <h4>Total de Produtos</h4>
+                        <p id="total-products-stat">0</p>
                     </div>
-                    <div id="verifiedProductInfo" class="hidden">
-                        <h4>Detalhes Verificados:</h4>
-                        <img id="verifiedProductImage" src="#" alt="Imagem do Produto Verificado">
-                        <p><strong>Nome:</strong> <span id="verifiedProductName"></span></p>
-                        <p><strong>Preço:</strong> <span id="verifiedProductPrice"></span></p>
-                        <button id="finalAddProductBtn" class="primary-btn">Adicionar Produto à Lista</button>
+                    <div class="summary-card">
+                        <h4>Produtos Comprados</h4>
+                        <p id="purchased-products-stat">0</p>
+                    </div>
+                    <div class="summary-card">
+                        <h4>Lista de Desejos</h4>
+                        <p id="pending-products-stat">0</p>
+                    </div>
+                    <div class="summary-card">
+                        <h4>Gasto Total (Comprados)</h4>
+                        <p id="total-spent-stat">R$ 0,00</p>
                     </div>
                 </div>
+                <div class="dashboard-charts">
+                    <div class="chart-container" id="finance-overview-chart-container">
+                        <h3>Visão Geral Financeira (Últimos 6 Meses)</h3>
+                        <canvas id="financeOverviewChart"></canvas>
+                    </div>
+                    <div class="chart-container" id="category-distribution-chart-container">
+                        <h3>Distribuição por Categoria</h3>
+                        <canvas id="categoryDistributionChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <section id="products-tab" class="tab-content">
+                <h2>Meus Produtos</h2>
                 <div class="product-list-container">
                     <h3>Pendentes</h3>
                     <ul id="pending-products-list" class="product-grid"></ul>
+                </div>
+            </section>
+
+            <section id="add-product-tab" class="tab-content">
+                <h2>Adicionar Novo Produto</h2>
+                <div class="form-container add-product-form-container">
+                    <div id="scrape-form" class="input-group">
+                        <input type="url" id="productUrlInput" placeholder="Cole a URL do produto aqui">
+                        <button id="verifyUrlBtn"><i class="fas fa-search-location"></i> Verificar URL</button>
+                    </div>
+                    <div id="verifiedProductInfo" class="hidden">
+                        <img id="verifiedProductImage" src="#" alt="Imagem Verificada">
+                        <p><strong>Nome:</strong> <span id="verifiedProductName"></span></p>
+                        <p><strong>Preço:</strong> <span id="verifiedProductPrice"></span></p>
+                        <button id="finalAddProductBtn" class="primary-btn"><i class="fas fa-plus"></i> Adicionar à Lista</button>
+                    </div>
                 </div>
             </section>
 
@@ -50,68 +104,130 @@
             </section>
             
             <section id="finance-tab" class="tab-content">
-                <h2>Dashboard Financeiro</h2>
+                <h2>Dashboard Financeiro Detalhado</h2>
                 <div class="finance-form-container">
-                    <h3>Registro Mensal</h3>
+                    <h3>Novo Registro Mensal</h3>
                      <div class="form-group">
-                        <label for="financeMonth">Mês/Ano</label>
+                        <label for="financeMonth">Mês/Ano:</label>
                         <input type="month" id="financeMonth" required>
                     </div>
                     <div class="form-group">
-                        <label for="financeRevenue">Receita (R$)</label>
+                        <label for="financeRevenue">Receita (R$):</label>
                         <input type="number" id="financeRevenue" placeholder="Ex: 5000.00" step="0.01">
                     </div>
                     <div class="form-group">
-                        <label for="financeExpenses">Gastos (R$)</label>
+                        <label for="financeExpenses">Gastos (R$):</label>
                          <input type="number" id="financeExpenses" placeholder="Ex: 3500.00" step="0.01">
                     </div>
                     <div class="form-group action-buttons">
-                        <button id="add-finance-entry-btn">Salvar Registro</button>
-                        <button id="cancel-finance-edit-btn" class="hidden">Cancelar Edição</button>
+                        <button id="add-finance-entry-btn"><i class="fas fa-save"></i> Salvar Registro</button>
+                        <button id="cancel-finance-edit-btn" class="hidden"><i class="fas fa-ban"></i> Cancelar</button>
                     </div>
                 </div>
-
                 <div class="finance-summary">
                     <h3>Resumo Geral</h3>
                     <p>Balanço Total: <strong id="finance-total-balance">R$ 0.00</strong></p>
                 </div>
-                
-                <div class="chart-container">
-                    <canvas id="financialChart"></canvas>
+                <div class="chart-container finance-detail-chart">
+                    <canvas id="financialLineChart"></canvas>
                 </div>
-
                  <div class="finance-list-container">
                     <h3>Histórico de Registros</h3>
-                    <ul id="finance-list">
-                        </ul>
+                    <ul id="finance-list"></ul>
                 </div>
+            </section>
+
+            <section id="settings-tab" class="tab-content">
+                <h2>Configurações</h2>
+                <p>Em desenvolvimento.</p>
             </section>
         </main>
     </div>
 
-    <div id="details-modal" class="modal-overlay hidden">
-        <div class="modal-content details-modal-content">
-            <span class="close-modal">&times;</span>
-            <div id="modal-product-details-content">
-                </div>
+    <div id="product-details-modal" class="modal-overlay hidden">
+        <div class="modal-content product-details-modal-content">
+            <span class="close-modal-btn">&times;</span>
+            <div id="modal-product-image-container">
+                <img id="modal-product-image" src="" alt="Imagem do Produto">
+            </div>
+            <h3 id="modal-product-name">Nome do Produto</h3>
+            <div class="modal-product-info">
+                <p><strong>Preço:</strong> <span id="modal-product-price"></span></p>
+                <p><strong>Status:</strong> <span id="modal-product-status"></span></p>
+                <p><strong>Categoria:</strong> <span id="modal-product-category">N/A</span></p>
+                <p><strong>Marca:</strong> <span id="modal-product-brand">N/A</span></p>
+                <p><strong>Adicionado em:</strong> <span id="modal-product-addedDate">N/A</span></p>
+                <p><strong>Descrição:</strong> <span id="modal-product-description">N/A</span></p>
+                <p><strong>Tags:</strong> <span id="modal-product-tags">Nenhuma</span></p>
+            </div>
+            <a id="modal-product-link" href="#" target="_blank" class="product-link-btn">
+                <i class="fas fa-external-link-alt"></i> Acessar link do produto
+            </a>
+            <div class="modal-actions">
+                <button id="modal-action-purchase" class="modal-action-btn"><i class="fas fa-check-circle"></i> Marcar como Comprado</button>
+                <button id="modal-action-edit" class="modal-action-btn edit"><i class="fas fa-edit"></i> Editar</button>
+                <button id="modal-action-delete" class="modal-action-btn delete"><i class="fas fa-trash"></i> Excluir</button>
+            </div>
         </div>
     </div>
 
     <div id="edit-product-modal" class="modal-overlay hidden">
-        <div class="modal-content edit-modal-content">
-            <span class="close-modal">&times;</span>
+        <div class="modal-content edit-product-modal-content">
+            <span class="close-modal-btn">&times;</span>
             <h3>Editar Produto</h3>
             <form id="edit-product-form">
                 <input type="hidden" id="edit-product-id">
-                <div class="form-group">
-                    <label for="edit-product-name">Nome</label>
-                    <input type="text" id="edit-product-name" required>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit-product-name">Nome do Produto*</label>
+                        <input type="text" id="edit-product-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-product-price">Preço (R$)</label>
+                        <input type="number" id="edit-product-price" step="0.01">
+                    </div>
                 </div>
                 <div class="form-group">
-                    <label for="edit-product-price">Preço (R$)</label>
-                    <input type="number" id="edit-product-price" step="0.01" required>
+                    <label for="edit-product-url">Link do Produto</label>
+                    <input type="url" id="edit-product-url">
                 </div>
-                <button type="submit" class="primary-btn">Salvar Alterações</button>
+                <div class="form-group">
+                    <label for="edit-product-image-url">URL da Imagem</label>
+                    <div class="input-group">
+                        <input type="url" id="edit-product-image-url">
+                        <button type="button" id="upload-image-btn-edit-modal" class="secondary-btn"><i class="fas fa-upload"></i></button>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit-product-category">Categoria*</label>
+                        <select id="edit-product-category">
+                            <option value="Eletrônicos">Eletrônicos</option>
+                            <option value="Roupas">Roupas</option>
+                            <option value="Casa">Casa</option>
+                            <option value="Livros">Livros</option>
+                            <option value="Outros">Outros</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-product-status">Status*</label>
+                        <select id="edit-product-status">
+                            <option value="pendente">Pendente</option>
+                            <option value="comprado">Comprado</option>
+                            <option value="descartado">Descartado</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="edit-product-tags">Tags</label>
+                    <input type="text" id="edit-product-tags" placeholder="Separadas por vírgula">
+                </div>
+                <div class="form-group">
+                    <label for="edit-product-description">Notas Adicionais</label>
+                    <textarea id="edit-product-description" rows="3" placeholder="Observações sobre o produto..."></textarea>
+                </div>
+                <img id="edit-product-preview-image" src="#" alt="Preview" class="form-image-preview hidden">
+                <button type="submit" class="primary-btn"><i class="fas fa-save"></i> Salvar Alterações</button>
             </form>
         </div>
     </div>
