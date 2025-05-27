@@ -6,6 +6,13 @@ require('dotenv').config(); // Carrega as variáveis de ambiente do arquivo .env
 // Importa a função de conexão com o banco de dados
 const connectDB = require('./database');
 
+// Importa as rotas
+const productRoutes = require('./api/products');
+const financeRoutes = require('./api/finances');
+// NOVO: Importa as rotas de autenticação
+const registerRoute = require('./api/auth/register'); //
+const loginRoute = require('./api/auth/login'); //
+
 // Cria a aplicação Express
 const app = express();
 
@@ -13,20 +20,21 @@ const app = express();
 connectDB();
 
 // Middlewares Essenciais
-// Habilita o CORS para permitir requisições de diferentes origens (importante para o desenvolvimento)
-app.use(cors());
-// Habilita o Express a entender JSON no corpo das requisições
-app.use(express.json());
+app.use(cors()); // Habilita o CORS
+app.use(express.json()); // Habilita o Express a entender JSON
 
-// Rota de Teste - para verificar se o servidor está no ar
+// Rota de Teste
 app.get('/', (req, res) => {
     res.send('API do Finance Dashboard está funcionando!');
 });
 
 // Define e usa as rotas da API
-// Todas as rotas definidas em 'products.js' serão acessíveis a partir de '/api/products'
-app.use('/api/products', require('./api/products'));
-// Adicione outras rotas aqui no futuro (ex: app.use('/api/auth', require('./api/auth'));)
+app.use('/api/products', productRoutes); // Rotas de produtos
+app.use('/api/finances', financeRoutes); // Rotas de finanças
+
+// NOVO: Rotas de autenticação
+app.post('/api/auth/register', registerRoute); // Rota de registro
+app.post('/api/auth/login', loginRoute);     // Rota de login
 
 // Define a porta do servidor
 const PORT = process.env.PORT || 3000;
@@ -36,5 +44,4 @@ app.listen(PORT, () => {
     console.log(`Servidor da API rodando na porta ${PORT}`);
 });
 
-// Exporta o app para ser usado pelo Vercel (se necessário)
 module.exports = app;

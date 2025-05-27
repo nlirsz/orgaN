@@ -1,50 +1,59 @@
 // src/api/auth/register.js
 
-// Garante que as variáveis de ambiente sejam carregadas.
-// É uma boa prática tê-lo em cada arquivo que acessa process.env diretamente.
-require('dotenv').config(); 
-
-const { connectToDatabase } = require('../../database'); // Caminho: de 'api/auth' para 'src/database'
-const bcrypt = require('bcryptjs');
+require('dotenv').config();
+const User = require('../../models/User'); // Importa o modelo de usuário
+const jwt = require('jsonwebtoken'); // Para gerar token após o registro
 
 module.exports = async (req, res) => {
-    // Para o endpoint de registro, esperamos apenas requisições POST.
     if (req.method !== 'POST') {
         return res.status(405).json({ message: 'Método não permitido. Utilize POST para registrar.' });
     }
 
-    const db = await connectToDatabase();
-    const usersCollection = db.collection('users'); // Coleção onde os usuários serão armazenados
-
     const { username, password } = req.body;
 
-    // Validação básica de entrada
     if (!username || !password) {
         return res.status(400).json({ message: 'Nome de usuário e senha são obrigatórios.' });
     }
 
     try {
-        // Verifica se o usuário já existe no banco de dados
-        const existingUser = await usersCollection.findOne({ username });
-        if (existingUser) {
+        // Verifica se o usuário já existe
+        let user = await User.findOne({ username });
+        if (user) {
             return res.status(409).json({ message: 'Usuário já existe.' });
         }
 
-        // Criptografa a senha antes de salvar no banco de dados
-        const hashedPassword = await bcrypt.hash(password, 10); // '10' é o custo do salt, um bom padrão
+        // Cria um novo usuário (o middleware 'pre' do User.js fará o hash da senha)
+        user = new User({ username, password });
+        await user.save();
 
-        // Insere o novo usuário na coleção
-        const result = await usersCollection.insertOne({ username, password: hashedPassword });
+        // Gera um token JWT para o novo usuário
+        const payload = {
+            user: {
+                userId: user.id // MongoDB _id é acessível via .id no Mongoose
+            }
+        };
 
-        // Retorna uma resposta de sucesso
-        res.status(201).json({ 
-            message: 'Usuário registrado com sucesso!', 
-            userId: result.insertedId // Opcional: retorna o ID gerado pelo MongoDB
-        });
+        jwt.sign(
+            payload,
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' },
+            (err, token) => {
+                if (err) throw err;
+                res.status(201).json({
+                    message: 'Usuário registrado com sucesso!',
+                    token,
+                    userId: user.id // Retorna o userId para o frontend
+                });
+            }
+        );
 
     } catch (error) {
-        // Captura e loga quaisquer erros durante o processo de registro
         console.error('Erro ao registrar usuário:', error);
+        // Erro de validação do Mongoose, por exemplo, minlength
+        if (error.name === 'ValidationError') {
+            const messages = Object.values(error.errors).map(val => val.message);
+            return res.status(400).json({ message: 'Erro de validação:', details: messages });
+        }
         res.status(500).json({ message: 'Erro interno do servidor ao registrar usuário.', error: error.message });
     }
 };

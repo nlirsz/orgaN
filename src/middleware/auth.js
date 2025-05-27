@@ -3,10 +3,8 @@
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-// Middleware é uma função que tem acesso aos objetos de requisição (req), resposta (res),
-// e à próxima função de middleware no ciclo de requisição-resposta do aplicativo (next).
 module.exports = function(req, res, next) {
-    // Pega o token do cabeçalho da requisição
+    // Pega o token do cabeçalho da requisição 'x-auth-token'
     const token = req.header('x-auth-token');
 
     // Verifica se não há token
@@ -21,11 +19,13 @@ module.exports = function(req, res, next) {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
         // Adiciona o usuário do payload do token ao objeto de requisição (req)
+        // O payload do token contém { user: { userId: '...' } }
         req.user = decoded.user;
-        
+
         // Chama a próxima função no ciclo
         next();
     } catch (err) {
+        // Se o token não for válido (expirado, malformado, etc.)
         res.status(401).json({ msg: 'Token não é válido.' });
     }
 };

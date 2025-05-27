@@ -9,7 +9,57 @@
     <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <div class="dashboard-layout">
+    <div id="auth-section" class="auth-section">
+        <div class="auth-container">
+            <div class="auth-tabs">
+                <button class="auth-tab-btn active" data-auth-tab="login">Login</button>
+                <button class="auth-tab-btn" data-auth-tab="register">Registrar</button>
+            </div>
+
+            <div id="login-tab-content" class="auth-tab-content active">
+                <h2>Bem-vindo de volta!</h2>
+                <form id="login-form" class="auth-form">
+                    <div class="form-group">
+                        <label for="login-username">Usuário</label>
+                        <input type="text" id="login-username" placeholder="Seu nome de usuário" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Senha</label>
+                        <input type="password" id="login-password" placeholder="Sua senha" required>
+                    </div>
+                    <div class="form-group remember-me-group">
+                        <input type="checkbox" id="remember-me-checkbox">
+                        <label for="remember-me-checkbox">Lembrar de mim</label>
+                    </div>
+                    <button type="submit" class="auth-submit-btn primary-btn">Entrar</button>
+                    <p class="auth-message" id="login-message"></p>
+                </form>
+            </div>
+
+            <div id="register-tab-content" class="auth-tab-content">
+                <h2>Crie sua conta</h2>
+                <form id="register-form" class="auth-form">
+                    <div class="form-group">
+                        <label for="register-username">Usuário</label>
+                        <input type="text" id="register-username" placeholder="Escolha um nome de usuário" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password">Senha</label>
+                        <input type="password" id="register-password" placeholder="Crie uma senha (min. 6 caracteres)" required>
+                    </div>
+                    <button type="submit" class="auth-submit-btn primary-btn">Registrar</button>
+                    <p class="auth-message" id="register-message"></p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="loading-spinner"></div>
+        <p>Carregando seus dados...</p>
+    </div>
+
+    <div class="dashboard-layout hidden">
         <aside class="sidebar">
             <div class="sidebar-header">
                 <img src="https://i.imgur.com/Kz4g38w.png" alt="Logo" class="logo" />
@@ -35,6 +85,9 @@
             <div class="sidebar-footer">
                  <button class="nav-btn" data-tab="settings" title="Configurações">
                     <i class="fas fa-cog"></i><span class="nav-text">Config.</span>
+                </button>
+                <button class="nav-btn" id="logout-btn" title="Sair">
+                    <i class="fas fa-sign-out-alt"></i><span class="nav-text">Sair</span>
                 </button>
             </div>
         </aside>
@@ -74,6 +127,10 @@
 
             <section id="products-tab" class="tab-content">
                 <h2>Meus Produtos</h2>
+                <button class="primary-btn go-to-add-product-tab-btn" data-target-tab="add-product">
+                    <i class="fas fa-plus-circle"></i> Adicionar Novo Produto
+                </button>
+
                 <div class="product-list-container">
                     <h3>Pendentes</h3>
                     <ul id="pending-products-list" class="product-grid"></ul>
@@ -83,6 +140,9 @@
             <section id="add-product-tab" class="tab-content">
                 <h2>Adicionar Novo Produto</h2>
                 <div class="form-container add-product-form-container">
+                    <h3>Dados do Produto</h3>
+
+                    <p class="form-section-title">Opção 1: Adicionar por URL (Scraping)</p>
                     <div id="scrape-form" class="input-group">
                         <input type="url" id="productUrlInput" placeholder="Cole a URL do produto aqui">
                         <button id="verifyUrlBtn"><i class="fas fa-search-location"></i> Verificar URL</button>
@@ -91,18 +151,61 @@
                         <img id="verifiedProductImage" src="#" alt="Imagem Verificada">
                         <p><strong>Nome:</strong> <span id="verifiedProductName"></span></p>
                         <p><strong>Preço:</strong> <span id="verifiedProductPrice"></span></p>
-                        <button id="finalAddProductBtn" class="primary-btn"><i class="fas fa-plus"></i> Adicionar à Lista</button>
                     </div>
+
+                    <p class="form-section-title">Opção 2: Inserir Dados Manualmente (ou ajustar dados do scraping)</p>
+                    <div class="form-group">
+                        <label for="manual-product-name">Nome do Produto*</label>
+                        <input type="text" id="manual-product-name" placeholder="Nome completo do produto" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="manual-product-price">Preço (R$)*</label>
+                        <input type="number" id="manual-product-price" step="0.01" placeholder="Ex: 123.45" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="manual-product-url">URL de Origem*</label>
+                        <input type="url" id="manual-product-url" placeholder="Link para o produto original" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="manual-product-image-url">URL da Imagem</label>
+                        <input type="url" id="manual-product-image-url" placeholder="Link direto para a imagem do produto">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="manual-product-category">Categoria</label>
+                            <select id="manual-product-category">
+                                <option value="Outros">Outros</option>
+                                <option value="Eletrônicos">Eletrônicos</option>
+                                <option value="Roupas">Roupas</option>
+                                <option value="Casa">Casa</option>
+                                <option value="Livros">Livros</option>
+                                <option value="Ferramentas">Ferramentas</option>
+                                <option value="Esportes">Esportes</option>
+                                <option value="Alimentos">Alimentos</option>
+                                <option value="Saúde e Beleza">Saúde e Beleza</option>
+                            </select>
+                        </div>
+                         <div class="form-group">
+                            <label for="manual-product-brand">Marca</label>
+                            <input type="text" id="manual-product-brand" placeholder="Marca do produto">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="manual-product-description">Descrição</label>
+                        <textarea id="manual-product-description" rows="3" placeholder="Breve descrição do produto"></textarea>
+                    </div>
+                    <p class="tab-message" id="add-product-message"></p>
+                    <button id="save-product-btn" class="primary-btn"><i class="fas fa-save"></i> Salvar Produto</button>
                 </div>
             </section>
-
             <section id="history-tab" class="tab-content">
                 <h2>Histórico de Compras</h2>
                 <div class="product-list-container">
+                    <h3>Comprados</h3>
                     <ul id="purchased-products-list" class="product-grid"></ul>
                 </div>
             </section>
-            
+
             <section id="finance-tab" class="tab-content">
                 <h2>Dashboard Financeiro Detalhado</h2>
                 <div class="finance-form-container">
@@ -119,6 +222,7 @@
                         <label for="financeExpenses">Gastos (R$):</label>
                          <input type="number" id="financeExpenses" placeholder="Ex: 3500.00" step="0.01">
                     </div>
+                    <p class="tab-message" id="finance-entry-message"></p>
                     <div class="form-group action-buttons">
                         <button id="add-finance-entry-btn"><i class="fas fa-save"></i> Salvar Registro</button>
                         <button id="cancel-finance-edit-btn" class="hidden"><i class="fas fa-ban"></i> Cancelar</button>
@@ -159,6 +263,8 @@
                 <p><strong>Adicionado em:</strong> <span id="modal-product-addedDate">N/A</span></p>
                 <p><strong>Descrição:</strong> <span id="modal-product-description">N/A</span></p>
                 <p><strong>Tags:</strong> <span id="modal-product-tags">Nenhuma</span></p>
+                <p><strong>Prioridade:</strong> <span id="modal-product-priority">N/A</span></p>
+                <p><strong>Notas:</strong> <span id="modal-product-notes">Nenhuma</span></p>
             </div>
             <a id="modal-product-link" href="#" target="_blank" class="product-link-btn">
                 <i class="fas fa-external-link-alt"></i> Acessar link do produto
@@ -219,19 +325,32 @@
                     </div>
                 </div>
                 <div class="form-group">
+                    <label for="edit-product-priority">Prioridade</label>
+                    <select id="edit-product-priority">
+                        <option value="Baixa">Baixa</option>
+                        <option value="Média">Média</option>
+                        <option value="Alta">Alta</option>
+                    </select>
+                </div>
+                <div class="form-group">
                     <label for="edit-product-tags">Tags</label>
                     <input type="text" id="edit-product-tags" placeholder="Separadas por vírgula">
                 </div>
                 <div class="form-group">
-                    <label for="edit-product-description">Notas Adicionais</label>
-                    <textarea id="edit-product-description" rows="3" placeholder="Observações sobre o produto..."></textarea>
+                    <label for="edit-product-description">Descrição (extraída da URL)</label>
+                    <textarea id="edit-product-description" rows="3" placeholder="Breve descrição do produto..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="edit-product-notes">Notas Adicionais</label>
+                    <textarea id="edit-product-notes" rows="3" placeholder="Suas observações sobre o produto..."></textarea>
                 </div>
                 <img id="edit-product-preview-image" src="#" alt="Preview" class="form-image-preview hidden">
+                <p class="tab-message" id="edit-product-message"></p>
                 <button type="submit" class="primary-btn"><i class="fas fa-save"></i> Salvar Alterações</button>
             </form>
         </div>
     </div>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="renderer.js"></script>
 </body>

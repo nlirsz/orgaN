@@ -16,8 +16,16 @@ const productSchema = new mongoose.Schema({
         },
         default: 'pendente',
     },
-    purchasedAt: { type: Date } // Data em que o produto foi marcado como comprado
-}, { 
+    purchasedAt: { type: Date }, // Data em que o produto foi marcado como comprado
+    category: { type: String },    // NOVO: Categoria do produto
+    tags: [{ type: String }],      // NOVO: Array de tags
+    priority: {                    // NOVO: Prioridade
+        type: String,
+        enum: ['Baixa', 'Média', 'Alta'],
+        default: 'Baixa'
+    },
+    notes: { type: String }        // NOVO: Notas adicionais
+}, {
     timestamps: true // Adiciona createdAt e updatedAt automaticamente
 });
 
