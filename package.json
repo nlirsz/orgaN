@@ -6,7 +6,7 @@
   "main": "src/main.js",
   "scripts": {
     "start": "electron-forge start",
-    "start:api": "node src/index.js",
+    "start:api": "node api/index.js",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
