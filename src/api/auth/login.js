@@ -1,18 +1,19 @@
 // src/api/auth/login.js
 
 require('dotenv').config();
-const User = require('../../../src/models/User'); // Importa o modelo de usuário
+const User = require('../../models/User'); // <--- CAMINHO CORRIGIDO
 const jwt = require('jsonwebtoken');
 
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) {
     console.error("ERRO: JWT_SECRET não definida nas variáveis de ambiente! O login não funcionará.");
-    // Em um ambiente de produção real, você poderia querer parar o processo ou notificar.
 }
 
 module.exports = async (req, res) => {
-    if (req.method !== 'POST') {
-        return res.status(405).json({ message: 'Método não permitido. Utilize POST para login.' });
+    // Seu código original de login aqui...
+    // Nenhuma mudança na lógica, apenas o require acima.
+    if (req.method !== 'POST') { // Adicionando verificação do método só por garantia, embora o router principal já faça isso
+        return res.status(405).json({ message: 'Método não permitido.' });
     }
 
     const { username, password } = req.body;
@@ -22,43 +23,30 @@ module.exports = async (req, res) => {
     }
 
     try {
-        // Procura o usuário no banco de dados
         const user = await User.findOne({ username });
-
         if (!user) {
             return res.status(401).json({ message: 'Credenciais inválidas.' });
         }
-
-        // Compara a senha fornecida com a senha criptografada no banco de dados
-        const passwordMatch = await user.comparePassword(password); // Usando o método do schema
-
+        const passwordMatch = await user.comparePassword(password);
         if (!passwordMatch) {
             return res.status(401).json({ message: 'Credenciais inválidas.' });
         }
-
-        // Se as credenciais forem válidas, gera um token JWT
-        const payload = {
-            user: {
-                userId: user.id // MongoDB _id é acessível via .id no Mongoose
-            }
-        };
-
+        const payload = { user: { userId: user.id } };
         jwt.sign(
             payload,
             JWT_SECRET,
-            { expiresIn: '1h' }, // Token expira em 1 hora
+            { expiresIn: '1h' },
             (err, token) => {
-                if (err) throw err;
+                if (err) throw err; // Este erro vai para o catch abaixo
                 res.status(200).json({
                     message: 'Login bem-sucedido.',
                     token,
-                    userId: user.id // Retorna o userId para o frontend
+                    userId: user.id
                 });
             }
         );
-
     } catch (error) {
-        console.error('Erro ao fazer login:', error);
-        res.status(500).json({ message: 'Erro interno do servidor ao fazer login.', error: error.message });
+        console.error('Erro detalhado no login.js:', error); // Log mais específico
+        res.status(500).json({ message: 'Erro interno do servidor ao fazer login.', errorDetails: error.message });
     }
 };

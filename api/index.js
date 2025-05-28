@@ -2,31 +2,42 @@
 
 const express = require('express');
 const cors = require('cors');
-require('dotenv').config(); 
+require('dotenv').config();
 
-// Caminhos ajustados para apontar para a pasta 'src'
-const connectDB = require('../src/database'); 
-const productRoutes = require('../src/api/products'); 
-const financeRoutes = require('../src/api/finances');   
-const registerRoute = require('../src/api/auth/register'); 
-const loginRoute = require('../src/api/auth/login');       
-// const testDbRoute = require('../src/api/test-db'); // Se você usou
+// --- CAMINHOS CORRIGIDOS ---
+// Saindo da pasta 'api/' para a raiz do projeto (usando '../')
+// e depois entrando em 'src/'
+const connectDB = require('../src/database');
+const productRoutes = require('../src/api/products');
+const financeRoutes = require('../src/api/finances');
+const registerRoute = require('../src/api/auth/register');
+const loginRoute = require('../src/api/auth/login');
+// const testDbRoute = require('../src/api/test-db'); // Se for usar
 
 const app = express();
-connectDB();
-app.use(cors()); 
-app.use(express.json()); 
 
-// Mantenha suas rotas como estão, pois elas já têm o prefixo /api internamente
-// ou são chamadas com ele (ex: app.use('/api/products', productRoutes))
+// Conecta ao MongoDB
+connectDB();
+
+// Middlewares Essenciais
+app.use(cors());
+app.use(express.json());
+
+// Rota de Teste (opcional, mas útil)
+app.get('/api', (req, res) => {
+    res.send('API do OrgaN está funcionando via Vercel Function!');
+});
+
+// Define e usa as rotas da API
+// O prefixo '/api' aqui é como a Vercel vai direcionar,
+// e suas rotas internas já estão esperando por isso (ex: '/products', '/auth/login')
 app.use('/api/products', productRoutes);
 app.use('/api/finances', financeRoutes);
-app.post('/api/auth/register', registerRoute); 
-app.post('/api/auth/login', loginRoute); 
+app.use('/api/auth/register', registerRoute); // Mantenha '/api/auth/register' se a rota em register.js for só '/'
+app.use('/api/auth/login', loginRoute);       // Mantenha '/api/auth/login' se a rota em login.js for só '/'
 // app.get('/api/test-db', testDbRoute);
 
-// A Vercel gerencia a porta, então o app.listen não é necessário para produção lá
-// Mas você pode manter para desenvolvimento local se rodar este arquivo diretamente
+// A Vercel gerencia a porta, então o app.listen é principalmente para desenvolvimento local
 if (process.env.NODE_ENV !== 'production') {
     const PORT = process.env.PORT || 3000;
     app.listen(PORT, () => {
@@ -34,4 +45,5 @@ if (process.env.NODE_ENV !== 'production') {
     });
 }
 
-module.exports = app; // Exporta o app para a Vercel
+// Exporta o app para a Vercel
+module.exports = app;
