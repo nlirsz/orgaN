@@ -13,7 +13,7 @@
     "lint": "echo \"No linting configured\"",
     "test": "jest"
   },
-    "keywords": [],
+  "keywords": [],
   "author": "nicol",
   "license": "MIT",
   "dependencies": {
@@ -29,7 +29,7 @@
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.16.0",
-    "mongoose": "^8.15.0",
+    "mongoose": "^8.15.1",
     "node-fetch": "^2.7.0",
     "puppeteer": "^24.9.0",
     "sqlite3": "^5.1.7"
