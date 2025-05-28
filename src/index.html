@@ -60,38 +60,35 @@
     </div>
 
     <div class="dashboard-layout hidden">
+        
         <aside class="sidebar">
             <div class="sidebar-header">
-                <img src="https://i.imgur.com/Kz4g38w.png" alt="Logo" class="logo" />
-                <span class="sidebar-title">OrgaN</span>
+                <img src="logo.png" alt="Logo" class="logo" />
+                <span class="sidebar-title"></span>
             </div>
-            <nav class="sidebar-nav">
-                <button class="nav-btn active" data-tab="dashboard-main" title="Painel Principal">
-                    <i class="fas fa-tachometer-alt"></i><span class="nav-text">Dashboard</span>
-                </button>
-                <button class="nav-btn" data-tab="products" title="Meus Produtos">
-                    <i class="fas fa-box-open"></i><span class="nav-text">Produtos</span>
-                </button>
-                <button class="nav-btn" data-tab="add-product" title="Adicionar Produto">
-                    <i class="fas fa-plus-circle"></i><span class="nav-text">Adicionar</span>
-                </button>
-                <button class="nav-btn" data-tab="history" title="Histórico de Compras">
-                    <i class="fas fa-history"></i><span class="nav-text">Histórico</span>
-                </button>
-                <button class="nav-btn" data-tab="finance" title="Finanças">
-                    <i class="fas fa-chart-pie"></i><span class="nav-text">Finanças</span>
-                </button>
-            </nav>
-            <div class="sidebar-footer">
-                 <button class="nav-btn" data-tab="settings" title="Configurações">
-                    <i class="fas fa-cog"></i><span class="nav-text">Config.</span>
-                </button>
-                <button class="nav-btn" id="logout-btn" title="Sair">
-                    <i class="fas fa-sign-out-alt"></i><span class="nav-text">Sair</span>
-                </button>
-            </div>
-        </aside>
 
+            <button class="nav-btn active" data-tab="dashboard-main" title="Painel Principal">
+                <i class="fas fa-tachometer-alt"></i><span class="nav-text"></span>
+            </button>
+            <button class="nav-btn" data-tab="products" title="Meus Produtos">
+                <i class="fas fa-box-open"></i><span class="nav-text"></span>
+            </button>
+            <button class="nav-btn" data-tab="add-product" title="Adicionar Produto">
+                <i class="fas fa-plus-circle"></i><span class="nav-text"></span>
+            </button>
+            <button class="nav-btn" data-tab="history" title="Histórico de Compras">
+                <i class="fas fa-history"></i><span class="nav-text"></span>
+            </button>
+            <button class="nav-btn" data-tab="finance" title="Finanças">
+                <i class="fas fa-chart-pie"></i><span class="nav-text"></span>
+            </button>
+            <button class="nav-btn" data-tab="settings" title="Configurações">
+                <i class="fas fa-cog"></i><span class="nav-text"></span>
+            </button>
+            <button class="nav-btn" id="logout-btn" title="Sair">
+                <i class="fas fa-sign-out-alt"></i><span class="nav-text"></span>
+            </button>
+        </aside>
         <main class="main-content-area">
             <section id="dashboard-main-tab" class="tab-content active">
                 <h2>Painel Principal</h2>
@@ -127,10 +124,21 @@
 
             <section id="products-tab" class="tab-content">
                 <h2>Meus Produtos</h2>
-                <button class="primary-btn go-to-add-product-tab-btn" data-target-tab="add-product">
-                    <i class="fas fa-plus-circle"></i> Adicionar Novo Produto
-                </button>
 
+                <div class="form-container add-product-form-container products-tab-add-section">
+                    <h3>Adicionar Produto por URL</h3>
+                    <div id="scrape-form-products-tab" class="input-group">
+                        <input type="url" id="productUrlInput-products-tab" placeholder="Cole a URL do produto aqui">
+                        <button id="verifyUrlBtn-products-tab"><i class="fas fa-search-location"></i> Verificar URL</button>
+                    </div>
+                    <div id="verifiedProductInfo-products-tab" class="hidden">
+                        <img id="verifiedProductImage-products-tab" src="#" alt="Imagem Verificada">
+                        <p><strong>Nome:</strong> <span id="verifiedProductName-products-tab"></span></p>
+                        <p><strong>Preço:</strong> <span id="verifiedProductPrice-products-tab"></span></p>
+                        <p class="tab-message" id="add-product-message-products-tab"></p>
+                        <button id="save-product-btn-products-tab" class="primary-btn"><i class="fas fa-save"></i> Salvar Produto</button>
+                    </div>
+                </div>
                 <div class="product-list-container">
                     <h3>Pendentes</h3>
                     <ul id="pending-products-list" class="product-grid"></ul>
@@ -142,18 +150,18 @@
                 <div class="form-container add-product-form-container">
                     <h3>Dados do Produto</h3>
 
-                    <p class="form-section-title">Opção 1: Adicionar por URL (Scraping)</p>
-                    <div id="scrape-form" class="input-group">
-                        <input type="url" id="productUrlInput" placeholder="Cole a URL do produto aqui">
-                        <button id="verifyUrlBtn"><i class="fas fa-search-location"></i> Verificar URL</button>
+                    <p class="form-section-title">Adicionar por URL </p>
+                    <div id="scrape-form-add-tab" class="input-group">
+                        <input type="url" id="productUrlInput-add-tab" placeholder="Cole a URL do produto aqui">
+                        <button id="verifyUrlBtn-add-tab"><i class="fas fa-search-location"></i> Verificar URL</button>
                     </div>
-                    <div id="verifiedProductInfo" class="hidden">
-                        <img id="verifiedProductImage" src="#" alt="Imagem Verificada">
-                        <p><strong>Nome:</strong> <span id="verifiedProductName"></span></p>
-                        <p><strong>Preço:</strong> <span id="verifiedProductPrice"></span></p>
+                    <div id="verifiedProductInfo-add-tab" class="hidden">
+                        <img id="verifiedProductImage-add-tab" src="#" alt="Imagem Verificada">
+                        <p><strong>Nome:</strong> <span id="verifiedProductName-add-tab"></span></p>
+                        <p><strong>Preço:</strong> <span id="verifiedProductPrice-add-tab"></span></p>
                     </div>
 
-                    <p class="form-section-title">Opção 2: Inserir Dados Manualmente (ou ajustar dados do scraping)</p>
+                    <p class="form-section-title">Dados</p>
                     <div class="form-group">
                         <label for="manual-product-name">Nome do Produto*</label>
                         <input type="text" id="manual-product-name" placeholder="Nome completo do produto" required>
@@ -194,8 +202,8 @@
                         <label for="manual-product-description">Descrição</label>
                         <textarea id="manual-product-description" rows="3" placeholder="Breve descrição do produto"></textarea>
                     </div>
-                    <p class="tab-message" id="add-product-message"></p>
-                    <button id="save-product-btn" class="primary-btn"><i class="fas fa-save"></i> Salvar Produto</button>
+                    <p class="tab-message" id="add-product-message-add-tab"></p>
+                    <button id="save-product-btn-add-tab" class="primary-btn"><i class="fas fa-save"></i> Salvar Produto</button>
                 </div>
             </section>
             <section id="history-tab" class="tab-content">
@@ -246,6 +254,13 @@
                 <p>Em desenvolvimento.</p>
             </section>
         </main>
+    </div>
+
+    <div id="image-modal" class="modal-overlay hidden">
+        <div class="modal-content image-modal-content">
+            <span class="close-modal-btn">&times;</span>
+            <img id="modal-image-content" src="" alt="Imagem Ampliada">
+        </div>
     </div>
 
     <div id="product-details-modal" class="modal-overlay hidden">

@@ -44,14 +44,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const purchasedList = getElem('purchased-products-list');
     const goToAddProductTabBtn = getElem('go-to-add-product-tab-btn');
 
-    // Adicionar Produto (aba 'add-product')
+    // Adicionar Produto (aba 'add-product' - COM SELETORES PRINCIPAIS)
     const addProductTab = getElem('add-product-tab');
-    const productUrlInput = getElem('productUrlInput');
-    const verifyUrlBtn = getElem('verifyUrlBtn');
-    const verifiedProductInfoDiv = getElem('verifiedProductInfo');
-    const addProductMessage = getElem('add-product-message');
+    const productUrlInputAddTab = getElem('productUrlInput-add-tab');
+    const verifyUrlBtnAddTab = getElem('verifyUrlBtn-add-tab');
+    const verifiedProductInfoDivAddTab = getElem('verifiedProductInfo-add-tab');
+    const addProductMessageAddTab = getElem('add-product-message-add-tab');
+    const saveProductBtnAddTab = getElem('save-product-btn-add-tab');
 
-    // Campos de entrada manual de produto (agora na aba 'add-product')
+    // Campos de entrada manual de produto (referências globais, pois são preenchidos por qualquer um dos scrapers)
     const manualProductNameInput = getElem('manual-product-name');
     const manualProductPriceInput = getElem('manual-product-price');
     const manualProductUrlInput = getElem('manual-product-url');
@@ -59,7 +60,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const manualProductCategorySelect = getElem('manual-product-category');
     const manualProductBrandInput = getElem('manual-product-brand');
     const manualProductDescriptionTextarea = getElem('manual-product-description');
-    const saveProductBtn = getElem('save-product-btn');
+    
+
+    // Produtos (seção de scraping DUPLICADA na aba 'products')
+    const productUrlInputProductsTab = getElem('productUrlInput-products-tab');
+    const verifyUrlBtnProductsTab = getElem('verifyUrlBtn-products-tab');
+    const verifiedProductInfoDivProductsTab = getElem('verifiedProductInfo-products-tab');
+    const addProductMessageProductsTab = getElem('add-product-message-products-tab');
+    const saveProductBtnProductsTab = getElem('save-product-btn-products-tab');
 
 
     // Finanças
@@ -72,6 +80,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalBalanceElem = getElem('finance-total-balance');
     const financeChartCanvas = getElem('financialLineChart');
     const financeEntryMessage = getElem('finance-entry-message');
+    // Adicione esta linha junto com as outras variáveis de finanças
+    const financeFormContainer = document.querySelector('.finance-form-container'); 
 
     // Dashboard Principal
     const financeOverviewChartCanvasEl = getElem('financeOverviewChart');
@@ -110,6 +120,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const editProductPrioritySelect = getElem('edit-product-priority');
     const editProductNotesTextarea = getElem('edit-product-notes');
     const editProductMessage = getElem('edit-product-message');
+
+    const imageModal = getElem('image-modal');
+    const modalImageContent = getElem('modal-image-content');
 
 
     // --- FUNÇÕES DE UTILIDADE ---
@@ -153,11 +166,31 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 5000);
     }
 
+    // NOVO: Função para exibir um modal
+    function showModal(modalElement) {
+        if (modalElement) {
+            modalElement.classList.remove('hidden'); // Remove 'hidden' para permitir a transição
+            modalElement.classList.add('active'); // Adiciona 'active' para iniciar a transição
+        }
+    }
+
+    // NOVO: Função para esconder um modal com delay (para transições CSS)
+    function hideModalWithDelay(modalElement, messageElement = null) {
+        if (modalElement) {
+            modalElement.classList.remove('active'); // Inicia a transição de saída
+            // Após a transição (0.3s para opacidade), adiciona 'hidden' para 'display: none'
+            setTimeout(() => {
+                modalElement.classList.add('hidden');
+                if (messageElement) messageElement.textContent = ''; // Limpa a mensagem ao fechar
+            }, 300); // Deve ser igual ou maior que a duração da transição de opacidade/transform
+        }
+    }
+
 
     function showAuthSection() {
         if(authSection) authSection.classList.remove('hidden');
         if(dashboardLayout) dashboardLayout.classList.add('hidden');
-        if(loadingOverlay) loadingOverlay.classList.add('hidden'); // Garante que o loading overlay esteja oculto
+        if(loadingOverlay) loadingOverlay.classList.add('hidden');
 
         currentUserId = null;
         authToken = null;
@@ -183,17 +216,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function showDashboard() {
         if(authSection) authSection.classList.add('hidden');
-        if(dashboardLayout) dashboardLayout.classList.add('hidden'); // Garante que o dashboard esteja oculto ANTES do loading
-        if(loadingOverlay) loadingOverlay.classList.remove('hidden'); // Mostra o spinner de carregamento
+        if(dashboardLayout) dashboardLayout.classList.add('hidden');
+        if(loadingOverlay) loadingOverlay.classList.remove('hidden');
+        console.log("Loading overlay should be visible now.");
 
         try {
-            // Garante que os dados iniciais do dashboard e produtos sejam carregados
             await fetchAndRenderDashboardStats();
             await fetchAndRenderProducts();
-            await fetchAndRenderFinances(); // Carrega finanças também no início
-            // Se tudo carregou, só então mostra o dashboard
+            await fetchAndRenderFinances();
+            
             if(dashboardLayout) dashboardLayout.classList.remove('hidden');
-            // Ativa a primeira aba do dashboard após todos os dados carregados
+            console.log("Dashboard should be visible now.");
+
             const initialActiveTabButton = getElem('dashboard-main');
             if (initialActiveTabButton) {
                 initialActiveTabButton.click();
@@ -203,7 +237,8 @@ document.addEventListener('DOMContentLoaded', () => {
             showAuthMessage(loginMessage, 'Erro ao carregar dados. Tente fazer login novamente.', false);
             logoutUser();
         } finally {
-            if(loadingOverlay) loadingOverlay.classList.add('hidden'); // Sempre esconde o spinner no final
+            if(loadingOverlay) loadingOverlay.classList.add('hidden');
+            console.log("Loading overlay should be hidden now.");
         }
     }
 
@@ -340,13 +375,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             if (tabId === 'products') {
                 fetchAndRenderProducts();
+                clearProductScrapeFormProductsTab();
             }
             if (tabId === 'history') {
                 fetchAndRenderProducts();
             }
-            // Navegar para aba de adicionar produto e limpar/redefinir o form
             if (tabId === 'add-product') {
-                clearAddProductForm();
+                clearAddProductFormAddTab();
             }
         });
     }
@@ -488,7 +523,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 datasets: [{
                     data: data.data,
                     backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#6366F1', '#14B8A6', '#F97316', '#8B5CF6'],
-                    hoverOffset: 4
+                    hoverOffset: 10
                 }]
             };
             chartOptions = {
@@ -498,25 +533,25 @@ document.addEventListener('DOMContentLoaded', () => {
                     legend: {
                         position: 'bottom',
                         labels: {
-                            color: '#F3F4F6'
+                            color: '#121212'
                         }
                     },
                     title: {
                         display: true,
                         text: isCategory ? 'Distribuição por Categoria' : 'Visão Geral Financeira',
-                        color: '#F3F4F6'
+                        color: '#121212'
                     }
                 }
             };
         } else {
-            const sortedEntries = [...data].sort((a, b) => a.mes_ano.localeCompare(b.mes_ano));
+            const sortedEntries = [...data].sort((a, b) => b.mes_ano.localeCompare(a.mes_ano));
             const labels = sortedEntries.map(e => {
                 const [year, month] = e.mes_ano.split('-');
                 const date = new Date(year, month - 1);
                 return date.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' });
-            });
-            const revenueData = sortedEntries.map(e => e.receita);
-            const expensesData = sortedEntries.map(e => e.gastos);
+            }).reverse();
+            const revenueData = sortedEntries.map(e => e.receita).reverse();
+            const expensesData = sortedEntries.map(e => e.gastos).reverse();
 
             chartData = {
                 labels: labels,
@@ -524,8 +559,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     {
                         label: 'Receita Mensal',
                         data: revenueData,
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgb(62, 235, 103)',
+                        backgroundColor: 'rgb(0, 255, 38)',
                         fill: false,
                         tension: 0.1
                     },
@@ -544,25 +579,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 maintainAspectRatio: false,
                 scales: {
                     x: {
-                        ticks: { color: '#E0E0E0' },
+                        ticks: { color: '#121212' },
                         grid: { color: 'rgba(224, 224, 224, 0.1)' }
                     },
                     y: {
                         beginAtZero: true,
-                        title: { display: true, text: 'Valor (R$)', color: '#E0E0E0' },
-                        ticks: { color: '#E0E0E0' },
+                        title: { display: true, text: 'Valor (R$)', color: '#121212' },
+                        ticks: { color: '#121212' },
                         grid: { color: 'rgba(224, 224, 224, 0.1)' }
                     }
                 },
                 plugins: {
                     legend: {
                         position: 'top',
-                        labels: { color: '#F3F4F6' }
+                        labels: { color: '#121212' }
                     },
                     title: {
                         display: true,
                         text: isCategory ? 'Distribuição por Categoria' : 'Evolução Financeira Mensal',
-                        color: '#F3F4F6'
+                        color: '#121212'
                     }
                 }
             };
@@ -652,114 +687,137 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- LÓGICA DE EVENTOS (Cont.) ---
 
-    // Verificar URL (Scraping)
-    if (verifyUrlBtn && productUrlInput && verifiedProductInfoDiv) {
-        verifyUrlBtn.addEventListener('click', async () => {
-            const url = productUrlInput.value.trim();
-            if (!url) return showTabMessage(addProductMessage, 'Por favor, insira uma URL.', false);
-            verifyUrlBtn.disabled = true;
-            verifyUrlBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
-            if(addProductMessage) addProductMessage.textContent = '';
+    // Lógica para ambas as seções de "Adicionar Produto por URL"
+    function setupScrapeEventListeners(urlInputEl, verifyBtnEl, infoDivEl, messageEl, saveBtnEl) {
+        if (verifyBtnEl && urlInputEl && infoDivEl) {
+            verifyBtnEl.addEventListener('click', async () => {
+                const url = urlInputEl.value.trim();
+                if (!url) return showTabMessage(messageEl, 'Por favor, insira uma URL.', false);
+                verifyBtnEl.disabled = true;
+                verifyBtnEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
+                if(messageEl) messageEl.textContent = '';
 
-            try {
-                const response = await fetch(`${API_BASE_URL}/products/scrape-url`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ url }),
-                });
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || `Erro HTTP ${response.status}`);
+                try {
+                    const response = await fetch(`${API_BASE_URL}/products/scrape-url`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ url }),
+                    });
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || `Erro HTTP ${response.status}`);
+                    }
+                    scrapedProductData = await response.json();
+
+                    const verifiedImgEl = infoDivEl.querySelector('img[id^="verifiedProductImage"]');
+                    const verifiedNameEl = infoDivEl.querySelector('span[id^="verifiedProductName"]');
+                    const verifiedPriceEl = infoDivEl.querySelector('span[id^="verifiedProductPrice"]');
+
+                    if(verifiedImgEl) verifiedImgEl.src = scrapedProductData.image || 'https://via.placeholder.com/100?text=Sem+Imagem';
+                    if(verifiedNameEl) verifiedNameEl.textContent = scrapedProductData.name || 'Nome não encontrado';
+                    if(verifiedPriceEl) verifiedPriceEl.textContent = scrapedProductData.price ? `R$ ${parseFloat(scrapedProductData.price).toFixed(2)}` : 'Preço não encontrado';
+
+                    // Preencher campos do formulário manual (sempre os mesmos IDs globais)
+                    if (manualProductNameInput) manualProductNameInput.value = scrapedProductData.name || '';
+                    if (manualProductPriceInput) manualProductPriceInput.value = scrapedProductData.price || '';
+                    if (manualProductUrlInput) manualProductUrlInput.value = url;
+                    if (manualProductImageUrlInput) manualProductImageUrlInput.value = scrapedProductData.image || '';
+                    if (manualProductCategorySelect) manualProductCategorySelect.value = scrapedProductData.category || 'Outros';
+                    if (manualProductBrandInput) manualProductBrandInput.value = scrapedProductData.brand || '';
+                    if (manualProductDescriptionTextarea) manualProductDescriptionTextarea.value = scrapedProductData.description || '';
+
+
+                    if (infoDivEl) {
+                        infoDivEl.classList.remove('hidden');
+                        if (saveBtnEl) saveBtnEl.style.display = 'inline-flex';
+                    }
+                    showTabMessage(messageEl, 'Produto verificado com sucesso! Você pode ajustar os detalhes e salvar.', true);
+
+                } catch (error) {
+                    showTabMessage(messageEl, `Erro na verificação: ${error.message}`, false);
+                    if (infoDivEl) infoDivEl.classList.add('hidden');
+                    if (saveBtnEl) saveBtnEl.style.display = 'none';
                 }
-                scrapedProductData = await response.json();
+                finally { verifyBtnEl.disabled = false; verifyBtnEl.innerHTML = '<i class="fas fa-search-location"></i> Verificar URL'; }
+            });
+        }
+    }
 
-                const verifiedImgEl = getElem('verifiedProductImage');
-                const verifiedNameEl = getElem('verifiedProductName');
-                const verifiedPriceEl = getElem('verifiedProductPrice');
+    // Configurar listeners para a seção de scraping na ABA 'add-product'
+    setupScrapeEventListeners(productUrlInputAddTab, verifyUrlBtnAddTab, verifiedProductInfoDivAddTab, addProductMessageAddTab, saveProductBtnAddTab);
 
-                if(verifiedImgEl) verifiedImgEl.src = scrapedProductData.image || 'https://via.placeholder.com/100?text=Sem+Imagem';
-                if(verifiedNameEl) verifiedNameEl.textContent = scrapedProductData.name || 'Nome não encontrado';
-                if(verifiedPriceEl) verifiedPriceEl.textContent = scrapedProductData.price ? `R$ ${parseFloat(scrapedProductData.price).toFixed(2)}` : 'Preço não encontrado';
-
-                // NOVO: Preencher campos do formulário manual com dados raspados
-                if (manualProductNameInput) manualProductNameInput.value = scrapedProductData.name || '';
-                if (manualProductPriceInput) manualProductPriceInput.value = scrapedProductData.price || '';
-                if (manualProductUrlInput) manualProductUrlInput.value = url;
-                if (manualProductImageUrlInput) manualProductImageUrlInput.value = scrapedProductData.image || '';
-                if (manualProductCategorySelect) manualProductCategorySelect.value = scrapedProductData.category || 'Outros';
-                if (manualProductBrandInput) manualProductBrandInput.value = scrapedProductData.brand || '';
-                if (manualProductDescriptionTextarea) manualProductDescriptionTextarea.value = scrapedProductData.description || '';
+    // Configurar listeners para a seção de scraping na ABA 'products'
+    setupScrapeEventListeners(productUrlInputProductsTab, verifyUrlBtnProductsTab, verifiedProductInfoDivProductsTab, addProductMessageProductsTab, saveProductBtnProductsTab);
 
 
-                if (verifiedProductInfoDiv) {
-                    if (saveProductBtn) saveProductBtn.style.display = 'inline-flex';
-                }
-                showTabMessage(addProductMessage, 'Produto verificado com sucesso! Você pode ajustar os detalhes e salvar.', true);
-
-            } catch (error) {
-                showTabMessage(addProductMessage, `Erro na verificação: ${error.message}`, false);
-                verifiedProductInfoDiv.classList.add('hidden');
-                if (saveProductBtn) saveProductBtn.style.display = 'none';
-            }
-            finally { verifyUrlBtn.disabled = false; verifyUrlBtn.innerHTML = '<i class="fas fa-search-location"></i> Verificar URL'; }
+    // Salvar Produto (universal para scraping ou manual)
+    if (saveProductBtnAddTab) {
+        saveProductBtnAddTab.addEventListener('click', async () => {
+            await handleSaveProduct(addProductMessageAddTab);
         });
     }
 
-    // NOVO: Salvar Produto (para scraping ou manual)
-    if (saveProductBtn) {
-        saveProductBtn.addEventListener('click', async () => {
-            if (!currentUserId) { showTabMessage(addProductMessage, 'Você precisa estar logado para adicionar produtos.', false); return; }
-
-            const name = manualProductNameInput.value.trim();
-            const price = parseFloat(manualProductPriceInput.value);
-            const urlOrigin = manualProductUrlInput.value.trim();
-            const image = manualProductImageUrlInput.value.trim();
-            const category = manualProductCategorySelect.value;
-            const brand = manualProductBrandInput.value.trim();
-            const description = manualProductDescriptionTextarea.value.trim();
-
-            if (!name || isNaN(price) || price <= 0 || !urlOrigin) {
-                return showTabMessage(addProductMessage, 'Nome, preço (positivo) e URL de origem são obrigatórios.', false);
-            }
-
-            const productToAdd = {
-                name,
-                price,
-                urlOrigin,
-                image: image || undefined,
-                category: category || 'Outros',
-                brand: brand || undefined,
-                description: description || undefined,
-                status: 'pendente'
-            };
-
-            Object.keys(productToAdd).forEach(key => productToAdd[key] === undefined && delete productToAdd[key]);
-
-            try {
-                const response = await authenticatedFetch(`${API_BASE_URL}/products`, {
-                    method: 'POST',
-                    body: JSON.stringify(productToAdd),
-                });
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || response.statusText);
-                }
-                showTabMessage(addProductMessage, "Produto salvo com sucesso!", true);
-                clearAddProductForm();
-                fetchAndRenderProducts();
-                fetchAndRenderDashboardStats();
-            } catch (error) {
-                showTabMessage(addProductMessage, `Erro ao salvar produto: ${error.message}`, false);
-                console.error("Erro ao salvar produto:", error);
-            }
+    if (saveProductBtnProductsTab) {
+        saveProductBtnProductsTab.addEventListener('click', async () => {
+            await handleSaveProduct(addProductMessageProductsTab);
         });
     }
 
-    // NOVO: Função para limpar o formulário de adição de produto
-    function clearAddProductForm() {
-        if (productUrlInput) productUrlInput.value = '';
-        if (verifiedProductInfoDiv) verifiedProductInfoDiv.classList.add('hidden');
-        if (saveProductBtn) saveProductBtn.style.display = 'none';
+    async function handleSaveProduct(messageElement) {
+        if (!currentUserId) { showTabMessage(messageElement, 'Você precisa estar logado para adicionar produtos.', false); return; }
+
+        const name = manualProductNameInput.value.trim();
+        const price = parseFloat(manualProductPriceInput.value);
+        const urlOrigin = manualProductUrlInput.value.trim();
+        const image = manualProductImageUrlInput.value.trim();
+        const category = manualProductCategorySelect.value;
+        const brand = manualProductBrandInput.value.trim();
+        const description = manualProductDescriptionTextarea.value.trim();
+
+        if (!name || isNaN(price) || price <= 0 || !urlOrigin) {
+            return showTabMessage(messageElement, 'Nome, preço (positivo) e URL de origem são obrigatórios.', false);
+        }
+
+        const productToAdd = {
+            name,
+            price,
+            urlOrigin,
+            image: image || undefined,
+            category: category || 'Outros',
+            brand: brand || undefined,
+            description: description || undefined,
+            status: 'pendente'
+        };
+
+        Object.keys(productToAdd).forEach(key => productToAdd[key] === undefined && delete productToAdd[key]);
+
+        try {
+            const response = await authenticatedFetch(`${API_BASE_URL}/products`, {
+                method: 'POST',
+                body: JSON.stringify(productToAdd),
+            });
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || response.statusText);
+            }
+            showTabMessage(messageElement, "Produto salvo com sucesso!", true);
+            clearAddProductFormAddTab();
+            clearProductScrapeFormProductsTab();
+
+            fetchAndRenderProducts();
+            fetchAndRenderDashboardStats();
+        } catch (error) {
+            showTabMessage(messageElement, `Erro ao salvar produto: ${error.message}`, false);
+            console.error("Erro ao salvar produto:", error);
+        }
+    }
+
+
+    // Funções para limpar os formulários de adição de produto
+    function clearAddProductFormAddTab() {
+        if (productUrlInputAddTab) productUrlInputAddTab.value = '';
+        if (verifiedProductInfoDivAddTab) verifiedProductInfoDivAddTab.classList.add('hidden');
+        if (saveProductBtnAddTab) saveProductBtnAddTab.style.display = 'none';
         scrapedProductData = null;
 
         if (manualProductNameInput) manualProductNameInput.value = '';
@@ -770,7 +828,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (manualProductBrandInput) manualProductBrandInput.value = '';
         if (manualProductDescriptionTextarea) manualProductDescriptionTextarea.value = '';
 
-        if(addProductMessage) addProductMessage.textContent = '';
+        if(addProductMessageAddTab) addProductMessageAddTab.textContent = '';
+    }
+
+    function clearProductScrapeFormProductsTab() {
+        if (productUrlInputProductsTab) productUrlInputProductsTab.value = '';
+        if (verifiedProductInfoDivProductsTab) verifiedProductInfoDivProductsTab.classList.add('hidden');
+        if (saveProductBtnProductsTab) saveProductBtnProductsTab.style.display = 'none';
+        if(addProductMessageProductsTab) addProductMessageProductsTab.textContent = '';
     }
 
 
@@ -779,13 +844,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const target = e.target;
         const card = target.closest('.product-card');
 
-        // Fechar Modais
+        // Fechar Modais (para detalhes, edição e imagem)
+        // MUDANÇA: A lógica de fechamento é agora centralizada em listeners específicos para cada modal
+        // Este bloco IF é REMOVIDO pois os listeners individuais farão o trabalho.
+        /*
         if (target.classList.contains('close-modal-btn') || target.classList.contains('modal-overlay')) {
             const activeModal = document.querySelector('.modal-overlay.active');
             if (activeModal) activeModal.classList.remove('active');
+            if (detailsModal) { detailsModal.classList.remove('active'); detailsModal.classList.add('hidden'); }
+            if (editModal) { editModal.classList.remove('active'); editModal.classList.add('hidden'); }
+            if (imageModal) { imageModal.classList.remove('active'); imageModal.classList.add('hidden'); }
             if(editProductMessage) editProductMessage.textContent = '';
             return;
         }
+        */
 
         if (!card) return;
 
@@ -796,7 +868,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (target.classList.contains('action-delete')) {
             e.stopPropagation();
             if (!confirm('Tem certeza que deseja excluir este produto?')) return;
-            if (!currentUserId) { showTabMessage(addProductMessage, 'Você precisa estar logado para excluir produtos.', false); return; }
+            if (!currentUserId) { showTabMessage(addProductMessageAddTab, 'Você precisa estar logado para excluir produtos.', false); return; }
 
             try {
                 const response = await authenticatedFetch(`${API_BASE_URL}/products/${productId}`, {
@@ -806,12 +878,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 card.remove();
                 fetchAndRenderDashboardStats();
                 fetchAndRenderProducts();
-                showTabMessage(addProductMessage, "Produto excluído com sucesso!", true);
-            } catch (error) { showTabMessage(addProductMessage, `Erro ao excluir: ${error.message}`, false); }
+                showTabMessage(addProductMessageAddTab, "Produto excluído com sucesso!", true);
+            } catch (error) { showTabMessage(addProductMessageAddTab, `Erro ao excluir: ${error.message}`, false); }
         }
         else if (target.classList.contains('action-purchase')) {
             e.stopPropagation();
-            if (!currentUserId) { showTabMessage(addProductMessage, 'Você precisa estar logado para marcar produtos.', false); return; }
+            if (!currentUserId) { showTabMessage(addProductMessageAddTab, 'Você precisa estar logado para marcar produtos.', false); return; }
 
             try {
                 const response = await authenticatedFetch(`${API_BASE_URL}/products/${productId}/purchase`, {
@@ -820,12 +892,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!response.ok) throw new Error(`Erro ao marcar comprado: ${response.statusText}`);
                 fetchAndRenderProducts();
                 fetchAndRenderDashboardStats();
-                showTabMessage(addProductMessage, "Produto marcado como comprado!", true);
-            } catch (error) { showTabMessage(addProductMessage, `Erro ao marcar comprado: ${error.message}`, false); }
+                showTabMessage(addProductMessageAddTab, "Produto marcado como comprado!", true);
+            } catch (error) { showTabMessage(addProductMessageAddTab, `Erro ao marcar comprado: ${error.message}`, false); }
         }
         else if (target.classList.contains('action-edit')) {
-            e.stopPropagation();
-            if (!currentUserId) { showTabMessage(addProductMessage, 'Você precisa estar logado para editar produtos.', false); return; }
+            e.stopPropagation(); // Garante que o clique não ative o modal de detalhes
+            if (!currentUserId) { showTabMessage(addProductMessageAddTab, 'Você precisa estar logado para editar produtos.', false); return; }
 
             if (editModal && editForm) {
                 editProductIdInput.value = productData._id;
@@ -844,13 +916,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     editProductPreviewImage.src = productData.image || '#';
                     editProductPreviewImage.classList.toggle('hidden', !productData.image);
                 }
-                editModal.classList.add('active');
+                showModal(editModal); // Usa showModal
                 if(editProductMessage) editProductMessage.textContent = '';
             }
         }
-        // Clique no Card para ver Detalhes
-        else {
-            console.log("Card clicado, tentando mostrar modal de detalhes.");
+        // NOVO: Clique na IMAGEM do card (diretamente)
+        else if (target.closest('.card-image')) {
+            e.stopPropagation();
+            openImageModal(productData.image);
+        }
+        // NOVO: Clique no TÍTULO do card (Nome do Produto) para abrir o modal de detalhes
+        else if (target.closest('.card-title')) {
+            e.stopPropagation();
             const allModalElementsFound = detailsModal && modalProductImage && modalProductName && modalProductPrice && modalProductStatus && modalProductCategory && modalProductBrand && modalProductAddedDate && modalProductDescription && modalProductTags && modalProductLink && modalProductPriority && modalProductNotes;
 
             if (!allModalElementsFound) {
@@ -871,23 +948,73 @@ document.addEventListener('DOMContentLoaded', () => {
                 modalProductPriority.textContent = productData.priority || 'N/A';
                 modalProductNotes.textContent = productData.notes || 'Nenhuma.';
 
-                modalProductLink.href = productData.urlOrigin || '#'; // Garante que há um href padrão
+                modalProductLink.href = productData.urlOrigin || '#';
 
                 if (modalActionPurchaseBtn) modalActionPurchaseBtn.style.display = productData.status === 'pendente' ? 'inline-flex' : 'none';
                 if(modalActionPurchaseBtn) modalActionPurchaseBtn.dataset.productId = productId;
                 if(modalActionEditBtn) modalActionEditBtn.dataset.productId = productId;
                 if(modalActionDeleteBtn) modalActionDeleteBtn.dataset.productId = productId;
 
-                detailsModal.classList.add('active');
+                showModal(detailsModal); // Usa showModal
                 console.log("Classe 'active' adicionada ao modal de detalhes.");
             } catch (modalPopulationError) {
                 console.error("Erro ao popular ou exibir o modal de detalhes do produto:", modalPopulationError);
                 console.error("Dados do produto que causaram o erro:", productData);
             }
         }
+        // else { /* NENHUMA LÓGICA GERAL DE CLIQUE NO CARD AQUI */ } // Removido o else que abria o modal de detalhes
     });
 
-    // Ações DENTRO do modal de detalhes
+    // Event listener para expandir imagem ao clicar DENTRO DO MODAL DE DETALHES
+    if (detailsModal) {
+        modalProductImage.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (modalProductImage.src) {
+                openImageModal(modalProductImage.src);
+            }
+        });
+    }
+
+    function openImageModal(imageSrc) {
+        if (!imageModal || !modalImageContent) {
+            console.error("Elementos do modal de imagem não encontrados. Verifique IDs.");
+            return;
+        }
+        modalImageContent.src = imageSrc;
+        showModal(imageModal); // Usa showModal
+    }
+
+    // Listener para fechar o modal da imagem (clique no 'x' ou no overlay)
+    if (imageModal) {
+        imageModal.addEventListener('click', (e) => {
+            if (e.target === imageModal || e.target.classList.contains('close-modal-btn')) {
+                hideModalWithDelay(imageModal);
+            }
+        });
+    }
+
+    // Listener para fechar o modal de detalhes (clique no 'x' ou no overlay)
+    if (detailsModal) {
+        detailsModal.addEventListener('click', (e) => {
+            if (e.target === detailsModal || e.target.classList.contains('close-modal-btn')) {
+                hideModalWithDelay(detailsModal);
+            }
+        });
+    }
+
+    // Listener para fechar o modal de edição (clique no 'x' ou no overlay)
+    // MUDANÇA: Adicionado listener direto para o modal de edição
+    const closeEditModalBtn = editModal ? editModal.querySelector('.close-modal-btn') : null;
+    if (editModal && closeEditModalBtn) {
+        editModal.addEventListener('click', (e) => {
+            if (e.target === editModal || e.target === closeEditModalBtn) { // Clicou no overlay ou no 'x'
+                hideModalWithDelay(editModal, editProductMessage);
+            }
+        });
+    }
+
+
+    // Ações DENTRO do modal de detalhes (Botões de Ação)
     if (detailsModal) {
         detailsModal.addEventListener('click', async (e) => {
             const target = e.target.closest('.modal-action-btn');
@@ -895,7 +1022,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const productId = target.dataset.productId;
             if(!productId) return;
-            if (!currentUserId) { showTabMessage(addProductMessage, 'Você precisa estar logado para realizar esta ação.', false); return; }
+            if (!currentUserId) { showTabMessage(addProductMessageAddTab, 'Você precisa estar logado para realizar esta ação.', false); return; }
 
             if(target.id === 'modal-action-purchase') {
                 try {
@@ -903,13 +1030,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         method: 'PATCH',
                     });
                     if (!response.ok) throw new Error(`Erro ao marcar comprado: ${response.statusText}`);
-                    detailsModal.classList.remove('active');
+                    hideModalWithDelay(detailsModal);
                     fetchAndRenderProducts();
                     fetchAndRenderDashboardStats();
-                    showTabMessage(addProductMessage, "Produto marcado como comprado!", true);
-                } catch (error) { showTabMessage(addProductMessage, `Erro ao marcar comprado: ${error.message}`, false); }
+                    showTabMessage(addProductMessageAddTab, "Produto marcado como comprado!", true);
+                } catch (error) { showTabMessage(addProductMessageAddTab, `Erro ao marcar comprado: ${error.message}`, false); }
             } else if (target.id === 'modal-action-edit') {
-                detailsModal.classList.remove('active');
+                hideModalWithDelay(detailsModal);
                 const productCard = document.querySelector(`.product-card[data-product-id="${productId}"]`);
                 if (productCard) {
                     const productData = JSON.parse(productCard.dataset.productJson);
@@ -929,7 +1056,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             editProductPreviewImage.src = productData.image || '#';
                             editProductPreviewImage.classList.toggle('hidden', !productData.image);
                         }
-                        editModal.classList.add('active');
+                        showModal(editModal);
                         if(editProductMessage) editProductMessage.textContent = '';
                     }
                 }
@@ -940,12 +1067,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         method: 'DELETE',
                     });
                     if (!response.ok) throw new Error(`Erro ao excluir: ${response.statusText}`);
-                    detailsModal.classList.remove('active');
+                    hideModalWithDelay(detailsModal);
                     fetchAndRenderProducts();
                     fetchAndRenderDashboardStats();
-                    showTabMessage(addProductMessage, "Produto excluído com sucesso!", true);
+                    showTabMessage(addProductMessageAddTab, "Produto excluído com sucesso!", true);
                 }
-                 catch (error) { showTabMessage(addProductMessage, `Erro ao excluir: ${error.message}`, false); }
+                 catch (error) { showTabMessage(addProductMessageAddTab, `Erro ao excluir: ${error.message}`, false); }
             }
         });
     }
@@ -986,9 +1113,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     const errorData = await response.json();
                     throw new Error(errorData.message || response.statusText);
                 }
-                if(editModal) editModal.classList.remove('active');
+                hideModalWithDelay(editModal, editProductMessage);
                 fetchAndRenderProducts();
-                showTabMessage(addProductMessage, "Produto atualizado com sucesso!", true);
+                showTabMessage(addProductMessageAddTab, "Produto atualizado com sucesso!", true);
             } catch (error) { showTabMessage(editProductMessage, `Erro ao atualizar: ${error.message}`, false); }
         });
     }
@@ -1051,12 +1178,19 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!currentUserId) { showTabMessage(financeEntryMessage, 'Você precisa estar logado para gerenciar finanças.', false); return; }
 
             if (editBtn) {
-                const financeIdToEdit = editBtn.dataset.id;
-                const entryElement = editBtn.closest('li');
-                const financeEntry = JSON.parse(entryElement.dataset.financeJson);
-                setupFinanceEdit(financeEntry);
-            } else if (deleteBtn) {
-                const financeIdToDelete = deleteBtn.dataset.id;
+                            // Pega os dados do item e preenche o formulário
+                            const financeIdToEdit = editBtn.dataset.id;
+                            const entryElement = editBtn.closest('li');
+                            const financeEntry = JSON.parse(entryElement.dataset.financeJson);
+                            setupFinanceEdit(financeEntry);
+
+                            // --- LINHA ADICIONADA PARA ROLAR A PÁGINA ---
+                            // Verifica se a variável do formulário existe antes de rolar
+                            if (financeFormContainer) {
+                                financeFormContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            }
+
+                        } else if (deleteBtn) {                const financeIdToDelete = deleteBtn.dataset.id;
                 if (confirm('Tem certeza que deseja excluir este registro financeiro?')) {
                     try {
                         const response = await authenticatedFetch(`${API_BASE_URL}/finances/${financeIdToDelete}`, {
@@ -1087,8 +1221,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (storedAuthToken && storedUserId) {
         authToken = storedAuthToken;
         currentUserId = storedUserId;
-        showDashboard(); // Chama showDashboard para carregar dados e exibir
+        showDashboard();
     } else {
-        showAuthSection(); // Mostra a tela de login
+        showAuthSection();
     }
 });
