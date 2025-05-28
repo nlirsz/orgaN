@@ -1,26 +1,41 @@
-// Arquivo: src/database.js
-const mongoose = require('mongoose'); //
-require('dotenv').config(); // Garante que as variáveis de ambiente sejam carregadas
+const mongoose = require('mongoose');
+require('dotenv').config();
 
-const connectDB = async () => { //
+let connectionInstance = null; // Para reutilizar a promessa de conexão
+
+const connectDB = async () => {
     if (mongoose.connection.readyState === 1) {
-        console.log('MongoDB já está conectado.');
-        return;
+        console.log('MongoDB já está conectado (readyState 1).');
+        return mongoose.connection.asPromise(); // Retorna a promessa da conexão existente
     }
-    if (mongoose.connection.readyState === 2) {
-        console.log('MongoDB já está conectando...');
-        return mongoose.connection.asPromise();
+    if (mongoose.connection.readyState === 2) { // 2 = connecting
+        console.log('MongoDB já está no processo de conexão (readyState 2)...');
+        return mongoose.connection.asPromise(); // Aguarda a conexão em progresso
     }
 
-    try {
-        console.log('Tentando conectar ao MongoDB Atlas com URI:', process.env.MONGODB_URI ? 'URI Presente' : 'URI NÃO PRESENTE');
-        await mongoose.connect(process.env.MONGODB_URI); //
-        console.log('Conectado ao MongoDB Atlas!'); //
-    } catch (err) {
-        console.error('Erro CRÍTICO ao conectar ao MongoDB:', err.message); //
-        console.error('Stack do erro:', err.stack);
-        throw err; // Re-lança o erro para ser capturado pelo chamador (ensureDBConnection)
+    // Se não houver uma promessa de conexão ativa, cria uma nova.
+    // Isso ajuda a evitar múltiplas tentativas de conexão simultâneas em ambientes serverless.
+    if (!connectionInstance) {
+        console.log('Nenhuma promessa de conexão ativa, criando uma nova.');
+        connectionInstance = mongoose.connect(process.env.MONGODB_URI)
+            .then(conn => {
+                console.log('MongoDB Conectado com Sucesso!');
+                // Uma vez conectado, podemos limpar a promessa para futuras chamadas,
+                // ou deixar que o readyState gerencie isso. Para serverless,
+                // manter a promessa resolvida pode ser útil para reuso rápido.
+                // No entanto, readyState é mais canônico.
+                return conn; // Retorna a instância de conexão do mongoose
+            })
+            .catch(err => {
+                console.error('ERRO CRÍTICO ao conectar ao MongoDB em connectDB:', err.message);
+                console.error('Stack do erro em connectDB:', err.stack);
+                connectionInstance = null; // Limpa a promessa em caso de falha para permitir nova tentativa
+                throw err; // Re-lança o erro
+            });
+    } else {
+        console.log('Reutilizando promessa de conexão existente.');
     }
+    return connectionInstance;
 };
 
-module.exports = connectDB; //
+module.exports = connectDB;
