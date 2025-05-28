@@ -61,34 +61,38 @@
 
     <div class="dashboard-layout hidden">
         
-        <aside class="sidebar">
-            <div class="sidebar-header">
+<aside class="sidebar">
+
+            <div class="sidebar-nav-main">
+                            <div class="sidebar-header">
                 <img src="logo.png" alt="Logo" class="logo" />
-                <span class="sidebar-title"></span>
             </div>
 
-            <button class="nav-btn active" data-tab="dashboard-main" title="Painel Principal">
-                <i class="fas fa-tachometer-alt"></i><span class="nav-text"></span>
-            </button>
-            <button class="nav-btn" data-tab="products" title="Meus Produtos">
-                <i class="fas fa-box-open"></i><span class="nav-text"></span>
-            </button>
-            <button class="nav-btn" data-tab="add-product" title="Adicionar Produto">
-                <i class="fas fa-plus-circle"></i><span class="nav-text"></span>
-            </button>
-            <button class="nav-btn" data-tab="history" title="Histórico de Compras">
-                <i class="fas fa-history"></i><span class="nav-text"></span>
-            </button>
-            <button class="nav-btn" data-tab="finance" title="Finanças">
-                <i class="fas fa-chart-pie"></i><span class="nav-text"></span>
-            </button>
+                <button class="nav-btn active" data-tab="dashboard-main" title="Painel Principal">
+                    <i class="fas fa-tachometer-alt"></i>
+                </button>
+                <button class="nav-btn" data-tab="products" title="Meus Produtos">
+                    <i class="fas fa-box-open"></i>
+                </button>
+                <button class="nav-btn" data-tab="add-product" title="Adicionar Produto">
+                    <i class="fas fa-plus-circle"></i>
+                </button>
+                <button class="nav-btn" data-tab="history" title="Histórico de Compras">
+                    <i class="fas fa-history"></i>
+                </button>
+                <button class="nav-btn" data-tab="finance" title="Finanças">
+                    <i class="fas fa-chart-pie"></i>
+                </button>
+            </div>
+
             <button class="nav-btn" data-tab="settings" title="Configurações">
-                <i class="fas fa-cog"></i><span class="nav-text"></span>
+                <i class="fas fa-cog"></i>
             </button>
             <button class="nav-btn" id="logout-btn" title="Sair">
-                <i class="fas fa-sign-out-alt"></i><span class="nav-text"></span>
+                <i class="fas fa-sign-out-alt"></i>
             </button>
         </aside>
+        
         <main class="main-content-area">
             <section id="dashboard-main-tab" class="tab-content active">
                 <h2>Painel Principal</h2>
@@ -128,8 +132,8 @@
                 <div class="form-container add-product-form-container products-tab-add-section">
                     <h3>Adicionar Produto por URL</h3>
                     <div id="scrape-form-products-tab" class="input-group">
-                        <input type="url" id="productUrlInput-products-tab" placeholder="Cole a URL do produto aqui">
-                        <button id="verifyUrlBtn-products-tab"><i class="fas fa-search-location"></i> Verificar URL</button>
+                        <input type="url" id="productUrlInput-products-tab" placeholder="URL do produto para adicionar na sua lista.">
+                        <button id="verifyUrlBtn-products-tab"><i class="fas fa-search"></i> Verificar URL</button>
                     </div>
                     <div id="verifiedProductInfo-products-tab" class="hidden">
                         <img id="verifiedProductImage-products-tab" src="#" alt="Imagem Verificada">
@@ -141,7 +145,8 @@
                 </div>
                 <div class="product-list-container">
                     <h3>Pendentes</h3>
-                    <ul id="pending-products-list" class="product-grid"></ul>
+                    <ul id="pending-products-list" class="product-grid">
+                        </ul>
                 </div>
             </section>
 
