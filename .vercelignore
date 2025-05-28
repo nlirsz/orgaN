@@ -1,0 +1,9 @@
+.git
+.github
+node_modules/      # A Vercel instala as dependências do package.json
+forge.config.js    # Específico do Electron Forge
+out/               # Pasta de build do Electron Forge
+*.log
+.DS_Store
+*.pem
+*.sqlite # Se você tiver algum banco de dados sqlite local que não deve ir

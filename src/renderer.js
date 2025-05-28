@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- VARIÁVEIS GLOBAIS E CONFIGURAÇÃO ---
-    const API_BASE_URL = 'http://localhost:3000/api';
+    const API_BASE_URL = '/api';   
     let currentUserId = null;
     let authToken = null;
     let scrapedProductData = null;
