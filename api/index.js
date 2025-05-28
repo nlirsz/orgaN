@@ -1,49 +1,71 @@
 // api/index.js
-
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 
-// --- CAMINHOS CORRIGIDOS ---
-// Saindo da pasta 'api/' para a raiz do projeto (usando '../')
-// e depois entrando em 'src/'
 const connectDB = require('../src/database');
 const productRoutes = require('../src/api/products');
 const financeRoutes = require('../src/api/finances');
 const registerRoute = require('../src/api/auth/register');
 const loginRoute = require('../src/api/auth/login');
-// const testDbRoute = require('../src/api/test-db'); // Se for usar
+// const testDbRoute = require('../src/api/test-db');
 
 const app = express();
 
-// Conecta ao MongoDB
-connectDB();
+// Variável para rastrear o status da promessa de conexão
+let connectionPromise = null;
 
-// Middlewares Essenciais
+const ensureDBConnection = async () => {
+    if (!connectionPromise) {
+        connectionPromise = connectDB().catch(err => {
+            console.error("Falha na promessa de conexão inicial do DB:", err);
+            connectionPromise = null; // Permite nova tentativa
+            throw err; // Relança o erro para a chamada atual
+        });
+    }
+    return connectionPromise;
+};
+
+// Tenta conectar na inicialização da instância da função serverless
+ensureDBConnection();
+
 app.use(cors());
 app.use(express.json());
 
-// Rota de Teste (opcional, mas útil)
+// Middleware para garantir que o DB esteja conectado antes de cada requisição à API
+// Isso é útil para cold starts ou se a conexão inicial falhar/demorar.
+app.use('/api', async (req, res, next) => {
+    try {
+        await ensureDBConnection();
+        next();
+    } catch (dbError) {
+        // Se ensureDBConnection() lançar um erro (porque connectDB falhou)
+        res.status(503).json({ message: 'Serviço indisponível devido a problema no banco de dados.' });
+    }
+});
+
+// Rotas
 app.get('/api', (req, res) => {
     res.send('API do OrgaN está funcionando via Vercel Function!');
 });
-
-// Define e usa as rotas da API
-// O prefixo '/api' aqui é como a Vercel vai direcionar,
-// e suas rotas internas já estão esperando por isso (ex: '/products', '/auth/login')
 app.use('/api/products', productRoutes);
 app.use('/api/finances', financeRoutes);
-app.use('/api/auth/register', registerRoute); // Mantenha '/api/auth/register' se a rota em register.js for só '/'
-app.use('/api/auth/login', loginRoute);       // Mantenha '/api/auth/login' se a rota em login.js for só '/'
-// app.get('/api/test-db', testDbRoute);
+app.use('/api/auth/register', registerRoute);
+app.use('/api/auth/login', loginRoute);
+// app.use('/api/test-db', testDbRoute);
 
-// A Vercel gerencia a porta, então o app.listen é principalmente para desenvolvimento local
+
 if (process.env.NODE_ENV !== 'production') {
     const PORT = process.env.PORT || 3000;
-    app.listen(PORT, () => {
-        console.log(`Servidor da API rodando localmente na porta ${PORT} a partir de api/index.js`);
+    // Garante que o DB conecte antes de iniciar o servidor localmente
+    ensureDBConnection().then(() => {
+        app.listen(PORT, () => {
+            console.log(`Servidor da API rodando localmente na porta ${PORT} a partir de api/index.js`);
+        });
+    }).catch(err => {
+        console.error("Falha ao iniciar o servidor local devido a erro no DB:", err);
+        // process.exit(1); // Pode sair se não conseguir conectar localmente também
     });
 }
 
-// Exporta o app para a Vercel
 module.exports = app;
