@@ -1,6 +1,11 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
+// ... (outras importações e middlewares) ...
+const mongoose = require('mongoose'); // Adicione esta linha no topo se ainda não estiver lá
+
+// ... (suas rotas existentes como app.use('/api/products', productRoutes); etc.) ...
+
 
 const connectDB = require('../src/database');
 const productRoutes = require('../src/api/products');
@@ -61,6 +66,64 @@ app.use('/api/auth/register', registerRoute);
 app.use('/api/auth/login', loginRoute);
 
 
+app.get('/api/test-db', async (req, res) => {
+    // O middleware de conexão '/api' já tentou conectar o DB.
+    // Vamos apenas verificar o estado aqui.
+    console.log('[api/index.js - /api/test-db] Rota de teste acessada.');
+    try {
+        const dbState = mongoose.connection.readyState;
+        const dbName = mongoose.connection.name;
+        const readyStateDescription = mongoose.ConnectionStates[dbState] || 'Desconhecido';
+
+        console.log(`[api/index.js - /api/test-db] Estado da conexão mongoose: <span class="math-inline">\{dbState\} \(</span>{readyStateDescription}), Nome do DB: ${dbName}`);
+
+        if (dbState === 1) { // 1: connected
+            res.status(200).json({
+                message: 'Conexão MongoDB OK via Express em api/index.js!',
+                dbName: dbName,
+                readyState: dbState,
+                readyStateDescription: readyStateDescription
+            });
+        } else {
+            // Tenta conectar novamente caso o middleware não tenha sido suficiente
+            console.warn(`[api/index.js - /api/test-db] Conexão não estava pronta. Tentando conectar novamente...`);
+            await connectDB(); // connectDB é sua função de src/database.js
+            const newDbState = mongoose.connection.readyState;
+            const newDbName = mongoose.connection.name;
+            const newReadyStateDescription = mongoose.ConnectionStates[newDbState] || 'Desconhecido';
+            console.log(`[api/index.js - /api/test-db] Novo estado da conexão: <span class="math-inline">\{newDbState\} \(</span>{newReadyStateDescription}), Nome do DB: ${newDbName}`);
+
+            if (newDbState === 1) {
+                 res.status(200).json({
+                    message: 'Conexão MongoDB OK após nova tentativa na rota /api/test-db!',
+                    dbName: newDbName,
+                    readyState: newDbState,
+                    readyStateDescription: newReadyStateDescription
+                });
+            } else {
+                res.status(503).json({
+                    message: 'Conexão MongoDB não está pronta, mesmo após nova tentativa na rota.',
+                    dbName: newDbName,
+                    readyState: newDbState,
+                    readyStateDescription: newReadyStateDescription,
+                    tip: 'Verifique os logs da função, URI/whitelist do DB e o middleware de conexão.'
+                });
+            }
+        }
+    } catch (error) {
+        console.error('[api/index.js - /api/test-db] Erro ao testar conexão DB:', error);
+        res.status(500).json({
+            message: 'Erro interno do servidor ao testar conexão DB.',
+            error: error.message,
+            stack: error.stack,
+        });
+    }
+});
+
+// ... (seu if (process.env.NODE_ENV !== 'production') ... e module.exports = app;) ...
+
+
+
 if (process.env.NODE_ENV !== 'production') {
     const PORT = process.env.PORT || 3000;
     connectDB().then(() => { // Garante conexão antes de iniciar localmente
@@ -80,6 +143,7 @@ app.use((req, res) => {
     // mas para serverless, o log de Vercel já cobre o término da função.
     console.log(`[Vercel Request Log] END: ${req.method} ${req.originalUrl} - Status: ${res.statusCode}`);
 });
+
 
 
 module.exports = app;
