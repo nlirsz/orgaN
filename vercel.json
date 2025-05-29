@@ -19,6 +19,10 @@
       }
     },
     {
+      "src": "/logo.ico",
+      "status": 204
+    },
+    {
       "src": "/(.*)",
       "dest": "/src/index.html"
     }
