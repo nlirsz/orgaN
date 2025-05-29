@@ -5,11 +5,11 @@ const cors = require('cors');
 require('dotenv').config();
 const mongoose = require('mongoose');
 
-const connectDB = require('../src/database');
-const productRoutes = require('../src/routes/products'); // Caminho corrigido
-const financeRoutes = require('../src/routes/finances');   // Caminho corrigido
-const registerRoute = require('../src/routes/auth/register'); // Caminho corrigido
-const loginRoute = require('../src/routes/auth/login');       // Caminho corrigido
+const connectDB = require('../database');
+const productRoutes = require('../routes/products'); // Caminho corrigido
+const financeRoutes = require('../routes/finances');   // Caminho corrigido
+const registerRoute = require('../routes/auth/register'); // Caminho corrigido
+const loginRoute = require('../routes/auth/login');       // Caminho corrigido
 
 const app = express();
 
