@@ -71,8 +71,7 @@ app.get('/api/test-db', async (req, res) => {
         const dbState = mongoose.connection.readyState;
         const dbName = mongoose.connection.name;
         const readyStateDescription = mongoose.ConnectionStates[dbState] || 'Desconhecido';
-        console.log(`[API V3 - /api/test-db] Estado da conexão mongoose: <span class="math-inline">\{dbState\} \(</span>{readyStateDescription}), Nome do DB: ${dbName}`);
-        if (dbState === 1) {
+        console.log(`[API V3 - /api/test-db] Estado da conexão mongoose: <span class="math-inline">\{dbState\} \(</span>{readyStateDescription}), Nome do DB: ${dbName}`);        if (dbState === 1) {
             res.status(200).json({
                 message: 'Conexão MongoDB OK via Express em api/index.js V3!',
                 dbName: dbName,
@@ -80,8 +79,7 @@ app.get('/api/test-db', async (req, res) => {
                 readyStateDescription: readyStateDescription
             });
         } else {
-            console.error(`[API V3 - /api/test-db] Chegou na rota de teste, mas DB não está conectado. Estado: <span class="math-inline">\{dbState\} \(</span>{readyStateDescription})`);
-            res.status(503).json({
+        console.error(`[API V3 - /api/test-db] Chegou na rota de teste, mas DB não está conectado. Estado: <span class="math-inline">\{dbState\} \(</span>{readyStateDescription})`);            res.status(503).json({
                 message: 'Conexão MongoDB não está pronta na rota /api/test-db V3.',
                 dbName: dbName,
                 readyState: dbState,
