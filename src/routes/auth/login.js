@@ -11,15 +11,8 @@ if (!JWT_SECRET) {
     console.error("[login.js] ERRO: JWT_SECRET não definida nas variáveis de ambiente! O login não funcionará.");
 }
 
-// Rota agora é POST / (relativo ao ponto de montagem /api/auth/login)
 router.post('/', async (req, res) => {
     console.log(`[login.js] Rota POST / acessada (montada em /api/auth/login) com método: ${req.method}`);
-
-    // A verificação de método não é mais necessária aqui, pois o router.post('/') já cuida disso.
-    // if (req.method !== 'POST') {
-    //     return res.status(405).json({ message: 'Método não permitido.' });
-    // }
-
     const { username, password } = req.body;
 
     if (!username || !password) {
@@ -30,11 +23,11 @@ router.post('/', async (req, res) => {
         console.log('[login.js] Verificando estado da conexão Mongoose antes de User.findOne(). ReadyState:', mongoose.connection.readyState, '(' + (mongoose.ConnectionStates[mongoose.connection.readyState] || 'Desconhecido') + ')');
         const user = await User.findOne({ username });
         if (!user) {
-            return res.status(401).json({ message: 'Credenciais inválidas.' });
+            return res.status(401).json({ message: 'Credenciais inválidas (usuário não encontrado).' });
         }
         const passwordMatch = await user.comparePassword(password);
         if (!passwordMatch) {
-            return res.status(401).json({ message: 'Credenciais inválidas.' });
+            return res.status(401).json({ message: 'Credenciais inválidas (senha incorreta).' });
         }
         const payload = { user: { userId: user.id } };
         jwt.sign(
@@ -42,7 +35,7 @@ router.post('/', async (req, res) => {
             JWT_SECRET,
             { expiresIn: '1h' },
             (err, token) => {
-                if (err) { // Melhor tratamento do erro do jwt.sign
+                if (err) {
                     console.error('[login.js] Erro ao gerar token JWT:', err);
                     return res.status(500).json({ message: 'Erro interno ao gerar token.' });
                 }

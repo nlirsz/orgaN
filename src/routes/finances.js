@@ -2,126 +2,108 @@
 const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth'); // CORRIGIDO
-const FinanceEntry = require('../models/FinanceEntry'); // Ajustado o caminho
+const FinanceEntry = require('../models/FinanceEntry'); // CORRIGIDO
 
-// Rota GET para listar registros financeiros
 router.get('/', auth, async (req, res) => {
     const userId = req.user.userId;
-
     try {
-        // Busca todos os registros financeiros para o userId autenticado
-        const financeEntries = await FinanceEntry.find({ userId }).sort({ mes_ano: -1 }); // Ordena do mais recente
+        const financeEntries = await FinanceEntry.find({ userId }).sort({ mes_ano: -1 });
         res.json(financeEntries);
     } catch (error) {
-        console.error('[API /finances GET] Erro ao buscar finanças:', error);
+        console.error('[finances.js GET /] Erro ao buscar finanças:', error);
         res.status(500).json({ message: 'Erro interno do servidor ao buscar finanças.' });
     }
 });
 
-// Rota POST para adicionar um novo registro financeiro
 router.post('/', auth, async (req, res) => {
-    const userId = req.user.userId; // Obtém userId do token JWT
-
+    const userId = req.user.userId;
     const { mes_ano, receita, gastos } = req.body;
 
-    // Validação básica
-    if (!mes_ano || isNaN(receita) || isNaN(gastos)) {
-        return res.status(400).json({ message: 'Campos obrigatórios (mês/ano, receita, gastos) estão faltando ou são inválidos.' });
+    if (!mes_ano || isNaN(parseFloat(receita)) || isNaN(parseFloat(gastos))) { // Validar parseFloat
+        return res.status(400).json({ message: 'Campos obrigatórios (mês/ano, receita, gastos) faltando ou inválidos.' });
     }
     if (!mes_ano.match(/^\d{4}-\d{2}$/)) {
         return res.status(400).json({ message: 'Formato de mês/ano inválido. Use AAAA-MM.' });
     }
 
     try {
-        // Tenta encontrar um registro existente para o mesmo mês/ano e usuário
         let existingEntry = await FinanceEntry.findOne({ userId, mes_ano });
         if (existingEntry) {
-            return res.status(409).json({ message: `Já existe um registro financeiro para ${mes_ano}. Por favor, edite-o.` });
+            return res.status(409).json({ message: `Já existe um registro financeiro para ${mes_ano}.` });
         }
-
         const newEntry = new FinanceEntry({
-            userId,
-            mes_ano,
+            userId, mes_ano,
             receita: parseFloat(receita),
             gastos: parseFloat(gastos)
         });
-
         const savedEntry = await newEntry.save();
         res.status(201).json(savedEntry);
-
     } catch (error) {
-        console.error('[API /finances POST] Erro ao adicionar registro financeiro:', error);
+        console.error('[finances.js POST /] Erro ao adicionar registro:', error);
         if (error.name === 'ValidationError') {
-            const messages = Object.values(error.errors).map(val => val.message);
-            return res.status(400).json({ message: 'Erro de validação ao salvar registro.', details: messages });
+            return res.status(400).json({ message: 'Erro de validação.', details: Object.values(error.errors).map(val => val.message) });
         }
-        res.status(500).json({ message: 'Erro ao salvar o registro financeiro no banco de dados.', details: error.toString() });
+        if (error.code === 11000) { // Conflito de chave única
+             return res.status(409).json({ message: `Já existe um registro para ${mes_ano}.` });
+        }
+        res.status(500).json({ message: 'Erro ao salvar registro financeiro.', details: error.toString() });
     }
 });
 
-// Rota PUT para atualizar um registro financeiro
 router.put('/:id', auth, async (req, res) => {
-    const userId = req.user.userId; // Obtém userId do token JWT
+    const userId = req.user.userId;
     const { id } = req.params;
     const { mes_ano, receita, gastos } = req.body;
 
-    // Validação básica
-    if (!mes_ano || isNaN(receita) || isNaN(gastos)) {
-        return res.status(400).json({ message: 'Campos obrigatórios (mês/ano, receita, gastos) estão faltando ou são inválidos para atualização.' });
+    if (!mes_ano || isNaN(parseFloat(receita)) || isNaN(parseFloat(gastos))) {
+        return res.status(400).json({ message: 'Campos obrigatórios faltando ou inválidos para atualização.' });
     }
     if (!mes_ano.match(/^\d{4}-\d{2}$/)) {
         return res.status(400).json({ message: 'Formato de mês/ano inválido. Use AAAA-MM.' });
     }
 
     try {
-        // Tenta encontrar e atualizar o registro, garantindo que pertença ao usuário logado
-        const updatedEntry = await FinanceEntry.findOneAndUpdate(
-            { _id: id, userId: userId }, // Filtra por ID do registro E userId
-            { mes_ano, receita: parseFloat(receita), gastos: parseFloat(gastos) },
-            { new: true, runValidators: true } // Retorna o documento atualizado e executa validações
-        );
+        // Verificar se o novo mes_ano já existe para este usuário (excluindo o documento atual)
+        const conflictingEntry = await FinanceEntry.findOne({ userId, mes_ano, _id: { $ne: id } });
+        if (conflictingEntry) {
+            return res.status(409).json({ message: `Já existe um registro financeiro para ${mes_ano}. Não é possível duplicar.` });
+        }
 
+        const updatedEntry = await FinanceEntry.findOneAndUpdate(
+            { _id: id, userId: userId },
+            { mes_ano, receita: parseFloat(receita), gastos: parseFloat(gastos) },
+            { new: true, runValidators: true }
+        );
         if (!updatedEntry) {
-            return res.status(404).json({ message: 'Registro financeiro não encontrado ou não pertence a este usuário.' });
+            return res.status(404).json({ message: 'Registro financeiro não encontrado.' });
         }
         res.json(updatedEntry);
-
     } catch (error) {
-        console.error(`[API /finances PUT] Erro ao atualizar registro financeiro ${id}:`, error);
-        if (error.name === 'CastError' && error.kind === 'ObjectId') {
-            return res.status(400).json({ message: 'ID do registro financeiro inválido.' });
-        }
+        console.error(`[finances.js PUT /:id] Erro ao atualizar registro ${id}:`, error);
+        if (error.name === 'CastError') { return res.status(400).json({ message: 'ID do registro inválido.' }); }
         if (error.name === 'ValidationError') {
-            const messages = Object.values(error.errors).map(val => val.message);
-            return res.status(400).json({ message: 'Erro de validação ao atualizar registro.', details: messages });
+            return res.status(400).json({ message: 'Erro de validação.', details: Object.values(error.errors).map(val => val.message) });
         }
-        if (error.code === 11000) { // Erro de duplicidade (índice único)
-             return res.status(409).json({ message: 'Já existe um registro para este mês/ano para este usuário. Por favor, escolha outro mês ou edite o registro existente.' });
+        if (error.code === 11000) {
+             return res.status(409).json({ message: 'Já existe um registro para este mês/ano.' });
         }
-        res.status(500).json({ message: 'Erro interno do servidor ao atualizar registro financeiro.' });
+        res.status(500).json({ message: 'Erro interno do servidor.' });
     }
 });
 
-// Rota DELETE para excluir um registro financeiro
 router.delete('/:id', auth, async (req, res) => {
-    const userId = req.user.userId; // Obtém userId do token JWT
+    const userId = req.user.userId;
     const { id } = req.params;
-
     try {
-        // Tenta encontrar e deletar o registro, garantindo que pertença ao usuário logado
-        const result = await FinanceEntry.deleteOne({ _id: id, userId: userId }); // Filtra por ID do registro E userId
-
+        const result = await FinanceEntry.deleteOne({ _id: id, userId: userId });
         if (result.deletedCount === 0) {
-            return res.status(404).json({ message: 'Registro financeiro não encontrado ou não pertence a este usuário.' });
+            return res.status(404).json({ message: 'Registro financeiro não encontrado.' });
         }
-        res.status(204).send(); // Resposta 204 indica sucesso sem conteúdo de retorno
-
+        res.status(204).send();
     } catch (error) {
-        console.error(`[API /finances DELETE] Erro ao excluir registro financeiro ${id}:`, error);
-        if (error.name === 'CastError' && error.kind === 'ObjectId') {
-            return res.status(400).json({ message: 'ID do registro financeiro inválido.' });
-        }
-        res.status(500).json({ message: 'Erro interno do servidor ao excluir registro financeiro.' });
+        console.error(`[finances.js DELETE /:id] Erro ao excluir registro ${id}:`, error);
+        if (error.name === 'CastError') { return res.status(400).json({ message: 'ID do registro inválido.' }); }
+        res.status(500).json({ message: 'Erro interno do servidor.' });
     }
 });
 

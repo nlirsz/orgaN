@@ -9,15 +9,15 @@
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "api/index.js"
+      "dest": "api/index.js" 
     },
     {
-      "src": "/(index\\.html|style\\.css|renderer\\.js|logo\\.png|favicon\\.ico)",
-      "dest": "/public/$1"
+      "src": "/favicon.ico",
+      "status": 204
     },
     {
       "src": "/(.*)",
-      "dest": "/public/index.html"
+      "dest": "/index.html" 
     }
   ]
 }

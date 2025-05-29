@@ -4,17 +4,15 @@ const router = express.Router();
 require('dotenv').config();
 const User = require('../../models/User'); // CORRIGIDO
 const jwt = require('jsonwebtoken');
-const mongoose = require('mongoose'); // Adicionado para logs de conexão
+const mongoose = require('mongoose');
 
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) {
     console.error("[register.js] ERRO: JWT_SECRET não definida nas variáveis de ambiente! O registro não funcionará.");
 }
 
-// Rota agora é POST / (relativo ao ponto de montagem /api/auth/register)
 router.post('/', async (req, res) => {
     console.log(`[register.js] Rota POST / acessada (montada em /api/auth/register) com método: ${req.method}`);
-
     const { username, password } = req.body;
 
     if (!username || !password) {
@@ -33,7 +31,7 @@ router.post('/', async (req, res) => {
         const payload = { user: { userId: user.id } };
         jwt.sign(
             payload,
-            JWT_SECRET, // Usar a constante definida acima
+            JWT_SECRET,
             { expiresIn: '1h' },
             (err, token) => {
                 if (err) {
@@ -52,7 +50,7 @@ router.post('/', async (req, res) => {
         if (error.stack) {
             console.error('[register.js] Stack do erro:', error.stack);
         }
-        if (error.reason) { // Alguns erros do Mongoose podem ter uma propriedade 'reason'
+        if (error.reason) {
             console.error('[register.js] Razão do erro (Mongoose):', error.reason);
         }
         if (error.name === 'ValidationError') {
