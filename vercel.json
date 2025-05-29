@@ -10,6 +10,17 @@
     {
       "src": "/api/(.*)",
       "dest": "/api/index.js"
+    },
+    {
+      "src": "/(.*\\.(css|js|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|webmanifest|xml|txt))",
+      "dest": "/src/$1"
+      "headers": {
+        "cache-control": "s-maxage=31536000, immutable"
+      }
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/src/index.html"
     }
   ]
 }
