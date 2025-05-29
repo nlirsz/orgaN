@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const Product = require('../models/Product');
-const auth = require('../../middleware/auth'); // Ajustado o caminho
+const auth = require('../middleware/auth'); // CORRIGIDO
 const { scrapeProductDetails } = require('./api_helpers/scrape-gemini'); // CORRIGIDO
 const { obterProduto: scrapeWithCheerio } = require('../price-scraper'); // CORRIGIDO
 

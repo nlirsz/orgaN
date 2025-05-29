@@ -1,8 +1,8 @@
 // src/routes/finances.js
 const express = require('express');
 const router = express.Router();
-const auth = require('../../middleware/auth'); // Ajustado o caminho
-const FinanceEntry = require('../../models/FinanceEntry'); // Ajustado o caminho
+const auth = require('../middleware/auth'); // CORRIGIDO
+const FinanceEntry = require('../models/FinanceEntry'); // Ajustado o caminho
 
 // Rota GET para listar registros financeiros
 router.get('/', auth, async (req, res) => {
