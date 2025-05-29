@@ -1,10 +1,10 @@
 // src/api/products.js
 const express = require('express');
 const router = express.Router();
-const Product = require('../models/Product');
-const auth = require('../middleware/auth');
-const { scrapeProductDetails } = require('./scrape-gemini');
-const { obterProduto: scrapeWithCheerio } = require('../price-scraper');
+const Product = require('../../models/Product'); // Ajustado o caminho
+const auth = require('../../middleware/auth'); // Ajustado o caminho
+const { scrapeProductDetails } = require('../api/scrape-gemini'); // Ajustado o caminho
+const { obterProduto: scrapeWithCheerio } = require('../../price-scraper'); // Ajustado o caminho
 
 // ====================================================================================================
 // ROTAS PARA DASHBOARD (MOVidas para o topo para evitar conflitos com :id)

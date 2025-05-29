@@ -5,10 +5,16 @@ require('dotenv').config();
 const mongoose = require('mongoose'); // Adicionado para verificar readyState e ConnectionStates
 
 const connectDB = require('../src/database');
-const productRoutes = require('../src/api/products');
-const financeRoutes = require('../src/api/finances');
-const registerRoute = require('../src/api/auth/register');
-const loginRoute = require('../src/api/auth/login');
+// const productRoutes = require('../src/api/products'); // Removido
+// const financeRoutes = require('../src/api/finances'); // Removido
+// const registerRoute = require('../src/api/auth/register'); // Removido
+// const loginRoute = require('../src/api/auth/login'); // Removido
+
+// Novas importações de rotas
+const productRoutes = require('../src/routes/products');
+const financeRoutes = require('../src/routes/finances');
+const registerRoute = require('../src/routes/auth/register');
+const loginRoute = require('../src/routes/auth/login');
 
 const app = express();
 console.log("[api/index.js] Express app inicializado.");
@@ -102,14 +108,17 @@ app.get('/api', (req, res) => {
 console.log("[api/index.js] Rota raiz /api registrada.");
 
 // Rotas da Aplicação
+// Rotas da Aplicação - Montadas após o middleware de conexão DB
+// Os routers em src/routes/ definem caminhos relativos ao seu ponto de montagem
+// Ex: src/routes/auth/login.js define router.post('/', ...) que será /api/auth/login/
 app.use('/api/products', productRoutes);
-console.log("[api/index.js] Rotas de produtos registradas em /api/products");
+console.log("[api/index.js] Rotas de produtos montadas em /api/products");
 app.use('/api/finances', financeRoutes);
-console.log("[api/index.js] Rotas de finanças registradas em /api/finances");
+console.log("[api/index.js] Rotas de finanças montadas em /api/finances");
 app.use('/api/auth/register', registerRoute);
-console.log("[api/index.js] Rota de registro registrada em /api/auth/register");
+console.log("[api/index.js] Rota de registro montada em /api/auth/register");
 app.use('/api/auth/login', loginRoute);
-console.log("[api/index.js] Rota de login registrada em /api/auth/login");
+console.log("[api/index.js] Rota de login montada em /api/auth/login");
 
 
 // Para desenvolvimento local

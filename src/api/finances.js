@@ -1,8 +1,8 @@
-// src/api/finances.js
+// src/routes/finances.js
 const express = require('express');
 const router = express.Router();
-const auth = require('../middleware/auth'); // Importa o middleware de autenticação
-const FinanceEntry = require('../models/FinanceEntry'); // NOVO: Importa o modelo de Finanças
+const auth = require('../../middleware/auth'); // Ajustado o caminho
+const FinanceEntry = require('../../models/FinanceEntry'); // Ajustado o caminho
 
 // Rota GET para listar registros financeiros
 router.get('/', auth, async (req, res) => {
