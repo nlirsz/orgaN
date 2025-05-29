@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 require('dotenv').config();
-const User = require('../../../models/User'); // Ajustado o caminho
+const User = require('../../models/User'); // CORRIGIDO
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose'); // Adicionado para logs de conexão
 

@@ -7,10 +7,12 @@ const mongoose = require('mongoose'); // Adicionado para verificar readyState e 
 
 // Caminhos CORRIGIDOS para a nova estrutura
 const connectDB = require('../src/database'); // Este caminho parece continuar correto
-const productRoutes = require('../src/routes/products'); // CORRIGIDO
-const financeRoutes = require('../src/routes/finances');   // CORRIGIDO
-const registerRoute = require('../src/routes/auth/register'); // CORRIGIDO
-const loginRoute = require('../src/routes/auth/login');       // CORRIGIDO
+// Em RAIZ_DO_PROJETO/api/index.js - ESTES DEVEM ESTAR CORRETOS
+const productRoutes = require('../src/routes/products');
+const financeRoutes = require('../src/routes/finances');
+const registerRoute = require('../src/routes/auth/register');
+const loginRoute = require('../src/routes/auth/login');
+
 
 // Se productRoutes ou outros handlers importam scrape-gemini,
 // os caminhos dentro DELES para scrape-gemini também podem precisar ser ajustados
