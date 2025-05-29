@@ -16,8 +16,8 @@
       "status": 204
     },
     {
-      "src": "/(.*)",         
-      "dest": "/index.html"   
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
   ]
 }
