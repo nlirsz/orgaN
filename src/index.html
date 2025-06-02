@@ -11,6 +11,9 @@
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 <body>
+            <header class="mobile-header">
+        <img src="/logo.png" alt="Logo OrgaN" class="logo-container" id="triggerMobileMenu">
+        </header>
     <div id="auth-section" class="auth-section">
         <div class="auth-container">
             <div class="auth-tabs">
@@ -280,6 +283,20 @@
             <img id="modal-image-content" src="" alt="Imagem Ampliada">
         </div>
     </div>
+    <div class="mobile-menu-overlay"></div>
+<nav class="mobile-menu" id="mobileMenu">
+    <img src="/logo.png" alt="Logo OrgaN" class="logo"> <div class="mobile-nav-items">
+        <button class="nav-btn active" data-tab="dashboard-main" title="Painel Principal"><i class="fas fa-tachometer-alt"></i></button>
+        <button class="nav-btn" data-tab="products" title="Meus Produtos"><i class="fas fa-box-open"></i></button>
+        <button class="nav-btn" data-tab="add-product" title="Adicionar Produto"><i class="fas fa-plus-circle"></i></button>
+        <button class="nav-btn" data-tab="history" title="Histórico de Compras"><i class="fas fa-history"></i></button>
+        <button class="nav-btn" data-tab="finance" title="Finanças"><i class="fas fa-chart-pie"></i></button>
+    </div>
+    <div class="mobile-menu-footer">
+        <button class="nav-btn" data-tab="settings" title="Configurações"><i class="fas fa-cog"></i></button>
+        <button class="nav-btn" id="logout-btn-mobile" title="Sair"><i class="fas fa-sign-out-alt"></i></button>
+    </div>
+</nav>
 
     <div id="product-details-modal" class="modal-overlay hidden">
         <div class="modal-content product-details-modal-content">
