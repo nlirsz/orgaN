@@ -23,16 +23,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginUsernameInput = getElem('login-username'); //
     const loginPasswordInput = getElem('login-password'); //
     const registerUsernameInput = getElem('register-username'); //
-    const registerEmailInput = getElem('register-email'); // Certifique-se que este ID existe no seu HTML
     const registerPasswordInput = getElem('register-password'); //
     const loginMessage = getElem('login-message'); //
     const registerMessage = getElem('register-message'); //
     const logoutBtn = getElem('logout-btn'); //
     const rememberMeCheckbox = getElem('remember-me-checkbox'); //
 
-    const passwordStrengthIndicator = getElem('password-strength-indicator'); //
-    const togglePasswordVisibilityBtn = getElem('toggle-password-visibility'); // Certifique-se que este ID existe
+    // --- NOVO: Seletor para feedback de força da senha ---
+    const passwordStrengthIndicator = getElem('password-strength-indicator'); // Crie um <div id="password-strength-indicator"></div> no seu HTML abaixo do input de senha do registro
 
+    // ... (outros seletores permanecem os mesmos) ...
     const loadingOverlay = getElem('loading-overlay'); //
     const sidebar = document.querySelector('.sidebar'); //
     const tabButtons = document.querySelectorAll('.nav-btn'); //
@@ -107,6 +107,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // --- FUNÇÕES DE UTILIDADE ---
+    // ... (authenticatedFetch, showAuthMessage, showTabMessage, showModal, hideModalWithDelay, showAuthSection, showDashboard permanecem as mesmas) ...
+
     async function authenticatedFetch(url, options = {}) { //
         if (!authToken) { //
             console.error("Token de autenticação não disponível. Redirecionando para login."); //
@@ -129,23 +131,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function showAuthMessage(element, message, isSuccess = false) { //
-        if (element) {
+        if (element) { // Adicionado para segurança
             element.textContent = message; //
             element.className = 'auth-message ' + (isSuccess ? 'success' : 'error'); //
             setTimeout(() => { //
-                if (element) element.textContent = ''; //
-                if (element) element.className = 'auth-message'; //
+                element.textContent = ''; //
+                element.className = 'auth-message'; //
             }, 5000); //
         }
     }
 
     function showTabMessage(element, message, isSuccess = false) { //
-         if (element) {
+         if (element) { // Adicionado para segurança
             element.textContent = message; //
             element.className = 'tab-message ' + (isSuccess ? 'success' : 'error'); //
             setTimeout(() => { //
-                if (element) element.textContent = ''; //
-                if (element) element.className = 'tab-message'; //
+                element.textContent = ''; //
+                element.className = 'tab-message'; //
             }, 5000); //
         }
     }
@@ -161,8 +163,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (modalElement) { //
             modalElement.classList.remove('active'); //
             setTimeout(() => { //
-                if (modalElement) modalElement.classList.add('hidden'); //
-                if (messageElement && messageElement.textContent) messageElement.textContent = ''; //
+                modalElement.classList.add('hidden'); //
+                if (messageElement) messageElement.textContent = ''; //
             }, 300); //
         }
     }
@@ -180,38 +182,41 @@ document.addEventListener('DOMContentLoaded', () => {
         if(loginUsernameInput) loginUsernameInput.value = ''; //
         if(loginPasswordInput) loginPasswordInput.value = ''; //
         if(registerUsernameInput) registerUsernameInput.value = ''; //
-        if(registerEmailInput) registerEmailInput.value = '';
         if(registerPasswordInput) registerPasswordInput.value = ''; //
 
+        if(authTabButtons) authTabButtons.forEach(btn => btn.classList.remove('active')); //
+        const loginTabBtn = document.querySelector('[data-auth-tab="login"]'); //
+        if(loginTabBtn) loginTabBtn.classList.add('active'); //
 
-        if(authTabButtons) { //
-            authTabButtons.forEach(btn => btn.classList.remove('active')); //
-            const loginTabBtn = document.querySelector('[data-auth-tab="login"]'); //
-            if(loginTabBtn) loginTabBtn.classList.add('active'); //
-        }
+        if(authTabContents) authTabContents.forEach(tabContent => tabContent.classList.remove('active')); //
+        const loginTabContent = getElem('login-tab-content'); //
+        if(loginTabContent) loginTabContent.classList.add('active'); //
 
-        if(authTabContents){ //
-            authTabContents.forEach(tabContent => tabContent.classList.remove('active')); //
-            const loginTabContent = getElem('login-tab-content'); //
-            if(loginTabContent) loginTabContent.classList.add('active'); //
-        }
-        
         if(loginMessage) loginMessage.textContent = ''; //
         if(registerMessage) registerMessage.textContent = ''; //
-        if(passwordStrengthIndicator) { //
-            passwordStrengthIndicator.textContent = 'Força: ';
-            passwordStrengthIndicator.style.color = 'grey';
-        }
-        if (typeof grecaptcha !== 'undefined' && grecaptcha.reset) {
-            try { grecaptcha.reset(0); } catch(e) {} 
-            try { grecaptcha.reset(1); } catch(e) {}
-        }
     }
-    
+    const togglePasswordVisibilityBtn = getElem('toggle-password-visibility'); //
+    // registerPasswordInput já foi definido anteriormente
+
+    if (togglePasswordVisibilityBtn && registerPasswordInput) { //
+        togglePasswordVisibilityBtn.addEventListener('click', () => {
+            const type = registerPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            registerPasswordInput.setAttribute('type', type);
+            // Altera o ícone do botão
+            const icon = togglePasswordVisibilityBtn.querySelector('i');
+            if (icon) {
+                icon.classList.toggle('fa-eye');
+                icon.classList.toggle('fa-eye-slash');
+            }
+        });
+    }
+
+
     async function showDashboard() { //
         if(authSection) authSection.classList.add('hidden'); //
         if(dashboardLayout) dashboardLayout.classList.add('hidden'); //
         if(loadingOverlay) loadingOverlay.classList.remove('hidden'); //
+        // console.log("Loading overlay should be visible now."); // Removido para limpeza
 
         try {
             await fetchAndRenderDashboardStats(); //
@@ -219,8 +224,9 @@ document.addEventListener('DOMContentLoaded', () => {
             await fetchAndRenderFinances(); //
             
             if(dashboardLayout) dashboardLayout.classList.remove('hidden'); //
+            // console.log("Dashboard should be visible now."); // Removido
 
-            const initialActiveTabButton = document.querySelector('.nav-btn[data-tab="dashboard-main"]'); //
+            const initialActiveTabButton = document.querySelector('.nav-btn[data-tab="dashboard-main"]'); // Corrigido para pegar o botão do painel principal
             if (initialActiveTabButton) { //
                 initialActiveTabButton.click(); //
             }
@@ -230,103 +236,65 @@ document.addEventListener('DOMContentLoaded', () => {
             logoutUser(); //
         } finally {
             if(loadingOverlay) loadingOverlay.classList.add('hidden'); //
+            // console.log("Loading overlay should be hidden now."); // Removido
         }
     }
 
 
     // --- LÓGICA DE AUTENTICAÇÃO ---
-    if (authTabButtons) { //
-        authTabButtons.forEach(button => { //
-            button.addEventListener('click', () => { //
-                authTabButtons.forEach(btn => btn.classList.remove('active')); //
-                button.classList.add('active'); //
+    if (authTabButtons) authTabButtons.forEach(button => { //
+        button.addEventListener('click', () => { //
+            authTabButtons.forEach(btn => btn.classList.remove('active')); //
+            button.classList.add('active'); //
 
-                authTabContents.forEach(tabContent => tabContent.classList.remove('active')); //
-                const tabContentElement = getElem(`${button.dataset.authTab}-tab-content`); //
-                if (tabContentElement) tabContentElement.classList.add('active'); //
+            authTabContents.forEach(tabContent => tabContent.classList.remove('active')); //
+            const tabContentElement = getElem(`${button.dataset.authTab}-tab-content`); //
+            if (tabContentElement) tabContentElement.classList.add('active'); //
 
-                if(loginUsernameInput) loginUsernameInput.value = ''; //
-                if(loginPasswordInput) loginPasswordInput.value = ''; //
-                if(registerUsernameInput) registerUsernameInput.value = ''; //
-                if(registerEmailInput) registerEmailInput.value = '';
-                if(registerPasswordInput) registerPasswordInput.value = ''; //
-                if(loginMessage) loginMessage.textContent = ''; //
-                if(registerMessage) registerMessage.textContent = ''; //
-                if(passwordStrengthIndicator) { //
-                    passwordStrengthIndicator.textContent = 'Força: ';
-                    passwordStrengthIndicator.style.color = 'grey';
-                }
-                // Resetar reCAPTCHA widgets
-                if (typeof grecaptcha !== 'undefined' && grecaptcha.reset) {
-                    const loginRecaptchaDiv = loginForm ? loginForm.querySelector('.g-recaptcha') : null;
-                    const registerRecaptchaDiv = registerForm ? registerForm.querySelector('.g-recaptcha') : null;
-                    if (loginRecaptchaDiv) try {grecaptcha.reset(0);} catch(e){} // Assumindo índice 0 para login
-                    if (registerRecaptchaDiv) try {grecaptcha.reset(1);} catch(e){} // Assumindo índice 1 para registro
-                }
-            });
+            if(loginUsernameInput) loginUsernameInput.value = ''; //
+            if(loginPasswordInput) loginPasswordInput.value = ''; //
+            if(registerUsernameInput) registerUsernameInput.value = ''; //
+            if(registerPasswordInput) registerPasswordInput.value = ''; //
+            if(loginMessage) loginMessage.textContent = ''; //
+            if(registerMessage) registerMessage.textContent = ''; //
         });
-    }
+    });
 
-    // --- LÓGICA PARA MOSTRAR/OCULTAR SENHA ---
-    if (togglePasswordVisibilityBtn && registerPasswordInput) { //
-        togglePasswordVisibilityBtn.addEventListener('click', () => { //
-            const type = registerPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password'; //
-            registerPasswordInput.setAttribute('type', type); //
-            const icon = togglePasswordVisibilityBtn.querySelector('i'); //
-            if (icon) { //
-                icon.classList.toggle('fa-eye'); //
-                icon.classList.toggle('fa-eye-slash'); //
-            }
-        });
-    }
+    // --- NOVO: Listener para feedback de força de senha ---
+    if (registerPasswordInput && passwordStrengthIndicator) {
+        registerPasswordInput.addEventListener('input', () => {
+            const password = registerPasswordInput.value;
+            let strengthText = 'Força: ';
+            let strengthColor = 'grey';
+            let score = 0;
 
-    // --- LISTENER PARA FEEDBACK DE FORÇA DA SENHA ---
-    if (registerPasswordInput && passwordStrengthIndicator) { //
-        registerPasswordInput.addEventListener('input', () => { //
-            const password = registerPasswordInput.value; //
-            let strengthText = 'Força: '; //
-            let strengthColor = 'grey'; //
-            let score = 0; //
-            const legendEl = document.getElementById('password-requirements-legend'); //
+            // Critérios de Exemplo - AJUSTE CONFORME O NECESSÁRIO
+            if (password.length >= 8) score++;
+            if (password.length >= 10) score++; // Bônus por comprimento maior
+            if (/[A-Z]/.test(password)) score++; // Letra maiúscula
+            if (/[a-z]/.test(password)) score++; // Letra minúscula
+            if (/[0-9]/.test(password)) score++; // Número
+            if (/[^A-Za-z0-9]/.test(password)) score++; // Caractere especial
 
-            if (password.length >= 8) score++; else if (password.length > 0) score--; // // Evitar negativo se vazio
-            if (password.length >= 10) score++;  //
-            if (/[A-Z]/.test(password)) score++; else if (password.length > 0) score--; //
-            if (/[a-z]/.test(password)) score++; else if (password.length > 0) score--; //
-            if (/[0-9]/.test(password)) score++; else if (password.length > 0) score--; //
-            if (/[^A-Za-z0-9\s]/.test(password)) score++; else if (password.length > 0) score--; // // Corrigido para não penalizar espaço
-            
-            score = Math.max(0, score); //
-
-            switch (score) { //
-                case 0: 
-                    strengthText += 'Muito Fraca'; 
-                    strengthColor = 'darkred'; 
-                    if (legendEl) legendEl.style.color = 'darkred';
-                    break;
-                case 1: case 2:
-                    strengthText += 'Fraca'; //
-                    strengthColor = 'red'; //
-                    if (legendEl) legendEl.style.color = 'red'; //
+            switch (score) {
+                case 0: case 1: case 2:
+                    strengthText += 'Fraca';
+                    strengthColor = 'red';
                     break;
                 case 3: case 4:
-                    strengthText += 'Média'; //
-                    strengthColor = 'orange'; //
-                    if (legendEl) legendEl.style.color = 'orange'; //
+                    strengthText += 'Média';
+                    strengthColor = 'orange';
                     break;
                 case 5: case 6:
-                    strengthText += 'Forte'; //
-                    strengthColor = 'green'; //
-                    if (legendEl) legendEl.style.color = 'green'; //
+                    strengthText += 'Forte';
+                    strengthColor = 'green';
                     break;
+                default:
+                    strengthText += 'Muito Fraca';
+                    strengthColor = 'darkred';
             }
-            if (password.length === 0) { // Se o campo estiver vazio, resetar
-                strengthText = 'Força: ';
-                strengthColor = 'grey';
-                if (legendEl) legendEl.style.color = 'var(--text-secondary)'; // Cor padrão da legenda
-            }
-            passwordStrengthIndicator.textContent = strengthText; //
-            passwordStrengthIndicator.style.color = strengthColor; //
+            passwordStrengthIndicator.textContent = strengthText;
+            passwordStrengthIndicator.style.color = strengthColor;
         });
     }
 
@@ -337,32 +305,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const username = loginUsernameInput.value.trim(); //
             const password = loginPasswordInput.value.trim(); //
 
-            const recaptchaWidgetLogin = loginForm.querySelector('.g-recaptcha'); //
-            let recaptchaResponse = ''; //
-            let loginWidgetId;
-            if (typeof grecaptcha !== 'undefined' && recaptchaWidgetLogin) { //
-                // Tenta obter o widgetId. Se o div do reCAPTCHA tiver um ID, use-o.
-                // Se não, o Google atribui IDs sequenciais (0, 1...).
-                // Assumindo que este é o primeiro widget na página/aba ativa.
-                try { 
-                    // Se você renderiza explicitamente com ID, use esse ID.
-                    // Caso contrário, o Google anexa o widget e o índice 0 pode funcionar se for o primeiro.
-                    // Esta parte pode ser frágil se múltiplos widgets estiverem sempre no DOM.
-                    const widgets = document.querySelectorAll('.g-recaptcha');
-                    if (widgets.length > 0 && loginForm.contains(widgets[0])) { // Verifica se o primeiro widget está no form de login
-                         loginWidgetId = 0; // Ou o ID que o google atribui a ele
-                         recaptchaResponse = grecaptcha.getResponse(loginWidgetId);
-                    }
-                } catch (err) { console.warn("reCAPTCHA widget (login) não encontrado ou erro ao obter resposta.");} //
-            }
+            // --- NOVO: Obter resposta do reCAPTCHA ---
+            const recaptchaResponse = (typeof grecaptcha !== 'undefined') ? grecaptcha.getResponse(0) : ''; // 0 é o ID do widget se houver apenas um, ou deixe vazio
+            // O widget de login será o primeiro na ordem do HTML se você adicionar em ambos.
+            // Se você tiver IDs específicos para os widgets do reCAPTCHA, use grecaptcha.getResponse(widgetId)
 
             if (!username || !password) { //
                 showAuthMessage(loginMessage, 'Por favor, preencha todos os campos.'); //
                 return; //
             }
-            if (typeof grecaptcha !== 'undefined' && recaptchaWidgetLogin && !recaptchaResponse) { //
-                showAuthMessage(loginMessage, 'Por favor, complete o reCAPTCHA.'); //
-                return; //
+            // --- NOVO: Validar reCAPTCHA no frontend (opcional, mas bom para UX) ---
+            if (typeof grecaptcha !== 'undefined' && !recaptchaResponse) { // Adicionar esta verificação
+                showAuthMessage(loginMessage, 'Por favor, complete o reCAPTCHA.');
+                return;
             }
 
             try {
@@ -372,7 +327,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     body: JSON.stringify({ 
                         username, 
                         password,
-                        recaptchaToken: recaptchaResponse 
+                        recaptchaToken: recaptchaResponse // --- NOVO: Enviar token do reCAPTCHA ---
                     }),
                 });
                 const data = await response.json(); //
@@ -391,12 +346,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     await showDashboard(); //
                 } else { //
                     showAuthMessage(loginMessage, data.message || 'Erro ao fazer login.'); //
-                    if (typeof grecaptcha !== 'undefined' && recaptchaWidgetLogin && loginWidgetId !== undefined) try {grecaptcha.reset(loginWidgetId);} catch(e){} //
+                    if (typeof grecaptcha !== 'undefined') grecaptcha.reset(0); // Resetar o reCAPTCHA do login em caso de falha
                 }
             } catch (error) { //
                 console.error('Erro de rede ao fazer login:', error); //
                 showAuthMessage(loginMessage, 'Erro de conexão com o servidor.'); //
-                if (typeof grecaptcha !== 'undefined' && recaptchaWidgetLogin && loginWidgetId !== undefined) try {grecaptcha.reset(loginWidgetId);} catch(e){} //
+                if (typeof grecaptcha !== 'undefined') grecaptcha.reset(0); // Resetar o reCAPTCHA do login
             }
         });
     }
@@ -404,50 +359,55 @@ document.addEventListener('DOMContentLoaded', () => {
     if (registerForm) { //
         registerForm.addEventListener('submit', async (e) => { //
             e.preventDefault(); //
-            
+            // --- NOVO: Adicionar campos de email, nome, sobrenome etc. aqui ---
+            // const email = getElem('register-email').value.trim(); // Exemplo, crie o input no HTML
+            // const firstName = getElem('register-firstName').value.trim(); // Exemplo
+            // const lastName = getElem('register-lastName').value.trim(); // Exemplo
+
             const username = registerUsernameInput.value.trim(); //
-            const email = registerEmailInput ? registerEmailInput.value.trim() : ''; 
             const password = registerPasswordInput.value.trim(); //
 
-            const recaptchaWidgetRegister = registerForm.querySelector('.g-recaptcha'); //
-            let recaptchaResponse = ''; //
-            let registerWidgetId;
-            if (typeof grecaptcha !== 'undefined' && recaptchaWidgetRegister) { //
-                try { 
-                    const widgets = document.querySelectorAll('.g-recaptcha');
-                    // Assumindo que o de registro é o segundo se ambos estiverem no DOM, ou o primeiro se for o único
-                    if (widgets.length > 1 && registerForm.contains(widgets[1])) {
-                        registerWidgetId = 1;
-                        recaptchaResponse = grecaptcha.getResponse(registerWidgetId);
-                    } else if (widgets.length > 0 && registerForm.contains(widgets[0])) {
-                         registerWidgetId = 0;
-                         recaptchaResponse = grecaptcha.getResponse(registerWidgetId);
-                    }
-                } catch (err) {console.warn("reCAPTCHA widget (register) não encontrado ou erro ao obter resposta.");} //
-            }
+            // --- NOVO: Obter resposta do reCAPTCHA ---
+            // Assumindo que o widget de registro é o segundo, ou tem um ID específico
+            // Se você tiver apenas um widget de reCAPTCHA por vez (ex: um para login, outro para registro, e eles não estão visíveis ao mesmo tempo)
+            // grecaptcha.getResponse() pode funcionar. Se tiver múltiplos widgets visíveis, você precisará de IDs.
+            // Para simplicidade, vamos assumir que você dará IDs aos seus widgets:
+            // <div class="g-recaptcha" data-sitekey="SUA_CHAVE" id="recaptcha-register-widget"></div>
+            // const recaptchaRegisterWidgetId = ... (obtenha o ID do widget se você o atribuiu)
+            const recaptchaResponse = (typeof grecaptcha !== 'undefined') ? grecaptcha.getResponse(1) : ''; // Supondo que o de registro é o segundo (ID 1)
+            // ou grecaptcha.getResponse() se apenas um estiver ativo/renderizado na aba.
 
-            if (!username || !email || !password) { //
-                showAuthMessage(registerMessage, 'Por favor, preencha nome de usuário, e-mail e senha.'); //
+            // --- NOVO: Adicionar validação para os novos campos ---
+            // if (!email || !firstName || !lastName) {
+            //     showAuthMessage(registerMessage, 'Por favor, preencha nome, sobrenome e email.');
+            //     return;
+            // }
+            if (!username || !password) { //
+                showAuthMessage(registerMessage, 'Por favor, preencha todos os campos.'); //
                 return; //
             }
-            
-            const passwordMinLength = 8; 
+            // Validação de força da senha no frontend (opcional, mas bom para UX)
+            // A validação principal será no backend
+            const passwordMinLength = 8; // Defina seus critérios
             if (password.length < passwordMinLength) { //
-                 showAuthMessage(registerMessage, `A senha deve ter no mínimo ${passwordMinLength} caracteres.`); //
-                 return; //
-            }
-
-            if (typeof grecaptcha !== 'undefined' && recaptchaWidgetRegister && !recaptchaResponse) { //
-                showAuthMessage(registerMessage, 'Por favor, complete o reCAPTCHA.'); //
+                showAuthMessage(registerMessage, `A senha deve ter no mínimo ${passwordMinLength} caracteres.`); //
                 return; //
             }
+            // --- NOVO: Validar reCAPTCHA no frontend (opcional, mas bom para UX) ---
+            if (typeof grecaptcha !== 'undefined' && !recaptchaResponse) {
+                showAuthMessage(registerMessage, 'Por favor, complete o reCAPTCHA.');
+                return;
+            }
+
 
             try {
                 const bodyPayload = { //
+                    // email, // NOVO
+                    // firstName, // NOVO
+                    // lastName, // NOVO
                     username, //
-                    email,
                     password, //
-                    recaptchaToken: recaptchaResponse 
+                    recaptchaToken: recaptchaResponse // --- NOVO: Enviar token do reCAPTCHA ---
                 };
 
                 const response = await fetch(`${API_BASE_URL}/auth/register`, { //
@@ -458,28 +418,41 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await response.json(); //
 
                 if (response.ok) { //
+                    // Se a verificação de e-mail for implementada, não logue o usuário imediatamente.
+                    // Apenas mostre a mensagem para verificar o e-mail.
                     showAuthMessage(registerMessage, data.message, true); //
-                    
-                    if (typeof grecaptcha !== 'undefined' && recaptchaWidgetRegister && registerWidgetId !== undefined) try {grecaptcha.reset(registerWidgetId);} catch(e){} //
-                    if (registerForm) registerForm.reset(); //
-                    if(passwordStrengthIndicator) { //
-                        passwordStrengthIndicator.textContent = 'Força: '; //
-                        passwordStrengthIndicator.style.color = 'grey'; //
-                        const legendEl = document.getElementById('password-requirements-legend');
-                        if(legendEl) legendEl.style.color = 'var(--text-secondary)';
+                    // authToken = data.token; // // COMENTAR se houver verificação de e-mail
+                    // currentUserId = data.userId; // // COMENTAR
+                    // localStorage.setItem('authToken', authToken); // // COMENTAR
+                    // localStorage.setItem('userId', currentUserId); // // COMENTAR
+                    // await showDashboard(); // // COMENTAR
+                    if (typeof grecaptcha !== 'undefined') grecaptcha.reset(1); // Resetar o reCAPTCHA do registro
+                    // Limpar campos do formulário de registro após sucesso
+                    registerForm.reset();
+                    if(passwordStrengthIndicator) {
+                        passwordStrengthIndicator.textContent = 'Força: ';
+                        passwordStrengthIndicator.style.color = 'grey';
                     }
+                    // Opcional: redirecionar para a aba de login ou mostrar uma mensagem proeminente
+                    // document.querySelector('[data-auth-tab="login"]').click();
                 } else { //
                     showAuthMessage(registerMessage, data.message || 'Erro ao registrar.'); //
-                    if (typeof grecaptcha !== 'undefined' && recaptchaWidgetRegister && registerWidgetId !== undefined) try {grecaptcha.reset(registerWidgetId);} catch(e){} //
+                    if (typeof grecaptcha !== 'undefined') grecaptcha.reset(1); // Resetar o reCAPTCHA do registro
                 }
             } catch (error) { //
                 console.error('Erro de rede ao registrar:', error); //
                 showAuthMessage(registerMessage, 'Erro de conexão com o servidor.'); //
-                if (typeof grecaptcha !== 'undefined' && recaptchaWidgetRegister && registerWidgetId !== undefined) try {grecaptcha.reset(registerWidgetId);} catch(e){} //
+                if (typeof grecaptcha !== 'undefined') grecaptcha.reset(1); // Resetar o reCAPTCHA do registro
             }
         });
     }
-    
+
+    // ... (logoutUser, lógica de navegação, funções de produto, dashboard, finanças, modais permanecem em grande parte as mesmas) ...
+    // A função createProductCard, fetchAndRenderProducts, fetchAndRenderDashboardStats, renderGenericChart, 
+    // fetchAndRenderFinances, clearFinanceForm, setupFinanceEdit, setupScrapeEventListeners,
+    // handleSaveProduct, clearAddProductFormAddTab, clearProductScrapeFormProductsTab,
+    // e todos os event listeners para modais e ações de card devem funcionar como antes.
+
     // --- FUNÇÃO DE LOGOUT ---
     if (logoutBtn) { //
         logoutBtn.addEventListener('click', logoutUser); //
@@ -500,10 +473,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!navBtn || navBtn.id === 'logout-btn') return; //
             const tabId = navBtn.dataset.tab; //
 
-            if(tabButtons) tabButtons.forEach(btn => btn.classList.remove('active')); //
-            if(navBtn) navBtn.classList.add('active'); //
+            tabButtons.forEach(btn => btn.classList.remove('active')); //
+            navBtn.classList.add('active'); //
 
-            if(tabContents) tabContents.forEach(tabContent => { //
+            tabContents.forEach(tabContent => { //
                 tabContent.classList.toggle('active', tabContent.id === `${tabId}-tab`); //
             });
 
@@ -536,52 +509,794 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // --- FUNÇÕES DE PRODUTOS ---
-    const createProductCard = (product) => { /* ...mesma função... */ }; //
-    const fetchAndRenderProducts = async () => { /* ...mesma função... */ }; //
+    const createProductCard = (product) => { //
+        const card = document.createElement('li'); //
+        card.className = 'product-card'; //
+        card.dataset.productId = product._id; //
+        card.dataset.productJson = JSON.stringify(product); //
+
+        const formattedPrice = `R$ ${parseFloat(product.price || 0).toFixed(2)}`; //
+        card.innerHTML = `
+            <div class="card-image-container">
+                <img src="${product.image || 'https://via.placeholder.com/200x150?text=Indisponível'}" alt="${product.name || 'Produto'}" class="card-image">
+            </div>
+            <div class="card-content">
+                <span class="card-title">${product.name || 'Nome Indisponível'}</span>
+                <span class="card-price">${product.price ? formattedPrice : 'Preço Indisponível'}</span>
+            </div>
+            <div class="card-actions">
+                ${product.status === 'pendente' ? '<i class="fas fa-check-circle action-purchase" title="Marcar como Comprado"></i>' : ''}
+                <i class="fas fa-edit action-edit" title="Editar"></i>
+                <i class="fas fa-trash-alt action-delete" title="Excluir"></i>
+            </div>
+        `; //
+        return card; //
+    };
+
+    const fetchAndRenderProducts = async () => { //
+        if (!pendingList || !purchasedList) { //
+            console.warn("Elementos das listas de produtos não encontrados."); //
+            return; //
+        }
+        if (!currentUserId) return; //
+
+        try {
+            const response = await authenticatedFetch(`${API_BASE_URL}/products?userId=${currentUserId}`); //
+            if (!response.ok) throw new Error(`Erro ao buscar produtos: ${response.statusText}`); //
+            const products = await response.json(); //
+
+            if(pendingList) pendingList.innerHTML = ''; //
+            if(purchasedList) purchasedList.innerHTML = ''; //
+            products.forEach(product => { //
+                const card = createProductCard(product); //
+                if (product.status === 'pendente' && pendingList) pendingList.appendChild(card); //
+                else if ((product.status === 'comprado' || product.status === 'descartado') && purchasedList) purchasedList.appendChild(card); //
+            });
+        } catch (error) { console.error("Erro em fetchAndRenderProducts:", error); } //
+    };
 
     // --- FUNÇÕES DE DASHBOARD PRINCIPAL ---
-    const fetchAndRenderDashboardStats = async () => { /* ...mesma função... */ }; //
-    const renderGenericChart = (canvasEl, type, data, chartInstanceRef, chartIdForInstanceCheck, isCategory = false) => { /* ...mesma função... */}; //
+    const fetchAndRenderDashboardStats = async () => { //
+        // console.log("Buscando estatísticas do dashboard..."); //
+        if (!currentUserId) return; //
+
+        if(getElem('total-products-stat')) getElem('total-products-stat').textContent = "0"; //
+        if(getElem('purchased-products-stat')) getElem('purchased-products-stat').textContent = "0"; //
+        if(getElem('pending-products-stat')) getElem('pending-products-stat').textContent = "0"; //
+        if(getElem('total-spent-stat')) getElem('total-spent-stat').textContent = "R$ 0,00"; //
+
+        try {
+            const statsResponse = await authenticatedFetch(`${API_BASE_URL}/products/stats?userId=${currentUserId}`); //
+            if (!statsResponse.ok) throw new Error(`Erro ao buscar estatísticas: ${statsResponse.statusText}`); //
+            const stats = await statsResponse.json(); //
+
+            if(getElem('total-products-stat')) getElem('total-products-stat').textContent = stats.totalProducts; //
+            if(getElem('purchased-products-stat')) getElem('purchased-products-stat').textContent = stats.purchasedProducts; //
+            if(getElem('pending-products-stat')) getElem('pending-products-stat').textContent = stats.pendingProducts; //
+            if(getElem('total-spent-stat')) { //
+                getElem('total-spent-stat').textContent = `R$ ${stats.totalSpent.toFixed(2)}`; //
+            }
+        } catch(err) { console.error("Erro ao buscar produtos para stats:", err); } //
+
+        let financeOverviewData = []; //
+        try {
+            const financeOverviewResponse = await authenticatedFetch(`${API_BASE_URL}/finances?userId=${currentUserId}`); //
+            if (financeOverviewResponse.ok) { //
+                financeOverviewData = await financeOverviewResponse.json(); //
+                // console.log("Dados financeiros para o dashboard:", financeOverviewData); //
+            } else { //
+                console.warn("API de finanças não retornou dados. Usando mocks para o gráfico financeiro do dashboard."); //
+                financeOverviewData = []; //
+            }
+        } catch (err) { //
+            console.error("Erro ao buscar dados financeiros para o dashboard. Usando mocks:", err); //
+            financeOverviewData = []; //
+        }
+        renderGenericChart(financeOverviewChartCanvasEl, 'line', financeOverviewData, financeOverviewChart, 'financeOverviewChart'); //
+
+
+        let categoryData = { labels: [], data: [] }; //
+        try {
+            const categoryDistResponse = await authenticatedFetch(`${API_BASE_URL}/products/category-distribution?userId=${currentUserId}`); //
+            if (categoryDistResponse.ok) { //
+                categoryData = await categoryDistResponse.json(); //
+                // console.log("Dados de categoria para o dashboard:", categoryData); //
+            } else { //
+                console.warn("API de distribuição de categoria não retornou dados. Usando mocks."); //
+                categoryData = { //
+                    labels: ['Eletrônicos', 'Roupas', 'Casa', 'Livros', 'Outros'], //
+                    data: [5, 3, 2, 1, 4] //
+                };
+            }
+        } catch (err) { //
+            console.error("Erro ao buscar dados de categoria para o dashboard. Usando mocks:", err); //
+            categoryData = { //
+                labels: ['Eletrônicos', 'Roupas', 'Casa', 'Livros', 'Outros'], //
+                data: [5, 3, 2, 1, 4] //
+            };
+        }
+        renderGenericChart(categoryDistributionChartCanvasEl, 'doughnut', categoryData, categoryDistributionChart, 'categoryDistributionChart', true); //
+    };
     
-    // --- FUNÇÕES DE FINANÇAS DETALHADO ---
+    // ... (renderGenericChart e o restante das funções de finanças e produto permanecem os mesmos)
+    const renderGenericChart = (canvasEl, type, data, chartInstanceRef, chartIdForInstanceCheck, isCategory = false) => { //
+        if (!canvasEl) { //
+            // console.warn(`Elemento canvas para o gráfico ${chartIdForInstanceCheck} não encontrado.`); //
+            return; //
+        }
+
+        // A referência do chartInstanceRef precisa ser passada como um objeto para ser modificável, 
+        // ou o chartInstance (financeChartInstance, etc.) precisa ser atualizado diretamente.
+        // Para simplificar, vamos assumir que as variáveis globais são atualizadas.
+        let currentChartInstance;
+        if (chartIdForInstanceCheck === 'financialLineChart') currentChartInstance = financeChartInstance;
+        else if (chartIdForInstanceCheck === 'financeOverviewChart') currentChartInstance = financeOverviewChart;
+        else if (chartIdForInstanceCheck === 'categoryDistributionChart') currentChartInstance = categoryDistributionChart;
+
+
+        if (currentChartInstance && currentChartInstance.canvas && currentChartInstance.canvas.id === canvasEl.id) { //
+            currentChartInstance.destroy(); //
+        }
+
+        let chartData, chartOptions; //
+
+        if (isCategory) { //
+            chartData = { //
+                labels: data.labels, //
+                datasets: [{ //
+                    data: data.data, //
+                    backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#6366F1', '#14B8A6', '#F97316', '#8B5CF6'], //
+                    hoverOffset: 10 //
+                }]
+            };
+            chartOptions = { //
+                responsive: true, //
+                maintainAspectRatio: false, //
+                plugins: { //
+                    legend: { //
+                        position: 'bottom', //
+                        labels: { //
+                            color: '#121212' //
+                        }
+                    },
+                    title: { //
+                        display: true, //
+                        text: isCategory ? 'Distribuição por Categoria' : 'Visão Geral Financeira', //
+                        color: '#121212' //
+                    }
+                }
+            };
+        } else { //
+            const sortedEntries = [...data].sort((a, b) => b.mes_ano.localeCompare(a.mes_ano)); //
+            const labels = sortedEntries.map(e => { //
+                const [year, month] = e.mes_ano.split('-'); //
+                const date = new Date(year, month - 1); //
+                return date.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' }); //
+            }).reverse(); //
+            const revenueData = sortedEntries.map(e => e.receita).reverse(); //
+            const expensesData = sortedEntries.map(e => e.gastos).reverse(); //
+
+            chartData = { //
+                labels: labels, //
+                datasets: [ //
+                    {
+                        label: 'Receita Mensal', //
+                        data: revenueData, //
+                        borderColor: 'rgb(62, 235, 103)', //
+                        backgroundColor: 'rgb(0, 255, 38)', //
+                        fill: false, //
+                        tension: 0.1 //
+                    },
+                    {
+                        label: 'Gastos Mensais', //
+                        data: expensesData, //
+                        borderColor: 'rgba(255, 99, 132, 1)', //
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)', //
+                        fill: false, //
+                        tension: 0.1 //
+                    }
+                ]
+            };
+            chartOptions = { //
+                responsive: true, //
+                maintainAspectRatio: false, //
+                scales: { //
+                    x: { //
+                        ticks: { color: '#121212' }, //
+                        grid: { color: 'rgba(224, 224, 224, 0.1)' } //
+                    },
+                    y: { //
+                        beginAtZero: true, //
+                        title: { display: true, text: 'Valor (R$)', color: '#121212' }, //
+                        ticks: { color: '#121212' }, //
+                        grid: { color: 'rgba(224, 224, 224, 0.1)' } //
+                    }
+                },
+                plugins: { //
+                    legend: { //
+                        position: 'top', //
+                        labels: { color: '#121212' } //
+                    },
+                    title: { //
+                        display: true, //
+                        text: isCategory ? 'Distribuição por Categoria' : 'Evolução Financeira Mensal', //
+                        color: '#121212' //
+                    }
+                }
+            };
+        }
+
+        const newChartInstance = new Chart(canvasEl.getContext('2d'), { type, data: chartData, options: chartOptions }); //
+
+        // Atualizar as referências globais
+        if (canvasEl.id === 'financialLineChart') financeChartInstance = newChartInstance; //
+        else if (canvasEl.id === 'financeOverviewChart') financeOverviewChart = newChartInstance; //
+        else if (canvasEl.id === 'categoryDistributionChart') categoryDistributionChart = newChartInstance; //
+    };
+    
     let financesData = []; //
-    const fetchAndRenderFinances = async () => { /* ...mesma função... */ }; //
-    const clearFinanceForm = () => { /* ...mesma função... */ }; //
-    const setupFinanceEdit = (financeEntry) => { /* ...mesma função... */ }; //
+
+    const fetchAndRenderFinances = async () => { //
+        if (!financeList || !totalBalanceElem) return; //
+        if (!currentUserId) return; //
+
+        if (financeMonthInput) financeMonthInput.disabled = false; //
+        if (financeRevenueInput) financeRevenueInput.disabled = false; //
+        if (financeExpensesInput) financeExpensesInput.disabled = false; //
+
+        try {
+            const response = await authenticatedFetch(`${API_BASE_URL}/finances?userId=${currentUserId}`); //
+            if (!response.ok) throw new Error(`Erro ao buscar finanças: ${response.statusText}`); //
+            financesData = await response.json(); //
+            // console.log("Finanças carregadas da API:", financesData); //
+        } catch (error) { //
+            console.error("Erro em fetchAndRenderFinances:", error); //
+            financesData = []; //
+            showTabMessage(financeEntryMessage, "Não foi possível carregar os dados financeiros. Verifique a conexão ou tente novamente.", false); //
+        }
+
+        if(financeList) financeList.innerHTML = ''; //
+        let totalBalance = 0; //
+        const sortedFinancesForList = [...financesData].sort((a, b) => b.mes_ano.localeCompare(a.mes_ano)); //
+
+        sortedFinancesForList.forEach(entry => { //
+            const balance = entry.receita - entry.gastos; //
+            totalBalance += balance; //
+            const li = document.createElement('li'); //
+            li.dataset.financeId = entry._id; //
+            li.dataset.financeJson = JSON.stringify(entry); //
+
+            const formattedMonthYear = new Date(entry.mes_ano + "-02").toLocaleDateString('pt-BR', { month: 'long', year: 'numeric', timeZone: 'UTC' }); //
+
+            li.innerHTML = `
+                <div class="finance-item-details">
+                    <strong>${formattedMonthYear}</strong>
+                    <span>Receita: <span class="revenue">R$ ${entry.receita.toFixed(2)}</span></span>
+                    <span>Gastos: <span class="expenses">R$ ${entry.gastos.toFixed(2)}</span></span>
+                    <span>Balanço: <span class="balance">R$ ${balance.toFixed(2)}</span></span>
+                </div>
+                <div class="finance-item-actions">
+                    <button class="edit-finance-btn" data-id="${entry._id}" title="Editar Registro"><i class="fa fa-pen"></i></button>
+                    <button class="delete-finance-btn" data-id="${entry._id}" title="Excluir Registro"><i class="fa fa-trash"></i></button>
+                </div>
+            `; //
+            if(financeList) financeList.appendChild(li); //
+        });
+        if(totalBalanceElem) totalBalanceElem.textContent = `R$ ${totalBalance.toFixed(2)}`; //
+
+        renderGenericChart(financeChartCanvas, 'line', financesData, financeChartInstance, 'financialLineChart'); //
+    };
+
+    const clearFinanceForm = () => { //
+        if(financeMonthInput) financeMonthInput.value = ''; //
+        if(financeRevenueInput) financeRevenueInput.value = ''; //
+        if(financeExpensesInput) financeExpensesInput.value = ''; //
+        if(addFinanceEntryBtn) addFinanceEntryBtn.innerHTML = '<i class="fas fa-save"></i> Salvar Registro'; //
+        if(cancelFinanceEditBtn) cancelFinanceEditBtn.classList.add('hidden'); //
+        editingFinanceId = null; //
+        if(financeEntryMessage) financeEntryMessage.textContent = ''; //
+    };
+
+    const setupFinanceEdit = (financeEntry) => { //
+        if(financeMonthInput) financeMonthInput.value = financeEntry.mes_ano; //
+        if(financeRevenueInput) financeRevenueInput.value = financeEntry.receita; //
+        if(financeExpensesInput) financeExpensesInput.value = financeEntry.gastos; //
+        if(addFinanceEntryBtn) addFinanceEntryBtn.innerHTML = '<i class="fas fa-save"></i> Atualizar Registro'; //
+        if(cancelFinanceEditBtn) cancelFinanceEditBtn.classList.remove('hidden'); //
+        editingFinanceId = financeEntry._id; //
+        if(financeEntryMessage) financeEntryMessage.textContent = ''; //
+    };
     
-    // --- LÓGICA DE EVENTOS PARA SCRAPING E SALVAR PRODUTO ---
-    function setupScrapeEventListeners(urlInputEl, verifyBtnEl, infoDivEl, messageEl, saveBtnEl) { /* ...mesma função... */ } //
-    if (productUrlInputAddTab && verifyUrlBtnAddTab && verifiedProductInfoDivAddTab && addProductMessageAddTab && saveProductBtnAddTab) { //
+    function setupScrapeEventListeners(urlInputEl, verifyBtnEl, infoDivEl, messageEl, saveBtnEl) { //
+        if (verifyBtnEl && urlInputEl && infoDivEl) { //
+            verifyBtnEl.addEventListener('click', async () => { //
+                const url = urlInputEl.value.trim(); //
+                if (!url) return showTabMessage(messageEl, 'Por favor, insira uma URL.', false); //
+                verifyBtnEl.disabled = true; //
+                verifyBtnEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...'; //
+                if(messageEl) messageEl.textContent = ''; //
+
+                try {
+                    const response = await fetch(`${API_BASE_URL}/products/scrape-url`, { //
+                        method: 'POST', //
+                        headers: { 'Content-Type': 'application/json' }, //
+                        body: JSON.stringify({ url }), //
+                    });
+                    if (!response.ok) { //
+                        const errorData = await response.json(); //
+                        throw new Error(errorData.message || `Erro HTTP ${response.status}`); //
+                    }
+                    scrapedProductData = await response.json(); //
+
+                    const verifiedImgEl = infoDivEl.querySelector('img[id^="verifiedProductImage"]'); //
+                    const verifiedNameEl = infoDivEl.querySelector('span[id^="verifiedProductName"]'); //
+                    const verifiedPriceEl = infoDivEl.querySelector('span[id^="verifiedProductPrice"]'); //
+
+                    if(verifiedImgEl) verifiedImgEl.src = scrapedProductData.image || 'https://via.placeholder.com/100?text=Sem+Imagem'; //
+                    if(verifiedNameEl) verifiedNameEl.textContent = scrapedProductData.name || 'Nome não encontrado'; //
+                    if(verifiedPriceEl) verifiedPriceEl.textContent = scrapedProductData.price ? `R$ ${parseFloat(scrapedProductData.price).toFixed(2)}` : 'Preço não encontrado'; //
+
+                    if (manualProductNameInput) manualProductNameInput.value = scrapedProductData.name || ''; //
+                    if (manualProductPriceInput) manualProductPriceInput.value = scrapedProductData.price || ''; //
+                    if (manualProductUrlInput) manualProductUrlInput.value = url; //
+                    if (manualProductImageUrlInput) manualProductImageUrlInput.value = scrapedProductData.image || ''; //
+                    if (manualProductCategorySelect) manualProductCategorySelect.value = scrapedProductData.category || 'Outros'; //
+                    if (manualProductBrandInput) manualProductBrandInput.value = scrapedProductData.brand || ''; //
+                    if (manualProductDescriptionTextarea) manualProductDescriptionTextarea.value = scrapedProductData.description || ''; //
+
+
+                    if (infoDivEl) { //
+                        infoDivEl.classList.remove('hidden'); //
+                        if (saveBtnEl) saveBtnEl.style.display = 'inline-flex'; //
+                    }
+                    showTabMessage(messageEl, 'Produto verificado com sucesso! Você pode ajustar os detalhes e salvar.', true); //
+
+                } catch (error) { //
+                    showTabMessage(messageEl, `Erro na verificação: ${error.message}`, false); //
+                    if (infoDivEl) infoDivEl.classList.add('hidden'); //
+                    if (saveBtnEl) saveBtnEl.style.display = 'none'; //
+                }
+                finally { verifyBtnEl.disabled = false; verifyBtnEl.innerHTML = '<i class="fas fa-search-location"></i> Verificar URL'; } //
+            });
+        }
+    }
+    
+    if (productUrlInputAddTab && verifyUrlBtnAddTab && verifiedProductInfoDivAddTab && addProductMessageAddTab && saveProductBtnAddTab) {
         setupScrapeEventListeners(productUrlInputAddTab, verifyUrlBtnAddTab, verifiedProductInfoDivAddTab, addProductMessageAddTab, saveProductBtnAddTab); //
     }
-    if (productUrlInputProductsTab && verifyUrlBtnProductsTab && verifiedProductInfoDivProductsTab && addProductMessageProductsTab && saveProductBtnProductsTab) { //
+    if (productUrlInputProductsTab && verifyUrlBtnProductsTab && verifiedProductInfoDivProductsTab && addProductMessageProductsTab && saveProductBtnProductsTab) {
         setupScrapeEventListeners(productUrlInputProductsTab, verifyUrlBtnProductsTab, verifiedProductInfoDivProductsTab, addProductMessageProductsTab, saveProductBtnProductsTab); //
     }
-    if (saveProductBtnAddTab) { /* ...mesma função... */ } //
-    if (saveProductBtnProductsTab) { /* ...mesma função... */ } //
-    async function handleSaveProduct(messageElement) { /* ...mesma função... */ } //
-    function clearAddProductFormAddTab() { /* ...mesma função... */ } //
-    function clearProductScrapeFormProductsTab() { /* ...mesma função... */ } //
-    
-    // --- DELEGAÇÃO DE EVENTOS PARA CARDS E MODAIS ---
-    const mainContentArea = document.querySelector('.main-content-area'); //
-    if (mainContentArea) { //
-        mainContentArea.addEventListener('click', async (e) => { /* ...mesma função... */ }); //
-    }
-    if (detailsModal && modalProductImage) { /* ...mesma função... */ } //
-    function openImageModal(imageSrc) { /* ...mesma função... */ } //
-    if (imageModal) { /* ...mesma função... */ } //
-    if (detailsModal) { /* ...mesma função... */ } //
-    const closeEditModalBtn = editModal ? editModal.querySelector('.close-modal-btn') : null; //
-    if (editModal && closeEditModalBtn) { /* ...mesma função... */ } //
-    if (detailsModal) { /* ...mesma função para ações dentro do modal de detalhes ... */ } //
-    if (editForm) { /* ...mesma função para submit do formulário de edição ... */ } //
-    
-    // --- LÓGICA PARA FINANÇAS ---
-    if(addFinanceEntryBtn && financeMonthInput && financeRevenueInput && financeExpensesInput) { /* ...mesma função... */ } //
-    if(cancelFinanceEditBtn) { /* ...mesma função... */ } //
-    if(financeList) { /* ...mesma função... */ } //
 
+    if (saveProductBtnAddTab) { //
+        saveProductBtnAddTab.addEventListener('click', async () => { //
+            await handleSaveProduct(addProductMessageAddTab); //
+        });
+    }
+
+    if (saveProductBtnProductsTab) { //
+        saveProductBtnProductsTab.addEventListener('click', async () => { //
+            await handleSaveProduct(addProductMessageProductsTab); //
+        });
+    }
+
+    async function handleSaveProduct(messageElement) { //
+        if (!currentUserId) { showTabMessage(messageElement, 'Você precisa estar logado para adicionar produtos.', false); return; } //
+
+        const name = manualProductNameInput.value.trim(); //
+        const price = parseFloat(manualProductPriceInput.value); //
+        const urlOrigin = manualProductUrlInput.value.trim(); //
+        const image = manualProductImageUrlInput.value.trim(); //
+        const category = manualProductCategorySelect.value; //
+        const brand = manualProductBrandInput.value.trim(); //
+        const description = manualProductDescriptionTextarea.value.trim(); //
+
+        if (!name || isNaN(price) || price <= 0 || !urlOrigin) { //
+            return showTabMessage(messageElement, 'Nome, preço (positivo) e URL de origem são obrigatórios.', false); //
+        }
+
+        const productToAdd = { //
+            name, //
+            price, //
+            urlOrigin, //
+            image: image || undefined, //
+            category: category || 'Outros', //
+            brand: brand || undefined, //
+            description: description || undefined, //
+            status: 'pendente' //
+        };
+
+        Object.keys(productToAdd).forEach(key => productToAdd[key] === undefined && delete productToAdd[key]); //
+
+        try {
+            const response = await authenticatedFetch(`${API_BASE_URL}/products`, { //
+                method: 'POST', //
+                body: JSON.stringify(productToAdd), //
+            });
+            if (!response.ok) { //
+                const errorData = await response.json(); //
+                throw new Error(errorData.message || response.statusText); //
+            }
+            showTabMessage(messageElement, "Produto salvo com sucesso!", true); //
+            clearAddProductFormAddTab(); //
+            clearProductScrapeFormProductsTab(); //
+
+            fetchAndRenderProducts(); //
+            fetchAndRenderDashboardStats(); //
+        } catch (error) { //
+            showTabMessage(messageElement, `Erro ao salvar produto: ${error.message}`, false); //
+            console.error("Erro ao salvar produto:", error); //
+        }
+    }
+    
+    function clearAddProductFormAddTab() { //
+        if (productUrlInputAddTab) productUrlInputAddTab.value = ''; //
+        if (verifiedProductInfoDivAddTab) verifiedProductInfoDivAddTab.classList.add('hidden'); //
+        if (saveProductBtnAddTab) saveProductBtnAddTab.style.display = 'none'; //
+        scrapedProductData = null; //
+
+        if (manualProductNameInput) manualProductNameInput.value = ''; //
+        if (manualProductPriceInput) manualProductPriceInput.value = ''; //
+        if (manualProductUrlInput) manualProductUrlInput.value = ''; //
+        if (manualProductImageUrlInput) manualProductImageUrlInput.value = ''; //
+        if (manualProductCategorySelect) manualProductCategorySelect.value = 'Outros'; //
+        if (manualProductBrandInput) manualProductBrandInput.value = ''; //
+        if (manualProductDescriptionTextarea) manualProductDescriptionTextarea.value = ''; //
+
+        if(addProductMessageAddTab) addProductMessageAddTab.textContent = ''; //
+    }
+
+    function clearProductScrapeFormProductsTab() { //
+        if (productUrlInputProductsTab) productUrlInputProductsTab.value = ''; //
+        if (verifiedProductInfoDivProductsTab) verifiedProductInfoDivProductsTab.classList.add('hidden'); //
+        if (saveProductBtnProductsTab) saveProductBtnProductsTab.style.display = 'none'; //
+        if(addProductMessageProductsTab) addProductMessageProductsTab.textContent = ''; //
+    }
+    
+    const mainContentArea = document.querySelector('.main-content-area');
+    if (mainContentArea) {
+        mainContentArea.addEventListener('click', async (e) => { //
+            const target = e.target; //
+            const card = target.closest('.product-card'); //
+
+            if (!card) return; //
+
+            const productId = card.dataset.productId; //
+            const productData = JSON.parse(card.dataset.productJson); //
+
+            if (target.classList.contains('action-delete')) { //
+                e.stopPropagation(); //
+                if (!confirm('Tem certeza que deseja excluir este produto?')) return; //
+                if (!currentUserId) { showTabMessage(addProductMessageAddTab, 'Você precisa estar logado para excluir produtos.', false); return; } //
+
+                try {
+                    const response = await authenticatedFetch(`${API_BASE_URL}/products/${productId}`, { //
+                        method: 'DELETE', //
+                    });
+                    if (!response.ok) throw new Error(`Erro ao excluir: ${response.statusText}`); //
+                    card.remove(); //
+                    fetchAndRenderDashboardStats(); //
+                    fetchAndRenderProducts(); // Adicionado para atualizar a lista de produtos também
+                    showTabMessage(addProductMessageAddTab, "Produto excluído com sucesso!", true); //
+                } catch (error) { showTabMessage(addProductMessageAddTab, `Erro ao excluir: ${error.message}`, false); } //
+            }
+            else if (target.classList.contains('action-purchase')) { //
+                e.stopPropagation(); //
+                if (!currentUserId) { showTabMessage(addProductMessageAddTab, 'Você precisa estar logado para marcar produtos.', false); return; } //
+
+                try {
+                    const response = await authenticatedFetch(`${API_BASE_URL}/products/${productId}/purchase`, { //
+                        method: 'PATCH', //
+                    });
+                    if (!response.ok) throw new Error(`Erro ao marcar comprado: ${response.statusText}`); //
+                    fetchAndRenderProducts(); //
+                    fetchAndRenderDashboardStats(); //
+                    showTabMessage(addProductMessageAddTab, "Produto marcado como comprado!", true); //
+                } catch (error) { showTabMessage(addProductMessageAddTab, `Erro ao marcar comprado: ${error.message}`, false); } //
+            }
+            else if (target.classList.contains('action-edit')) { //
+                e.stopPropagation(); //
+                if (!currentUserId) { showTabMessage(addProductMessageAddTab, 'Você precisa estar logado para editar produtos.', false); return; } //
+
+                if (editModal && editForm) { //
+                    if(editProductIdInput) editProductIdInput.value = productData._id; //
+                    if(editProductNameInput) editProductNameInput.value = productData.name || ''; //
+                    if(editProductPriceInput) editProductPriceInput.value = productData.price || ''; //
+                    if(editProductUrlInput) editProductUrlInput.value = productData.urlOrigin || ''; //
+                    if(editProductImageUrlInput) editProductImageUrlInput.value = productData.image || ''; //
+                    if(editProductCategorySelect) editProductCategorySelect.value = productData.category || 'Outros'; //
+                    if(editProductStatusSelect) editProductStatusSelect.value = productData.status || 'pendente'; //
+                    if(editProductTagsInput) editProductTagsInput.value = (productData.tags || []).join(', '); //
+                    if(editProductDescriptionTextarea) editProductDescriptionTextarea.value = productData.description || ''; //
+                    if(editProductPrioritySelect) editProductPrioritySelect.value = productData.priority || 'Baixa'; //
+                    if(editProductNotesTextarea) editProductNotesTextarea.value = productData.notes || ''; //
+
+                    if(editProductPreviewImage) { //
+                        editProductPreviewImage.src = productData.image || '#'; //
+                        editProductPreviewImage.classList.toggle('hidden', !productData.image); //
+                    }
+                    showModal(editModal); //
+                    if(editProductMessage) editProductMessage.textContent = ''; //
+                }
+            }
+            else if (target.closest('.card-image')) { //
+                e.stopPropagation(); //
+                openImageModal(productData.image); //
+            }
+            else if (target.closest('.card-title')) { //
+                e.stopPropagation(); //
+                const allModalElementsFound = detailsModal && modalProductImage && modalProductName && modalProductPrice && modalProductStatus && modalProductCategory && modalProductBrand && modalProductAddedDate && modalProductDescription && modalProductTags && modalProductLink && modalProductPriority && modalProductNotes; //
+
+                if (!allModalElementsFound) { //
+                    console.error("Um ou mais elementos do modal de detalhes não foram encontrados. Verifique seus IDs no index.html."); //
+                    return; //
+                }
+
+                try {
+                    if(modalProductImage) modalProductImage.src = productData.image || 'https://via.placeholder.com/300x200?text=Sem+Imagem'; //
+                    if(modalProductName) modalProductName.textContent = productData.name || 'Nome Indisponível'; //
+                    if(modalProductPrice) modalProductPrice.textContent = productData.price ? `R$ ${parseFloat(productData.price).toFixed(2)}` : 'Preço Indisponível'; //
+                    if(modalProductStatus) modalProductStatus.textContent = (productData.status && productData.status.length > 0) ? productData.status.charAt(0).toUpperCase() + productData.status.slice(1) : 'N/A'; //
+                    if(modalProductCategory) modalProductCategory.textContent = productData.category || 'Não definida'; //
+                    if(modalProductBrand) modalProductBrand.textContent = productData.brand || 'Não informada'; //
+                    if(modalProductAddedDate) modalProductAddedDate.textContent = productData.createdAt ? new Date(productData.createdAt).toLocaleDateString('pt-BR') : 'Data indisponível'; //
+                    if(modalProductDescription) modalProductDescription.textContent = productData.description || 'Nenhuma descrição.'; //
+                    if(modalProductTags) modalProductTags.textContent = (productData.tags && productData.tags.length > 0) ? productData.tags.join(', ') : 'Nenhuma'; //
+                    if(modalProductPriority) modalProductPriority.textContent = productData.priority || 'N/A'; //
+                    if(modalProductNotes) modalProductNotes.textContent = productData.notes || 'Nenhuma.'; //
+
+                    if(modalProductLink) modalProductLink.href = productData.urlOrigin || '#'; //
+
+                    if (modalActionPurchaseBtn) modalActionPurchaseBtn.style.display = productData.status === 'pendente' ? 'inline-flex' : 'none'; //
+                    if(modalActionPurchaseBtn) modalActionPurchaseBtn.dataset.productId = productId; //
+                    if(modalActionEditBtn) modalActionEditBtn.dataset.productId = productId; //
+                    if(modalActionDeleteBtn) modalActionDeleteBtn.dataset.productId = productId; //
+
+                    showModal(detailsModal); //
+                    // console.log("Classe 'active' adicionada ao modal de detalhes."); //
+                } catch (modalPopulationError) { //
+                    console.error("Erro ao popular ou exibir o modal de detalhes do produto:", modalPopulationError); //
+                    console.error("Dados do produto que causaram o erro:", productData); //
+                }
+            }
+        });
+    }
+    
+    if (detailsModal && modalProductImage) { //
+        modalProductImage.addEventListener('click', (e) => { //
+            e.stopPropagation(); //
+            if (modalProductImage.src) { //
+                openImageModal(modalProductImage.src); //
+            }
+        });
+    }
+
+    function openImageModal(imageSrc) { //
+        if (!imageModal || !modalImageContent) { //
+            console.error("Elementos do modal de imagem não encontrados. Verifique IDs."); //
+            return; //
+        }
+        if(modalImageContent) modalImageContent.src = imageSrc; //
+        showModal(imageModal); //
+    }
+
+    if (imageModal) { //
+        imageModal.addEventListener('click', (e) => { //
+            if (e.target === imageModal || e.target.classList.contains('close-modal-btn')) { //
+                hideModalWithDelay(imageModal); //
+            }
+        });
+    }
+    
+    if (detailsModal) { //
+        detailsModal.addEventListener('click', (e) => { //
+            if (e.target === detailsModal || e.target.classList.contains('close-modal-btn')) { //
+                hideModalWithDelay(detailsModal); //
+            }
+        });
+    }
+    
+    const closeEditModalBtn = editModal ? editModal.querySelector('.close-modal-btn') : null; //
+    if (editModal && closeEditModalBtn) { //
+        editModal.addEventListener('click', (e) => { //
+            if (e.target === editModal || e.target === closeEditModalBtn) { //
+                hideModalWithDelay(editModal, editProductMessage); //
+            }
+        });
+    }
+
+    if (detailsModal) { //
+        detailsModal.addEventListener('click', async (e) => { //
+            const target = e.target.closest('.modal-action-btn'); //
+            if(!target) return; //
+
+            const productId = target.dataset.productId; //
+            if(!productId) return; //
+            if (!currentUserId) { showTabMessage(addProductMessageAddTab, 'Você precisa estar logado para realizar esta ação.', false); return; } //
+
+            if(target.id === 'modal-action-purchase') { //
+                try {
+                    const response = await authenticatedFetch(`${API_BASE_URL}/products/${productId}/purchase`, { //
+                        method: 'PATCH', //
+                    });
+                    if (!response.ok) throw new Error(`Erro ao marcar comprado: ${response.statusText}`); //
+                    hideModalWithDelay(detailsModal); //
+                    fetchAndRenderProducts(); //
+                    fetchAndRenderDashboardStats(); //
+                    showTabMessage(addProductMessageAddTab, "Produto marcado como comprado!", true); //
+                } catch (error) { showTabMessage(addProductMessageAddTab, `Erro ao marcar comprado: ${error.message}`, false); } //
+            } else if (target.id === 'modal-action-edit') { //
+                hideModalWithDelay(detailsModal); //
+                const productCard = document.querySelector(`.product-card[data-product-id="${productId}"]`); //
+                if (productCard) { //
+                    const productData = JSON.parse(productCard.dataset.productJson); //
+                    if (editModal && editForm) { //
+                        if(editProductIdInput) editProductIdInput.value = productData._id; //
+                        if(editProductNameInput) editProductNameInput.value = productData.name || ''; //
+                        if(editProductPriceInput) editProductPriceInput.value = productData.price || ''; //
+                        if(editProductUrlInput) editProductUrlInput.value = productData.urlOrigin || ''; //
+                        if(editProductImageUrlInput) editProductImageUrlInput.value = productData.image || ''; //
+                        if(editProductCategorySelect) editProductCategorySelect.value = productData.category || 'Outros'; //
+                        if(editProductStatusSelect) editProductStatusSelect.value = productData.status || 'pendente'; //
+                        if(editProductTagsInput) editProductTagsInput.value = (productData.tags || []).join(', '); //
+                        if(editProductDescriptionTextarea) editProductDescriptionTextarea.value = productData.description || ''; //
+                        if(editProductPrioritySelect) editProductPrioritySelect.value = productData.priority || 'Baixa'; //
+                        if(editProductNotesTextarea) editProductNotesTextarea.value = productData.notes || ''; //
+                        if(editProductPreviewImage) { //
+                            editProductPreviewImage.src = productData.image || '#'; //
+                            editProductPreviewImage.classList.toggle('hidden', !productData.image); //
+                        }
+                        showModal(editModal); //
+                        if(editProductMessage) editProductMessage.textContent = ''; //
+                    }
+                }
+            } else if (target.id === 'modal-action-delete') { //
+                if (!confirm('Tem certeza que deseja excluir este produto?')) return; //
+                try {
+                    const response = await authenticatedFetch(`${API_BASE_URL}/products/${productId}`, { //
+                        method: 'DELETE', //
+                    });
+                    if (!response.ok) throw new Error(`Erro ao excluir: ${response.statusText}`); //
+                    hideModalWithDelay(detailsModal); //
+                    fetchAndRenderProducts(); //
+                    fetchAndRenderDashboardStats(); //
+                    showTabMessage(addProductMessageAddTab, "Produto excluído com sucesso!", true); //
+                }
+                 catch (error) { showTabMessage(addProductMessageAddTab, `Erro ao excluir: ${error.message}`, false); } //
+            }
+        });
+    }
+
+    if (editForm) { //
+        editForm.addEventListener('submit', async (e) => { //
+            e.preventDefault(); //
+            if (!editProductIdInput || !editProductNameInput || !editProductPriceInput) return; //
+            if (!currentUserId) { showTabMessage(editProductMessage, 'Você precisa estar logado para salvar edições.', false); return; } //
+
+            const productId = editProductIdInput.value; //
+            const updatedData = { //
+                name: editProductNameInput.value, //
+                price: parseFloat(editProductPriceInput.value), //
+                urlOrigin: editProductUrlInput ? editProductUrlInput.value : undefined, //
+                image: editProductImageUrlInput ? editProductImageUrlInput.value : undefined, //
+                category: editProductCategorySelect ? editProductCategorySelect.value : undefined, //
+                status: editProductStatusSelect ? editProductStatusSelect.value : undefined, //
+                tags: editProductTagsInput ? editProductTagsInput.value.split(',').map(tag => tag.trim()).filter(tag => tag) : undefined, //
+                description: editProductDescriptionTextarea ? editProductDescriptionTextarea.value : undefined, //
+                priority: editProductPrioritySelect ? editProductPrioritySelect.value : undefined, //
+                notes: editProductNotesTextarea ? editProductNotesTextarea.value : undefined, //
+            };
+            Object.keys(updatedData).forEach(key => { //
+                if (updatedData[key] === undefined || updatedData[key] === '' || (Array.isArray(updatedData[key]) && updatedData[key].length === 0)) { //
+                    delete updatedData[key]; //
+                }
+            });
+
+            try {
+                const response = await authenticatedFetch(`${API_BASE_URL}/products/${productId}`, { //
+                    method: 'PUT', //
+                    body: JSON.stringify(updatedData) //
+                });
+                if (!response.ok) { //
+                    const errorData = await response.json(); //
+                    throw new Error(errorData.message || response.statusText); //
+                }
+                hideModalWithDelay(editModal, editProductMessage); //
+                fetchAndRenderProducts(); //
+                showTabMessage(addProductMessageAddTab, "Produto atualizado com sucesso!", true); //
+            } catch (error) { showTabMessage(editProductMessage, `Erro ao atualizar: ${error.message}`, false); } //
+        });
+    }
+    
+    if(addFinanceEntryBtn && financeMonthInput && financeRevenueInput && financeExpensesInput) { //
+        addFinanceEntryBtn.addEventListener('click', async () => { //
+            if (!currentUserId) { showTabMessage(financeEntryMessage, 'Você precisa estar logado para gerenciar finanças.', false); return; } //
+
+            const month = financeMonthInput.value; //
+            const revenue = parseFloat(financeRevenueInput.value) || 0; //
+            const expenses = parseFloat(financeExpensesInput.value) || 0; //
+
+            if (!month) return showTabMessage(financeEntryMessage, "Selecione o mês e ano.", false); //
+            if (isNaN(revenue) || isNaN(expenses)) return showTabMessage(financeEntryMessage, "Por favor, preencha valores numéricos válidos para Receita e Gastos.", false); //
+
+            const financeData = { mes_ano: month, receita: revenue, gastos: expenses }; //
+
+            try {
+                let response; //
+                if (editingFinanceId) { //
+                    response = await authenticatedFetch(`${API_BASE_URL}/finances/${editingFinanceId}`, { //
+                        method: 'PUT', //
+                        body: JSON.stringify(financeData), //
+                    });
+                } else { //
+                    response = await authenticatedFetch(`${API_BASE_URL}/finances`, { //
+                        method: 'POST', //
+                        body: JSON.stringify(financeData), //
+                    });
+                }
+
+                if (!response.ok) { //
+                    const errorData = await response.json(); //
+                    throw new Error(errorData.message || response.statusText); //
+                }
+
+                showTabMessage(financeEntryMessage, `Registro financeiro ${editingFinanceId ? 'atualizado' : 'adicionado'} com sucesso!`, true); //
+                fetchAndRenderFinances(); //
+                fetchAndRenderDashboardStats(); //
+                clearFinanceForm(); //
+            } catch (error) { //
+                showTabMessage(financeEntryMessage, `Erro ao salvar/atualizar finanças: ${error.message}`, false); //
+                console.error("Erro financeiro:", error); //
+            }
+        });
+    }
+    if(cancelFinanceEditBtn) { //
+        cancelFinanceEditBtn.addEventListener('click', () => { //
+            clearFinanceForm(); //
+        });
+    }
+    
+    if(financeList) { //
+        financeList.addEventListener('click', async (e) => { //
+            const editBtn = e.target.closest('.edit-finance-btn'); //
+            const deleteBtn = e.target.closest('.delete-finance-btn'); //
+
+            if (!currentUserId) { showTabMessage(financeEntryMessage, 'Você precisa estar logado para gerenciar finanças.', false); return; } //
+
+            if (editBtn) { //
+                            const financeIdToEdit = editBtn.dataset.id; //
+                            const entryElement = editBtn.closest('li'); //
+                            if (entryElement && entryElement.dataset.financeJson) {
+                                const financeEntry = JSON.parse(entryElement.dataset.financeJson); //
+                                setupFinanceEdit(financeEntry); //
+    
+                                if (financeFormContainer) { //
+                                    financeFormContainer.scrollIntoView({ behavior: 'smooth', block: 'start' }); //
+                                }
+                            }
+
+                        } else if (deleteBtn) {                const financeIdToDelete = deleteBtn.dataset.id; //
+                if (confirm('Tem certeza que deseja excluir este registro financeiro?')) { //
+                    try {
+                        const response = await authenticatedFetch(`${API_BASE_URL}/finances/${financeIdToDelete}`, { //
+                            method: 'DELETE', //
+                        });
+                        if (!response.ok) { //
+                            const errorData = await response.json(); //
+                            throw new Error(errorData.message || response.statusText); //
+                        }
+                        showTabMessage(financeEntryMessage, "Registro financeiro excluído com sucesso!", true); //
+                        fetchAndRenderFinances(); //
+                        fetchAndRenderDashboardStats(); //
+                        clearFinanceForm(); //
+                    } catch (error) { //
+                        showTabMessage(financeEntryMessage, `Erro ao excluir registro financeiro: ${error.message}`, false); //
+                        console.error("Erro financeiro:", error); //
+                    }
+                }
+            }
+        });
+    }
 
     // --- INICIALIZAÇÃO ---
     const storedAuthToken = localStorage.getItem('authToken'); //
