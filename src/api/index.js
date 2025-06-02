@@ -10,6 +10,11 @@ const productRoutes = require('../routes/products'); // Caminho corrigido
 const financeRoutes = require('../routes/finances');   // Caminho corrigido
 const registerRoute = require('../routes/auth/register'); // Caminho corrigido
 const loginRoute = require('../routes/auth/login');       // Caminho corrigido
+const connectionStates = mongoose.STATES || { 
+  0: 'disconnected', 1: 'connected', 2: 'connecting', 3: 'disconnecting'
+};
+const stateDescription = connectionStates[mongoose.connection.readyState] || 'Desconhecido';
+console.log(`[Vercel DB Middleware V4] Estado inicial da conexão mongoose: ${mongoose.connection.readyState} (${stateDescription})`);
 
 const app = express();
 

@@ -29,7 +29,7 @@ const connectDB = async () => {
             throw new Error('MONGODB_URI não está definida.');
         }
         
-        console.log('[database.js] Tentando conectar com MONGODB_URI:', MONGODB_URI_FROM_ENV.substring(0, MONGODB_URI_FROM_ENV.indexOf('@') > 0 ? MONGODB_URI_FROM_ENV.indexOf('@') : 30) + '...'); // Log ofuscado
+            console.log('[database.js] Tentando conectar com MONGODB_URI: **** (oculto por segurança)');
         
         const connectionOptions = {
             connectTimeoutMS: 10000,
