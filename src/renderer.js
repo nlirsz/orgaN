@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginUsernameInput = getElem('login-username'); //
     const loginPasswordInput = getElem('login-password'); //
     const registerUsernameInput = getElem('register-username'); //
-    const registerEmailInput = getElem('register-email'); // NOVO: Campo de email para registro
+    const registerEmailInput = getElem('register-email'); // Certifique-se que este ID existe no seu HTML
     const registerPasswordInput = getElem('register-password'); //
     const loginMessage = getElem('login-message'); //
     const registerMessage = getElem('register-message'); //
@@ -31,9 +31,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const rememberMeCheckbox = getElem('remember-me-checkbox'); //
 
     const passwordStrengthIndicator = getElem('password-strength-indicator'); //
-    const togglePasswordVisibilityBtn = getElem('toggle-password-visibility'); // NOVO: Botão de mostrar/ocultar senha
+    const togglePasswordVisibilityBtn = getElem('toggle-password-visibility'); // Certifique-se que este ID existe
 
-    // ... (outros seletores permanecem os mesmos) ...
     const loadingOverlay = getElem('loading-overlay'); //
     const sidebar = document.querySelector('.sidebar'); //
     const tabButtons = document.querySelectorAll('.nav-btn'); //
@@ -108,24 +107,148 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // --- FUNÇÕES DE UTILIDADE ---
-    async function authenticatedFetch(url, options = {}) { /* ...mesma função... */ } //
-    function showAuthMessage(element, message, isSuccess = false) { /* ...mesma função... */ } //
-    function showTabMessage(element, message, isSuccess = false) { /* ...mesma função... */ } //
-    function showModal(modalElement) { /* ...mesma função... */ } //
-    function hideModalWithDelay(modalElement, messageElement = null) { /* ...mesma função... */ } //
-    function showAuthSection() { /* ...mesma função... */ } //
-    async function showDashboard() { /* ...mesma função... */ } //
+    async function authenticatedFetch(url, options = {}) { //
+        if (!authToken) { //
+            console.error("Token de autenticação não disponível. Redirecionando para login."); //
+            showAuthSection(); //
+            throw new Error("Não autenticado."); //
+        }
+        const headers = { //
+            'Content-Type': 'application/json', //
+            'x-auth-token': authToken, //
+            ...options.headers, //
+        };
+        const response = await fetch(url, { ...options, headers }); //
+
+        if (response.status === 401 || response.status === 403) { //
+            showAuthMessage(loginMessage, 'Sessão expirada ou não autorizado. Por favor, faça login novamente.', false); //
+            logoutUser(); //
+            throw new Error("Não autorizado ou sessão expirada."); //
+        }
+        return response; //
+    }
+
+    function showAuthMessage(element, message, isSuccess = false) { //
+        if (element) {
+            element.textContent = message; //
+            element.className = 'auth-message ' + (isSuccess ? 'success' : 'error'); //
+            setTimeout(() => { //
+                if (element) element.textContent = ''; //
+                if (element) element.className = 'auth-message'; //
+            }, 5000); //
+        }
+    }
+
+    function showTabMessage(element, message, isSuccess = false) { //
+         if (element) {
+            element.textContent = message; //
+            element.className = 'tab-message ' + (isSuccess ? 'success' : 'error'); //
+            setTimeout(() => { //
+                if (element) element.textContent = ''; //
+                if (element) element.className = 'tab-message'; //
+            }, 5000); //
+        }
+    }
+
+    function showModal(modalElement) { //
+        if (modalElement) { //
+            modalElement.classList.remove('hidden'); //
+            modalElement.classList.add('active'); //
+        }
+    }
+
+    function hideModalWithDelay(modalElement, messageElement = null) { //
+        if (modalElement) { //
+            modalElement.classList.remove('active'); //
+            setTimeout(() => { //
+                if (modalElement) modalElement.classList.add('hidden'); //
+                if (messageElement && messageElement.textContent) messageElement.textContent = ''; //
+            }, 300); //
+        }
+    }
+
+    function showAuthSection() { //
+        if(authSection) authSection.classList.remove('hidden'); //
+        if(dashboardLayout) dashboardLayout.classList.add('hidden'); //
+        if(loadingOverlay) loadingOverlay.classList.add('hidden'); //
+
+        currentUserId = null; //
+        authToken = null; //
+        localStorage.removeItem('authToken'); //
+        localStorage.removeItem('userId'); //
+
+        if(loginUsernameInput) loginUsernameInput.value = ''; //
+        if(loginPasswordInput) loginPasswordInput.value = ''; //
+        if(registerUsernameInput) registerUsernameInput.value = ''; //
+        if(registerEmailInput) registerEmailInput.value = '';
+        if(registerPasswordInput) registerPasswordInput.value = ''; //
+
+
+        if(authTabButtons) { //
+            authTabButtons.forEach(btn => btn.classList.remove('active')); //
+            const loginTabBtn = document.querySelector('[data-auth-tab="login"]'); //
+            if(loginTabBtn) loginTabBtn.classList.add('active'); //
+        }
+
+        if(authTabContents){ //
+            authTabContents.forEach(tabContent => tabContent.classList.remove('active')); //
+            const loginTabContent = getElem('login-tab-content'); //
+            if(loginTabContent) loginTabContent.classList.add('active'); //
+        }
+        
+        if(loginMessage) loginMessage.textContent = ''; //
+        if(registerMessage) registerMessage.textContent = ''; //
+        if(passwordStrengthIndicator) { //
+            passwordStrengthIndicator.textContent = 'Força: ';
+            passwordStrengthIndicator.style.color = 'grey';
+        }
+        if (typeof grecaptcha !== 'undefined' && grecaptcha.reset) {
+            try { grecaptcha.reset(0); } catch(e) {} 
+            try { grecaptcha.reset(1); } catch(e) {}
+        }
+    }
+    
+    async function showDashboard() { //
+        if(authSection) authSection.classList.add('hidden'); //
+        if(dashboardLayout) dashboardLayout.classList.add('hidden'); //
+        if(loadingOverlay) loadingOverlay.classList.remove('hidden'); //
+
+        try {
+            await fetchAndRenderDashboardStats(); //
+            await fetchAndRenderProducts(); //
+            await fetchAndRenderFinances(); //
+            
+            if(dashboardLayout) dashboardLayout.classList.remove('hidden'); //
+
+            const initialActiveTabButton = document.querySelector('.nav-btn[data-tab="dashboard-main"]'); //
+            if (initialActiveTabButton) { //
+                initialActiveTabButton.click(); //
+            }
+        } catch (error) { //
+            console.error("Erro ao carregar dados iniciais do dashboard:", error); //
+            showAuthMessage(loginMessage, 'Erro ao carregar dados. Tente fazer login novamente.', false); //
+            logoutUser(); //
+        } finally {
+            if(loadingOverlay) loadingOverlay.classList.add('hidden'); //
+        }
+    }
 
 
     // --- LÓGICA DE AUTENTICAÇÃO ---
     if (authTabButtons) { //
         authTabButtons.forEach(button => { //
             button.addEventListener('click', () => { //
-                // ... (lógica de troca de abas) ...
+                authTabButtons.forEach(btn => btn.classList.remove('active')); //
+                button.classList.add('active'); //
+
+                authTabContents.forEach(tabContent => tabContent.classList.remove('active')); //
+                const tabContentElement = getElem(`${button.dataset.authTab}-tab-content`); //
+                if (tabContentElement) tabContentElement.classList.add('active'); //
+
                 if(loginUsernameInput) loginUsernameInput.value = ''; //
                 if(loginPasswordInput) loginPasswordInput.value = ''; //
                 if(registerUsernameInput) registerUsernameInput.value = ''; //
-                if(registerEmailInput) registerEmailInput.value = ''; // Limpar campo de e-mail
+                if(registerEmailInput) registerEmailInput.value = '';
                 if(registerPasswordInput) registerPasswordInput.value = ''; //
                 if(loginMessage) loginMessage.textContent = ''; //
                 if(registerMessage) registerMessage.textContent = ''; //
@@ -133,13 +256,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     passwordStrengthIndicator.textContent = 'Força: ';
                     passwordStrengthIndicator.style.color = 'grey';
                 }
-                 // Resetar reCAPTCHA widgets se existirem
+                // Resetar reCAPTCHA widgets
                 if (typeof grecaptcha !== 'undefined' && grecaptcha.reset) {
-                    // Tenta resetar os widgets. Se você der IDs aos seus widgets, use-os aqui.
-                    // Ex: grecaptcha.reset(loginRecaptchaWidgetId); grecaptcha.reset(registerRecaptchaWidgetId);
-                    // Por enquanto, tentaremos resetar por índice se eles forem os únicos na página.
-                    try { grecaptcha.reset(0); } catch(e) {} // Widget de login
-                    try { grecaptcha.reset(1); } catch(e) {} // Widget de registro
+                    const loginRecaptchaDiv = loginForm ? loginForm.querySelector('.g-recaptcha') : null;
+                    const registerRecaptchaDiv = registerForm ? registerForm.querySelector('.g-recaptcha') : null;
+                    if (loginRecaptchaDiv) try {grecaptcha.reset(0);} catch(e){} // Assumindo índice 0 para login
+                    if (registerRecaptchaDiv) try {grecaptcha.reset(1);} catch(e){} // Assumindo índice 1 para registro
                 }
             });
         });
@@ -165,39 +287,43 @@ document.addEventListener('DOMContentLoaded', () => {
             let strengthText = 'Força: '; //
             let strengthColor = 'grey'; //
             let score = 0; //
+            const legendEl = document.getElementById('password-requirements-legend'); //
 
-            const legendEl = document.getElementById('password-requirements-legend');
-
-            if (password.length >= 8) score++; else score--; //
+            if (password.length >= 8) score++; else if (password.length > 0) score--; // // Evitar negativo se vazio
             if (password.length >= 10) score++;  //
-            if (/[A-Z]/.test(password)) score++; else score--; //
-            if (/[a-z]/.test(password)) score++; else score--; //
-            if (/[0-9]/.test(password)) score++; else score--; //
-            if (/[^A-Za-z0-9]/.test(password)) score++; else score--; //
+            if (/[A-Z]/.test(password)) score++; else if (password.length > 0) score--; //
+            if (/[a-z]/.test(password)) score++; else if (password.length > 0) score--; //
+            if (/[0-9]/.test(password)) score++; else if (password.length > 0) score--; //
+            if (/[^A-Za-z0-9\s]/.test(password)) score++; else if (password.length > 0) score--; // // Corrigido para não penalizar espaço
             
-            // Assegurar que o score não seja negativo para a lógica do switch
-            score = Math.max(0, score);
+            score = Math.max(0, score); //
 
             switch (score) { //
-                case 0: case 1: case 2:
+                case 0: 
+                    strengthText += 'Muito Fraca'; 
+                    strengthColor = 'darkred'; 
+                    if (legendEl) legendEl.style.color = 'darkred';
+                    break;
+                case 1: case 2:
                     strengthText += 'Fraca'; //
                     strengthColor = 'red'; //
-                    if (legendEl) legendEl.style.color = 'red';
+                    if (legendEl) legendEl.style.color = 'red'; //
                     break;
                 case 3: case 4:
                     strengthText += 'Média'; //
                     strengthColor = 'orange'; //
-                    if (legendEl) legendEl.style.color = 'orange';
+                    if (legendEl) legendEl.style.color = 'orange'; //
                     break;
                 case 5: case 6:
                     strengthText += 'Forte'; //
                     strengthColor = 'green'; //
-                    if (legendEl) legendEl.style.color = 'green';
+                    if (legendEl) legendEl.style.color = 'green'; //
                     break;
-                default:
-                    strengthText += 'Muito Fraca'; //
-                    strengthColor = 'darkred'; //
-                     if (legendEl) legendEl.style.color = 'darkred';
+            }
+            if (password.length === 0) { // Se o campo estiver vazio, resetar
+                strengthText = 'Força: ';
+                strengthColor = 'grey';
+                if (legendEl) legendEl.style.color = 'var(--text-secondary)'; // Cor padrão da legenda
             }
             passwordStrengthIndicator.textContent = strengthText; //
             passwordStrengthIndicator.style.color = strengthColor; //
@@ -212,16 +338,23 @@ document.addEventListener('DOMContentLoaded', () => {
             const password = loginPasswordInput.value.trim(); //
 
             const recaptchaWidgetLogin = loginForm.querySelector('.g-recaptcha'); //
-            let recaptchaResponse = '';
-            if (typeof grecaptcha !== 'undefined' && recaptchaWidgetLogin) {
-                // Se você tiver vários widgets, precisa de uma maneira de obter o ID correto.
-                // Se este é o único visível ou o primeiro, o índice 0 pode funcionar.
-                // Para ser mais robusto, seria bom ter IDs únicos para os divs do g-recaptcha
-                // e usar `grecaptcha.getResponse(widgetId)`.
-                // Assumindo que o widget de login é o primeiro (índice 0 se você tem dois na página)
-                try { recaptchaResponse = grecaptcha.getResponse(0); } catch (err) { console.warn("reCAPTCHA widget (login) não encontrado ou erro ao obter resposta.");}
+            let recaptchaResponse = ''; //
+            let loginWidgetId;
+            if (typeof grecaptcha !== 'undefined' && recaptchaWidgetLogin) { //
+                // Tenta obter o widgetId. Se o div do reCAPTCHA tiver um ID, use-o.
+                // Se não, o Google atribui IDs sequenciais (0, 1...).
+                // Assumindo que este é o primeiro widget na página/aba ativa.
+                try { 
+                    // Se você renderiza explicitamente com ID, use esse ID.
+                    // Caso contrário, o Google anexa o widget e o índice 0 pode funcionar se for o primeiro.
+                    // Esta parte pode ser frágil se múltiplos widgets estiverem sempre no DOM.
+                    const widgets = document.querySelectorAll('.g-recaptcha');
+                    if (widgets.length > 0 && loginForm.contains(widgets[0])) { // Verifica se o primeiro widget está no form de login
+                         loginWidgetId = 0; // Ou o ID que o google atribui a ele
+                         recaptchaResponse = grecaptcha.getResponse(loginWidgetId);
+                    }
+                } catch (err) { console.warn("reCAPTCHA widget (login) não encontrado ou erro ao obter resposta.");} //
             }
-
 
             if (!username || !password) { //
                 showAuthMessage(loginMessage, 'Por favor, preencha todos os campos.'); //
@@ -258,12 +391,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     await showDashboard(); //
                 } else { //
                     showAuthMessage(loginMessage, data.message || 'Erro ao fazer login.'); //
-                    if (typeof grecaptcha !== 'undefined' && recaptchaWidgetLogin) try {grecaptcha.reset(0);} catch(e){} //
+                    if (typeof grecaptcha !== 'undefined' && recaptchaWidgetLogin && loginWidgetId !== undefined) try {grecaptcha.reset(loginWidgetId);} catch(e){} //
                 }
             } catch (error) { //
                 console.error('Erro de rede ao fazer login:', error); //
                 showAuthMessage(loginMessage, 'Erro de conexão com o servidor.'); //
-                if (typeof grecaptcha !== 'undefined' && recaptchaWidgetLogin) try {grecaptcha.reset(0);} catch(e){} //
+                if (typeof grecaptcha !== 'undefined' && recaptchaWidgetLogin && loginWidgetId !== undefined) try {grecaptcha.reset(loginWidgetId);} catch(e){} //
             }
         });
     }
@@ -273,18 +406,27 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault(); //
             
             const username = registerUsernameInput.value.trim(); //
-            const email = registerEmailInput ? registerEmailInput.value.trim() : ''; // NOVO
+            const email = registerEmailInput ? registerEmailInput.value.trim() : ''; 
             const password = registerPasswordInput.value.trim(); //
 
             const recaptchaWidgetRegister = registerForm.querySelector('.g-recaptcha'); //
-            let recaptchaResponse = '';
-            if (typeof grecaptcha !== 'undefined' && recaptchaWidgetRegister) {
-                 // Assumindo que o widget de registro é o segundo (índice 1 se você tem dois na página)
-                try { recaptchaResponse = grecaptcha.getResponse(1); } catch (err) {console.warn("reCAPTCHA widget (register) não encontrado ou erro ao obter resposta.");}
+            let recaptchaResponse = ''; //
+            let registerWidgetId;
+            if (typeof grecaptcha !== 'undefined' && recaptchaWidgetRegister) { //
+                try { 
+                    const widgets = document.querySelectorAll('.g-recaptcha');
+                    // Assumindo que o de registro é o segundo se ambos estiverem no DOM, ou o primeiro se for o único
+                    if (widgets.length > 1 && registerForm.contains(widgets[1])) {
+                        registerWidgetId = 1;
+                        recaptchaResponse = grecaptcha.getResponse(registerWidgetId);
+                    } else if (widgets.length > 0 && registerForm.contains(widgets[0])) {
+                         registerWidgetId = 0;
+                         recaptchaResponse = grecaptcha.getResponse(registerWidgetId);
+                    }
+                } catch (err) {console.warn("reCAPTCHA widget (register) não encontrado ou erro ao obter resposta.");} //
             }
 
-
-            if (!username || !email || !password) { // // Email adicionado à validação
+            if (!username || !email || !password) { //
                 showAuthMessage(registerMessage, 'Por favor, preencha nome de usuário, e-mail e senha.'); //
                 return; //
             }
@@ -294,7 +436,6 @@ document.addEventListener('DOMContentLoaded', () => {
                  showAuthMessage(registerMessage, `A senha deve ter no mínimo ${passwordMinLength} caracteres.`); //
                  return; //
             }
-             // Poderia adicionar mais validações de frontend para a senha aqui, mas a do backend é a principal.
 
             if (typeof grecaptcha !== 'undefined' && recaptchaWidgetRegister && !recaptchaResponse) { //
                 showAuthMessage(registerMessage, 'Por favor, complete o reCAPTCHA.'); //
@@ -304,7 +445,7 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const bodyPayload = { //
                     username, //
-                    email,    // NOVO
+                    email,
                     password, //
                     recaptchaToken: recaptchaResponse 
                 };
@@ -319,26 +460,128 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (response.ok) { //
                     showAuthMessage(registerMessage, data.message, true); //
                     
-                    if (typeof grecaptcha !== 'undefined' && recaptchaWidgetRegister) try {grecaptcha.reset(1);} catch(e){} //
-                    registerForm.reset(); //
+                    if (typeof grecaptcha !== 'undefined' && recaptchaWidgetRegister && registerWidgetId !== undefined) try {grecaptcha.reset(registerWidgetId);} catch(e){} //
+                    if (registerForm) registerForm.reset(); //
                     if(passwordStrengthIndicator) { //
                         passwordStrengthIndicator.textContent = 'Força: '; //
                         passwordStrengthIndicator.style.color = 'grey'; //
+                        const legendEl = document.getElementById('password-requirements-legend');
+                        if(legendEl) legendEl.style.color = 'var(--text-secondary)';
                     }
-                    // Lógica para verificação de e-mail (não logar automaticamente) viria aqui.
                 } else { //
                     showAuthMessage(registerMessage, data.message || 'Erro ao registrar.'); //
-                    if (typeof grecaptcha !== 'undefined' && recaptchaWidgetRegister) try {grecaptcha.reset(1);} catch(e){} //
+                    if (typeof grecaptcha !== 'undefined' && recaptchaWidgetRegister && registerWidgetId !== undefined) try {grecaptcha.reset(registerWidgetId);} catch(e){} //
                 }
             } catch (error) { //
                 console.error('Erro de rede ao registrar:', error); //
                 showAuthMessage(registerMessage, 'Erro de conexão com o servidor.'); //
-                if (typeof grecaptcha !== 'undefined' && recaptchaWidgetRegister) try {grecaptcha.reset(1);} catch(e){} //
+                if (typeof grecaptcha !== 'undefined' && recaptchaWidgetRegister && registerWidgetId !== undefined) try {grecaptcha.reset(registerWidgetId);} catch(e){} //
+            }
+        });
+    }
+    
+    // --- FUNÇÃO DE LOGOUT ---
+    if (logoutBtn) { //
+        logoutBtn.addEventListener('click', logoutUser); //
+    }
+
+    function logoutUser() { //
+        authToken = null; //
+        currentUserId = null; //
+        localStorage.removeItem('authToken'); //
+        localStorage.removeItem('userId'); //
+        showAuthSection(); //
+    }
+
+    // --- LÓGICA DE NAVEGAÇÃO (ABAS DO DASHBOARD) ---
+    if (sidebar && tabButtons.length > 0) { //
+        sidebar.addEventListener('click', (e) => { //
+            const navBtn = e.target.closest('.nav-btn'); //
+            if (!navBtn || navBtn.id === 'logout-btn') return; //
+            const tabId = navBtn.dataset.tab; //
+
+            if(tabButtons) tabButtons.forEach(btn => btn.classList.remove('active')); //
+            if(navBtn) navBtn.classList.add('active'); //
+
+            if(tabContents) tabContents.forEach(tabContent => { //
+                tabContent.classList.toggle('active', tabContent.id === `${tabId}-tab`); //
+            });
+
+            if (tabId === 'finance') { //
+                fetchAndRenderFinances(); //
+            }
+            if (tabId === 'dashboard-main') { //
+                fetchAndRenderDashboardStats(); //
+            }
+            if (tabId === 'products') { //
+                fetchAndRenderProducts(); //
+                clearProductScrapeFormProductsTab(); //
+            }
+            if (tabId === 'history') { //
+                fetchAndRenderProducts(); //
+            }
+            if (tabId === 'add-product') { //
+                clearAddProductFormAddTab(); //
             }
         });
     }
 
-    // ... (logoutUser e toda a lógica de abas, produtos, finanças, modais permanecem os mesmos) ...
+    if (goToAddProductTabBtn) { //
+        goToAddProductTabBtn.addEventListener('click', () => { //
+            const addProductNavBtn = document.querySelector('.nav-btn[data-tab="add-product"]'); //
+            if (addProductNavBtn) { //
+                addProductNavBtn.click(); //
+            }
+        });
+    }
+    
+    // --- FUNÇÕES DE PRODUTOS ---
+    const createProductCard = (product) => { /* ...mesma função... */ }; //
+    const fetchAndRenderProducts = async () => { /* ...mesma função... */ }; //
+
+    // --- FUNÇÕES DE DASHBOARD PRINCIPAL ---
+    const fetchAndRenderDashboardStats = async () => { /* ...mesma função... */ }; //
+    const renderGenericChart = (canvasEl, type, data, chartInstanceRef, chartIdForInstanceCheck, isCategory = false) => { /* ...mesma função... */}; //
+    
+    // --- FUNÇÕES DE FINANÇAS DETALHADO ---
+    let financesData = []; //
+    const fetchAndRenderFinances = async () => { /* ...mesma função... */ }; //
+    const clearFinanceForm = () => { /* ...mesma função... */ }; //
+    const setupFinanceEdit = (financeEntry) => { /* ...mesma função... */ }; //
+    
+    // --- LÓGICA DE EVENTOS PARA SCRAPING E SALVAR PRODUTO ---
+    function setupScrapeEventListeners(urlInputEl, verifyBtnEl, infoDivEl, messageEl, saveBtnEl) { /* ...mesma função... */ } //
+    if (productUrlInputAddTab && verifyUrlBtnAddTab && verifiedProductInfoDivAddTab && addProductMessageAddTab && saveProductBtnAddTab) { //
+        setupScrapeEventListeners(productUrlInputAddTab, verifyUrlBtnAddTab, verifiedProductInfoDivAddTab, addProductMessageAddTab, saveProductBtnAddTab); //
+    }
+    if (productUrlInputProductsTab && verifyUrlBtnProductsTab && verifiedProductInfoDivProductsTab && addProductMessageProductsTab && saveProductBtnProductsTab) { //
+        setupScrapeEventListeners(productUrlInputProductsTab, verifyUrlBtnProductsTab, verifiedProductInfoDivProductsTab, addProductMessageProductsTab, saveProductBtnProductsTab); //
+    }
+    if (saveProductBtnAddTab) { /* ...mesma função... */ } //
+    if (saveProductBtnProductsTab) { /* ...mesma função... */ } //
+    async function handleSaveProduct(messageElement) { /* ...mesma função... */ } //
+    function clearAddProductFormAddTab() { /* ...mesma função... */ } //
+    function clearProductScrapeFormProductsTab() { /* ...mesma função... */ } //
+    
+    // --- DELEGAÇÃO DE EVENTOS PARA CARDS E MODAIS ---
+    const mainContentArea = document.querySelector('.main-content-area'); //
+    if (mainContentArea) { //
+        mainContentArea.addEventListener('click', async (e) => { /* ...mesma função... */ }); //
+    }
+    if (detailsModal && modalProductImage) { /* ...mesma função... */ } //
+    function openImageModal(imageSrc) { /* ...mesma função... */ } //
+    if (imageModal) { /* ...mesma função... */ } //
+    if (detailsModal) { /* ...mesma função... */ } //
+    const closeEditModalBtn = editModal ? editModal.querySelector('.close-modal-btn') : null; //
+    if (editModal && closeEditModalBtn) { /* ...mesma função... */ } //
+    if (detailsModal) { /* ...mesma função para ações dentro do modal de detalhes ... */ } //
+    if (editForm) { /* ...mesma função para submit do formulário de edição ... */ } //
+    
+    // --- LÓGICA PARA FINANÇAS ---
+    if(addFinanceEntryBtn && financeMonthInput && financeRevenueInput && financeExpensesInput) { /* ...mesma função... */ } //
+    if(cancelFinanceEditBtn) { /* ...mesma função... */ } //
+    if(financeList) { /* ...mesma função... */ } //
+
 
     // --- INICIALIZAÇÃO ---
     const storedAuthToken = localStorage.getItem('authToken'); //
