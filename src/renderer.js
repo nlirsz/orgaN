@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalImageContent = getElem('modal-image-content'); //
     const mobileMenu = document.getElementById('mobileMenu');
     const mobileMenuOverlay = document.querySelector('.mobile-menu-overlay');
-    const logoParaAbrirMenu = document.getElementById('seuLogoOuBotaoParaAbrir'); // Defina o ID correto
+    const logoParaAbrirMenu = document.getElementById('triggerMobileMenu');
 
 
 
