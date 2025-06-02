@@ -833,79 +833,151 @@ button:active, .primary-btn:active, .auth-submit-btn:active { transform: transla
 #cancel-finance-edit-btn:hover { background-color: #6B7280; }
 
 
-/* --- MODAIS (POPUPS) --- */
+/* MODAIS (Fundo Claro) */
 .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(10, 10, 10, 0.85); /* Overlay mais escuro */
-    backdrop-filter: blur(8px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1001;
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
+    background: rgba(30, 30, 30, 0.75); 
+    backdrop-filter: blur(4px); 
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1001; opacity: 0; visibility: hidden; pointer-events: none;
     transition: opacity 0.3s ease, visibility 0s linear 0.3s;
 }
 .modal-overlay.active {
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
+    opacity: 1; visibility: visible; pointer-events: auto;
     transition: opacity 0.3s ease, visibility 0s linear 0s;
 }
-
-.modal-content {
-    background: var(--bg-secondary); /* Fundo do modal escuro */
-    color: var(--text-primary); /* Texto do modal claro */
-    font-family: 'Inter', sans-serif;
-    max-width: 800px;
-    height: auto;
-    padding: 25px;
-    border-radius: 12px;
-    box-shadow: 0 15px 50px rgba(0,0,0,0.7); /* Sombra mais forte */
-    position: relative;
-    max-height: 90vh;
-    overflow-y: auto;
-    width: 50%; /* Mantido */
-    border: 1px solid var(--border-color);
-    transition: transform 0.3s ease, opacity 0.3s ease;
+.modal-content { 
+    background: var(--bg-secondary-page-elements); 
+    color: var(--text-on-light-bg); 
+    border-radius: 10px; 
+    box-shadow: 0 8px 30px rgba(0,0,0,0.20); 
+    border: 1px solid var(--border-color-light);
+    font-family: 'Inter', sans-serif; max-width: 800px; height: auto;
+    padding: 25px 30px; position: relative; max-height: 90vh; overflow-y: auto;
+    width: 50%; transition: transform 0.3s ease, opacity 0.3s ease;
 }
-
-.modal-content img {
-    max-width: 100%;
-    height: auto;
-    display: block;
-    margin: 15px auto;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: transform 0.2s ease;
-    background-color: #FFFFFF; /* Fundo branco para imagens se destacarem */
-}
-
-.close-modal-btn {
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    font-size: 1.8em;
-    color: var(--text-secondary); /* Cor do X clara */
-    cursor: pointer;
-    transition: color 0.2s, transform 0.2s;
-    line-height: 1;
-    padding: 5px;
+/* Estilo específico para o modal de imagem */
+.image-modal-content {
+    padding: 10px; /* Menos padding para modal de imagem */
+    background: #333; /* Fundo escuro para contraste da imagem */
     border: none;
-    background: none;
-    z-index: 1002;
-    cursor: pointer;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
 }
-.close-modal-btn:hover {
-    color: var(--primary-action); /* Azul no hover */
-    transform: scale(1.3);
-    transition: all 0.2s ease-in-out;
+.image-modal-content img#modal-image-content { 
+    background-color: transparent; /* Sem fundo extra */
+    border: none; /* Sem borda na imagem ampliada */
+    max-width: 90vw; /* Largura máxima relativa à tela */
+    max-height: 85vh; /* Altura máxima relativa à tela */
+    border-radius: 6px;
+    margin: 0;
 }
+.image-modal-content .close-modal-btn {
+    color: #ccc; /* Cor do X no modal de imagem escuro */
+    top: 10px; right: 10px; font-size: 2em;
+}
+.image-modal-content .close-modal-btn:hover { color: #fff; }
+
+
+/* Imagem padrão dentro de outros modais */
+.modal-content img#modal-product-image, 
+.modal-content img#edit-product-preview-image { 
+    background-color: var(--bg-element-light); 
+    border: 1px solid var(--border-color-light); 
+    max-width: 100%; height: auto; display: block; margin: 15px auto;
+    border-radius: 8px; cursor: pointer; transition: transform 0.2s ease;
+    object-fit: contain; 
+}
+#modal-product-image-container { 
+    width: 100%;
+    max-height: 250px; 
+    background-color: var(--bg-element-light); 
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 20px; overflow: hidden; 
+}
+.close-modal-btn { /* Para todos os modais exceto o de imagem já estilizado acima */
+    color: var(--text-secondary-on-light-bg); 
+    position: absolute; top: 12px; right: 15px; font-size: 1.7em; 
+    cursor: pointer; transition: color 0.2s, transform 0.2s;
+    line-height: 1; padding: 5px; border: none; background: none; z-index: 1002;
+}
+.close-modal-btn:hover { color: var(--primary-action); transform: scale(1.1); }
+
+/* Modal de Detalhes do Produto (Slide-in) - Fundo Claro */
+.product-details-modal-content {
+    background: var(--bg-secondary-page-elements); 
+    color: var(--text-on-light-bg); 
+    border-left: 1px solid var(--border-color-light);
+    max-width: 400px; width: 90%; 
+    height: 100vh; position: fixed;
+    top: 0; right: 0; margin-left: auto; border-radius: 0; 
+    padding: 25px; transform: translateX(100%); 
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1); 
+}
+.modal-overlay.active .product-details-modal-content { transform: translateX(0); }
+.product-details-modal-content h3#modal-product-name { color: var(--text-on-light-bg); font-size: 1.4em; margin-bottom: 15px; }
+.modal-product-info p { color: var(--text-secondary-on-light-bg); font-size: 0.9em; }
+.modal-product-info p strong { color: var(--text-on-light-bg); font-weight: 600; }
+
+/* Modal de Edição - Fundo Claro */
+.edit-product-modal-content { 
+    background: var(--bg-secondary-page-elements); 
+    color: var(--text-on-light-bg); 
+    max-width: 650px; padding: 25px 30px;
+}
+.edit-product-modal-content h3 { color: var(--text-on-light-bg); border-bottom: 1px solid var(--border-color-light); font-size: 1.5em; margin-bottom: 20px; }
+#edit-product-form label { color: var(--text-secondary-on-light-bg); font-weight: 500; }
+#edit-product-form input[type="text"],
+#edit-product-form input[type="number"],
+#edit-product-form input[type="url"],
+#edit-product-form select,
+#edit-product-form textarea {
+    background-color: #FFFFFF; 
+    border: 1px solid var(--border-color-light);
+    color: var(--text-on-light-bg);
+}
+#edit-product-form input::placeholder,
+#edit-product-form textarea::placeholder { color: var(--text-placeholder-on-light-input); }
+#edit-product-form input:focus,
+#edit-product-form select:focus,
+#edit-product-form textarea:focus {
+    border-color: var(--primary-action);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+}
+#edit-product-form img#edit-product-preview-image {
+    background-color: var(--bg-element-light); 
+    border: 1px solid var(--border-color-light);
+}
+.edit-product-modal-content textarea::-webkit-scrollbar { width: 8px; }
+.edit-product-modal-content textarea::-webkit-scrollbar-track { background: var(--bg-element-light); border-radius: 4px; }
+.edit-product-modal-content textarea::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
+.edit-product-modal-content textarea::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+
+
+/* ESTILOS PARA O OVERLAY DE CARREGAMENTO */
+.loading-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.65); 
+    display: flex; flex-direction: column; 
+    align-items: center; justify-content: center;
+    z-index: 2000; 
+    opacity: 0; visibility: hidden; 
+    transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out; 
+}
+.loading-overlay.active { opacity: 1; visibility: visible; } 
+.hidden { display: none !important; } /* Manter para compatibilidade com JS existente */
+
+.loading-spinner {
+    border: 5px solid #f3f3f3; 
+    border-top: 5px solid var(--primary-action); 
+    border-radius: 50%;
+    width: 45px; height: 45px; 
+    animation: spin 0.8s linear infinite; 
+    margin-bottom: 15px; 
+}
+.loading-overlay p { color: #FFFFFF; font-size: 1.05em; font-weight: 500; }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
 
 /* Modal de Detalhes do Produto (Slide-in) */
 .product-details-modal-content {
