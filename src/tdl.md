@@ -35,14 +35,14 @@
 
 **Segurança na Criação de Contas e Login:**
 
-1.  **[ ] Implementar CAPTCHA (ex: Google reCAPTCHA v2 ou v3 / hCaptcha):**
-    * [ ] Formulário de criação de conta (`register-form`).
-    * [ ] Formulário de login (`login-form`), especialmente após tentativas falhas.
-2.  **[ ] Fortalecer Requisitos de Senha:**
-    * [ ] Frontend: Adicionar feedback visual sobre a força da senha no formulário de registro.
-    * [ ] Backend: Se não estiver completo, garantir validação de complexidade (maiúsculas, minúsculas, números, caracteres especiais, comprimento mínimo) na rota de registro (`POST /api/auth/register`).
+1.  **[x] Implementar CAPTCHA (ex: Google reCAPTCHA v2 ou v3 / hCaptcha):**
+    * [x] Formulário de criação de conta (`register-form`).
+    * [x] Formulário de login (`login-form`), especialmente após tentativas falhas.
+2.  **[x] Fortalecer Requisitos de Senha:**
+    * [x] Frontend: Adicionar feedback visual sobre a força da senha no formulário de registro.
+    * [x] Backend: Se não estiver completo, garantir validação de complexidade (maiúsculas, minúsculas, números, caracteres especiais, comprimento mínimo) na rota de registro (`POST /api/auth/register`).
 3.  **[ ] Implementar Verificação de E-mail:**
-    * [ ] Backend: Criar rota para gerar e enviar token de verificação por e-mail.
+    * [x] Backend: Criar rota para gerar e enviar token de verificação por e-mail.
     * [ ] Backend: Criar rota para validar token e ativar conta.
     * [ ] Frontend: Informar usuário sobre necessidade de verificação.
 4.  **[ ] (Opcional) Login Social (Google):**

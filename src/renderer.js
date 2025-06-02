@@ -195,6 +195,22 @@ document.addEventListener('DOMContentLoaded', () => {
         if(loginMessage) loginMessage.textContent = ''; //
         if(registerMessage) registerMessage.textContent = ''; //
     }
+    const togglePasswordVisibilityBtn = getElem('toggle-password-visibility'); //
+    // registerPasswordInput já foi definido anteriormente
+
+    if (togglePasswordVisibilityBtn && registerPasswordInput) { //
+        togglePasswordVisibilityBtn.addEventListener('click', () => {
+            const type = registerPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            registerPasswordInput.setAttribute('type', type);
+            // Altera o ícone do botão
+            const icon = togglePasswordVisibilityBtn.querySelector('i');
+            if (icon) {
+                icon.classList.toggle('fa-eye');
+                icon.classList.toggle('fa-eye-slash');
+            }
+        });
+    }
+
 
     async function showDashboard() { //
         if(authSection) authSection.classList.add('hidden'); //

@@ -194,6 +194,49 @@ html, body {
     background-color: #333333;
 }
 
+.password-wrapper {
+    position: relative;
+    display: flex; /* Para alinhar o input e o botão */
+    align-items: center; /* Alinha verticalmente no centro */
+}
+
+.password-wrapper input[type="password"],
+.password-wrapper input[type="text"] { /* Para quando a senha for mostrada */
+    padding-right: 40px; /* Adiciona espaço para o botão não sobrepor o texto */
+    /* flex-grow: 1; (já deve ter da regra geral de input) */
+}
+
+.toggle-password-btn {
+    position: absolute;
+    right: 1px; /* Ajuste fino para alinhar dentro da borda do input */
+    top: 1px;   /* Ajuste fino */
+    bottom: 1px;/* Ajuste fino */
+    border: none;
+    background: transparent;
+    padding: 0 10px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2; /* Para garantir que fique acima do input */
+    border-radius: 0 20px 20px 0; /* Para arredondar o canto direito se o input for arredondado */
+}
+
+.toggle-password-btn:hover {
+    color: var(--primary-action);
+}
+
+.toggle-password-btn i {
+    font-size: 1em; /* Ajuste o tamanho do ícone conforme necessário */
+}
+
+#password-requirements-legend {
+    font-size: 0.75em; /* Um pouco menor que o indicador de força */
+    color: var(--text-secondary); /* Ou uma cor mais suave */
+    line-height: 1.4;
+}
+
 #password-strength-indicator {
     font-size: 0.8em; /* Ou o tamanho que preferir */
     margin-top: 5px;
@@ -383,7 +426,7 @@ html, body {
     align-items: center;
 
 }
-input[type="url"], input[type="text"], input[type="number"], input[type="month"], input[type="password"], select, textarea {
+input[type="url"], input[type="text"], input[type="number"], input[type="month"], input[type="password"], select, textarea, input[type="email"] {
     flex-grow: 1;
     padding: 10px 12px;
     font-size: 0.95em;
