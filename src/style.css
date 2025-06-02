@@ -58,6 +58,12 @@
     --error-color: #dc3545;   /* Vermelho Bootstrap */
     --edit-color: #ffc107;    /* Amarelo Bootstrap */
     --highlight-action-text: #FFFFFF; 
+
+
+    /* Sombra para elementos escuros em fundo claro */
+    --element-shadow-on-light-bg: 0px 6px 12px rgba(0, 0, 0, 0.15); /* Sombra padrão um pouco mais forte */
+    --element-hover-shadow-on-light-bg: 0px 8px 18px rgba(0, 0, 0, 0.2); /* Sombra no hover um pouco mais forte */
+    
 }
 
 
@@ -545,12 +551,12 @@ button:active, .primary-btn:active, .auth-submit-btn:active { transform: transla
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    box-shadow: var(--card-shadow);
+    box-shadow: var(--element-shadow-on-light-bg);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 .product-card:hover { 
     transform: translateY(-5px); /* Efeito de elevação maior */
-    box-shadow: var(--card-hover-shadow);
+    box-shadow: var(--element-hover-shadow-on-light-bg);
     cursor: pointer;
 }
 
@@ -1355,6 +1361,68 @@ a.product-link-btn:hover { background-color: var(--primary-action-hover); }
         font-size: 1.2em; /* Tamanho dos ícones */
         padding: 5px;
     }
+
+    /* Área de Produto Verificado (Ajustes) */
+#verifiedProductInfo-add-tab, 
+#verifiedProductInfo-products-tab {
+    margin: 20px auto; /* Centraliza e adiciona margem */
+    padding: 20px;
+    background-color: var(--bg-element-dark); /* Fundo escuro para contraste na página clara */
+    color: var(--text-on-dark-bg); /* Texto claro */
+    border-radius: 12px;
+    border: 1px solid var(--border-color-dark-elements); /* Borda sutil escura */
+    text-align: center;
+    box-shadow: var(--element-shadow-on-light-bg); /* Sombra para destacar na página clara */
+    
+    /* REMOVA OU AJUSTE DRASTICAMENTE A LINHA ABAIXO: */
+    /* max-width: 100px; */ /* << Isso estava causando o layout "esmagado" */
+    max-width: 450px; /* Defina uma largura máxima razoável */
+    
+    overflow-y: auto; /* Mantém o scroll se o conteúdo for grande */
+    max-height: 500px; /* Aumentar um pouco a altura máxima se necessário */
+    display: flex; /* Adicionado para melhor controle interno */
+    flex-direction: column; /* Adicionado */
+    align-items: center; /* Adicionado */
+}
+
+#verifiedProductInfo-add-tab.hidden,
+#verifiedProductInfo-products-tab.hidden {
+    display: none !important; /* Garante que o hidden funcione */
+}
+
+
+/* Imagem dentro da área de produto verificado */
+#verifiedProductImage-add-tab,
+#verifiedProductImage-products-tab {
+    display: block;
+    max-width: 100%;     /* Garante que a imagem não ultrapasse o contêiner */
+    height: auto;        /* Mantém a proporção da imagem */
+    max-height: 250px;   /* Define uma altura máxima para a imagem da prévia */
+    border-radius: 8px;  /* Bordas arredondadas */
+    margin: 0 auto 15px auto; /* Centraliza e adiciona margem inferior */
+    background-color: #FFFFFF; /* Fundo branco para a imagem, caso ela tenha transparência */
+    object-fit: contain; /* Garante que toda a imagem apareça, sem cortes, dentro das dimensões */
+    border: 1px solid var(--border-color-dark-elements);
+    cursor: default; /* Não precisa ser clicável aqui, a menos que queira ampliar */
+}
+
+#verifiedProductInfo-add-tab p, 
+#verifiedProductInfo-products-tab p {
+    margin-bottom: 8px; 
+    font-size: 0.95em; 
+    color: var(--text-on-dark-bg); /* Garante texto claro */
+}
+#verifiedProductInfo-add-tab p strong, 
+#verifiedProductInfo-products-tab p strong { 
+    color: var(--text-on-dark-bg); /* Garante texto claro */
+}
+
+/* Botão Salvar Produto dentro da prévia */
+#save-product-btn-add-tab,
+#save-product-btn-products-tab {
+    margin-top: 15px; /* Espaço acima do botão */
+    display: inline-flex !important; /* Garante que apareça se não estiver hidden */
+}
 
 
     /* Modal de detalhes do produto em telas pequenas (comportamento de modal centralizado) */
