@@ -194,6 +194,19 @@ html, body {
     background-color: #333333;
 }
 
+#password-strength-indicator {
+    font-size: 0.8em; /* Ou o tamanho que preferir */
+    margin-top: 5px;
+    /* Você pode adicionar mais estilos aqui, mas a cor é definida pelo JS */
+}
+
+.g-recaptcha {
+    margin-bottom: 15px; /* Exemplo de margem inferior */
+    /* Centralizar o widget se o container for maior */
+    display: flex;
+    justify-content: center;
+}
+
 
 
 /* ======================================================= */
