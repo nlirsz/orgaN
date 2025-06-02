@@ -6,14 +6,10 @@
     <title>OrgaN</title>
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net;" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-<link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="/style.css">
     <link rel="icon" href="/logo.ico">
-    <script src="renderer.js"></script>
-    <img src="logo.png" alt="Logo" class="logo" /> </head>
+</head>
 <body>
-    
-    <body>
     <div id="auth-section" class="auth-section">
         <div class="auth-container">
             <div class="auth-tabs">
@@ -65,14 +61,11 @@
     </div>
 
     <div class="dashboard-layout hidden">
-        
-<aside class="sidebar">
-
+        <aside class="sidebar">
             <div class="sidebar-nav-main">
-                            <div class="sidebar-header">
-                <img src="logo.png" alt="Logo" class="logo" />
-            </div>
-
+                <div class="sidebar-header">
+                    <img src="/logo.png" alt="Logo" class="logo" />
+                </div>
                 <button class="nav-btn active" data-tab="dashboard-main" title="Painel Principal">
                     <i class="fas fa-tachometer-alt"></i>
                 </button>
@@ -89,7 +82,6 @@
                     <i class="fas fa-chart-pie"></i>
                 </button>
             </div>
-
             <button class="nav-btn" data-tab="settings" title="Configurações">
                 <i class="fas fa-cog"></i>
             </button>
@@ -133,7 +125,6 @@
 
             <section id="products-tab" class="tab-content">
                 <h2>Meus Produtos</h2>
-
                 <div class="form-container add-product-form-container products-tab-add-section">
                     <h3>Adicionar Produto por URL</h3>
                     <div id="scrape-form-products-tab" class="input-group">
@@ -151,7 +142,7 @@
                 <div class="product-list-container">
                     <h3>Pendentes</h3>
                     <ul id="pending-products-list" class="product-grid">
-                        </ul>
+                    </ul>
                 </div>
             </section>
 
@@ -159,7 +150,6 @@
                 <h2>Adicionar Novo Produto</h2>
                 <div class="form-container add-product-form-container">
                     <h3>Dados do Produto</h3>
-
                     <p class="form-section-title">Adicionar por URL </p>
                     <div id="scrape-form-add-tab" class="input-group">
                         <input type="url" id="productUrlInput-add-tab" placeholder="Cole a URL do produto aqui">
@@ -216,6 +206,7 @@
                     <button id="save-product-btn-add-tab" class="primary-btn"><i class="fas fa-save"></i> Salvar Produto</button>
                 </div>
             </section>
+
             <section id="history-tab" class="tab-content">
                 <h2>Histórico de Compras</h2>
                 <div class="product-list-container">
@@ -377,6 +368,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="renderer.js"></script>
+    <script src="/renderer.js"></script>
 </body>
 </html>
