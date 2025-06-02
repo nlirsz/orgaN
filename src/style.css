@@ -632,11 +632,9 @@ button:active, .primary-btn:active, .auth-submit-btn:active { transform: transla
     color: var(--text-primary); /* Cor mais clara no hover */
     transform: scale(1.15); 
 }
-/* Cores específicas para hover de ícones de ação, se necessário manter */
-/* .card-actions .action-purchase:hover { color: var(--success-color); } */
-/* .card-actions .action-edit:hover { color: var(--edit-color); } */
-/* .card-actions .action-delete:hover { color: var(--error-color); } */
-/* Na referência, os ícones pareciam ser brancos/cinza claro e não mudavam de cor no hover, apenas talvez um scale. */
+.card-actions .action-purchase:hover { color: var(--success-color); } */
+.card-actions .action-edit:hover { color: var(--edit-color); } */
+.card-actions .action-delete:hover { color: var(--error-color); } */
 
 
 /* --- SEÇÃO DASHBOARD PRINCIPAL --- */
@@ -704,6 +702,57 @@ button:active, .primary-btn:active, .auth-submit-btn:active { transform: transla
     letter-spacing: 0.05em;
 }
 
+
+/* ============================================ */
+/* ESTILOS PARA O OVERLAY DE CARREGAMENTO       */
+/* ============================================ */
+.loading-overlay {
+    position: fixed; /* Cobre a tela inteira */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.65); /* Fundo semi-transparente escuro */
+    display: flex;
+    flex-direction: column; /* Para alinhar spinner e texto verticalmente */
+    align-items: center;
+    justify-content: center;
+    z-index: 2000; /* Garante que fique por cima de tudo */
+    opacity: 0; /* Começa invisível */
+    visibility: hidden; /* Começa escondido */
+    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+}
+
+.loading-overlay.active { /* Classe para mostrar o overlay */
+    opacity: 1;
+    visibility: visible;
+}
+
+.loading-spinner {
+    border: 6px solid #f3f3f3; /* Cinza claro */
+    border-top: 6px solid var(--primary-action); /* Azul (cor primária) */
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px; /* Espaço entre o spinner e o texto */
+}
+
+.loading-overlay p {
+    color: #FFFFFF; /* Cor do texto "Carregando..." */
+    font-size: 1.1em;
+    font-weight: 500;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* A classe .hidden que você já usa para esconder elementos */
+.hidden {
+    display: none !important;
+}
 
 /* --- SEÇÃO FINANCEIRA --- */
 .finance-form-container { 

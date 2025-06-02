@@ -320,42 +320,51 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
+            // ...dentro do listener de submit do loginForm...
             try {
-                const response = await fetch(`${API_BASE_URL}/auth/login`, { //
-                    method: 'POST', //
-                    headers: { 'Content-Type': 'application/json' }, //
+                if(loadingOverlay) loadingOverlay.classList.remove('hidden'); // MOSTRAR OVERLAY
+
+                const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
                         username, 
                         password,
-                        recaptchaToken: recaptchaResponse // --- NOVO: Enviar token do reCAPTCHA ---
+                        recaptchaToken: recaptchaResponse 
                     }),
                 });
-                const data = await response.json(); //
+                const data = await response.json();
 
-                if (response.ok) { //
-                    authToken = data.token; //
-                    currentUserId = data.userId; //
-                    if (rememberMeCheckbox && rememberMeCheckbox.checked) { //
-                        localStorage.setItem('authToken', authToken); //
-                        localStorage.setItem('userId', currentUserId); //
-                    } else { //
-                        localStorage.removeItem('authToken'); //
-                        localStorage.removeItem('userId'); //
+                if (response.ok) {
+                    authToken = data.token;
+                    currentUserId = data.userId;
+                    if (rememberMeCheckbox && rememberMeCheckbox.checked) {
+                        localStorage.setItem('authToken', authToken);
+                        localStorage.setItem('userId', currentUserId);
+                    } else {
+                        localStorage.removeItem('authToken');
+                        localStorage.removeItem('userId');
                     }
-                    showAuthMessage(loginMessage, data.message, true); //
-                    await showDashboard(); //
-                } else { //
-                    showAuthMessage(loginMessage, data.message || 'Erro ao fazer login.'); //
-                    if (typeof grecaptcha !== 'undefined') grecaptcha.reset(0); // Resetar o reCAPTCHA do login em caso de falha
+                    // Não precisa de showAuthMessage aqui, o showDashboard já cuida do overlay
+                    await showDashboard(); // showDashboard já tem seu próprio controle de overlay
+                } else {
+                    showAuthMessage(loginMessage, data.message || 'Erro ao fazer login.');
+                    if (typeof grecaptcha !== 'undefined') grecaptcha.reset(0);
                 }
-            } catch (error) { //
-                console.error('Erro de rede ao fazer login:', error); //
-                showAuthMessage(loginMessage, 'Erro de conexão com o servidor.'); //
-                if (typeof grecaptcha !== 'undefined') grecaptcha.reset(0); // Resetar o reCAPTCHA do login
+            } catch (error) {
+                console.error('Erro de rede ao fazer login:', error);
+                showAuthMessage(loginMessage, 'Erro de conexão com o servidor.');
+                if (typeof grecaptcha !== 'undefined') grecaptcha.reset(0);
+            } finally {
+                // Apenas esconde o overlay se showDashboard não foi chamado ou falhou antes
+                // showDashboard já tem seu próprio finally para esconder o overlay.
+                // Para garantir que seja escondido se o login falhar antes de chamar showDashboard:
+                if (!authToken && loadingOverlay) { // Se não autenticou, esconde o overlay aqui.
+                     loadingOverlay.classList.add('hidden'); // ESCONDER OVERLAY
+                }
             }
         });
     }
-
     if (registerForm) { //
         registerForm.addEventListener('submit', async (e) => { //
             e.preventDefault(); //
@@ -980,19 +989,25 @@ document.addEventListener('DOMContentLoaded', () => {
                     showTabMessage(addProductMessageAddTab, "Produto excluído com sucesso!", true); //
                 } catch (error) { showTabMessage(addProductMessageAddTab, `Erro ao excluir: ${error.message}`, false); } //
             }
-            else if (target.classList.contains('action-purchase')) { //
-                e.stopPropagation(); //
-                if (!currentUserId) { showTabMessage(addProductMessageAddTab, 'Você precisa estar logado para marcar produtos.', false); return; } //
+            // ...dentro de mainContentArea.addEventListener('click', ...
+            else if (target.classList.contains('action-purchase')) {
+                e.stopPropagation();
+                if (!currentUserId) { /* ... */ return; }
 
+                if(loadingOverlay) loadingOverlay.classList.remove('hidden'); // MOSTRAR OVERLAY
                 try {
-                    const response = await authenticatedFetch(`${API_BASE_URL}/products/${productId}/purchase`, { //
-                        method: 'PATCH', //
+                    const response = await authenticatedFetch(`${API_BASE_URL}/products/${productId}/purchase`, {
+                        method: 'PATCH',
                     });
-                    if (!response.ok) throw new Error(`Erro ao marcar comprado: ${response.statusText}`); //
-                    fetchAndRenderProducts(); //
-                    fetchAndRenderDashboardStats(); //
-                    showTabMessage(addProductMessageAddTab, "Produto marcado como comprado!", true); //
-                } catch (error) { showTabMessage(addProductMessageAddTab, `Erro ao marcar comprado: ${error.message}`, false); } //
+                    if (!response.ok) throw new Error(`Erro ao marcar comprado: ${response.statusText}`);
+                    fetchAndRenderProducts();
+                    fetchAndRenderDashboardStats();
+                    showTabMessage(addProductMessageAddTab, "Produto marcado como comprado!", true);
+                } catch (error) { 
+                    showTabMessage(addProductMessageAddTab, `Erro ao marcar comprado: ${error.message}`, false); 
+                } finally {
+                    if(loadingOverlay) loadingOverlay.classList.add('hidden'); // ESCONDER OVERLAY
+                }
             }
             else if (target.classList.contains('action-edit')) { //
                 e.stopPropagation(); //
