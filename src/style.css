@@ -23,7 +23,7 @@
     --text-secondary-on-light-bg: #6c757d; /* Cinza para texto secundário */
     --border-color-light: #dee2e6; /* Borda cinza clara */
     --bg-element-light: #F8F9FA; /* Um off-white para elementos como sidebar, inputs claros */
-    
+
     /* Para Elementos Escuros Contrastantes (Cards de Produto, Painel Principal Cards) */
     --bg-element-dark: #2B2B2B; /* Um cinza bem escuro, mas não preto total */
     --text-on-dark-bg: #F8F9FA; /* Texto quase branco para fundos escuros */
@@ -35,19 +35,19 @@
     --primary-action-hover: #0056b3;
     --menu-active-icon-bg: #007BFF; /* Azul para ícone ativo no menu mobile */
     --secondary-action-color: #FFC107; /* Amarelo/Laranja para logout, como na referência */
-    
+
     /* Placeholders */
-    --text-placeholder-on-light-input: #6c757d; 
+    --text-placeholder-on-light-input: #6c757d;
     --text-placeholder-on-dark-input: #868e96;
 
     /* Sombras */
-    --element-shadow-on-light-bg: 0px 4px 10px rgba(0, 0, 0, 0.08); 
+    --element-shadow-on-light-bg: 0px 4px 10px rgba(0, 0, 0, 0.08);
     --element-hover-shadow-on-light-bg: 0px 6px 15px rgba(0, 0, 0, 0.12);
 
     /* Cores Específicas para o Menu Mobile Escuro */
     --mobile-menu-bg: #1A1D24; /* Um preto azulado escuro, como na referência */
-    --mobile-menu-nav-items-container-bg: #2C3038; 
-    --mobile-menu-icon-inactive-bg: #454A54; 
+    --mobile-menu-nav-items-container-bg: #2C3038;
+    --mobile-menu-icon-inactive-bg: #454A54;
     --mobile-menu-icon-color: var(--text-on-dark-bg);
     --mobile-menu-icon-active-color: #FFFFFF;
     --mobile-menu-logout-icon-color: var(--secondary-action-color);
@@ -57,13 +57,13 @@
     --success-color: #28a745; /* Verde Bootstrap */
     --error-color: #dc3545;   /* Vermelho Bootstrap */
     --edit-color: #ffc107;    /* Amarelo Bootstrap */
-    --highlight-action-text: #FFFFFF; 
+    --highlight-action-text: #FFFFFF;
 
 
     /* Sombra para elementos escuros em fundo claro */
     --element-shadow-on-light-bg: 0px 6px 12px rgba(0, 0, 0, 0.15); /* Sombra padrão um pouco mais forte */
     --element-hover-shadow-on-light-bg: 0px 8px 18px rgba(0, 0, 0, 0.2); /* Sombra no hover um pouco mais forte */
-    
+
 }
 
 
@@ -94,7 +94,7 @@ html, body {
     gap: 25px;
     z-index: 100;
     border-right: 1px solid var(--border-color); /* Borda sutil */
-    box-shadow: 5px 0px 15px rgba(0, 0, 0, 0.2); 
+    box-shadow: 5px 0px 15px rgba(0, 0, 0, 0.2);
 }
 
 .sidebar-header .logo {
@@ -194,12 +194,12 @@ html, body {
 
 /* Botão Ativo Genérico (caso precise fora da pílula, mas o da pílula é mais específico) */
 /* .nav-btn.active {
-    background-color: var(--primary-action); 
-    border-left: none; 
+    background-color: var(--primary-action);
+    border-left: none;
     padding: 0;
 }
 .nav-btn.active i {
-    color: var(--highlight-action); 
+    color: var(--highlight-action);
 } */
 
 /* Botões do Rodapé (Config e Logout) */
@@ -225,8 +225,8 @@ html, body {
 }
 .toggle-password-btn {
     position: absolute;
-    right: 1px; 
-    top: 1px;  
+    right: 1px;
+    top: 1px;
     bottom: 1px;
     border: none;
     background: transparent;
@@ -271,7 +271,7 @@ html, body {
     font-size: 1.8em; /* Mantido do seu CSS */
     color: var(--text-primary); /* Texto claro */
     margin-bottom: 25px;
-    border-bottom: none; 
+    border-bottom: none;
     padding-bottom: 10px;
     text-align: center;
     font-weight: 700;
@@ -298,8 +298,8 @@ html, body {
     align-items: center;
     box-shadow: -2px 8px 16.8px rgba(0, 0, 0, 0.15); /* Sombra mantida */
     border: 1px solid #D9D9D9; /* Borda clara mantida */
-    max-width: 1150px; 
-    margin: 0 auto 35px auto; 
+    max-width: 1150px;
+    margin: 0 auto 35px auto;
 }
 #scrape-form-products-tab.input-group input[type="url"] {
     flex-grow: 1;
@@ -310,14 +310,14 @@ html, body {
     font-family: 'Almarai', sans-serif;
     color: var(--input-light-text); /* Texto escuro para input claro */
     box-shadow: none;
-    border-radius: 78px; 
+    border-radius: 78px;
 }
 #scrape-form-products-tab.input-group input[type="url"]::placeholder {
     color: var(--input-light-placeholder); /* Placeholder escuro */
     font-weight: 700;
 }
 #scrape-form-products-tab.input-group input[type="url"]:focus {
-    box-shadow: none; 
+    box-shadow: none;
 }
 #scrape-form-products-tab.input-group button { /* Botão "Verificar URL" */
     background-color: var(--primary-action); /* Azul */
@@ -325,17 +325,17 @@ html, body {
     font-family: 'Almarai', sans-serif;
     font-weight: 700;
     font-size: 1.1em;
-    border-radius: 78px; 
+    border-radius: 78px;
     padding: 12px 30px;
-    margin: 0; 
+    margin: 0;
     width: auto;
-    white-space: nowrap; 
+    white-space: nowrap;
     box-shadow: none;
     border: none;
 }
 #scrape-form-products-tab.input-group button:hover {
     background-color: var(--primary-action-hover);
-    transform: none; 
+    transform: none;
 }
 #scrape-form-products-tab.input-group button i.fa-search { /* Adicione a classe fa-search ao ícone no HTML */
     margin-left: 8px; /* Espaço entre texto e ícone, se houver texto */
@@ -489,34 +489,69 @@ button:active, .primary-btn:active, .auth-submit-btn:active { transform: transla
 .hidden { display: none !important; }
 
 
-#verifiedProductInfo, #verifiedProductInfo-products-tab {
+/* REMOVIDO PARA CORREÇÃO - Esta regra antiga causava o problema de "extremamente fino" */
+/* #verifiedProductInfo, #verifiedProductInfo-products-tab {
     margin-top: 20px;
     padding: 18px;
-    background-color: var(--bg-secondary); /* Fundo escuro */
+    background-color: var(--bg-secondary);
     border-radius: 8px;
     border: 1px solid var(--border-color);
     text-align: center;
     box-shadow: var(--card-shadow);
-    max-width: 100px; /* Estava 100px, talvez aumentar? */
+    max-width: 100px;
     margin-left: auto;
     margin-right: auto;
     overflow-y: auto;
     max-height: 400px;
+} */
+
+/* MODIFICADO/ADICIONADO PARA CORREÇÃO - Regra geral para a área de produto verificado */
+/* Movida de dentro da media query mobile para se tornar a regra base */
+#verifiedProductInfo-add-tab,
+#verifiedProductInfo-products-tab {
+    margin: 20px auto; /* Centraliza e adiciona margem */
+    padding: 20px;
+    background-color: var(--bg-element-dark); /* Fundo escuro para contraste na página clara */
+    color: var(--text-on-dark-bg); /* Texto claro */
+    border-radius: 12px;
+    border: 1px solid var(--border-color-dark-elements); /* Borda sutil escura */
+    text-align: center;
+    box-shadow: var(--element-shadow-on-light-bg); /* Sombra para destacar na página clara */
+    max-width: 450px; /* Defina uma largura máxima razoável */
+    overflow-y: auto; /* Mantém o scroll se o conteúdo for grande */
+    max-height: 500px; /* Aumentar um pouco a altura máxima se necessário */
+    display: flex; /* Adicionado para melhor controle interno */
+    flex-direction: column; /* Adicionado */
+    align-items: center; /* Adicionado */
 }
-#verifiedProductInfo h4, #verifiedProductInfo-products-tab h4 { font-size: 1.2em; margin-bottom: 12px; color: var(--text-primary); }
-#verifiedProductInfo p, #verifiedProductInfo-products-tab p { margin-bottom: 8px; font-size: 0.95em; color: var(--text-secondary); }
-#verifiedProductInfo p strong, #verifiedProductInfo-products-tab p strong { color: var(--text-primary); }
-#verifiedProductInfo img, #verifiedProductInfo-products-tab img {
+
+#verifiedProductInfo-add-tab.hidden,
+#verifiedProductInfo-products-tab.hidden {
+    display: none !important; /* Garante que o hidden funcione */
+}
+
+/* MODIFICADO/ADICIONADO PARA CORREÇÃO - Regra geral para a imagem dentro da área de produto verificado */
+/* Movida de dentro da media query mobile para se tornar a regra base */
+#verifiedProductImage-add-tab,
+#verifiedProductImage-products-tab {
     display: block;
-    max-width: 120px;
-    max-height: 120px;
-    border-radius: 6px;
-    margin: 10px auto 15px;
-    background-color: #FFFFFF; /* Fundo branco para imagem se destacar */
-    object-fit: contain;
-    border: 1px solid var(--border-color);
-    cursor: pointer;
+    max-width: 100%;     /* Garante que a imagem não ultrapasse o contêiner */
+    height: auto;        /* Mantém a proporção da imagem */
+    max-height: 250px;   /* Define uma altura máxima para a imagem da prévia */
+    border-radius: 8px;  /* Bordas arredondadas */
+    margin: 0 auto 15px auto; /* Centraliza e adiciona margem inferior */
+    background-color: #FFFFFF; /* Fundo branco para a imagem, caso ela tenha transparência */
+    object-fit: contain; /* Garante que toda a imagem apareça, sem cortes, dentro das dimensões */
+    border: 1px solid var(--border-color-dark-elements);
+    cursor: default;
 }
+
+
+#verifiedProductInfo h4, #verifiedProductInfo-products-tab h4 { font-size: 1.2em; margin-bottom: 12px; color: var(--text-primary); } /* Esta regra pode precisar de ajuste se #verifiedProductInfo não for usado e as cores deveriam ser de --text-on-dark-bg */
+#verifiedProductInfo p, #verifiedProductInfo-products-tab p { margin-bottom: 8px; font-size: 0.95em; color: var(--text-secondary); } /* Idem */
+#verifiedProductInfo p strong, #verifiedProductInfo-products-tab p strong { color: var(--text-primary); } /* Idem */
+/* #verifiedProductInfo img, #verifiedProductInfo-products-tab img { ... }  - A nova regra específica para #verifiedProductImage- já cobre isso */
+
 
 /* ============================================ */
 /* ATUALIZAÇÃO: GRID E CARDS DE PRODUTO      */
@@ -554,7 +589,7 @@ button:active, .primary-btn:active, .auth-submit-btn:active { transform: transla
     box-shadow: var(--element-shadow-on-light-bg);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-.product-card:hover { 
+.product-card:hover {
     transform: translateY(-5px); /* Efeito de elevação maior */
     box-shadow: var(--element-hover-shadow-on-light-bg);
     cursor: pointer;
@@ -628,9 +663,9 @@ button:active, .primary-btn:active, .auth-submit-btn:active { transform: transla
     transition: color 0.2s, transform 0.2s;
     padding: 8px; /* Área de clique maior */
 }
-.card-actions i:hover { 
+.card-actions i:hover {
     color: var(--text-primary); /* Cor mais clara no hover */
-    transform: scale(1.15); 
+    transform: scale(1.15);
 }
 .card-actions .action-purchase:hover { color: var(--success-color); } */
 .card-actions .action-edit:hover { color: var(--edit-color); } */
@@ -755,7 +790,7 @@ button:active, .primary-btn:active, .auth-submit-btn:active { transform: transla
 }
 
 /* --- SEÇÃO FINANCEIRA --- */
-.finance-form-container { 
+.finance-form-container {
     background-color: var(--bg-secondary); /* Fundo escuro */
     padding: 25px;
     border-radius: 10px;
@@ -807,7 +842,7 @@ button:active, .primary-btn:active, .auth-submit-btn:active { transform: transla
 #finance-list .finance-item-details strong { display: block; margin-bottom: 6px; font-size: 1.1em; color: var(--text-primary); font-weight: 600; }
 #finance-list .finance-item-details span { margin-right: 18px; color: var(--text-secondary); font-weight: 500; }
 /* Cores de revenue/expenses mantidas, verificar contraste com tema escuro */
-#finance-list .finance-item-details .revenue { color: var(--success-color); font-weight: 500; } 
+#finance-list .finance-item-details .revenue { color: var(--success-color); font-weight: 500; }
 #finance-list .finance-item-details .expenses { color: var(--error-color); font-weight: 500;}
 #finance-list .finance-item-details .balance { color: var(--text-primary); font-weight: 600;}
 
@@ -833,10 +868,10 @@ button:active, .primary-btn:active, .auth-submit-btn:active { transform: transla
 #cancel-finance-edit-btn:hover { background-color: #6B7280; }
 
 
-/* MODAIS (Fundo Claro) */
+/* MODAIS */
 .modal-overlay {
-    background: rgba(30, 30, 30, 0.75); 
-    backdrop-filter: blur(4px); 
+    background: rgba(30, 30, 30, 0.75);
+    backdrop-filter: blur(4px);
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     display: flex; align-items: center; justify-content: center;
     z-index: 1001; opacity: 0; visibility: hidden; pointer-events: none;
@@ -846,58 +881,76 @@ button:active, .primary-btn:active, .auth-submit-btn:active { transform: transla
     opacity: 1; visibility: visible; pointer-events: auto;
     transition: opacity 0.3s ease, visibility 0s linear 0s;
 }
-.modal-content { 
-    background: var(--bg-secondary-page-elements); 
-    color: var(--text-on-light-bg); 
-    border-radius: 10px; 
-    box-shadow: 0 8px 30px rgba(0,0,0,0.20); 
+.modal-content {
+    /* MODIFICADO/ADICIONADO PARA CORREÇÃO - Fundo do modal principal */
+    background: var(--bg-page-primary); /* Alterado de --bg-secondary-page-elements para --bg-page-primary (#FFFFFF) */
+    color: var(--text-on-light-bg);
+    border-radius: 10px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.20);
     border: 1px solid var(--border-color-light);
     font-family: 'Inter', sans-serif; max-width: 800px; height: auto;
     padding: 25px 30px; position: relative; max-height: 90vh; overflow-y: auto;
     width: 50%; transition: transform 0.3s ease, opacity 0.3s ease;
 }
+
 /* Estilo específico para o modal de imagem */
 .image-modal-content {
-    padding: 10px; /* Menos padding para modal de imagem */
-    background: #333; /* Fundo escuro para contraste da imagem */
+    padding: 10px;
+    background: #333;
     border: none;
     box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    /* MODIFICADO/ADICIONADO PARA CORREÇÃO - Para centralizar e limitar o tamanho do contêiner da imagem */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-width: calc(400px + 20px); /* Imagem max-width (400px) + padding (2*10px) */
+    max-height: calc(400px + 20px); /* Imagem max-height (400px) + padding (2*10px) */
+    width: auto; /* Para encolher se a imagem for menor */
+    height: auto; /* Para encolher se a imagem for menor */
 }
-.image-modal-content img#modal-image-content { 
-    background-color: transparent; /* Sem fundo extra */
-    border: none; /* Sem borda na imagem ampliada */
-    max-width: 90vw; /* Largura máxima relativa à tela */
-    max-height: 85vh; /* Altura máxima relativa à tela */
+.image-modal-content img#modal-image-content {
+    background-color: transparent;
+    border: none;
+    /* MODIFICADO/ADICIONADO PARA CORREÇÃO - Limitar tamanho da imagem no modal */
+    max-width: 400px;
+    max-height: 400px;
+    width: auto; /* Para manter proporção */
+    height: auto; /* Para manter proporção */
+    object-fit: contain; /* Para garantir que a imagem caiba sem cortar, mantendo proporção */
     border-radius: 6px;
-    margin: 0;
+    margin: 0; /* Já era 0, bom para flex container */
+    display: block; /* Adicionado por consistência */
 }
 .image-modal-content .close-modal-btn {
     color: #ccc; /* Cor do X no modal de imagem escuro */
     top: 10px; right: 10px; font-size: 2em;
+    /* Ajuste para garantir que o botão X do modal de imagem não seja coberto se o modal for menor */
+    position: absolute; /* Mantém o posicionamento absoluto */
+    z-index: 1; /* Para garantir que fique sobre a imagem se houver sobreposição */
 }
 .image-modal-content .close-modal-btn:hover { color: #fff; }
 
 
 /* Imagem padrão dentro de outros modais */
-.modal-content img#modal-product-image, 
-.modal-content img#edit-product-preview-image { 
-    background-color: var(--bg-element-light); 
-    border: 1px solid var(--border-color-light); 
+.modal-content img#modal-product-image,
+.modal-content img#edit-product-preview-image {
+    background-color: var(--bg-element-light);
+    border: 1px solid var(--border-color-light);
     max-width: 100%; height: auto; display: block; margin: 15px auto;
     border-radius: 8px; cursor: pointer; transition: transform 0.2s ease;
-    object-fit: contain; 
+    object-fit: contain;
 }
-#modal-product-image-container { 
+#modal-product-image-container {
     width: 100%;
-    max-height: 250px; 
-    background-color: var(--bg-element-light); 
+    max-height: 250px;
+    background-color: var(--bg-element-light);
     border-radius: 8px;
     display: flex; align-items: center; justify-content: center;
-    margin-bottom: 20px; overflow: hidden; 
+    margin-bottom: 20px; overflow: hidden;
 }
 .close-modal-btn { /* Para todos os modais exceto o de imagem já estilizado acima */
-    color: var(--text-secondary-on-light-bg); 
-    position: absolute; top: 12px; right: 15px; font-size: 1.7em; 
+    color: var(--text-secondary-on-light-bg);
+    position: absolute; top: 12px; right: 15px; font-size: 1.7em;
     cursor: pointer; transition: color 0.2s, transform 0.2s;
     line-height: 1; padding: 5px; border: none; background: none; z-index: 1002;
 }
@@ -905,14 +958,15 @@ button:active, .primary-btn:active, .auth-submit-btn:active { transform: transla
 
 /* Modal de Detalhes do Produto (Slide-in) - Fundo Claro */
 .product-details-modal-content {
-    background: var(--bg-secondary-page-elements); 
-    color: var(--text-on-light-bg); 
+    /* MODIFICADO/ADICIONADO PARA CORREÇÃO - Fundo do modal de detalhes */
+    background: var(--bg-page-primary); /* Alterado de --bg-secondary-page-elements para --bg-page-primary (#FFFFFF) */
+    color: var(--text-on-light-bg);
     border-left: 1px solid var(--border-color-light);
-    max-width: 400px; width: 90%; 
+    max-width: 400px; width: 90%;
     height: 100vh; position: fixed;
-    top: 0; right: 0; margin-left: auto; border-radius: 0; 
-    padding: 25px; transform: translateX(100%); 
-    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1); 
+    top: 0; right: 0; margin-left: auto; border-radius: 0;
+    padding: 25px; transform: translateX(100%);
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .modal-overlay.active .product-details-modal-content { transform: translateX(0); }
 .product-details-modal-content h3#modal-product-name { color: var(--text-on-light-bg); font-size: 1.4em; margin-bottom: 15px; }
@@ -920,9 +974,10 @@ button:active, .primary-btn:active, .auth-submit-btn:active { transform: transla
 .modal-product-info p strong { color: var(--text-on-light-bg); font-weight: 600; }
 
 /* Modal de Edição - Fundo Claro */
-.edit-product-modal-content { 
-    background: var(--bg-secondary-page-elements); 
-    color: var(--text-on-light-bg); 
+.edit-product-modal-content {
+    /* MODIFICADO/ADICIONADO PARA CORREÇÃO - Fundo do modal de edição */
+    background: var(--bg-page-primary); /* Alterado de --bg-secondary-page-elements para --bg-page-primary (#FFFFFF) */
+    color: var(--text-on-light-bg);
     max-width: 650px; padding: 25px 30px;
 }
 .edit-product-modal-content h3 { color: var(--text-on-light-bg); border-bottom: 1px solid var(--border-color-light); font-size: 1.5em; margin-bottom: 20px; }
@@ -932,9 +987,9 @@ button:active, .primary-btn:active, .auth-submit-btn:active { transform: transla
 #edit-product-form input[type="url"],
 #edit-product-form select,
 #edit-product-form textarea {
-    background-color: #FFFFFF; 
+    background-color: #FFFFFF; /* Já era branco, mantido */
     border: 1px solid var(--border-color-light);
-    color: var(--text-on-light-bg);
+    color: var(--text-on-light-bg); /* Já era para texto claro, mantido */
 }
 #edit-product-form input::placeholder,
 #edit-product-form textarea::placeholder { color: var(--text-placeholder-on-light-input); }
@@ -945,7 +1000,7 @@ button:active, .primary-btn:active, .auth-submit-btn:active { transform: transla
     box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
 }
 #edit-product-form img#edit-product-preview-image {
-    background-color: var(--bg-element-light); 
+    background-color: var(--bg-element-light);
     border: 1px solid var(--border-color-light);
 }
 .edit-product-modal-content textarea::-webkit-scrollbar { width: 8px; }
@@ -954,162 +1009,43 @@ button:active, .primary-btn:active, .auth-submit-btn:active { transform: transla
 .edit-product-modal-content textarea::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
 
 
-/* ESTILOS PARA O OVERLAY DE CARREGAMENTO */
-.loading-overlay {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background-color: rgba(0, 0, 0, 0.65); 
-    display: flex; flex-direction: column; 
-    align-items: center; justify-content: center;
-    z-index: 2000; 
-    opacity: 0; visibility: hidden; 
-    transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out; 
-}
-.loading-overlay.active { opacity: 1; visibility: visible; } 
-.hidden { display: none !important; } /* Manter para compatibilidade com JS existente */
+/* ESTILOS PARA O OVERLAY DE CARREGAMENTO (REPETIDO NO FINAL, VOU MANTER APENAS UM) */
+/* .loading-overlay { ... } */
+/* .loading-overlay.active { ... } */
+/* .hidden { ... } */ /* Mantido no início */
+/* .loading-spinner { ... } */
+/* .loading-overlay p { ... } */
+/* @keyframes spin { ... } */
 
-.loading-spinner {
-    border: 5px solid #f3f3f3; 
-    border-top: 5px solid var(--primary-action); 
-    border-radius: 50%;
-    width: 45px; height: 45px; 
-    animation: spin 0.8s linear infinite; 
-    margin-bottom: 15px; 
-}
-.loading-overlay p { color: #FFFFFF; font-size: 1.05em; font-weight: 500; }
-@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-
-/* Modal de Detalhes do Produto (Slide-in) */
-.product-details-modal-content {
-    /* Herda .modal-content, então fundo e cor de texto já são escuros */
-    max-width: 450px;
-    width: 100%;
-    /* color: var(--text-primary); Já herdado */
-    height: 100vh;
-    position: fixed;
-    top: 0;
-    right: 0;
-    margin-left: auto;
-    border-radius: 0;
-    border-left: 1px solid var(--border-color);
-    padding: 30px;
-    transform: translateX(100%); 
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.modal-overlay.active .product-details-modal-content {
-    transform: translateX(0);
-}
-
-#modal-product-image-container {
-    width: 100%;
-    height: 200px;
-    background-color: #FFFFFF; /* Fundo branco para a imagem */
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 20px;
-}
-#modal-product-image {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-    border-radius: 6px;
-    cursor: pointer;
-}
-.product-details-modal-content h3#modal-product-name {
-    font-size: 1.6em;
-    margin-bottom: 10px;
-    color: var(--text-primary);
-    text-align: center;
-    border-bottom: none;
-    padding-bottom: 0;
-}
-.modal-product-info { margin-bottom: 20px; }
-.modal-product-info p {
-    margin-bottom: 8px;
-    color: var(--text-secondary);
-    font-size: 0.9em;
-    line-height: 1.5;
-}
-.modal-product-info p strong { color: var(--text-primary); }
-a.product-link-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    width: 100%;
-    margin-bottom: 15px;
-    padding: 10px 15px;
-    background-color: var(--primary-action);
-    color: var(--highlight-action);
-    text-decoration: none;
-    border-radius: 6px;
-    font-weight: 500;
-    transition: background-color 0.2s;
-}
-a.product-link-btn:hover { background-color: var(--primary-action-hover); }
-
-.modal-actions {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-top: 15px;
-}
-.modal-actions .modal-action-btn {
-    padding: 10px;
-    font-size: 0.9em;
-    justify-content: center;
-}
-.modal-actions .modal-action-btn.purchase { background-color: var(--success-color); }
-.modal-actions .modal-action-btn.purchase:hover { background-color: #0D8A61; } /* Mais escuro */
-.modal-actions .modal-action-btn.edit { background-color: var(--edit-color); color: #121212; /* Texto escuro para contraste com amarelo */ }
-.modal-actions .modal-action-btn.edit:hover { background-color: #D68910; }
-.modal-actions .modal-action-btn.delete { grid-column: span 2; background-color: var(--error-color); }
-.modal-actions .modal-action-btn.delete:hover { background-color: #C0392B; }
+/* Modal de Detalhes do Produto (Slide-in) - (REPETIDO, JÁ ESTILIZADO ACIMA) */
+/* .product-details-modal-content { ... } */
+/* #modal-product-image-container { ... } */ /* Este está definido acima e é genérico, talvez não precise do específico para product-details se o genérico for suficiente. */
+/* #modal-product-image { ... } */
+/* .product-details-modal-content h3#modal-product-name { ... } */
+/* .modal-product-info { ... } */
+/* .modal-product-info p { ... } */
+/* .modal-product-info p strong { ... } */
+/* a.product-link-btn { ... } */
+/* .modal-actions { ... } */
+/* .modal-actions .modal-action-btn { ... } */
+/* .modal-actions .modal-action-btn.purchase { ... } */
+/* .modal-actions .modal-action-btn.purchase:hover { ... } */
+/* .modal-actions .modal-action-btn.edit { ... } */
+/* .modal-actions .modal-action-btn.edit:hover { ... } */
+/* .modal-actions .modal-action-btn.delete { ... } */
+/* .modal-actions .modal-action-btn.delete:hover { ... } */
 
 
-/* Modal de Edição do Produto */
-.edit-product-modal-content {
-    /* Herda .modal-content, então fundo e cor de texto já são escuros */
-    max-width: 750px;
-    padding: 30px;
-}
-.edit-product-modal-content h3 {
-    font-size: 1.7em;
-    margin-bottom: 25px;
-    color: var(--text-primary);
-    text-align: center;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 15px;
-}
-#edit-product-form .form-row {
-    display: flex;
-    gap: 20px;
-    margin-bottom: 0;
-}
-#edit-product-form .form-row .form-group {
-    flex: 1;
-    margin-bottom: 18px;
-}
-#edit-product-form .form-group { margin-bottom: 18px; }
-#edit-product-form label { font-weight: 500; color: var(--text-secondary); }
-#edit-product-form img#edit-product-preview-image {
-    display: block;
-    max-width: 150px;
-    max-height: 150px;
-    border-radius: 8px;
-    margin: 10px auto 20px;
-    background-color: #FFFFFF; /* Fundo branco para imagem */
-    object-fit: contain;
-    border: 1px solid var(--border-color);
-}
-#edit-product-form button[type="submit"] {
-    margin-top: 25px;
-    background-color: var(--success-color);
-    font-size: 1em;
-}
-#edit-product-form button[type="submit"]:hover { background-color: #0D8A61; }
+/* Modal de Edição do Produto - (REPETIDO, JÁ ESTILIZADO ACIMA) */
+/* .edit-product-modal-content { ... } */
+/* .edit-product-modal-content h3 { ... } */
+/* #edit-product-form .form-row { ... } */
+/* #edit-product-form .form-row .form-group { ... } */
+/* #edit-product-form .form-group { ... } */
+/* #edit-product-form label { ... } */
+/* #edit-product-form img#edit-product-preview-image { ... } */ /* Já estilizado como .modal-content img#edit-product-preview-image */
+/* #edit-product-form button[type="submit"] { ... } */
+/* #edit-product-form button[type="submit"]:hover { ... } */
 
 
 /* --- SEÇÃO DE AUTENTICAÇÃO --- */
@@ -1236,13 +1172,7 @@ a.product-link-btn:hover { background-color: var(--primary-action-hover); }
 
     /* Modal de detalhes do produto em telas médias */
     .product-details-modal-content {
-        /* Essa regra já fazia o modal centralizar em telas < 1024px,
-           o que é diferente do slide-in do desktop.
-           Se o objetivo é manter o slide-in, esta regra precisa ser ajustada ou
-           condicionada para telas ainda menores.
-           Por ora, manterei para ver o comportamento desejado.
-        */
-        position: fixed; /* Garante que seja fixo e não absolute */
+        position: fixed;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%) scale(0.95); /* Inicia um pouco menor */
@@ -1251,8 +1181,11 @@ a.product-link-btn:hover { background-color: var(--primary-action-hover); }
         height: auto;
         max-height: 85vh; /* Altura máxima */
         right: auto; /* Reseta o 'right' do desktop */
-        border-radius: 12px;
+        border-radius: 12px; /* MODIFICADO/ADICIONADO PARA CORREÇÃO: Mantido arredondado para modal centralizado */
         /* border-left: 1px solid var(--border-color); Não precisa de border-left se está centralizado */
+        /* MODIFICADO/ADICIONADO PARA CORREÇÃO: Garante que o fundo seja branco aqui também */
+        background: var(--bg-page-primary); /* Assegura fundo branco */
+        color: var(--text-on-light-bg); /* Assegura texto escuro */
         transition: opacity 0.3s ease, transform 0.3s ease;
     }
     .modal-overlay.active .product-details-modal-content {
@@ -1292,7 +1225,7 @@ a.product-link-btn:hover { background-color: var(--primary-action-hover); }
 @media (max-width: 767px) {
     /* Esconde a sidebar original do desktop */
     .dashboard-layout > .sidebar {
-        display: flex; 
+        display: flex; /* Mantido flex, ajuste se precisar esconder display: none; */
     }
 
     /* Novo Menu Mobile */
@@ -1323,7 +1256,6 @@ a.product-link-btn:hover { background-color: var(--primary-action-hover); }
         border-radius: 50%;
         box-shadow: 0px 0px 12px rgba(255, 255, 255, 0.1);
         margin-bottom: 20px; /* Espaço abaixo do logo */
-        /* Adicionar a imagem do logo aqui via background-image ou tag <img> no HTML */
     }
     .mobile-menu .mobile-nav-items { /* Container para os botões de navegação */
         display: flex;
@@ -1358,7 +1290,7 @@ a.product-link-btn:hover { background-color: var(--primary-action-hover); }
     .mobile-menu .nav-btn:hover i {
          color: var(--highlight-action);
     }
-    
+
     /* Botões de rodapé no menu mobile */
     .mobile-menu-footer {
         margin-top: auto; /* Empurra para o final */
@@ -1403,147 +1335,69 @@ a.product-link-btn:hover { background-color: var(--primary-action-hover); }
         grid-template-columns: 1fr; /* Um card por linha no mobile */
         gap: 20px;
     }
-    .product-card { /* Aplicando o layout da referência mobile */
+    .product-card {
         display: flex;
-        flex-direction: row; /* Imagem à esquerda, conteúdo à direita */
-        align-items: stretch; /* Para que os filhos preencham a altura */
-        border-radius: 15px; /* Bordas arredondadas como na ref mobile */
-        
-        /* Efeito de brilho e sombra (simulado) */
-        /* A sombra já vem de var(--card-shadow) */
-        /* Para o brilho sutil na borda, pode ser complexo sem pseudo-elementos.
-           Uma borda clara pode simular parte do efeito. */
-        /* border-top: 1px solid rgba(255, 255, 255, 0.08); */
-        /* border-left: 1px solid rgba(255, 255, 255, 0.08); */
-        position: relative; /* Para o pseudo-elemento de brilho, se usar */
+        flex-direction: row;
+        align-items: stretch;
+        border-radius: 15px;
+        position: relative;
     }
-    /* Simulação do brilho com pseudo-elemento (opcional, pode precisar de ajustes)
-    .product-card::before {
-        content: "";
-        position: absolute;
-        top: -1px;
-        left: -1px;
-        right: -1px;
-        bottom: -1px;
-        border-radius: 16px;
-        background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0));
-        pointer-events: none;
-        z-index: 1;
-    }*/
-
 
     .product-card .card-image-container {
         flex-shrink: 0;
-        width: 100px; /* Largura da imagem como na referência */
-        height: auto; /* Altura automática para manter proporção, ou fixa se preferir */
-        min-height: 100px; /* Altura mínima */
+        width: 100px;
+        height: auto;
+        min-height: 100px;
         padding: 8px;
-        border-radius: 15px 0 0 15px; /* Arredondamento só à esquerda */
-        align-self: stretch; /* Estica para preencher a altura do card */
+        border-radius: 15px 0 0 15px;
+        align-self: stretch;
     }
     .product-card .card-image {
-        border-radius: 8px; /* Arredondamento da imagem interna */
+        border-radius: 8px;
     }
 
     .product-card .card-content {
         flex-grow: 1;
         padding: 12px;
-        text-align: left; /* Texto alinhado à esquerda */
-        border-radius: 0; /* Remove border-radius do content pois o card pai já tem */
+        text-align: left;
+        border-radius: 0;
         display: flex;
         flex-direction: column;
-        justify-content: space-between; /* Para empurrar o preço para baixo se houver espaço */
+        justify-content: space-between;
     }
     .product-card .card-title {
-        font-size: 1em; /* Ajuste de tamanho para mobile */
-        min-height: 0; /* Remove min-height, deixa o texto fluir */
-        -webkit-line-clamp: 3; /* Permite até 3 linhas */
+        font-size: 1em;
+        min-height: 0;
+        -webkit-line-clamp: 3;
         line-clamp: 3;
         margin-bottom: 6px;
     }
     .product-card .card-price {
-        font-size: 1.5em; /* Tamanho do preço como na referência (ex: 25px) */
+        font-size: 1.5em;
         margin-bottom: 8px;
-        margin-top: 8px; /* Adiciona espaço acima do preço */
+        margin-top: 8px;
         text-align: left;
     }
     .product-card .card-actions {
-        flex-direction: column; /* Ícones empilhados verticalmente */
-        justify-content: center; /* Centraliza os ícones */
+        flex-direction: column;
+        justify-content: center;
         align-items: center;
         padding: 10px 8px;
-        border-top: none; /* Remove a borda de cima */
-        border-left: 1px solid var(--border-color); /* Adiciona borda à esquerda */
-        width: auto; /* Largura automática baseada nos ícones */
-        flex-shrink: 0; /* Não encolhe */
-        gap: 10px; /* Espaço entre ícones */
+        border-top: none;
+        border-left: 1px solid var(--border-color);
+        width: auto;
+        flex-shrink: 0;
+        gap: 10px;
     }
      .product-card .card-actions i {
-        font-size: 1.2em; /* Tamanho dos ícones */
+        font-size: 1.2em;
         padding: 5px;
     }
 
     /* Área de Produto Verificado (Ajustes) */
-#verifiedProductInfo-add-tab, 
-#verifiedProductInfo-products-tab {
-    margin: 20px auto; /* Centraliza e adiciona margem */
-    padding: 20px;
-    background-color: var(--bg-element-dark); /* Fundo escuro para contraste na página clara */
-    color: var(--text-on-dark-bg); /* Texto claro */
-    border-radius: 12px;
-    border: 1px solid var(--border-color-dark-elements); /* Borda sutil escura */
-    text-align: center;
-    box-shadow: var(--element-shadow-on-light-bg); /* Sombra para destacar na página clara */
-    
-    /* REMOVA OU AJUSTE DRASTICAMENTE A LINHA ABAIXO: */
-    /* max-width: 100px; */ /* << Isso estava causando o layout "esmagado" */
-    max-width: 450px; /* Defina uma largura máxima razoável */
-    
-    overflow-y: auto; /* Mantém o scroll se o conteúdo for grande */
-    max-height: 500px; /* Aumentar um pouco a altura máxima se necessário */
-    display: flex; /* Adicionado para melhor controle interno */
-    flex-direction: column; /* Adicionado */
-    align-items: center; /* Adicionado */
-}
-
-#verifiedProductInfo-add-tab.hidden,
-#verifiedProductInfo-products-tab.hidden {
-    display: none !important; /* Garante que o hidden funcione */
-}
-
-
-/* Imagem dentro da área de produto verificado */
-#verifiedProductImage-add-tab,
-#verifiedProductImage-products-tab {
-    display: block;
-    max-width: 100%;     /* Garante que a imagem não ultrapasse o contêiner */
-    height: auto;        /* Mantém a proporção da imagem */
-    max-height: 250px;   /* Define uma altura máxima para a imagem da prévia */
-    border-radius: 8px;  /* Bordas arredondadas */
-    margin: 0 auto 15px auto; /* Centraliza e adiciona margem inferior */
-    background-color: #FFFFFF; /* Fundo branco para a imagem, caso ela tenha transparência */
-    object-fit: contain; /* Garante que toda a imagem apareça, sem cortes, dentro das dimensões */
-    border: 1px solid var(--border-color-dark-elements);
-    cursor: default; /* Não precisa ser clicável aqui, a menos que queira ampliar */
-}
-
-#verifiedProductInfo-add-tab p, 
-#verifiedProductInfo-products-tab p {
-    margin-bottom: 8px; 
-    font-size: 0.95em; 
-    color: var(--text-on-dark-bg); /* Garante texto claro */
-}
-#verifiedProductInfo-add-tab p strong, 
-#verifiedProductInfo-products-tab p strong { 
-    color: var(--text-on-dark-bg); /* Garante texto claro */
-}
-
-/* Botão Salvar Produto dentro da prévia */
-#save-product-btn-add-tab,
-#save-product-btn-products-tab {
-    margin-top: 15px; /* Espaço acima do botão */
-    display: inline-flex !important; /* Garante que apareça se não estiver hidden */
-}
+    /* A regra geral para #verifiedProductInfo-add-tab e #verifiedProductInfo-products-tab agora está fora da media query,
+       portanto, não precisa ser repetida aqui, a menos que haja ajustes ESPECÍFICOS para mobile < 767px
+       que diferem da nova regra geral. Por ora, a regra geral deve ser suficiente. */
 
 
     /* Modal de detalhes do produto em telas pequenas (comportamento de modal centralizado) */
@@ -1552,5 +1406,8 @@ a.product-link-btn:hover { background-color: var(--primary-action-hover); }
            que é apropriado para mobile também. */
         max-width: 90%;
         max-height: 85vh;
+        /* Assegurar que o fundo seja branco em <767px se sobrescrito em algum lugar */
+        background: var(--bg-page-primary);
+        color: var(--text-on-light-bg);
     }
 }
