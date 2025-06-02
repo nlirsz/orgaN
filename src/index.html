@@ -95,7 +95,13 @@
                 <button class="nav-btn" data-tab="history" title="Histórico de Compras">
                     <i class="fas fa-history"></i>
                 </button>
+                <button class="nav-btn" data-tab="finance" title="Finanças">
+                    <i class="fas fa-chart-pie"></i>
+                </button>
             </div>
+            <button class="nav-btn" data-tab="settings" title="Configurações">
+                <i class="fas fa-cog"></i>
+            </button>
             <button class="nav-btn" id="logout-btn" title="Sair">
                 <i class="fas fa-sign-out-alt"></i>
             </button>
@@ -123,6 +129,10 @@
                     </div>
                 </div>
                 <div class="dashboard-charts">
+                    <div class="chart-container" id="finance-overview-chart-container">
+                        <h3>Visão Geral Financeira (Últimos 6 Meses)</h3>
+                        <canvas id="financeOverviewChart"></canvas>
+                    </div>
                     <div class="chart-container" id="category-distribution-chart-container">
                         <h3>Distribuição por Categoria</h3>
                         <canvas id="categoryDistributionChart"></canvas>
@@ -374,7 +384,6 @@
             </form>
         </div>
     </div>
-    
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="/renderer.js"></script>
