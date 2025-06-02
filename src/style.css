@@ -26,18 +26,18 @@
     
     /* Para Elementos Escuros Contrastantes (Cards de Produto, Painel Principal Cards) */
     --bg-element-dark: #2B2B2B; 
-    --text-on-dark-bg: #F8F9FA; 
+    --text-on-dark-bg: #F0F0F0; 
     --text-secondary-on-dark-bg: #adb5bd;
     --border-color-dark-elements: #495057; 
 
     /* Cores de Ação */
     --primary-action: #007BFF; 
     --primary-action-hover: #0056b3; 
-    --menu-active-icon-bg: var(--primary-action);
+    --menu-active-icon-bg: var(--primary-action); /* Usado para ícone ativo na pílula da sidebar e menu mobile */
     --secondary-action-color: #FFC107; /* Amarelo/Laranja para logout */
     
     /* Sombras */
-    --element-shadow-on-light-bg: 0px 5px 15px rgba(0, 0, 0, 0.1); /* Sombra mais pronunciada para cards */
+    --element-shadow-on-light-bg: 0px 5px 15px rgba(0, 0, 0, 0.1); 
     --element-hover-shadow-on-light-bg: 0px 7px 20px rgba(0, 0, 0, 0.15);
     
     /* Outras */
@@ -47,9 +47,9 @@
     --highlight-action-text: #FFFFFF; 
 
     /* Inputs com fundo claro (exceção, como a barra de URL) */
-    --input-light-bg: #F0F0F0;
-    --input-light-text: #222222;
-    --input-light-placeholder: #555555;
+    --input-light-bg: #F0F0F0; /* Mantido do seu CSS original */
+    --input-light-text: #222222; /* Mantido do seu CSS original */
+    --input-light-placeholder: #555555; /* Mantido do seu CSS original */
 }
 
 
@@ -102,8 +102,8 @@ html, body {
     align-items: center;
     gap: 30px; 
 }
-.sidebar-title { display: none; }
-.sidebar-nav { width: 100%; flex-grow: 1; }
+.sidebar-title { display: none; } /* Não usado ativamente */
+.sidebar-nav { width: 100%; flex-grow: 1; } /* Não usado ativamente */
 
 .nav-btn { 
     width: 45px; height: 45px;
@@ -114,20 +114,21 @@ html, body {
 }
 .nav-btn i { font-size: 22px; line-height: 1; } 
 
+/* Botões DENTRO da pílula escura (sidebar desktop) */
 .sidebar-nav-main .nav-btn {
-    background: #4A4A4A; 
+    background: #4A4A4A; /* Fundo dos ícones inativos na pílula */
 }
 .sidebar-nav-main .nav-btn i {
-    color: #D0D0D0; 
+    color: #D0D0D0; /* Cor dos ícones inativos na pílula */
 }
 .sidebar-nav-main .nav-btn.active {
-    background-color: var(--primary-action); 
+    background-color: var(--menu-active-icon-bg); 
 }
 .sidebar-nav-main .nav-btn.active i {
     color: var(--highlight-action-text); 
 }
 .sidebar-nav-main .nav-btn:hover {
-    background-color: var(--primary-action); 
+    background-color: var(--menu-active-icon-bg); 
     transform: scale(1.08);
     box-shadow: 0 2px 6px rgba(0,119,255,0.25);
 }
@@ -180,7 +181,7 @@ html, body { overflow: hidden; }
 
 /* Barra de Adicionar Produto por URL (Fundo claro) */
 #scrape-form-products-tab.input-group {
-    background-color: var(--input-light-bg); /* Usando variável correta */
+    background-color: var(--input-light-bg); 
     border-radius: 78px; padding: 8px;
     display: flex; align-items: center;
     box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.07); 
@@ -235,13 +236,13 @@ html, body { overflow: hidden; }
     color: var(--text-on-dark-bg); 
     border-radius: 15px; 
     overflow: hidden; display: flex; flex-direction: column;
-    box-shadow: var(--element-shadow-on-light-bg); /* Sombra adicionada/ajustada */
+    box-shadow: var(--element-shadow-on-light-bg); /* Sombra APLICADA */
     transition: transform 0.25s ease, box-shadow 0.25s ease;
     position: relative; 
 }
 .product-card:hover { 
     transform: translateY(-6px); 
-    box-shadow: var(--element-hover-shadow-on-light-bg); /* Sombra no hover */
+    box-shadow: var(--element-hover-shadow-on-light-bg); /* Sombra no HOVER */
     cursor: pointer;
 }
 .product-card::before { 
@@ -305,10 +306,9 @@ html, body { overflow: hidden; }
 /* Cor no hover dos ícones dos cards */
 .card-actions i:hover { 
     color: var(--text-on-dark-bg); /* Clareia para o texto principal do card */
-    /* Para cores específicas, adicione classes 'action-purchase', 'action-edit', 'action-delete' no HTML/JS */
-    /* e descomente/ajuste as regras abaixo: */
     transform: scale(1.15); 
 }
+/* Se quiser cores específicas por ação, adicione classes aos <i> no JS */
 /* .card-actions .action-purchase:hover { color: var(--success-color); } */
 /* .card-actions .action-edit:hover { color: var(--edit-color); } */
 /* .card-actions .action-delete:hover { color: var(--error-color); } */
@@ -335,6 +335,12 @@ html, body { overflow: hidden; }
     border-radius: 6px; 
     font-size: 0.95em;
     box-shadow: inset 0 1px 2px rgba(0,0,0,0.06);
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    cursor: text;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+    flex-grow: 1;
 }
 .form-container input::placeholder, 
 .edit-product-modal-content input::placeholder,
@@ -349,8 +355,16 @@ html, body { overflow: hidden; }
     box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2); 
 }
 .form-container select, .edit-product-modal-content select {
+    appearance: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%236c757d'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd' /%3E%3C/svg%3E"); 
+    background-repeat: no-repeat;
+    background-position: right 0.8rem center;
+    background-size: 1.1em;
+    padding-right: 2.5rem;
+    cursor: pointer;
+    width: 100%;
     height: 44px; 
+    font-family: 'Space Grotesk', sans-serif; 
 }
 .form-group { 
     margin-bottom: 18px;
@@ -392,7 +406,6 @@ button:hover, .primary-btn:hover {
     background-color: var(--bg-element-light); 
     border: 1px solid var(--border-color-light);
     color: var(--text-on-light-bg); 
-    /* ... manter outras propriedades do secondary-btn */
     font-weight: 500;
     transition: background-color 0.2s, color 0.2s;
     padding: 10px 18px;
@@ -404,21 +417,23 @@ button:hover, .primary-btn:hover {
     background-color: #e2e6ea; 
     border-color: #dae0e5;
 }
+.auth-submit-btn { /* Botões de submit da autenticação */
+    width: 100%; margin-top: 15px; 
+}
 
 
 /* --- SEÇÃO DASHBOARD PRINCIPAL (Cards Escuros) --- */
 /* Gráfico de Visão Geral Financeira foi removido do HTML */
 .summary-card,
-.dashboard-charts .chart-container,
-#verifiedProductInfo, #verifiedProductInfo-products-tab {
+.dashboard-charts .chart-container { /* Aplicado a todos os chart-containers */
     background-color: var(--bg-element-dark);
     color: var(--text-on-dark-bg);
     box-shadow: var(--element-shadow-on-light-bg);
     border-radius: 12px; 
     padding: 20px 25px; 
+    margin-bottom: 25px; /* Adicionado para espaçamento */
 }
-.summary-card h4, .chart-container h3, 
-#verifiedProductInfo h4, #verifiedProductInfo-products-tab h4 {
+.summary-card h4, .chart-container h3 {
     color: var(--text-secondary-on-dark-bg);
     border-bottom: 1px solid var(--border-color-dark-elements); 
     padding-bottom: 12px; 
@@ -426,48 +441,49 @@ button:hover, .primary-btn:hover {
     font-size: 1.05em; 
     font-weight: 500;
 }
-.summary-card p, 
-#verifiedProductInfo p, #verifiedProductInfo-products-tab p {
+.summary-card p {
     color: var(--text-on-dark-bg);
-}
-.summary-card p { font-size: 2em; } 
-#verifiedProductInfo p strong, #verifiedProductInfo-products-tab p strong { 
-    color: var(--text-on-dark-bg); 
-}
-#verifiedProductInfo img, #verifiedProductInfo-products-tab img {
-    background-color: #FFFFFF; 
-    border: 1px solid var(--border-color-dark-elements);
-    display: block; 
-    /* max-width: 100% e max-height agora estão na regra mais específica abaixo */
-    border-radius: 6px;
-    margin: 10px auto 15px; 
-    object-fit: contain; 
-    cursor: pointer;
+    font-size: 2em; 
 }
 /* Área de Produto Verificado (Ajustes para tamanho da imagem e layout) */
 #verifiedProductInfo-add-tab, 
 #verifiedProductInfo-products-tab {
     margin: 25px auto; 
     padding: 20px;
-    max-width: 450px; /* Largura máxima razoável para a prévia */
-    max-height: none; /* Remover limitação de altura anterior se houver */
+    background-color: var(--bg-element-dark); /* Fundo escuro */
+    color: var(--text-on-dark-bg); /* Texto claro */
+    border-radius: 12px;
+    border: 1px solid var(--border-color-dark-elements);
+    text-align: center;
+    box-shadow: var(--element-shadow-on-light-bg);
+    max-width: 450px; 
     display: flex; 
     flex-direction: column; 
     align-items: center; 
+    overflow: hidden; /* Para evitar que imagem grande quebre layout antes de carregar CSS */
 }
 #verifiedProductImage-add-tab,
 #verifiedProductImage-products-tab {
+    display: block;
     max-width: 100%;   
+    width: auto; /* Para manter proporção com max-height */
     height: auto;        
-    max-height: 220px; /* Altura máxima para a imagem da prévia */
+    max-height: 200px; /* Altura máxima para a imagem da prévia */
     border-radius: 8px;  
     margin-bottom: 15px; 
     object-fit: contain; 
+    background-color: #FFFFFF; /* Fundo branco para a área da imagem */
+    border: 1px solid var(--border-color-dark-elements);
 }
 #verifiedProductInfo-add-tab p, 
 #verifiedProductInfo-products-tab p {
     margin-bottom: 8px; 
     font-size: 0.95em; 
+    color: var(--text-on-dark-bg); 
+}
+#verifiedProductInfo-add-tab p strong, 
+#verifiedProductInfo-products-tab p strong { 
+    color: var(--text-on-dark-bg); 
 }
 #save-product-btn-add-tab,
 #save-product-btn-products-tab {
@@ -478,9 +494,8 @@ button:hover, .primary-btn:hover {
 
 /* MODAIS (Fundo Claro) */
 .modal-overlay {
-    background: rgba(30, 30, 30, 0.75); /* Overlay um pouco mais escuro */
+    background: rgba(30, 30, 30, 0.75); 
     backdrop-filter: blur(4px); 
-    /* ... (outros estilos de modal-overlay) ... */
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     display: flex; align-items: center; justify-content: center;
     z-index: 1001; opacity: 0; visibility: hidden; pointer-events: none;
@@ -491,24 +506,47 @@ button:hover, .primary-btn:hover {
     transition: opacity 0.3s ease, visibility 0s linear 0s;
 }
 .modal-content { 
-    background: var(--bg-secondary-page-elements); /* Fundo BRANCO */
-    color: var(--text-on-light-bg); /* Texto ESCURO */
+    background: var(--bg-secondary-page-elements); 
+    color: var(--text-on-light-bg); 
     border-radius: 10px; 
-    box-shadow: 0 8px 30px rgba(0,0,0,0.15); /* Sombra mais suave */
+    box-shadow: 0 8px 30px rgba(0,0,0,0.20); 
     border: 1px solid var(--border-color-light);
     font-family: 'Inter', sans-serif; max-width: 800px; height: auto;
     padding: 25px 30px; position: relative; max-height: 90vh; overflow-y: auto;
     width: 50%; transition: transform 0.3s ease, opacity 0.3s ease;
 }
+/* Estilo específico para o modal de imagem */
+.image-modal-content {
+    padding: 10px; /* Menos padding para modal de imagem */
+    background: #333; /* Fundo escuro para contraste da imagem */
+    border: none;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+}
+.image-modal-content img#modal-image-content { 
+    background-color: transparent; /* Sem fundo extra */
+    border: none; /* Sem borda na imagem ampliada */
+    max-width: 90vw; /* Largura máxima relativa à tela */
+    max-height: 85vh; /* Altura máxima relativa à tela */
+    border-radius: 6px;
+    margin: 0;
+}
+.image-modal-content .close-modal-btn {
+    color: #ccc; /* Cor do X no modal de imagem escuro */
+    top: 10px; right: 10px; font-size: 2em;
+}
+.image-modal-content .close-modal-btn:hover { color: #fff; }
+
+
+/* Imagem padrão dentro de outros modais */
 .modal-content img#modal-product-image, 
 .modal-content img#edit-product-preview-image { 
-    background-color: var(--bg-element-light); /* Fundo claro para a área da imagem */
+    background-color: var(--bg-element-light); 
     border: 1px solid var(--border-color-light); 
     max-width: 100%; height: auto; display: block; margin: 15px auto;
     border-radius: 8px; cursor: pointer; transition: transform 0.2s ease;
     object-fit: contain; 
 }
-#modal-product-image-container { /* Container da imagem no modal de detalhes */
+#modal-product-image-container { 
     width: 100%;
     max-height: 250px; 
     background-color: var(--bg-element-light); 
@@ -516,7 +554,7 @@ button:hover, .primary-btn:hover {
     display: flex; align-items: center; justify-content: center;
     margin-bottom: 20px; overflow: hidden; 
 }
-.close-modal-btn {
+.close-modal-btn { /* Para todos os modais exceto o de imagem já estilizado acima */
     color: var(--text-secondary-on-light-bg); 
     position: absolute; top: 12px; right: 15px; font-size: 1.7em; 
     cursor: pointer; transition: color 0.2s, transform 0.2s;
@@ -524,7 +562,8 @@ button:hover, .primary-btn:hover {
 }
 .close-modal-btn:hover { color: var(--primary-action); transform: scale(1.1); }
 
-.product-details-modal-content { /* Modal de detalhes slide-in - fundo claro */
+/* Modal de Detalhes do Produto (Slide-in) - Fundo Claro */
+.product-details-modal-content {
     background: var(--bg-secondary-page-elements); 
     color: var(--text-on-light-bg); 
     border-left: 1px solid var(--border-color-light);
@@ -539,7 +578,8 @@ button:hover, .primary-btn:hover {
 .modal-product-info p { color: var(--text-secondary-on-light-bg); font-size: 0.9em; }
 .modal-product-info p strong { color: var(--text-on-light-bg); font-weight: 600; }
 
-.edit-product-modal-content { /* Modal de edição - fundo claro */
+/* Modal de Edição - Fundo Claro */
+.edit-product-modal-content { 
     background: var(--bg-secondary-page-elements); 
     color: var(--text-on-light-bg); 
     max-width: 650px; padding: 25px 30px;
@@ -567,7 +607,9 @@ button:hover, .primary-btn:hover {
     background-color: var(--bg-element-light); 
     border: 1px solid var(--border-color-light);
 }
-.edit-product-modal-content textarea::-webkit-scrollbar-thumb { background: #c1c1c1; }
+.edit-product-modal-content textarea::-webkit-scrollbar { width: 8px; }
+.edit-product-modal-content textarea::-webkit-scrollbar-track { background: var(--bg-element-light); border-radius: 4px; }
+.edit-product-modal-content textarea::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
 .edit-product-modal-content textarea::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
 
 
@@ -579,37 +621,77 @@ button:hover, .primary-btn:hover {
     align-items: center; justify-content: center;
     z-index: 2000; 
     opacity: 0; visibility: hidden; 
-    transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out; /* Transição mais rápida */
+    transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out; 
 }
-.loading-overlay.active { opacity: 1; visibility: visible; } /* Para usar com JS add/remove 'active' */
-/* Se usar .hidden, a transição não funciona. Garanta que .hidden tenha display:none !important */
+.loading-overlay.active { opacity: 1; visibility: visible; } 
+.hidden { display: none !important; } /* Manter para compatibilidade com JS existente */
+
 .loading-spinner {
     border: 5px solid #f3f3f3; 
     border-top: 5px solid var(--primary-action); 
     border-radius: 50%;
-    width: 45px; height: 45px; /* Um pouco menor */
-    animation: spin 0.8s linear infinite; /* Mais rápido */
+    width: 45px; height: 45px; 
+    animation: spin 0.8s linear infinite; 
     margin-bottom: 15px; 
 }
 .loading-overlay p { color: #FFFFFF; font-size: 1.05em; font-weight: 500; }
 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-.hidden { display: none !important; }
 
 
 /* --- SEÇÃO DE AUTENTICAÇÃO (Tema Claro) --- */
-/* Reutilizando estilos já definidos para tema claro */
-.auth-section { background-color: var(--bg-page-primary); }
+.auth-section { 
+    display: flex; justify-content: center; align-items: center;
+    height: 100vh;
+    background-color: var(--bg-page-primary); 
+    animation: fadeIn 0.5s ease-out;
+}
 .auth-container {
     background-color: var(--bg-secondary-page-elements); 
     color: var(--text-on-light-bg); 
+    max-width: 450px; width: 100%;
+    padding: 30px 35px; border-radius: 12px;
     box-shadow: 0 8px 25px rgba(0,0,0,0.08); 
     border: 1px solid var(--border-color-light); 
+    text-align: center;
 }
-/* ... e assim por diante para os outros elementos da autenticação ... */
+.auth-container h2 { 
+    color: var(--text-on-light-bg);
+    font-size: 1.6em; 
+    margin-bottom: 20px;
+}
+.auth-tabs { 
+    border-bottom: 1px solid var(--border-color-light); 
+    margin-bottom: 25px; 
+    display: flex; justify-content: center;
+}
+.auth-tab-btn { 
+    color: var(--text-secondary-on-light-bg); 
+    padding: 10px 15px; 
+    font-size: 1em; 
+    background: none; border: none; font-weight: 600; cursor: pointer;
+    transition: color 0.2s, border-bottom 0.2s; border-bottom: 3px solid transparent;
+}
+.auth-tab-btn.active { color: var(--primary-action); border-bottom-color: var(--primary-action); }
+.auth-tab-btn:hover { color: var(--text-on-light-bg); }
+/* Inputs na autenticação usarão as regras gerais de input para tema claro */
+.auth-form input[type="text"],
+.auth-form input[type="password"],
+.auth-form input[type="email"] {
+    background-color: #FFFFFF; 
+    border: 1px solid #ced4da; 
+    color: #212529; 
+}
+.auth-submit-btn { 
+    width: 100%; margin-top: 15px; 
+    padding: 10px 18px; font-size: 1em; 
+    background-color: var(--primary-action); 
+    color: var(--highlight-action-text); 
+}
+.auth-submit-btn:hover { background-color: var(--primary-action-hover); }
 
 
 /* ============================================ */
-/* MOBILE HEADER (NOVO)                       */
+/* MOBILE HEADER                                */
 /* ============================================ */
 .mobile-header {
     display: none; 
@@ -636,10 +718,10 @@ button:hover, .primary-btn:hover {
 /* BARRA INFERIOR MOBILE                      */
 /* ============================================ */
 @media (max-width: 767px) {
-    .mobile-header { display: flex; } /* Mostra o header com logo no mobile */
+    .mobile-header { display: flex; } /* Mostra o header com logo no mobile (se você adicionou o HTML) */
     
     .dashboard-layout > .sidebar { /* Transforma a sidebar desktop em barra inferior */
-        display: flex; 
+        display: flex !important; /* Garante que seja flexível */
         flex-direction: row; 
         justify-content: space-around; 
         align-items: center;
@@ -649,28 +731,23 @@ button:hover, .primary-btn:hover {
         background-color: var(--bg-element-light); 
         border-top: 1px solid var(--border-color-light); 
         box-shadow: 0 -2px 5px rgba(0,0,0,0.07);
-        z-index: 1000;
+        z-index: 999; /* Abaixo do header mobile, se sobreporem */
         padding: 0; 
     }
 
     .sidebar .sidebar-header,
-    .sidebar .sidebar-nav-main { /* Esconde a pílula escura e o logo da sidebar original */
-        display: none;
+    .sidebar .sidebar-nav-main { /* A pílula escura é escondida no mobile */
+        display: none !important;
     }
-    /* Esconde botões não desejados na barra inferior */
+    /* Esconde botões da sidebar desktop que NÃO vão para a barra inferior */
     .sidebar .nav-btn[data-tab="settings"],
-    .sidebar .nav-btn[data-tab="finance"] /* Já removido do HTML, mas garantindo */
-     {
-         display: none !important; /* Garante que não apareçam */
+    .sidebar .nav-btn[data-tab="finance"] { /* Finanças já foi removido do HTML */
+         display: none !important;
     }
-    /* Mostra apenas os botões desejados */
-    .sidebar .nav-btn { display: none; } /* Esconde todos por padrão na barra mobile */
-    .sidebar .nav-btn[data-tab="dashboard-main"],
-    .sidebar .nav-btn[data-tab="products"],
-    .sidebar .nav-btn[data-tab="add-product"],
-    .sidebar .nav-btn[data-tab="history"],
-    .sidebar .nav-btn#logout-btn { 
-        display: flex !important; 
+
+    /* Estilo e exibição dos botões na barra inferior */
+    .sidebar .nav-btn { /* Regra geral para botões na barra inferior */
+        display: none; /* Esconde todos por padrão */
         flex-grow: 1; flex-basis: 0;
         justify-content: center; flex-direction: column; 
         height: 100%; 
@@ -679,22 +756,35 @@ button:hover, .primary-btn:hover {
         background-color: transparent; 
         border-left: none !important;
     }
+    /* Mostrar APENAS os ícones desejados */
+    .sidebar .nav-btn[data-tab="dashboard-main"],
+    .sidebar .nav-btn[data-tab="products"],
+    .sidebar .nav-btn[data-tab="add-product"],
+    .sidebar .nav-btn[data-tab="history"],
+    .sidebar .nav-btn#logout-btn { 
+        display: flex !important; 
+    }
+
     .sidebar .nav-btn i {
-        font-size: 1.6em; /* Ícones maiores para barra inferior */
+        font-size: 1.6em; /* Ícones maiores para toque */
         color: var(--text-secondary-on-light-bg); 
-        margin-bottom: 3px; /* Pequeno espaço se houver texto (que não haverá) */
+        margin-bottom: 3px;
     }
     .sidebar .nav-btn.active i {
         color: var(--primary-action); 
     }
     .sidebar .nav-btn:hover i {
-        color: var(--text-on-light-bg); /* Cor de hover mais escura */
+        color: var(--text-on-light-bg); 
     }
-    .sidebar .nav-btn#logout-btn i { /* Estilo específico para logout na barra */
+    .sidebar .nav-btn#logout-btn { /* Botão de logout na barra inferior */
+        margin-top: 0; 
+        border: none; 
+    }
+    .sidebar .nav-btn#logout-btn i {
         color: var(--text-secondary-on-light-bg);
     }
     .sidebar .nav-btn#logout-btn:hover i {
-        color: var(--error-color); /* Vermelho no hover para logout */
+        color: var(--error-color); 
     }
 
     .main-content-area {
@@ -703,7 +793,7 @@ button:hover, .primary-btn:hover {
         padding-left: 15px; 
         padding-right: 15px;
     }
-    /* ... (restante dos seus estilos mobile para cards, modais, etc., que já estavam no seu CSS original para <767px) ... */
+    /* ... (restante dos seus estilos mobile para cards, modais, etc.) ... */
     .main-content-area h2 { font-size: 1.5em; margin-bottom: 20px; padding-bottom: 10px;}
     #scrape-form-products-tab.input-group { max-width: 100%; margin-bottom: 20px; padding: 8px 10px;}
     #scrape-form-products-tab.input-group input[type="url"] { font-size: 0.95em; padding: 10px 15px;}
@@ -721,8 +811,8 @@ button:hover, .primary-btn:hover {
     .product-card .card-actions { flex-direction: column; justify-content: space-around; padding: 6px 5px; border-left: 1px solid var(--border-color-dark-elements); gap: 5px; }
     .product-card .card-actions i { font-size: 1em; padding: 3px; }
     
-    #verifiedProductInfo-add-tab, #verifiedProductInfo-products-tab { max-width: 90%; padding: 15px;}
-    #verifiedProductImage-add-tab, #verifiedProductImage-products-tab { max-height: 180px; }
+    #verifiedProductInfo-add-tab, #verifiedProductInfo-products-tab { max-width: calc(100% - 30px); padding: 15px;} /* Ajustado para ocupar largura com margens */
+    #verifiedProductImage-add-tab, #verifiedProductImage-products-tab { max-height: 160px; } /* Reduzido um pouco */
 
     .product-details-modal-content { max-width: 95%; max-height: 90vh; padding: 15px; }
     #modal-product-image-container { height: 140px; margin-bottom: 15px; } 
@@ -754,10 +844,10 @@ button:hover, .primary-btn:hover {
     .product-grid { grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 20px;}
     .card-image-container { height: 160px; }
 
-    .product-details-modal-content { /* Modal centralizado para tablet */
+    .product-details-modal-content { 
         position: fixed; top: 50%; left: 50%;
         transform: translate(-50%, -50%) scale(0.95);
-        width: auto; max-width: 600px; /* Reduzido um pouco para tablet */
+        width: auto; max-width: 600px; 
         height: auto; max-height: 85vh;
         right: auto; border-radius: 10px;
         border-left: none; 
