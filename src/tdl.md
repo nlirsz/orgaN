@@ -42,7 +42,7 @@
     * [x] Frontend: Adicionar feedback visual sobre a força da senha no formulário de registro.
     * [x] Backend: Se não estiver completo, garantir validação de complexidade (maiúsculas, minúsculas, números, caracteres especiais, comprimento mínimo) na rota de registro (`POST /api/auth/register`).
 3.  **[ ] Implementar Verificação de E-mail:**
-    * [x] Backend: Criar rota para gerar e enviar token de verificação por e-mail.
+    * [ ] Backend: Criar rota para gerar e enviar token de verificação por e-mail.
     * [ ] Backend: Criar rota para validar token e ativar conta.
     * [ ] Frontend: Informar usuário sobre necessidade de verificação.
 4.  **[ ] (Opcional) Login Social (Google):**
