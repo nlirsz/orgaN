@@ -4,11 +4,19 @@
     {
       "src": "api/index.js",
       "use": "@vercel/node"
+    },
+    {
+      "src": "public",
+      "use": "@vercel/static"
     }
   ],
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/index.js" },
-    { "source": "/", "destination": "/public/index.html" },
-    { "source": "/((?!api/|favicon.ico|logo.ico|style.css|renderer.js|logo.png|.*\\.).*)", "destination": "/public/index.html" }
+    { "source": "/favicon.ico", "destination": "/favicon.ico" },
+    { "source": "/logo.ico", "destination": "/logo.ico" },
+    { "source": "/style.css", "destination": "/style.css" },
+    { "source": "/renderer.js", "destination": "/renderer.js" },
+    { "source": "/logo.png", "destination": "/logo.png" },
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }
