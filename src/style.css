@@ -17,33 +17,47 @@
 /* ATUALIZAÇÃO: TEMA ESCURO            */
 /* ============================================ */
 :root {
-    --bg-primary: #ececec; /* Fundo principal BEM escuro */
-    --bg-secondary: #818181; /* Fundo de elementos como cards, um pouco mais claro */
-    --bg-tertiary: #2C2C2C; /* Para elementos ainda mais sutis ou fundos de input/sidebar */
-    --bg-accent: #3A3A3A; /* Para acentos ou bordas mais escuras */
+    /* Tema Claro Principal */
+    --bg-page-primary: #FFFFFF;
+    --text-on-light-bg: #212529; /* Um preto suave, bom para leitura */
+    --text-secondary-on-light-bg: #6c757d; /* Cinza para texto secundário */
+    --border-color-light: #dee2e6; /* Borda cinza clara */
+    --bg-element-light: #F8F9FA; /* Um off-white para elementos como sidebar, inputs claros */
     
-    --primary-action: #0077FF; /* Azul dos botões ativos - Mantido */
-    --primary-action-hover: #005ECC; /* Mantido */
+    /* Para Elementos Escuros Contrastantes (Cards de Produto, Painel Principal Cards) */
+    --bg-element-dark: #2B2B2B; /* Um cinza bem escuro, mas não preto total */
+    --text-on-dark-bg: #F8F9FA; /* Texto quase branco para fundos escuros */
+    --text-secondary-on-dark-bg: #adb5bd; /* Cinza claro para texto secundário em fundos escuros */
+    --border-color-dark-elements: #495057; /* Borda para elementos escuros */
+
+    /* Cores de Ação */
+    --primary-action: #007BFF; /* Azul padrão Bootstrap */
+    --primary-action-hover: #0056b3;
+    --menu-active-icon-bg: #007BFF; /* Azul para ícone ativo no menu mobile */
+    --secondary-action-color: #FFC107; /* Amarelo/Laranja para logout, como na referência */
     
-    --secondary-action: #FFA500; /* Laranja/Âmbar para ações secundárias (ex: logout no menu mobile) */
-    
-    --text-primary: #E0E0E0; /* Texto principal claro */
-    --text-secondary: #A0A0A0; /* Texto secundário mais suave */
-    --text-placeholder: #757575; /* Placeholder para inputs escuros */
+    /* Placeholders */
+    --text-placeholder-on-light-input: #6c757d; 
+    --text-placeholder-on-dark-input: #868e96;
 
-    /* Cores para inputs com fundo claro (exceção ao tema escuro) */
-    --input-light-bg: #F0F0F0;
-    --input-light-text: #222222;
-    --input-light-placeholder: #555555;
+    /* Sombras */
+    --element-shadow-on-light-bg: 0px 4px 10px rgba(0, 0, 0, 0.08); 
+    --element-hover-shadow-on-light-bg: 0px 6px 15px rgba(0, 0, 0, 0.12);
 
-    --border-color: #3A3A3A; /* Bordas escuras */
-    --card-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3); /* Sombra para cards escuros */
-    --card-hover-shadow: 0px 8px 20px rgba(0, 0, 0, 0.4);
+    /* Cores Específicas para o Menu Mobile Escuro */
+    --mobile-menu-bg: #1A1D24; /* Um preto azulado escuro, como na referência */
+    --mobile-menu-nav-items-container-bg: #2C3038; 
+    --mobile-menu-icon-inactive-bg: #454A54; 
+    --mobile-menu-icon-color: var(--text-on-dark-bg);
+    --mobile-menu-icon-active-color: #FFFFFF;
+    --mobile-menu-logout-icon-color: var(--secondary-action-color);
+    --mobile-menu-logout-border-color: var(--secondary-action-color);
 
-    --success-color: #10B981; /* Mantido, mas verificar contraste */
-    --error-color: #EF4444;   /* Mantido */
-    --edit-color: #F59E0B;    /* Mantido */
-    --highlight-action: #FFFFFF; /* Texto branco em botões primários - Mantido */
+    /* Outras (mantidas do seu CSS anterior, ajuste se necessário) */
+    --success-color: #28a745; /* Verde Bootstrap */
+    --error-color: #dc3545;   /* Vermelho Bootstrap */
+    --edit-color: #ffc107;    /* Amarelo Bootstrap */
+    --highlight-action-text: #FFFFFF; 
 }
 
 
