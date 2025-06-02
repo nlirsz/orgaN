@@ -12,11 +12,6 @@
   ],
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/index.js" },
-    { "source": "/favicon.ico", "destination": "/favicon.ico" },
-    { "source": "/logo.ico", "destination": "/logo.ico" },
-    { "source": "/style.css", "destination": "/style.css" },
-    { "source": "/renderer.js", "destination": "/renderer.js" },
-    { "source": "/logo.png", "destination": "/logo.png" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }
