@@ -104,6 +104,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const editProductMessage = getElem('edit-product-message'); //
     const imageModal = getElem('image-modal'); //
     const modalImageContent = getElem('modal-image-content'); //
+    const mobileMenu = document.getElementById('mobileMenu');
+    const mobileMenuOverlay = document.querySelector('.mobile-menu-overlay');
+    const logoParaAbrirMenu = document.getElementById('seuLogoOuBotaoParaAbrir'); // Defina o ID correto
+
 
 
     // --- FUNÇÕES DE UTILIDADE ---
@@ -928,6 +932,28 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error("Erro ao salvar produto:", error); //
         }
     }
+
+    function toggleMobileMenu() {
+    mobileMenu.classList.toggle('is-open');
+    mobileMenuOverlay.classList.toggle('is-visible');
+}
+
+if (logoParaAbrirMenu) {
+    logoParaAbrirMenu.addEventListener('click', toggleMobileMenu);
+}
+if (mobileMenuOverlay) {
+    mobileMenuOverlay.addEventListener('click', toggleMobileMenu); // Fecha ao clicar no overlay
+}
+
+// Opcional: Fechar menu ao clicar em um item do menu (se for navegação de página inteira)
+const navButtonsMobile = mobileMenu.querySelectorAll('.nav-btn');
+    navButtonsMobile.forEach(button => {
+        button.addEventListener('click', () => {
+             if (mobileMenu.classList.contains('is-open')) {
+                 toggleMobileMenu();
+             }
+         });
+     });
     
     function clearAddProductFormAddTab() { //
         if (productUrlInputAddTab) productUrlInputAddTab.value = ''; //
