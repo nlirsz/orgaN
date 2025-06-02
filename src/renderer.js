@@ -104,10 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const editProductMessage = getElem('edit-product-message'); //
     const imageModal = getElem('image-modal'); //
     const modalImageContent = getElem('modal-image-content'); //
-    const mobileMenu = document.getElementById('mobileMenu');
-    const mobileMenuOverlay = document.querySelector('.mobile-menu-overlay');
-    const logoParaAbrirMenu = document.getElementById('triggerMobileMenu');
-
+    
 
 
     // --- FUNÇÕES DE UTILIDADE ---
@@ -932,8 +929,6 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error("Erro ao salvar produto:", error); //
         }
     }
-
-    
     
     function clearAddProductFormAddTab() { //
         if (productUrlInputAddTab) productUrlInputAddTab.value = ''; //
