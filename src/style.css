@@ -59,7 +59,7 @@
     --bg-primary: var(--bg-page-primary); /* Overall page/body background */
     --text-primary: var(--text-on-light-bg); /* Default text color for light backgrounds */
 
-    --bg-secondary: #2c2f33; /* Darker grey for component backgrounds (e.g., cards, forms) - A common dark shade */
+    --bg-secondary: #ffffff; /* Darker grey for component backgrounds (e.g., cards, forms) - A common dark shade */
     --bg-tertiary: #222528;  /* Slightly different dark shade for sidebars, inputs */
     --bg-accent: #3a3f44;    /* Accent color for elements on dark backgrounds (e.g., buttons in sidebar) */
     --border-color: var(--border-color-dark-elements); /* Default border for dark-themed elements */
