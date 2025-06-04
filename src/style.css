@@ -21,7 +21,7 @@
 
     /* Para Elementos Escuros Contrastantes */
     --bg-element-dark: #2B2B2B;
-    --text-on-dark-bg: #F8F9FA;
+    --text-on-dark-bg: #242424;
     --text-secondary-on-dark-bg: #424344;
     --border-color-dark-elements: #495057;
 
@@ -243,7 +243,7 @@ button:active, .primary-btn:active, .auth-submit-btn:active { transform: transla
 .card-content { padding: 15px; background-color: #121212; border-radius: 0 0 12px 12px; flex-grow: 1; display: flex; flex-direction: column; text-align: center; }
 .card-title { font-family: 'Almarai', sans-serif; font-size: 1.1em; font-weight: 700; color: var(--text-on-dark-bg); margin-bottom: 8px; line-height: 1.4; min-height: 2.8em; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; cursor: pointer; }
 .card-price { font-size: 1.8em; font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: var(--text-on-dark-bg); margin-top: auto; margin-bottom: 15px; }
-.card-actions { padding: 10px 15px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--border-color); background-color: transparent; }
+.card-actions { padding: 10px 15px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--border-color); background-color: #121212; }
 .card-actions i { font-size: 1.3em; color: var(--text-secondary-on-dark-bg); cursor: pointer; transition: color 0.2s, transform 0.2s; padding: 8px; }
 .card-actions i:hover { color: var(--text-on-dark-bg); transform: scale(1.15); }
 #dashboard-main-tab h2 { margin-bottom: 20px; text-align: left; color: var(--text-on-light-bg); }
