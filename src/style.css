@@ -368,64 +368,273 @@ a.product-link-btn:hover { background-color: var(--primary-action-hover); }
 }
 
 @media (max-width: 767px) {
-    /* ... (outros estilos mobile existentes que você já tem) ... */
+    /* === IMPLEMENTAÇÃO DA BARRA DE NAVEGAÇÃO INFERIOR MOBILE === */
 
-    /* === MODIFICAÇÕES E ADIÇÕES PARA OS PROBLEMAS APONTADOS === */
+    /* Oculta o menu mobile deslizante original (se houver) */
+    .mobile-menu { display: none !important; }
+    .mobile-menu-overlay { display: none !important; }
 
-    /* 1. Ajustes Gerais para Modais em Telas Pequenas */
-    .modal-content {
-        width: 90%; /* Ocupa mais a largura da tela */
-        max-width: calc(100vw - 30px); /* Garante pequenas margens laterais */
-        margin-top: 20px; /* Margem superior */
-        margin-bottom: 20px; /* Margem inferior */
-        padding: 20px; /* Padding interno ajustado */
-        max-height: 85vh; /* Altura máxima com scroll */
-        overflow-y: auto; /* Adiciona scroll se o conteúdo for maior */
+    /* Transforma a .sidebar desktop em uma barra inferior fixa */
+    .dashboard-layout > .sidebar {
+        display: flex !important; /* Garante que esteja visível e como flex */
+        flex-direction: row;    /* Itens em linha */
+        position: fixed;        /* Fixa na tela */
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 60px;           /* Altura da barra */
+        background-color: var(--bg-page-primary); /* Fundo branco, conforme tema */
+        padding: 0 5px;         /* Padding horizontal mínimo */
+        justify-content: space-around; /* Distribui os ícones */
+        align-items: center;
+        box-shadow: 0 -2px 5px rgba(0,0,0,0.08); /* Sombra para destacar */
+        z-index: 1001;          /* Acima do conteúdo, abaixo de modais superiores */
+        border-top: 1px solid var(--border-color-light); /* Borda superior clara */
+        border-right: none;     /* Remove a borda direita do desktop */
+        gap: 0;                 /* Reseta o gap do layout em coluna do desktop */
     }
 
-    /* Garante que o modal de detalhes do produto (slide-in) não seja afetado negativamente */
-    /* pela regra geral de .modal-content acima, se ele já tem estilos específicos para mobile. */
-    /* No seu CSS atual, .product-details-modal-content já tem max-width: 90% e max-height: 85vh, o que é bom. */
-    /* Apenas garantindo que ele não pegue 'margin: auto' se for um slide-in de tela cheia. */
-    .product-details-modal-content {
-        width: 90%; /* Mantém o padrão para o slide-in, pode ser até 100% */
-        max-width: 400px; /* Pode manter o max-width específico se desejado */
-        margin-left: auto; /* Se for slide da direita, mantém auto na esquerda */
-        margin-top: 0; /* Slide-in geralmente é do topo */
-        margin-bottom: 0;
-        height: 100vh; /* Ocupa toda a altura */
-        border-radius: 0; /* Sem bordas arredondadas para tela cheia */
-    }
+    /* Oculta elementos não necessários na barra inferior */
+    .sidebar .sidebar-header { display: none !important; }
+    .sidebar .nav-btn[data-tab="finance"] { display: none !important; }
+    /* O botão de configurações já deve estar oculto pela regra global:
+       .nav-btn[data-tab="settings"] { display: none !important; }
+       Se precisar garantir especificamente para este contexto: */
+    .sidebar .nav-btn[data-tab="settings"] { display: none !important; }
 
-    /* Para o modal de edição especificamente, se precisar de mais ajustes além do .modal-content geral */
-    .edit-product-modal-content {
-        /* Herdará width: 90% do .modal-content acima, o que deve resolver o problema de ser "muito fino" */
-        /* Se precisar de padding específico: */
-        padding: 20px 15px; /* Exemplo: padding horizontal um pouco menor */
+    /* Faz os botões dentro de .sidebar-nav-main serem itens diretos da .sidebar */
+    .sidebar .sidebar-nav-main {
+        display: contents;
     }
     
-    #edit-product-form .form-row {
-        flex-direction: column; /* Empilha os campos lado a lado no desktop */
-        gap: 0; /* Remove o gap se empilhado, ou ajusta */
+    /* Estilo para os botões de navegação na barra inferior branca */
+    .sidebar .nav-btn {
+        width: auto; 
+        height: 100%;
+        flex: 1; /* Para distribuir o espaço igualmente */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0; /* Sem bordas arredondadas */
+        background-color: transparent; /* Fundo transparente */
+        padding: 5px 0;
+        margin: 0;
+        gap: 2px; /* Pequeno espaço (útil se houvesse texto abaixo do ícone) */
+        transition: background-color 0.2s, color 0.2s;
     }
-     #edit-product-form .form-row .form-group {
-        margin-bottom: 15px; /* Espaçamento entre campos empilhados */
+    .sidebar .nav-btn i {
+        font-size: 22px; /* Tamanho do ícone ajustado */
+        line-height: 1;
+        color: var(--text-secondary-on-light-bg); /* Ícones cinza escuro na barra branca */
+    }
+    .sidebar .nav-btn:hover {
+        background-color: var(--bg-element-light); /* Fundo cinza claro no hover */
+        transform: none; /* Sem transformação de escala */
+        box-shadow: none; /* Sem sombra extra no hover */
+    }
+    .sidebar .nav-btn:hover i {
+        color: var(--primary-action); /* Ícone azul no hover */
+    }
+    .sidebar .nav-btn.active {
+        background-color: transparent; /* Fundo transparente para o ativo */
+    }
+    .sidebar .nav-btn.active i {
+        color: var(--primary-action); /* Ícone ativo azul */
+    }
+    /* Estilo específico para o ícone de logout na barra inferior */
+    .sidebar #logout-btn i {
+         color: var(--text-secondary-on-light-bg); /* Cor padrão do ícone */
+    }
+     .sidebar #logout-btn:hover i {
+        color: var(--error-color); /* Cor de erro (vermelho) no hover do logout */
+    }
+    /* === FIM DA IMPLEMENTAÇÃO DA BARRA INFERIOR MOBILE === */
+
+    /* Ajuste no padding da área de conteúdo principal para a barra inferior */
+    .main-content-area {
+        padding-top: 15px;
+        padding-left: 15px; /* Reduz padding lateral no mobile */
+        padding-right: 15px; /* Reduz padding lateral no mobile */
+        padding-bottom: 75px; /* Espaço para a barra inferior de 60px + 15px de margem */
+    }
+    .main-content-area h2 {
+        font-size: 1.5em; /* Títulos um pouco menores no mobile */
+        margin-bottom: 20px;
     }
 
-
-    /* 2. Ajustes para Dashboard e Resumo Financeiro Mobile */
-    .dashboard-summary-cards {
-        grid-template-columns: 1fr; /* Empilha os cards de resumo */
-        gap: 15px;
+    /* Responsividade para o grupo de input "Verificar URL" */
+    #scrape-form-products-tab.input-group {
+        flex-wrap: wrap;
+        justify-content: center;
+        padding: 8px 15px; /* Padding interno do grupo */
+        border-radius: 30px; /* Raio de borda ajustado */
+        max-width: 95%;     /* Largura máxima para permitir centralização */
+        margin-left: auto;  /* Centraliza o bloco */
+        margin-right: auto; /* Centraliza o bloco */
+        margin-bottom: 25px; /* Margem inferior */
     }
-    .summary-card {
+    #scrape-form-products-tab.input-group input[type="url"] {
+        flex-basis: 100%; /* Input ocupa a largura total */
+        width: 100%;
+        margin-bottom: 10px; /* Espaço entre input e botão quando quebrado */
+        text-align: center;  /* Centraliza o placeholder */
+        font-size: 1em;      /* Tamanho da fonte do input */
+    }
+    #scrape-form-products-tab.input-group button {
+        width: 100%; /* Botão ocupa a largura total */
+        padding: 12px 20px;
+        font-size: 1em; /* Tamanho da fonte do botão */
+    }
+
+    /* Ajustes nos cards de produto para mobile */
+    .product-grid {
+        grid-template-columns: 1fr; /* Um card por linha */
+        gap: 15px; /* Espaçamento entre cards */
+    }
+    .product-card { /* Card com fundo branco e texto escuro */
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+        border-radius: 10px; /* Borda um pouco menos arredondada */
+        position: relative;
+        background-color: var(--bg-page-primary); /* Fundo branco */
+        border: 1px solid var(--border-color-light); /* Borda clara */
+        box-shadow: var(--element-shadow-on-light-bg); /* Sombra escura sutil */
+    }
+    .product-card .card-image-container {
+        flex-shrink: 0;
+        width: 90px; /* Largura da imagem um pouco menor */
+        height: auto;
+        min-height: 90px;
+        padding: 8px;
+        border-radius: 10px 0 0 10px; /* Ajusta o raio para a borda */
+        align-self: stretch;
+        background-color: #FFFFFF; /* Fundo da imagem sempre branco */
+        border-right: 1px solid var(--border-color-light); /* Linha separadora */
+    }
+    .product-card .card-image {
+        border-radius: 6px;
+    }
+    .product-card .card-content { /* Conteúdo do card com texto escuro */
+        flex-grow: 1;
+        padding: 10px 12px; /* Padding ajustado */
+        text-align: left;
+        border-radius: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        background-color: var(--bg-page-primary); /* Fundo branco */
+    }
+    .product-card .card-title {
+        font-size: 0.95em; /* Título um pouco menor */
+        min-height: 0;
+        -webkit-line-clamp: 2; /* Máximo de 2 linhas para o título */
+        line-clamp: 2;
+        margin-bottom: 4px;
+        color: var(--text-on-light-bg); /* Texto escuro */
+        font-weight: 600;
+    }
+    .product-card .card-price {
+        font-size: 1.3em; /* Preço um pouco menor */
+        margin-bottom: 6px;
+        margin-top: 4px;
+        text-align: left;
+        color: var(--text-on-light-bg); /* Texto escuro */
+        font-weight: 700;
+    }
+    .product-card .card-actions { /* Ações com ícones escuros */
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 8px 5px; /* Padding ajustado */
+        border-top: none;
+        border-left: 1px solid var(--border-color-light); /* Borda clara */
+        width: auto;
+        flex-shrink: 0;
+        gap: 8px; /* Espaço entre ícones */
+    }
+     .product-card .card-actions i {
+        font-size: 1.1em; /* Ícones um pouco menores */
+        padding: 4px;
+        color: var(--text-secondary-on-light-bg); /* Ícones cinza escuro */
+    }
+     .product-card .card-actions i:hover {
+        color: var(--primary-action); /* Cor primária no hover */
+    }
+
+    /* Caixa de Informação do Produto Verificado */
+    #verifiedProductInfo-add-tab,
+    #verifiedProductInfo-products-tab {
+        max-width: 95%; /* Ocupa mais a largura da tela */
         padding: 15px;
     }
-    .summary-card h4 {
+    #verifiedProductImage-add-tab,
+    #verifiedProductImage-products-tab {
+        max-height: 180px; /* Imagem da prévia um pouco menor */
+    }
+
+    /* Ajustes Gerais para Modais em Telas Pequenas */
+    .modal-content {
+        width: 90%;
+        max-width: calc(100vw - 30px); /* Pequenas margens laterais */
+        margin-top: 20px;
+        margin-bottom: 20px;
+        padding: 15px; /* Padding geral para modais no mobile */
+        max-height: 90vh; /* Aumenta um pouco a altura máxima permitida */
+        overflow-y: auto;
+    }
+
+    /* Modal de Detalhes do Produto (Slide-in) */
+    .product-details-modal-content {
+        width: 85%; /* Slide-in ocupa um pouco menos da tela */
+        max-width: 360px; /* Max width para o slide-in */
+        padding: 20px 15px; /* Padding ajustado */
+        height: 100vh; /* Ocupa toda a altura */
+        margin-left: auto;
+        margin-top: 0;
+        margin-bottom: 0;
+        border-radius: 0;
+    }
+
+    /* Modal de Edição de Produto */
+    .edit-product-modal-content {
+        /* Herdará width: 90% do .modal-content geral */
+        padding: 20px 15px; /* Padding ajustado */
+    }
+    #edit-product-form .form-row {
+        flex-direction: column; /* Empilha campos que estavam lado a lado */
+        gap: 0;
+    }
+    #edit-product-form .form-row .form-group {
+        margin-bottom: 15px; /* Espaçamento entre campos empilhados */
+    }
+    #edit-product-form label {
+        font-size: 0.85em;
+    }
+    /* Inputs dentro do modal de edição */
+    #edit-product-form input[type="text"], 
+    #edit-product-form input[type="number"], 
+    #edit-product-form input[type="url"], 
+    #edit-product-form select, 
+    #edit-product-form textarea {
         font-size: 0.9em;
+        padding: 8px 10px;
+    }
+
+    /* Ajustes para Dashboard e Resumo Financeiro Mobile */
+    .dashboard-summary-cards {
+        grid-template-columns: 1fr; /* Empilha os cards de resumo */
+        gap: 10px; /* Espaçamento menor */
+    }
+    .summary-card {
+        padding: 12px; /* Padding menor */
+    }
+    .summary-card h4 {
+        font-size: 0.85em;
     }
     .summary-card p {
-        font-size: 1.6em;
+        font-size: 1.5em;
     }
 
     .dashboard-charts {
@@ -433,41 +642,38 @@ a.product-link-btn:hover { background-color: var(--primary-action-hover); }
         gap: 15px;
     }
     .dashboard-charts .chart-container {
-        padding: 15px;
-        height: auto; /* Altura automática para o conteúdo */
-        min-height: 280px; /* Altura mínima para visualização do gráfico */
+        padding: 10px; /* Padding menor */
+        height: 280px; /* Altura fixa menor para gráficos */
+        min-height: unset; /* Remove min-height para usar a altura fixa */
+        overflow: hidden; /* Evita estouro do gráfico */
     }
     .dashboard-charts .chart-container h3 {
-        font-size: 1em; /* Ajusta o tamanho do título do gráfico */
-        margin-bottom: 10px;
+        font-size: 0.9em; /* Título do gráfico menor */
+        margin-bottom: 8px;
     }
-    /* Garante que o canvas do gráfico seja responsivo */
     .dashboard-charts .chart-container canvas {
         max-width: 100%;
-        height: auto !important; /* Importante para sobrescrever estilos inline do Chart.js se necessário */
+        max-height: 100%; /* Garante que o canvas não ultrapasse o container */
     }
-
-    /* Ajustes específicos para a seção de finanças se o problema de corte for lá */
-    .finance-summary { /* Se este for o "resumo financeiro" com o número cortado */
-        padding: 15px;
+    /* Específico para o gráfico problemático, se necessário */
+    #finance-overview-chart-container {
+        height: 280px;
+        overflow: hidden;
     }
-    .finance-summary p {
-        font-size: 1.5em; /* Exemplo de ajuste de fonte para evitar corte */
-        word-break: break-all; /* Quebra palavras longas se for o caso */
+    #financeOverviewChart {
+        max-width: 100%;
+        max-height: 100%;
     }
-    .chart-container.finance-detail-chart { /* Se o problema for no gráfico detalhado de finanças */
-        min-height: 280px;
+    
+    /* Ajustes para Auth Container no Mobile */
+    .auth-container {
+        padding: 20px;
+        max-width: 100%;
+        width: calc(100% - 30px); /* Ocupa quase toda a largura com pequenas margens */
+        margin: 20px 15px;
     }
-
-
-    /* Reafirmando o padding para a barra inferior, caso o problema de corte do último card persista */
-    /* Esta regra já existe no seu CSS, mas é crucial. */
-    .main-content-area {
-        /* ... outros estilos ... */
-        padding-bottom: 75px; /* (60px da barra + 15px de margem). Verifique se a altura da barra é realmente 60px. */
-        /* Se o conteúdo ainda corta, pode ser necessário aumentar esse padding, */
-        /* ou investigar se algum elemento filho está causando overflow inesperado. */
+    .auth-tab-btn {
+        font-size: 1em;
+        padding: 10px; /* Padding menor nos botões de aba */
     }
-
-    /* ... (restante dos seus estilos mobile existentes) ... */
 }
