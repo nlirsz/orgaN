@@ -1,4 +1,5 @@
 // Em RAIZ_DO_PROJETO/api/index.js
+import { inject } from '@vercel/analytics';
 
 const express = require('express');
 const cors = require('cors');
