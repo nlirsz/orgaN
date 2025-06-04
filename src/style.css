@@ -36,8 +36,8 @@
     --text-placeholder-on-dark-input: #868e96;
 
     /* Sombras */
-    --element-shadow-on-light-bg: 0px 6px 12px rgba(0, 0, 0, 0.15);
-    --element-hover-shadow-on-light-bg: 0px 8px 18px rgba(0, 0, 0, 0.2);
+    --element-shadow-on-light-bg: 0px 6px 12px rgba(0, 0, 0, 0.1); /* Adjusted shadow slightly for light cards */
+    --element-hover-shadow-on-light-bg: 0px 8px 18px rgba(0, 0, 0, 0.12);  /* Adjusted shadow slightly for light cards */
 
     /* Cores Específicas para o Menu Mobile Escuro (será ocultado, mas mantendo vars) */
     --mobile-menu-bg: #1A1D24;
@@ -57,13 +57,20 @@
     /* DEFINITIONS FOR COMMON VARIABLES */
     --bg-primary: var(--bg-page-primary);
     --text-primary: var(--text-on-light-bg);
-    --bg-secondary: #2c2f33;
-    --bg-tertiary: #ffffff;
-    --bg-accent: #3a3f44;
-    --border-color: var(--border-color-dark-elements);
+    /* --bg-secondary: #2c2f33; /* No longer default dark for components like cards */
+    /* --bg-tertiary: #222528; /* No longer default dark for sidebar */
+    --bg-accent: #e9ecef; /* Light accent for hovers on light backgrounds */
+    --border-color: var(--border-color-light); /* Default border is now light */
+
+    /* For the light URL input group */
     --input-light-bg: var(--bg-element-light);
     --input-light-text: var(--text-on-light-bg);
     --input-light-placeholder: var(--text-secondary-on-light-bg);
+
+    /* Specific dark backgrounds that remain */
+    --dark-component-bg: #2c2f33; /* For form containers, specific dark elements if needed */
+    --dark-input-bg: #222528; /* For general dark inputs */
+    --sidebar-nav-main-bg: #121212; /* User request */
 }
 
 html, body {
@@ -80,29 +87,29 @@ html, body {
 }
 
 /* === DESKTOP SIDEBAR === */
-.sidebar {
+.sidebar { /* MODIFIED: Light theme */
     width: 100px;
-    background: #ececec;
+    background: var(--bg-page-primary); /* White background */
     padding: 35px 0;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 25px;
-    z-index: 100; /* Lower than mobile bottom bar if they could overlap on resize */
-    border-right: 1px solid var(--border-color);
-    box-shadow: 5px 0px 15px rgba(0, 0, 0, 0.2);
+    z-index: 100;
+    border-right: 1px solid var(--border-color-light); /* Light border */
+    box-shadow: 3px 0px 10px rgba(0, 0, 0, 0.08); /* Softer shadow for light sidebar */
 }
 
 .sidebar-header .logo {
     width: 45px;
     height: 45px;
     border-radius: 50%;
-    box-shadow: 0px 0px 9.7px rgba(255, 255, 255, 0.1);
+    /* box-shadow: 0px 0px 9.7px rgba(0,0,0, 0.1); /* Shadow for logo on light bg if needed */
 }
 
-.sidebar-nav-main {
+.sidebar-nav-main { /* MODIFIED: Specific dark background */
     width: 60px;
-    background: #121212;
+    background: var(--sidebar-nav-main-bg); /* #121212 */
     box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.25);
     border-radius: 56px;
     padding: 10px 0;
@@ -113,19 +120,16 @@ html, body {
 }
 
 .sidebar-title { display: none; }
-.sidebar-title.active {
+.sidebar-title.active { /* If used on a light sidebar, text needs to be dark */
     display: block;
     font-size: 1.2em;
-    color: var(--text-on-dark-bg);
+    color: var(--text-on-light-bg);
     font-weight: 600;
     margin-bottom: 20px;
     text-align: center;
 }
-.sidebar-nav { /* Not used in current HTML structure provided */
-    width: 100%;
-    flex-grow: 1;
-}
-.nav-btn {
+
+.nav-btn { /* Base style for all nav buttons */
     width: 45px;
     height: 45px;
     border: none;
@@ -135,56 +139,290 @@ html, body {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background-color 0.2s, transform 0.2s;
+    transition: background-color 0.2s, color 0.2s, transform 0.2s; /* Added color transition */
 }
-.nav-btn:hover {
+.nav-btn:hover { /* General hover for nav buttons if not overridden */
     transform: scale(1.12);
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
 }
 .nav-btn i {
     font-size: 28px;
     line-height: 1;
+    transition: color 0.2s;
 }
 
+/* Buttons INSIDE the dark .sidebar-nav-main pill */
 .sidebar-nav-main .nav-btn {
-    background: var(--bg-accent);
+    background: #3A3A3A; /* Darker grey circles on #121212 background */
 }
 .sidebar-nav-main .nav-btn i {
-    color: var(--text-on-dark-bg);
+    color: var(--text-on-dark-bg); /* Light icons */
 }
 .sidebar-nav-main .nav-btn.active {
-    background-color: var(--primary-action);
+    background-color: var(--primary-action); /* Blue active circle */
 }
 .sidebar-nav-main .nav-btn.active i {
-    color: var(--highlight-action-text);
+    color: var(--highlight-action-text); /* White icon on blue */
 }
 .sidebar-nav-main .nav-btn:hover {
-    background-color: var(--primary-action-hover);
+    background-color: var(--primary-action-hover); /* Darker blue on hover */
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.25);
 }
 .sidebar-nav-main .nav-btn:hover i {
-    color: var(--highlight-action-text);
+    color: var(--highlight-action-text); /* White icon on hover */
 }
 
-.sidebar > .nav-btn { /* For Settings and Logout on desktop */
-    background-color: var(--bg-accent);
+/* Buttons OUTSIDE the pill, directly in .sidebar (Settings, Logout on DESKTOP) */
+.sidebar > .nav-btn { /* These are on the new white sidebar background */
+    background-color: transparent;
 }
 .sidebar > .nav-btn i {
-    color: var(--text-on-dark-bg);
+    color: var(--text-secondary-on-light-bg); /* Dark grey icons */
 }
 .sidebar > .nav-btn:hover {
-    background-color: var(--primary-action-hover);
+    background-color: var(--bg-element-light); /* Light grey circle on hover */
+    transform: scale(1.12); /* Keep scale */
+    box-shadow: none;
 }
 .sidebar > .nav-btn:hover i {
-    color: var(--highlight-action-text);
+    color: var(--primary-action); /* Blue icon on hover */
+}
+.sidebar > .nav-btn.active i { /* If settings/logout could be active */
+    color: var(--primary-action);
 }
 
-.nav-btn[data-tab="settings"] { /* Pushes settings to near bottom on desktop */
+
+.nav-btn[data-tab="settings"] {
     margin-top: auto;
 }
-/* ... (Rest of your existing CSS up to media queries) ... */
 
-/* Coloque o restante do seu CSS aqui (Auth, Forms, Modals, Dashboard, etc.) */
-/* ... (Vou omitir o meio do CSS para economizar espaço, as mudanças principais estão no :root e no @media) ... */
+/* ... (Rest of CSS, ensuring text colors are appropriate for their new backgrounds) ... */
+/* ... (Skipping to product card for brevity, full CSS will be at the end) ... */
+
+.product-card { /* MODIFIED: Light theme */
+    background-color: var(--bg-page-primary); /* White background */
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--element-shadow-on-light-bg); /* Dark shadow */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 1px solid var(--border-color-light); /* Light border for definition */
+}
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--element-hover-shadow-on-light-bg);
+    cursor: pointer;
+}
+
+.card-image-container { /* Stays white, image inside */
+    width: 100%;
+    height: 180px;
+    background-color: #FFFFFF;
+    border-radius: 11px 11px 0 0; /* Adjust if border is 1px */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding: 10px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border-color-light); /* Separator if card content is also white */
+}
+.card-image {
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 6px;
+    object-fit: contain;
+    cursor: pointer;
+}
+
+.card-content { /* MODIFIED: Light theme */
+    padding: 15px;
+    background-color: var(--bg-page-primary); /* White background */
+    border-radius: 0 0 11px 11px; /* Adjust if border is 1px */
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+.card-title { /* MODIFIED: Light theme */
+    font-family: 'Almarai', sans-serif;
+    font-size: 1.1em;
+    font-weight: 700;
+    color: var(--text-on-light-bg); /* Dark text */
+    margin-bottom: 8px;
+    line-height: 1.4;
+    min-height: 2.8em; /* For 2 lines */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    cursor: pointer;
+}
+.card-price { /* MODIFIED: Light theme */
+    font-size: 1.8em;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    color: var(--text-on-light-bg); /* Dark text */
+    margin-top: auto;
+    margin-bottom: 15px;
+}
+.card-actions { /* MODIFIED: Light theme */
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-top: 1px solid var(--border-color-light); /* Light border */
+    background-color: transparent; /* Background of card is white */
+}
+.card-actions i { /* MODIFIED: Light theme */
+    font-size: 1.3em;
+    color: var(--text-secondary-on-light-bg); /* Darker grey icons */
+    cursor: pointer;
+    transition: color 0.2s, transform 0.2s;
+    padding: 8px;
+}
+.card-actions i:hover { /* MODIFIED: Light theme */
+    color: var(--primary-action); /* Blue on hover */
+    transform: scale(1.15);
+}
+
+/* Other elements like forms, inputs, modals would generally retain their existing theming
+   unless they were also meant to change. The request was specific to cards and sidebar.
+   Dark elements like .form-container, .auth-container, .summary-card will remain dark
+   unless their --bg-secondary variable meaning is changed globally, which I avoided for now.
+   I used --dark-component-bg for their backgrounds if a specific dark is needed.
+*/
+
+/* Ensuring form containers and other major dark components remain dark */
+.form-container, .finance-form-container, .auth-container,
+.summary-card, .dashboard-charts .chart-container,
+.chart-container.finance-detail-chart, #finance-list li {
+    background-color: var(--dark-component-bg); /* Use specific dark var */
+    color: var(--text-on-dark-bg);
+    /* Their existing text colors, borders should mostly be fine if they use a dark-bg var */
+}
+/* Adjust text inside these dark containers */
+.form-container h3, .finance-form-container h3, .auth-container h2,
+.form-section-title, .summary-card h4, .summary-card p, .chart-container h3,
+.finance-summary h3, .finance-summary p, .finance-list-container h3,
+#finance-list .finance-item-details strong, #finance-list .finance-item-details .balance,
+.auth-tab-btn, .form-group.remember-me-group, .auth-message {
+    color: var(--text-on-dark-bg);
+}
+.form-group label, #password-requirements-legend, #password-strength-indicator,
+#finance-list .finance-item-details span, .finance-item-actions button {
+    color: var(--text-secondary-on-dark-bg);
+}
+.auth-tab-btn { color: var(--text-secondary-on-dark-bg); }
+.auth-tab-btn:hover { color: var(--text-on-dark-bg); }
+
+
+/* Inputs remain dark by default */
+input[type="url"], input[type="text"], input[type="number"], input[type="month"], input[type="password"], select, textarea, input[type="email"] {
+    background-color: var(--dark-input-bg); /* Use specific dark input var */
+    border: 1px solid var(--border-color-dark-elements); /* Dark border */
+    color: var(--text-on-dark-bg);
+}
+input::placeholder, textarea::placeholder {
+    color: var(--text-placeholder-on-dark-input);
+}
+.toggle-password-btn {
+    color: var(--text-secondary-on-dark-bg);
+}
+
+
+/* === MOBILE BOTTOM NAVIGATION BAR === */
+@media (max-width: 767px) {
+    /* Hide the original slide-in mobile menu and its overlay */
+    .mobile-menu { display: none !important; }
+    .mobile-menu-overlay { display: none !important; }
+
+    /* Repurpose desktop sidebar as a fixed bottom bar */
+    .dashboard-layout > .sidebar { /* MODIFIED: Now white background */
+        display: flex !important;
+        flex-direction: row;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 60px;
+        background-color: var(--bg-page-primary); /* White background */
+        padding: 0 5px;
+        justify-content: space-around;
+        align-items: center;
+        box-shadow: 0 -2px 5px rgba(0,0,0,0.08); /* Softer shadow for light bar */
+        z-index: 1001;
+        border-top: 1px solid var(--border-color-light); /* Light top border */
+        border-right: none;
+        gap: 0;
+    }
+
+    .sidebar .sidebar-header { display: none !important; }
+    .sidebar .nav-btn[data-tab="finance"] { display: none !important; }
+    .sidebar .nav-btn[data-tab="settings"] { display: none !important; }
+    .sidebar .sidebar-nav-main { /* This is the #121212 pill, should not be part of bottom bar icons directly */
+        display: contents; /* Its children (buttons) become direct flex items of .sidebar */
+        /* The background of sidebar-nav-main itself will not be visible here */
+    }
+    
+    /* Style for nav buttons in the bottom bar (now on white background) */
+    .sidebar .nav-btn {
+        width: auto; 
+        height: 100%;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0;
+        background-color: transparent;
+        padding: 5px 0;
+        margin: 0;
+        gap: 2px;
+        transition: background-color 0.2s, color 0.2s;
+    }
+    .sidebar .nav-btn i {
+        font-size: 22px;
+        line-height: 1;
+        color: var(--text-secondary-on-light-bg); /* Dark grey icons on white bar */
+    }
+    .sidebar .nav-btn:hover {
+        background-color: var(--bg-element-light); /* Light grey hover */
+        transform: none;
+        box-shadow: none;
+    }
+    .sidebar .nav-btn:hover i {
+        color: var(--primary-action); /* Blue icon on hover */
+    }
+    .sidebar .nav-btn.active {
+        background-color: transparent; 
+    }
+    .sidebar .nav-btn.active i {
+        color: var(--primary-action); /* Blue active icon */
+    }
+    /* Logout button icon on bottom bar */
+    .sidebar #logout-btn i {
+         color: var(--text-secondary-on-light-bg); /* Default dark icon color */
+    }
+     .sidebar #logout-btn:hover i {
+        color: var(--error-color); /* Red on hover for logout, if desired */
+    }
+
+
+    .main-content-area {
+        padding-bottom: 75px; /* Space for the bottom bar */
+    }
+    /* ... other mobile styles ... */
+}
+
+
+/* Incluindo o restante do seu CSS aqui para garantir que todas as partes estão presentes */
+/* (Omitido para brevidade, mas seria o restante do seu CSS original não modificado por esta requisição específica) */
+/* Cole o restante do seu CSS original aqui, começando de onde parei as modificações de sidebar/cards */
+/* Por exemplo, a partir de .password-wrapper se não foi tocado acima, ou .main-content-area, etc. */
+/* Re-incluindo o final para ter um arquivo "completo" com as edições */
 
 html, body { font-family: 'Inter', sans-serif; color: var(--text-primary); background-color: var(--bg-primary); height: 100%; overflow: hidden; }
 .dashboard-layout { display: flex; height: 100vh; }
@@ -210,14 +448,14 @@ html, body { font-family: 'Inter', sans-serif; color: var(--text-primary); backg
 #scrape-form-products-tab.input-group button { background-color: var(--primary-action); color: var(--highlight-action-text); font-family: 'Almarai', sans-serif; font-weight: 700; font-size: 1.1em; border-radius: 78px; padding: 12px 30px; margin: 0; width: auto; white-space: nowrap; box-shadow: none; border: none; flex-shrink: 0; }
 #scrape-form-products-tab.input-group button:hover { background-color: var(--primary-action-hover); transform: none; }
 #scrape-form-products-tab.input-group button i.fa-search { margin-left: 8px; }
-.form-container, .finance-form-container, .auth-container { background-color: var(--bg-secondary); padding: 25px; border-radius: 10px; margin-bottom: 30px; box-shadow: var(--element-shadow-on-light-bg); }
+.form-container, .finance-form-container, .auth-container { background-color: var(--dark-component-bg); padding: 25px; border-radius: 10px; margin-bottom: 30px; box-shadow: var(--element-shadow-on-light-bg); color: var(--text-on-dark-bg); }
 .add-product-form-container { margin-left: auto; margin-right: auto; }
-.form-section-title { font-size: 1.5em; font-family: 'Almarai', sans-serif; color: var(--text-on-dark-bg); margin-top: 25px; margin-bottom: 20px; text-align: center; font-weight: 700; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
+.form-section-title { font-size: 1.5em; font-family: 'Almarai', sans-serif; color: var(--text-on-dark-bg); margin-top: 25px; margin-bottom: 20px; text-align: center; font-weight: 700; border-bottom: 1px solid var(--border-color-dark-elements); padding-bottom: 15px; }
 .form-container h3, .finance-form-container h3, .auth-container h2 { font-size: 1.4em; margin-top: 0; margin-bottom: 20px; color: var(--text-on-dark-bg); text-align: center; }
 .form-group { margin-bottom: 18px; display: flex; flex-direction: column; gap: 6px; }
 .form-group label { display: block; margin-bottom: 6px; font-size: 0.9em; color: var(--text-secondary-on-dark-bg); font-weight: 500; }
 .input-group { display: flex; gap: 10px; margin-bottom: 15px; align-items: center; flex-wrap: wrap; justify-content: space-between; width: 100%; }
-input[type="url"], input[type="text"], input[type="number"], input[type="month"], input[type="password"], select, textarea, input[type="email"] { flex-grow: 1; padding: 10px 12px; font-size: 0.95em; background-color: var(--bg-tertiary); border: 1px solid var(--border-color); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); color: var(--text-on-dark-bg); border-radius: 20px; transition: border-color 0.2s, box-shadow 0.2s; box-sizing: border-box; font-family: 'Inter', sans-serif; font-weight: 400; cursor: text; }
+input[type="url"], input[type="text"], input[type="number"], input[type="month"], input[type="password"], select, textarea, input[type="email"] { flex-grow: 1; padding: 10px 12px; font-size: 0.95em; background-color: var(--dark-input-bg); border: 1px solid var(--border-color-dark-elements); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); color: var(--text-on-dark-bg); border-radius: 20px; transition: border-color 0.2s, box-shadow 0.2s; box-sizing: border-box; font-family: 'Inter', sans-serif; font-weight: 400; cursor: text; }
 input::placeholder, textarea::placeholder { color: var(--text-placeholder-on-dark-input); }
 input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary-action); box-shadow: 0 0 0 3px rgba(0, 119, 255, 0.3); cursor: text; }
 textarea { resize: vertical; min-height: 70px; }
@@ -226,47 +464,37 @@ button, .primary-btn, .auth-submit-btn { padding: 10px 18px; background-color: v
 button:hover, .primary-btn:hover, .auth-submit-btn:hover { background-color: var(--primary-action-hover); transform: translateY(-1px); box-shadow: 0 4px 6px rgba(0, 0, 0, 0.25); }
 button:active, .primary-btn:active, .auth-submit-btn:active { transform: translateY(0px); }
 .primary-btn, .auth-submit-btn { width: 100%; margin-top: 10px; }
-.secondary-btn { background-color: var(--bg-accent); border: 1px solid var(--border-color); color: var(--text-on-dark-bg); font-weight: 500; transition: background-color 0.2s, color 0.2s; padding: 10px 18px; border-radius: 6px; cursor: pointer; display: inline-flex; }
-.secondary-btn:hover { background-color: var(--border-color); color: var(--text-on-dark-bg); }
+.secondary-btn { background-color: var(--bg-element-light); border: 1px solid var(--border-color-light); color: var(--text-on-light-bg); font-weight: 500; transition: background-color 0.2s, color 0.2s; padding: 10px 18px; border-radius: 6px; cursor: pointer; display: inline-flex; }
+.secondary-btn:hover { background-color: var(--border-color-light); color: var(--text-on-light-bg); }
 .hidden { display: none !important; }
 #verifiedProductInfo-add-tab, #verifiedProductInfo-products-tab { margin: 20px auto; padding: 20px; background-color: var(--bg-element-dark); color: var(--text-on-dark-bg); border-radius: 12px; border: 1px solid var(--border-color-dark-elements); box-shadow: var(--element-shadow-on-light-bg); max-width: 480px; overflow-y: auto; max-height: 500px; display: flex; flex-direction: column; align-items: center; text-align: center; }
 #verifiedProductInfo-add-tab h4, #verifiedProductInfo-products-tab h4 { font-size: 1.2em; margin-bottom: 12px; color: var(--text-on-dark-bg); }
 #verifiedProductInfo-add-tab p, #verifiedProductInfo-products-tab p { margin-bottom: 8px; font-size: 0.95em; color: var(--text-secondary-on-dark-bg); }
 #verifiedProductInfo-add-tab p strong, #verifiedProductInfo-products-tab p strong { color: var(--text-on-dark-bg); }
 #verifiedProductImage-add-tab, #verifiedProductImage-products-tab { display: block; max-width: 100%; height: auto; max-height: 250px; border-radius: 8px; margin: 10px auto 15px; background-color: #FFFFFF; object-fit: contain; border: 1px solid var(--border-color-dark-elements); cursor: default; }
-.product-list-container h3 { font-size: 1.5em; font-family: 'Almarai', sans-serif; color: var(--text-on-dark-bg); margin-top: 30px; margin-bottom: 18px; text-align: center; font-weight: 700; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; letter-spacing: 0.05em; cursor: default; }
-.product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 25px; list-style: none; padding: 0; margin: 0; cursor: default; }
-.product-card { background-color: var(--bg-secondary); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; box-shadow: var(--element-shadow-on-light-bg); transition: transform 0.2s ease, box-shadow 0.2s ease; }
-.product-card:hover { transform: translateY(-5px); box-shadow: var(--element-hover-shadow-on-light-bg); cursor: pointer; }
-.card-image-container { width: 100%; height: 180px; background-color: #FFFFFF; border-radius: 12px 12px 0 0; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 10px; cursor: pointer; }
-.card-image { max-width: 100%; max-height: 100%; border-radius: 6px; object-fit: contain; cursor: pointer; }
-.card-content { padding: 15px; background-color: var(--bg-secondary); border-radius: 0 0 12px 12px; flex-grow: 1; display: flex; flex-direction: column; text-align: center; }
-.card-title { font-family: 'Almarai', sans-serif; font-size: 1.1em; font-weight: 700; color: var(--text-on-dark-bg); margin-bottom: 8px; line-height: 1.4; min-height: 2.8em; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; cursor: pointer; }
-.card-price { font-size: 1.8em; font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: var(--text-on-dark-bg); margin-top: auto; margin-bottom: 15px; }
-.card-actions { padding: 10px 15px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--border-color); background-color: transparent; }
-.card-actions i { font-size: 1.3em; color: var(--text-secondary-on-dark-bg); cursor: pointer; transition: color 0.2s, transform 0.2s; padding: 8px; }
-.card-actions i:hover { color: var(--text-on-dark-bg); transform: scale(1.15); }
+.product-list-container h3 { font-size: 1.5em; font-family: 'Almarai', sans-serif; color: var(--text-on-light-bg); margin-top: 30px; margin-bottom: 18px; text-align: center; font-weight: 700; border-bottom: 1px solid var(--border-color-light); padding-bottom: 10px; letter-spacing: 0.05em; cursor: default; } /* Text on light page */
+/* Product grid container (if any) should have appropriate background if page is white */
 #dashboard-main-tab h2 { margin-bottom: 20px; text-align: left; color: var(--text-on-light-bg); }
 .dashboard-summary-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 20px; margin-bottom: 30px; }
-.summary-card { background-color: var(--bg-secondary); padding: 20px; border-radius: 8px; box-shadow: var(--element-shadow-on-light-bg); transition: transform 0.2s ease, box-shadow 0.2s ease; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+.summary-card { background-color: var(--dark-component-bg); color: var(--text-on-dark-bg); padding: 20px; border-radius: 8px; box-shadow: var(--element-shadow-on-light-bg); transition: transform 0.2s ease, box-shadow 0.2s ease; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
 .summary-card h4 { font-size: 0.95em; color: var(--text-secondary-on-dark-bg); margin-bottom: 8px; font-weight: 500; letter-spacing: 0.05em; }
 .summary-card p { font-size: 1.8em; font-weight: 700; color: var(--text-on-dark-bg); margin: 0; transition: color 0.2s; }
 .dashboard-charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 20px; margin-bottom: 30px; }
-.dashboard-charts .chart-container { height: 400px; background: var(--bg-secondary); padding: 20px; margin-top: 0; margin-bottom: 0; border-radius: 10px; box-shadow: var(--element-shadow-on-light-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.dashboard-charts .chart-container { height: 400px; background: var(--dark-component-bg); color: var(--text-on-dark-bg); padding: 20px; margin-top: 0; margin-bottom: 0; border-radius: 10px; box-shadow: var(--element-shadow-on-light-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; transition: transform 0.2s ease, box-shadow 0.2s ease; }
 .chart-container h3 { font-size: 1.1em; text-align: center; color: var(--text-on-dark-bg); margin-bottom: 15px; font-weight: 500; letter-spacing: 0.05em; }
 .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.65); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; }
 .loading-overlay.active { opacity: 1; visibility: visible; }
 .loading-spinner { border: 6px solid #f3f3f3; border-top: 6px solid var(--primary-action); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 20px; }
 .loading-overlay p { color: #FFFFFF; font-size: 1.1em; font-weight: 500; }
 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-.finance-form-container { background-color: var(--bg-secondary); padding: 25px; border-radius: 10px; margin-bottom: 30px; box-shadow: var(--element-shadow-on-light-bg); display: flex; flex-direction: column; }
-.finance-summary { background-color: var(--bg-secondary); padding: 20px; border-radius: 10px; margin-bottom: 25px; text-align: center; box-shadow: var(--element-shadow-on-light-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.finance-form-container { background-color: var(--dark-component-bg); color: var(--text-on-dark-bg); padding: 25px; border-radius: 10px; margin-bottom: 30px; box-shadow: var(--element-shadow-on-light-bg); display: flex; flex-direction: column; }
+.finance-summary { background-color: var(--dark-component-bg); color: var(--text-on-dark-bg); padding: 20px; border-radius: 10px; margin-bottom: 25px; text-align: center; box-shadow: var(--element-shadow-on-light-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; transition: transform 0.2s ease, box-shadow 0.2s ease; }
 .finance-summary h3 { font-size: 1.2em; margin-bottom: 8px; color: var(--text-secondary-on-dark-bg); font-weight: 500; letter-spacing: 0.05em; }
 .finance-summary p { font-size: 1.6em; font-weight: 600; color: var(--text-on-dark-bg); margin: 0; transition: color 0.2s; }
-.chart-container.finance-detail-chart { background: var(--bg-secondary); padding: 20px; border-radius: 10px; margin-bottom: 25px; height: 380px; box-shadow: var(--element-shadow-on-light-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; transition: transform 0.2s ease, box-shadow 0.2s ease; }
-.finance-list-container h3 { font-size: 1.5em; color: var(--text-on-dark-bg); margin-top: 0; margin-bottom: 18px; text-align: center; font-weight: 600; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; letter-spacing: 0.05em; }
+.chart-container.finance-detail-chart { background: var(--dark-component-bg); color: var(--text-on-dark-bg); padding: 20px; border-radius: 10px; margin-bottom: 25px; height: 380px; box-shadow: var(--element-shadow-on-light-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.finance-list-container h3 { font-size: 1.5em; color: var(--text-on-dark-bg); margin-top: 0; margin-bottom: 18px; text-align: center; font-weight: 600; border-bottom: 1px solid var(--border-color-dark-elements); padding-bottom: 10px; letter-spacing: 0.05em; }
 #finance-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; max-height: calc(100vh - 200px); }
-#finance-list li { background-color: var(--bg-tertiary); padding: 18px; border-radius: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid var(--primary-action); box-shadow: 0 3px 8px rgba(0,0,0,0.2); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+#finance-list li { background-color: var(--dark-input-bg); /* Using dark input bg for list items */ padding: 18px; border-radius: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid var(--primary-action); box-shadow: 0 3px 8px rgba(0,0,0,0.2); transition: transform 0.2s ease, box-shadow 0.2s ease; }
 #finance-list .finance-item-details { font-size: 0.95em; line-height: 1.5; }
 #finance-list .finance-item-details strong { display: block; margin-bottom: 6px; font-size: 1.1em; color: var(--text-on-dark-bg); font-weight: 600; }
 #finance-list .finance-item-details span { margin-right: 18px; color: var(--text-secondary-on-dark-bg); font-weight: 500; }
@@ -274,14 +502,14 @@ button:active, .primary-btn:active, .auth-submit-btn:active { transform: transla
 #finance-list .finance-item-details .expenses { color: var(--error-color); font-weight: 500;}
 #finance-list .finance-item-details .balance { color: var(--text-on-dark-bg); font-weight: 600;}
 .finance-item-actions { display: flex; gap: 8px; align-items: center; justify-content: center; flex-shrink: 0; margin-left: 12px; }
-.finance-item-actions button { background: none; border: 1px solid var(--border-color); color: var(--text-secondary-on-dark-bg); padding: 6px 10px; border-radius: 5px; cursor: pointer; transition: background-color 0.2s, color 0.2s; font-size: 0.9em; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; flex-shrink: 0; }
-.finance-item-actions button:hover { background-color: var(--border-color); color: var(--text-on-dark-bg); transform: scale(1.05); }
+.finance-item-actions button { background: none; border: 1px solid var(--border-color-dark-elements); color: var(--text-secondary-on-dark-bg); padding: 6px 10px; border-radius: 5px; cursor: pointer; transition: background-color 0.2s, color 0.2s; font-size: 0.9em; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; flex-shrink: 0; }
+.finance-item-actions button:hover { background-color: var(--border-color-dark-elements); color: var(--text-on-dark-bg); transform: scale(1.05); }
 .form-group.action-buttons { display: flex; gap: 12px; margin-top: 20px; justify-content: center; }
 #cancel-finance-edit-btn { background-color: #4B5563; }
 #cancel-finance-edit-btn:hover { background-color: #6B7280; }
 .modal-overlay { background: rgba(30, 30, 30, 0.75); backdrop-filter: blur(4px); position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; z-index: 1001; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.3s ease, visibility 0s linear 0.3s; }
 .modal-overlay.active { opacity: 1; visibility: visible; pointer-events: auto; transition: opacity 0.3s ease, visibility 0s linear 0s; }
-.modal-content { background: var(--bg-secondary); color: var(--text-on-dark-bg); border-radius: 10px; box-shadow: 0 8px 30px rgba(0,0,0,0.20); border: 1px solid var(--border-color-dark-elements); font-family: 'Inter', sans-serif; max-width: 800px; height: auto; padding: 25px 30px; position: relative; max-height: 90vh; overflow-y: auto; width: 50%; transition: transform 0.3s ease, opacity 0.3s ease; }
+.modal-content { /* Base for most modals, default to dark */ background: var(--dark-component-bg); color: var(--text-on-dark-bg); border-radius: 10px; box-shadow: 0 8px 30px rgba(0,0,0,0.20); border: 1px solid var(--border-color-dark-elements); font-family: 'Inter', sans-serif; max-width: 800px; height: auto; padding: 25px 30px; position: relative; max-height: 90vh; overflow-y: auto; width: 50%; transition: transform 0.3s ease, opacity 0.3s ease; }
 .image-modal-content { padding: 10px; background: #333; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.5); width: auto; height: auto; display: inline-block; max-width: calc(400px + 20px); }
 .image-modal-content img#modal-image-content { background-color: transparent; border: none; max-width: 400px; max-height: 400px; object-fit: contain; border-radius: 6px; margin: 0; display: block; }
 .image-modal-content .close-modal-btn { color: #ccc; top: 10px; right: 10px; font-size: 2em; }
@@ -326,8 +554,8 @@ a.product-link-btn:hover { background-color: var(--primary-action-hover); }
 #edit-product-form button[type="submit"] { margin-top: 25px; background-color: var(--success-color); font-size: 1em; }
 #edit-product-form button[type="submit"]:hover { background-color: #0D8A61; }
 .auth-section { display: flex; justify-content: center; align-items: center; height: 100vh; background-color: var(--bg-primary); animation: fadeIn 0.5s ease-out; }
-.auth-container { max-width: 450px; width: 100%; padding: 40px; border-radius: 12px; box-shadow: 0 10px 20px rgba(0,0,0,0.35); text-align: center; background-color: var(--bg-secondary); }
-.auth-tabs { display: flex; justify-content: center; margin-bottom: 30px; border-bottom: 1px solid var(--border-color); }
+.auth-container { max-width: 450px; width: 100%; padding: 40px; border-radius: 12px; box-shadow: 0 10px 20px rgba(0,0,0,0.35); text-align: center; background-color: var(--dark-component-bg); /* Ensuring auth container is dark */ color: var(--text-on-dark-bg); }
+.auth-tabs { display: flex; justify-content: center; margin-bottom: 30px; border-bottom: 1px solid var(--border-color-dark-elements); } /* Darker border */
 .auth-tab-btn { background: none; border: none; padding: 12px 20px; font-size: 1.1em; font-weight: 600; color: var(--text-secondary-on-dark-bg); cursor: pointer; transition: color 0.2s, border-bottom 0.2s; border-bottom: 3px solid transparent; }
 .auth-tab-btn.active { color: var(--primary-action); border-bottom-color: var(--primary-action); }
 .auth-tab-btn:hover { color: var(--text-on-dark-bg); }
@@ -350,7 +578,6 @@ a.product-link-btn:hover { background-color: var(--primary-action-hover); }
 }
 
 @media (max-width: 1024px) {
-    /* .sidebar { width: 80px; } */ /* Desktop sidebar hidden on mobile by later rule */
     .main-content-area { padding: 20px; }
     .main-content-area h2 { font-size: 1.6em; }
     .product-grid { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); }
@@ -362,119 +589,92 @@ a.product-link-btn:hover { background-color: var(--primary-action-hover); }
     .auth-tab-btn { font-size: 1em; padding: 10px 15px; }
 }
 
-.mobile-menu-overlay { /* Will be hidden */
-    /* ... existing styles ... */
-}
-
 @media (max-width: 767px) {
-    /* === BEGIN MOBILE BOTTOM BAR IMPLEMENTATION === */
-
-    /* Hide the original slide-in mobile menu and its overlay */
     .mobile-menu { display: none !important; }
     .mobile-menu-overlay { display: none !important; }
 
-    /* Repurpose desktop sidebar as a fixed bottom bar */
     .dashboard-layout > .sidebar {
-        display: flex !important; /* Ensure it's visible and flex */
+        display: flex !important;
         flex-direction: row;
         position: fixed;
         bottom: 0;
         left: 0;
         width: 100%;
-        height: 60px; /* Adjust height as needed */
-        background-color: var(--bg-secondary); /* Dark background for the bar */
-        padding: 0 5px; /* Minimal horizontal padding */
+        height: 60px;
+        background-color: var(--bg-page-primary); /* White background for bottom bar */
+        padding: 0 5px;
         justify-content: space-around;
         align-items: center;
-        box-shadow: 0 -2px 5px rgba(0,0,0,0.2); /* Shadow on top */
-        z-index: 1001; /* Ensure it's above content, below modals */
-        border-top: 1px solid var(--border-color-dark-elements);
-        border-right: none; /* Remove desktop right border */
-        gap: 0; /* Reset gap from desktop column layout */
+        box-shadow: 0 -2px 5px rgba(0,0,0,0.08);
+        z-index: 1001;
+        border-top: 1px solid var(--border-color-light);
+        border-right: none;
+        gap: 0;
     }
 
-    /* Hide elements not needed in the bottom bar */
     .sidebar .sidebar-header { display: none !important; }
     .sidebar .nav-btn[data-tab="finance"] { display: none !important; }
     .sidebar .nav-btn[data-tab="settings"] { display: none !important; }
-    .sidebar .sidebar-nav-main {
-        display: contents; /* Makes children of .sidebar-nav-main direct flex items of .sidebar */
-    }
+    .sidebar .sidebar-nav-main { display: contents; }
     
-    /* Style for nav buttons in the bottom bar */
     .sidebar .nav-btn {
-        width: auto; /* Override fixed width/height for circular buttons if not desired for bar */
-        height: 100%; /* Fill the bar height */
-        flex: 1; /* Distribute space for a typical bottom bar feel */
+        width: auto; 
+        height: 100%;
+        flex: 1;
         display: flex;
-        flex-direction: column; /* Icon over text (if text was visible) */
+        flex-direction: column;
         align-items: center;
         justify-content: center;
-        border-radius: 0; /* No rounded corners for bar items typically */
-        background-color: transparent; /* Default transparent background */
-        padding: 5px 0; /* Adjust padding */
-        margin: 0; /* Reset margin */
-        gap: 2px; /* Small gap if text were below icon */
-        transition: background-color 0.2s, color 0.2s; /* Smoother transition */
+        border-radius: 0;
+        background-color: transparent;
+        padding: 5px 0;
+        margin: 0;
+        gap: 2px;
+        transition: background-color 0.2s, color 0.2s;
     }
     .sidebar .nav-btn i {
-        font-size: 22px; /* Adjust icon size for bottom bar */
+        font-size: 22px;
         line-height: 1;
-        color: var(--text-secondary-on-dark-bg); /* Default icon color */
+        color: var(--text-secondary-on-light-bg); /* Dark icons for white bar */
     }
     .sidebar .nav-btn:hover {
-        background-color: var(--bg-accent); /* Subtle hover background */
-        transform: none; /* No scale transform */
-        box-shadow: none; /* No extra shadow on hover */
+        background-color: var(--bg-element-light);
+        transform: none;
+        box-shadow: none;
     }
     .sidebar .nav-btn:hover i {
-        color: var(--primary-action); /* Icon color change on hover */
+        color: var(--primary-action);
     }
     .sidebar .nav-btn.active {
-        background-color: transparent; /* Or a subtle active background like var(--bg-accent) */
+        background-color: transparent; 
     }
     .sidebar .nav-btn.active i {
-        color: var(--primary-action); /* Active icon color */
+        color: var(--primary-action);
     }
     .sidebar #logout-btn i {
-        /* color: var(--secondary-action-color); /* Optional: if logout icon should be different color */
+         color: var(--text-secondary-on-light-bg);
     }
-    /* === END MOBILE BOTTOM BAR IMPLEMENTATION === */
-
-    /* Responsiveness for URL input group */
-    #scrape-form-products-tab.input-group {
-        flex-wrap: wrap;
-        justify-content: center;
-        padding: 8px 15px;
-        border-radius: 30px;
-    }
-    #scrape-form-products-tab.input-group input[type="url"] {
-        flex-basis: 100%;
-        width: 100%; /* Ensure it takes full width before wrapping */
-        margin-bottom: 10px;
-        text-align: center;
-        font-size: 1em;
-    }
-    #scrape-form-products-tab.input-group button {
-        width: 100%;
-        padding: 12px 20px;
-        font-size: 1em;
+     .sidebar #logout-btn:hover i {
+        color: var(--error-color); 
     }
 
-    .main-content-area {
-        padding-top: 15px;
-        padding-bottom: 75px; /* Space for the new 60px bottom bar + buffer */
-    }
+    #scrape-form-products-tab.input-group { flex-wrap: wrap; justify-content: center; padding: 8px 15px; border-radius: 30px; }
+    #scrape-form-products-tab.input-group input[type="url"] { flex-basis: 100%; width: 100%; margin-bottom: 10px; text-align: center; font-size: 1em; }
+    #scrape-form-products-tab.input-group button { width: 100%; padding: 12px 20px; font-size: 1em; }
 
+    .main-content-area { padding-top: 15px; padding-bottom: 75px; }
     .product-grid { grid-template-columns: 1fr; gap: 20px; }
-    .product-card { display: flex; flex-direction: row; align-items: stretch; border-radius: 15px; position: relative; }
-    .product-card .card-image-container { flex-shrink: 0; width: 100px; height: auto; min-height: 100px; padding: 8px; border-radius: 15px 0 0 15px; align-self: stretch; }
+    .product-card .card-image-container { border-bottom: 1px solid var(--border-color-light); /* Ensure separator if card-content is also white */ }
+    .product-card { display: flex; flex-direction: row; align-items: stretch; border-radius: 15px; position: relative; background-color: var(--bg-page-primary); border: 1px solid var(--border-color-light); } /* Ensure mobile card is light */
+    .product-card .card-image-container { flex-shrink: 0; width: 100px; height: auto; min-height: 100px; padding: 8px; border-radius: 15px 0 0 15px; align-self: stretch; background-color: #FFFFFF; }
     .product-card .card-image { border-radius: 8px; }
-    .product-card .card-content { flex-grow: 1; padding: 12px; text-align: left; border-radius: 0; display: flex; flex-direction: column; justify-content: space-between; }
-    .product-card .card-title { font-size: 1em; min-height: 0; -webkit-line-clamp: 3; line-clamp: 3; margin-bottom: 6px; }
-    .product-card .card-price { font-size: 1.5em; margin-bottom: 8px; margin-top: 8px; text-align: left; }
-    .product-card .card-actions { flex-direction: column; justify-content: center; align-items: center; padding: 10px 8px; border-top: none; border-left: 1px solid var(--border-color); width: auto; flex-shrink: 0; gap: 10px; }
-    .product-card .card-actions i { font-size: 1.2em; padding: 5px; }
+    .product-card .card-content { flex-grow: 1; padding: 12px; text-align: left; border-radius: 0; display: flex; flex-direction: column; justify-content: space-between; background-color: var(--bg-page-primary); }
+    .product-card .card-title { font-size: 1em; min-height: 0; -webkit-line-clamp: 3; line-clamp: 3; margin-bottom: 6px; color: var(--text-on-light-bg); }
+    .product-card .card-price { font-size: 1.5em; margin-bottom: 8px; margin-top: 8px; text-align: left; color: var(--text-on-light-bg); }
+    .product-card .card-actions { flex-direction: column; justify-content: center; align-items: center; padding: 10px 8px; border-top: none; border-left: 1px solid var(--border-color-light); width: auto; flex-shrink: 0; gap: 10px; }
+    .product-card .card-actions i { font-size: 1.2em; padding: 5px; color: var(--text-secondary-on-light-bg); }
+     .product-card .card-actions i:hover { color: var(--primary-action); }
+
 
     #verifiedProductInfo-add-tab,
     #verifiedProductInfo-products-tab { max-width: 95%; }
