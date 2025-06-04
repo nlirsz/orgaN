@@ -452,12 +452,14 @@ a.product-link-btn:hover { background-color: var(--primary-action-hover); }
     /* === FIM DA IMPLEMENTAÇÃO DA BARRA INFERIOR MOBILE === */
 
     /* Ajuste no padding da área de conteúdo principal para a barra inferior */
-    .main-content-area {
+.main-content-area {
         padding-top: 15px;
-        padding-left: 15px; /* Reduz padding lateral no mobile */
-        padding-right: 15px; /* Reduz padding lateral no mobile */
-        padding-bottom: 75px; /* Espaço para a barra inferior de 60px + 15px de margem */
+        padding-left: 15px;
+        padding-right: 15px;
+        padding-bottom: 100px; /* Aumentado para teste (ex: de 75px para 100px) */
+        /* overflow-y: auto; height: 100vh; são herdados */
     }
+    
     .main-content-area h2 {
         font-size: 1.5em; /* Títulos um pouco menores no mobile */
         margin-bottom: 20px;
