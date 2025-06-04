@@ -58,7 +58,7 @@
     --bg-primary: var(--bg-page-primary);
     --text-primary: var(--text-on-light-bg);
     --bg-secondary: #2c2f33;
-    --bg-tertiary: #222528;
+    --bg-tertiary: #ffffff;
     --bg-accent: #3a3f44;
     --border-color: var(--border-color-dark-elements);
     --input-light-bg: var(--bg-element-light);
@@ -82,7 +82,7 @@ html, body {
 /* === DESKTOP SIDEBAR === */
 .sidebar {
     width: 100px;
-    background: var(--bg-tertiary);
+    background: #ececec;
     padding: 35px 0;
     display: flex;
     flex-direction: column;
@@ -102,7 +102,7 @@ html, body {
 
 .sidebar-nav-main {
     width: 60px;
-    background: var(--bg-secondary);
+    background: #121212;
     box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.25);
     border-radius: 56px;
     padding: 10px 0;
