@@ -180,13 +180,14 @@ html, body {
 
 .nav-btn[data-tab="settings"] { /* Pushes settings to near bottom on desktop */
     margin-top: auto;
+    display: none !important;
 }
 /* ... (Rest of your existing CSS up to media queries) ... */
 
 /* Coloque o restante do seu CSS aqui (Auth, Forms, Modals, Dashboard, etc.) */
 /* ... (Vou omitir o meio do CSS para economizar espaço, as mudanças principais estão no :root e no @media) ... */
 
-html, body { font-family: 'Inter', sans-serif; color: var(--text-primary); background-color: var(--bg-primary); height: 100%; overflow: hidden; }
+html, body { font-family: 'Montserrat', sans-serif; color: var(--text-primary); background-color: var(--bg-primary); height: 100%; overflow: hidden; }
 .dashboard-layout { display: flex; height: 100vh; }
 .password-wrapper { position: relative; display: flex; align-items: center; }
 .password-wrapper input[type="password"], .password-wrapper input[type="text"] { padding-right: 40px; }
@@ -217,7 +218,7 @@ html, body { font-family: 'Inter', sans-serif; color: var(--text-primary); backg
 .form-group { margin-bottom: 18px; display: flex; flex-direction: column; gap: 6px; }
 .form-group label { display: block; margin-bottom: 6px; font-size: 0.9em; color: var(--text-secondary-on-dark-bg); font-weight: 500; }
 .input-group { display: flex; gap: 10px; margin-bottom: 15px; align-items: center; flex-wrap: wrap; justify-content: space-between; width: 100%; }
-input[type="url"], input[type="text"], input[type="number"], input[type="month"], input[type="password"], select, textarea, input[type="email"] { flex-grow: 1; padding: 10px 12px; font-size: 0.95em; background-color: var(--bg-tertiary); border: 1px solid var(--border-color); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); color: var(--text-on-dark-bg); border-radius: 20px; transition: border-color 0.2s, box-shadow 0.2s; box-sizing: border-box; font-family: 'Inter', sans-serif; font-weight: 400; cursor: text; }
+input[type="url"], input[type="text"], input[type="number"], input[type="month"], input[type="password"], select, textarea, input[type="email"] { flex-grow: 1; padding: 10px 12px; font-size: 0.95em; background-color: var(--bg-tertiary); border: 1px solid var(--border-color); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); color: #121212; border-radius: 20px; transition: border-color 0.2s, box-shadow 0.2s; box-sizing: border-box; font-family: 'Inter', sans-serif; font-weight: 400; cursor: text; }
 input::placeholder, textarea::placeholder { color: var(--text-placeholder-on-dark-input); }
 input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary-action); box-shadow: 0 0 0 3px rgba(0, 119, 255, 0.3); cursor: text; }
 textarea { resize: vertical; min-height: 70px; }
@@ -244,7 +245,7 @@ button:active, .primary-btn:active, .auth-submit-btn:active { transform: transla
 .card-title { font-family: 'Almarai', sans-serif; font-size: 1.1em; font-weight: 700; color: var(--text-on-dark-bg); margin-bottom: 8px; line-height: 1.4; min-height: 2.8em; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; cursor: pointer; }
 .card-price { font-size: 1.8em; font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: var(--text-on-dark-bg); margin-top: auto; margin-bottom: 15px; }
 .card-actions { padding: 10px 15px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--border-color); background-color: #121212; }
-.card-actions i { font-size: 1.3em; color: var(--text-secondary-on-dark-bg); cursor: pointer; transition: color 0.2s, transform 0.2s; padding: 8px; }
+.card-actions i { font-size: 1.3em; color: #ececec; cursor: pointer; transition: color 0.2s, transform 0.2s; padding: 8px; }
 .card-actions i:hover { color: #007BFF; transform: scale(1.15); }
 #dashboard-main-tab h2 { margin-bottom: 20px; text-align: left; color: var(--text-on-light-bg); }
 .dashboard-summary-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 20px; margin-bottom: 30px; }
@@ -262,9 +263,9 @@ button:active, .primary-btn:active, .auth-submit-btn:active { transform: transla
 .finance-form-container { background-color: #fff; padding: 25px; border-radius: 10px; margin-bottom: 30px; box-shadow: var(--element-shadow-on-light-bg); display: flex; flex-direction: column; }
 .finance-summary { background-color: var(--bg-secondary); padding: 20px; border-radius: 10px; margin-bottom: 25px; text-align: center; box-shadow: var(--element-shadow-on-light-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; transition: transform 0.2s ease, box-shadow 0.2s ease; }
 .finance-summary h3 { font-size: 1.2em; margin-bottom: 8px; color: var(--text-secondary-on-dark-bg); font-weight: 500; letter-spacing: 0.05em; }
-.finance-summary p { font-size: 1.6em; font-weight: 600; color: var(--text-on-dark-bg); margin: 0; transition: color 0.2s; }
+.finance-summary p { font-size: 1.6em; font-weight: 600; color: #121212; margin: 0; transition: color 0.2s; }
 .chart-container.finance-detail-chart { background: var(--bg-secondary); padding: 20px; border-radius: 10px; margin-bottom: 25px; height: 380px; box-shadow: var(--element-shadow-on-light-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; transition: transform 0.2s ease, box-shadow 0.2s ease; }
-.finance-list-container h3 { font-size: 1.5em; color: var(--text-on-dark-bg); margin-top: 0; margin-bottom: 18px; text-align: center; font-weight: 600; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; letter-spacing: 0.05em; }
+.finance-list-container h3 { font-size: 1.5em; color: #121212; margin-top: 0; margin-bottom: 18px; text-align: center; font-weight: 600; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; letter-spacing: 0.05em; }
 #finance-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; max-height: calc(100vh - 200px); }
 #finance-list li { background-color: var(--bg-tertiary); padding: 18px; border-radius: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid var(--primary-action); box-shadow: 0 3px 8px rgba(0,0,0,0.2); transition: transform 0.2s ease, box-shadow 0.2s ease; }
 #finance-list .finance-item-details { font-size: 0.95em; line-height: 1.5; }
@@ -367,119 +368,106 @@ a.product-link-btn:hover { background-color: var(--primary-action-hover); }
 }
 
 @media (max-width: 767px) {
-    /* === BEGIN MOBILE BOTTOM BAR IMPLEMENTATION === */
+    /* ... (outros estilos mobile existentes que você já tem) ... */
 
-    /* Hide the original slide-in mobile menu and its overlay */
-    .mobile-menu { display: none !important; }
-    .mobile-menu-overlay { display: none !important; }
+    /* === MODIFICAÇÕES E ADIÇÕES PARA OS PROBLEMAS APONTADOS === */
 
-    /* Repurpose desktop sidebar as a fixed bottom bar */
-    .dashboard-layout > .sidebar {
-        display: flex !important; /* Ensure it's visible and flex */
-        flex-direction: row;
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 60px; /* Adjust height as needed */
-        background-color: var(--bg-secondary); /* Dark background for the bar */
-        padding: 0 5px; /* Minimal horizontal padding */
-        justify-content: space-around;
-        align-items: center;
-        box-shadow: 0 -2px 5px rgba(0,0,0,0.2); /* Shadow on top */
-        z-index: 1001; /* Ensure it's above content, below modals */
-        border-top: 1px solid var(--border-color-dark-elements);
-        border-right: none; /* Remove desktop right border */
-        gap: 0; /* Reset gap from desktop column layout */
+    /* 1. Ajustes Gerais para Modais em Telas Pequenas */
+    .modal-content {
+        width: 90%; /* Ocupa mais a largura da tela */
+        max-width: calc(100vw - 30px); /* Garante pequenas margens laterais */
+        margin-top: 20px; /* Margem superior */
+        margin-bottom: 20px; /* Margem inferior */
+        padding: 20px; /* Padding interno ajustado */
+        max-height: 85vh; /* Altura máxima com scroll */
+        overflow-y: auto; /* Adiciona scroll se o conteúdo for maior */
     }
 
-    /* Hide elements not needed in the bottom bar */
-    .sidebar .sidebar-header { display: none !important; }
-    .sidebar .nav-btn[data-tab="finance"] { display: none !important; }
-    .sidebar .nav-btn[data-tab="settings"] { display: none !important; }
-    .sidebar .sidebar-nav-main {
-        display: contents; /* Makes children of .sidebar-nav-main direct flex items of .sidebar */
+    /* Garante que o modal de detalhes do produto (slide-in) não seja afetado negativamente */
+    /* pela regra geral de .modal-content acima, se ele já tem estilos específicos para mobile. */
+    /* No seu CSS atual, .product-details-modal-content já tem max-width: 90% e max-height: 85vh, o que é bom. */
+    /* Apenas garantindo que ele não pegue 'margin: auto' se for um slide-in de tela cheia. */
+    .product-details-modal-content {
+        width: 90%; /* Mantém o padrão para o slide-in, pode ser até 100% */
+        max-width: 400px; /* Pode manter o max-width específico se desejado */
+        margin-left: auto; /* Se for slide da direita, mantém auto na esquerda */
+        margin-top: 0; /* Slide-in geralmente é do topo */
+        margin-bottom: 0;
+        height: 100vh; /* Ocupa toda a altura */
+        border-radius: 0; /* Sem bordas arredondadas para tela cheia */
+    }
+
+    /* Para o modal de edição especificamente, se precisar de mais ajustes além do .modal-content geral */
+    .edit-product-modal-content {
+        /* Herdará width: 90% do .modal-content acima, o que deve resolver o problema de ser "muito fino" */
+        /* Se precisar de padding específico: */
+        padding: 20px 15px; /* Exemplo: padding horizontal um pouco menor */
     }
     
-    /* Style for nav buttons in the bottom bar */
-    .sidebar .nav-btn {
-        width: auto; /* Override fixed width/height for circular buttons if not desired for bar */
-        height: 100%; /* Fill the bar height */
-        flex: 1; /* Distribute space for a typical bottom bar feel */
-        display: flex;
-        flex-direction: column; /* Icon over text (if text was visible) */
-        align-items: center;
-        justify-content: center;
-        border-radius: 0; /* No rounded corners for bar items typically */
-        background-color: transparent; /* Default transparent background */
-        padding: 5px 0; /* Adjust padding */
-        margin: 0; /* Reset margin */
-        gap: 2px; /* Small gap if text were below icon */
-        transition: background-color 0.2s, color 0.2s; /* Smoother transition */
+    #edit-product-form .form-row {
+        flex-direction: column; /* Empilha os campos lado a lado no desktop */
+        gap: 0; /* Remove o gap se empilhado, ou ajusta */
     }
-    .sidebar .nav-btn i {
-        font-size: 22px; /* Adjust icon size for bottom bar */
-        line-height: 1;
-        color: var(--text-secondary-on-dark-bg); /* Default icon color */
+     #edit-product-form .form-row .form-group {
+        margin-bottom: 15px; /* Espaçamento entre campos empilhados */
     }
-    .sidebar .nav-btn:hover {
-        background-color: var(--bg-accent); /* Subtle hover background */
-        transform: none; /* No scale transform */
-        box-shadow: none; /* No extra shadow on hover */
-    }
-    .sidebar .nav-btn:hover i {
-        color: var(--primary-action); /* Icon color change on hover */
-    }
-    .sidebar .nav-btn.active {
-        background-color: transparent; /* Or a subtle active background like var(--bg-accent) */
-    }
-    .sidebar .nav-btn.active i {
-        color: var(--primary-action); /* Active icon color */
-    }
-    .sidebar #logout-btn i {
-        /* color: var(--secondary-action-color); /* Optional: if logout icon should be different color */
-    }
-    /* === END MOBILE BOTTOM BAR IMPLEMENTATION === */
 
-    /* Responsiveness for URL input group */
-    #scrape-form-products-tab.input-group {
-        flex-wrap: wrap;
-        justify-content: center;
-        padding: 8px 15px;
-        border-radius: 30px;
+
+    /* 2. Ajustes para Dashboard e Resumo Financeiro Mobile */
+    .dashboard-summary-cards {
+        grid-template-columns: 1fr; /* Empilha os cards de resumo */
+        gap: 15px;
     }
-    #scrape-form-products-tab.input-group input[type="url"] {
-        flex-basis: 100%;
-        width: 100%; /* Ensure it takes full width before wrapping */
+    .summary-card {
+        padding: 15px;
+    }
+    .summary-card h4 {
+        font-size: 0.9em;
+    }
+    .summary-card p {
+        font-size: 1.6em;
+    }
+
+    .dashboard-charts {
+        grid-template-columns: 1fr; /* Empilha os gráficos */
+        gap: 15px;
+    }
+    .dashboard-charts .chart-container {
+        padding: 15px;
+        height: auto; /* Altura automática para o conteúdo */
+        min-height: 280px; /* Altura mínima para visualização do gráfico */
+    }
+    .dashboard-charts .chart-container h3 {
+        font-size: 1em; /* Ajusta o tamanho do título do gráfico */
         margin-bottom: 10px;
-        text-align: center;
-        font-size: 1em;
     }
-    #scrape-form-products-tab.input-group button {
-        width: 100%;
-        padding: 12px 20px;
-        font-size: 1em;
+    /* Garante que o canvas do gráfico seja responsivo */
+    .dashboard-charts .chart-container canvas {
+        max-width: 100%;
+        height: auto !important; /* Importante para sobrescrever estilos inline do Chart.js se necessário */
     }
 
+    /* Ajustes específicos para a seção de finanças se o problema de corte for lá */
+    .finance-summary { /* Se este for o "resumo financeiro" com o número cortado */
+        padding: 15px;
+    }
+    .finance-summary p {
+        font-size: 1.5em; /* Exemplo de ajuste de fonte para evitar corte */
+        word-break: break-all; /* Quebra palavras longas se for o caso */
+    }
+    .chart-container.finance-detail-chart { /* Se o problema for no gráfico detalhado de finanças */
+        min-height: 280px;
+    }
+
+
+    /* Reafirmando o padding para a barra inferior, caso o problema de corte do último card persista */
+    /* Esta regra já existe no seu CSS, mas é crucial. */
     .main-content-area {
-        padding-top: 15px;
-        padding-bottom: 75px; /* Space for the new 60px bottom bar + buffer */
+        /* ... outros estilos ... */
+        padding-bottom: 75px; /* (60px da barra + 15px de margem). Verifique se a altura da barra é realmente 60px. */
+        /* Se o conteúdo ainda corta, pode ser necessário aumentar esse padding, */
+        /* ou investigar se algum elemento filho está causando overflow inesperado. */
     }
 
-    .product-grid { grid-template-columns: 1fr; gap: 20px; }
-    .product-card { display: flex; flex-direction: row; align-items: stretch; border-radius: 15px; position: relative; }
-    .product-card .card-image-container { flex-shrink: 0; width: 100px; height: auto; min-height: 100px; padding: 8px; border-radius: 15px 0 0 15px; align-self: stretch; }
-    .product-card .card-image { border-radius: 8px; }
-    .product-card .card-content { flex-grow: 1; padding: 12px; text-align: left; border-radius: 0; display: flex; flex-direction: column; justify-content: space-between; }
-    .product-card .card-title { font-size: 1em; min-height: 0; -webkit-line-clamp: 3; line-clamp: 3; margin-bottom: 6px; }
-    .product-card .card-price { font-size: 1.5em; margin-bottom: 8px; margin-top: 8px; text-align: left; }
-    .product-card .card-actions { flex-direction: column; justify-content: center; align-items: center; padding: 10px 8px; border-top: none; border-left: 1px solid var(--border-color); width: auto; flex-shrink: 0; gap: 10px; }
-    .product-card .card-actions i { font-size: 1.2em; padding: 5px; }
-
-    #verifiedProductInfo-add-tab,
-    #verifiedProductInfo-products-tab { max-width: 95%; }
-    #verifiedProductInfo-add-tab.hidden,
-    #verifiedProductInfo-products-tab.hidden { display: none !important; }
-
-    .product-details-modal-content { max-width: 90%; max-height: 85vh; }
+    /* ... (restante dos seus estilos mobile existentes) ... */
 }
