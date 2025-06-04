@@ -1,4 +1,14 @@
+    // Início do renderer.js
+import { inject } from '@vercel/analytics';
+
+inject(); // Chama a função para inicializar o Vercel Analytics
+
+// O restante do seu código do renderer.js continua abaixo...
+// Exemplo: document.addEventListener('DOMContentLoaded', () => { ... });
+
+
 document.addEventListener('DOMContentLoaded', () => {
+
 
     // --- VARIÁVEIS GLOBAIS E CONFIGURAÇÃO ---
     const API_BASE_URL = '/api';  //
