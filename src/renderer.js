@@ -564,6 +564,15 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) { console.error("Erro em fetchAndRenderProducts:", error); } //
     };
 
+    // Coloque isso no seu arquivo JavaScript principal (ex: renderer.js)
+const setAppHeight = () => {
+  const doc = document.documentElement;
+  doc.style.setProperty('--app-height', `${window.innerHeight}px`);
+}
+window.addEventListener('resize', setAppHeight);
+window.addEventListener('orientationchange', setAppHeight); // Para mudanças de orientação
+setAppHeight(); // Executa na carga inicial e quando o DOM estiver pronto
+
     // --- FUNÇÕES DE DASHBOARD PRINCIPAL ---
     const fetchAndRenderDashboardStats = async () => { //
         // console.log("Buscando estatísticas do dashboard..."); //
@@ -1312,13 +1321,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-
-    const appHeight = () => {
-    const doc = document.documentElement;
-    doc.style.setProperty('--app-height', `${window.innerHeight}px`);
-}
-window.addEventListener('resize', appHeight);
-appHeight(); // Executa na carga inicial
 
     // --- INICIALIZAÇÃO ---
     const storedAuthToken = localStorage.getItem('authToken'); //

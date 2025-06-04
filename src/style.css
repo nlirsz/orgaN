@@ -18,6 +18,7 @@
     --text-secondary-on-light-bg: #6c757d;
     --border-color-light: #dee2e6;
     --bg-element-light: #F8F9FA;
+    --app-height: 100vh; /* Fallback para caso o JS não execute */
 
     /* Para Elementos Escuros Contrastantes */
     --bg-element-dark: #2B2B2B;
@@ -451,15 +452,21 @@ a.product-link-btn:hover { background-color: var(--primary-action-hover); }
     }
     /* === FIM DA IMPLEMENTAÇÃO DA BARRA INFERIOR MOBILE === */
 
-    /* Ajuste no padding da área de conteúdo principal para a barra inferior */
-.main-content-area {
-        padding-top: 15px;
-        padding-left: 15px;
-        padding-right: 15px;
-        padding-bottom: 100px; /* Aumentado para teste (ex: de 75px para 100px) */
-        /* overflow-y: auto; height: 100vh; são herdados */
-    }
-    
+        /* Elementos que precisam da altura total da viewport */
+        .dashboard-layout {
+        height: var(--app-height);
+        display: flex; /* Já deve estar assim */
+        flex-direction: column; /* Se a barra inferior fosse parte do fluxo, mas é fixed */
+        }
+
+        .main-content-area {
+        height: var(--app-height); /* Usa a altura calculada */
+        /* Ou, se .dashboard-layout é o container flex principal e a barra é fixed: */
+        /* height: 100%; /* Se .dashboard-layout já tem a altura correta */
+        overflow-y: auto;
+        padding-bottom: 75px; /* Para a barra inferior de 60px + buffer */
+        flex-grow: 1; /* Se .dashboard-layout for flex-direction: column */
+        }    
     .main-content-area h2 {
         font-size: 1.5em; /* Títulos um pouco menores no mobile */
         margin-bottom: 20px;
