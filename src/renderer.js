@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-
     // --- VARIÁVEIS GLOBAIS E CONFIGURAÇÃO ---
     const API_BASE_URL = '/api';  //
     let currentUserId = null; //
