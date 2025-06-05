@@ -11,9 +11,7 @@
     "make": "electron-forge make",
     "publish": "electron-forge publish",
     "lint": "echo \"No linting configured\"",
-    "test": "jest",
-    "build-js": "esbuild renderer.js --bundle --outfile=dist/renderer.bundle.js --format=esm --minify",
-    "build": "npm run build-js && npm run build-api" 
+    "test": "jest"
 },
 
   "keywords": [],
