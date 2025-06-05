@@ -1,4 +1,3 @@
-    // Início do renderer.js
 import { inject } from '@vercel/analytics';
 
 inject(); // Chama a função para inicializar o Vercel Analytics
