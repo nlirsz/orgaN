@@ -365,98 +365,94 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-    if (registerForm) { //
-        registerForm.addEventListener('submit', async (e) => { //
-            e.preventDefault(); //
-            // --- NOVO: Adicionar campos de email, nome, sobrenome etc. aqui ---
-            // const email = getElem('register-email').value.trim(); // Exemplo, crie o input no HTML
-            // const firstName = getElem('register-firstName').value.trim(); // Exemplo
-            // const lastName = getElem('register-lastName').value.trim(); // Exemplo
+if (registerForm) {
+    registerForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-            const username = registerUsernameInput.value.trim(); //
-            const password = registerPasswordInput.value.trim(); //
+        // Extrai os valores dos campos do formulário
+        const username = registerUsernameInput.value.trim();
+        const password = registerPasswordInput.value.trim();
 
-            // --- NOVO: Obter resposta do reCAPTCHA ---
-            // Assumindo que o widget de registro é o segundo, ou tem um ID específico
-            // Se você tiver apenas um widget de reCAPTCHA por vez (ex: um para login, outro para registro, e eles não estão visíveis ao mesmo tempo)
-            // grecaptcha.getResponse() pode funcionar. Se tiver múltiplos widgets visíveis, você precisará de IDs.
-            // Para simplicidade, vamos assumir que você dará IDs aos seus widgets:
-            // <div class="g-recaptcha" data-sitekey="SUA_CHAVE" id="recaptcha-register-widget"></div>
-            // const recaptchaRegisterWidgetId = ... (obtenha o ID do widget se você o atribuiu)
-            const recaptchaResponse = (typeof grecaptcha !== 'undefined') ? grecaptcha.getResponse(1) : ''; // Supondo que o de registro é o segundo (ID 1)
-            // ou grecaptcha.getResponse() se apenas um estiver ativo/renderizado na aba.
+        // Obtém o token do reCAPTCHA. O "1" assume que este é o segundo widget reCAPTCHA na página (o primeiro sendo o de login).
+        const recaptchaResponse = (typeof grecaptcha !== 'undefined') ? grecaptcha.getResponse(1) : '';
 
-            // --- NOVO: Adicionar validação para os novos campos ---
-            // if (!email || !firstName || !lastName) {
-            //     showAuthMessage(registerMessage, 'Por favor, preencha nome, sobrenome e email.');
-            //     return;
-            // }
-            if (!username || !password) { //
-                showAuthMessage(registerMessage, 'Por favor, preencha todos os campos.'); //
-                return; //
-            }
-            // Validação de força da senha no frontend (opcional, mas bom para UX)
-            // A validação principal será no backend
-            const passwordMinLength = 8; // Defina seus critérios
-            if (password.length < passwordMinLength) { //
-                showAuthMessage(registerMessage, `A senha deve ter no mínimo ${passwordMinLength} caracteres.`); //
-                return; //
-            }
-            // --- NOVO: Validar reCAPTCHA no frontend (opcional, mas bom para UX) ---
-            if (typeof grecaptcha !== 'undefined' && !recaptchaResponse) {
-                showAuthMessage(registerMessage, 'Por favor, complete o reCAPTCHA.');
-                return;
-            }
+        // --- Validações no Frontend ---
+        if (!username || !password) {
+            showAuthMessage(registerMessage, 'Por favor, preencha todos os campos.');
+            return;
+        }
 
+        // Validação simples de comprimento da senha
+        const passwordMinLength = 8;
+        if (password.length < passwordMinLength) {
+            showAuthMessage(registerMessage, `A senha deve ter no mínimo ${passwordMinLength} caracteres.`);
+            return;
+        }
 
-            try {
-                const bodyPayload = { //
-                    // email, // NOVO
-                    // firstName, // NOVO
-                    // lastName, // NOVO
-                    username, //
-                    password, //
-                    recaptchaToken: recaptchaResponse // --- NOVO: Enviar token do reCAPTCHA ---
-                };
+        // Validação do reCAPTCHA
+        if (typeof grecaptcha !== 'undefined' && !recaptchaResponse) {
+            showAuthMessage(registerMessage, 'Por favor, complete o reCAPTCHA.');
+            return;
+        }
 
-                const response = await fetch(`${API_BASE_URL}/auth/register`, { //
-                    method: 'POST', //
-                    headers: { 'Content-Type': 'application/json' }, //
-                    body: JSON.stringify(bodyPayload),
-                });
-                const data = await response.json(); //
+        try {
+            // Monta o corpo da requisição para a API
+            const bodyPayload = {
+                username,
+                password,
+                recaptchaToken: recaptchaResponse
+            };
 
-                if (response.ok) { //
-                    // Se a verificação de e-mail for implementada, não logue o usuário imediatamente.
-                    // Apenas mostre a mensagem para verificar o e-mail.
-                    showAuthMessage(registerMessage, data.message, true); //
-                    // authToken = data.token; // // COMENTAR se houver verificação de e-mail
-                    // currentUserId = data.userId; // // COMENTAR
-                    // localStorage.setItem('authToken', authToken); // // COMENTAR
-                    // localStorage.setItem('userId', currentUserId); // // COMENTAR
-                    // await showDashboard(); // // COMENTAR
-                    if (typeof grecaptcha !== 'undefined') grecaptcha.reset(1); // Resetar o reCAPTCHA do registro
-                    // Limpar campos do formulário de registro após sucesso
-                    registerForm.reset();
-                    if(passwordStrengthIndicator) {
-                        passwordStrengthIndicator.textContent = 'Força: ';
-                        passwordStrengthIndicator.style.color = 'grey';
-                    }
-                    // Opcional: redirecionar para a aba de login ou mostrar uma mensagem proeminente
-                    // document.querySelector('[data-auth-tab="login"]').click();
-                } else { //
-                    showAuthMessage(registerMessage, data.message || 'Erro ao registrar.'); //
-                    if (typeof grecaptcha !== 'undefined') grecaptcha.reset(1); // Resetar o reCAPTCHA do registro
+            // Envia a requisição de registro para a API
+            const response = await fetch(`${API_BASE_URL}/auth/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(bodyPayload),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // --- Ações de UX para registro bem-sucedido ---
+
+                // 1. Limpa o formulário de registro e o indicador de força da senha
+                registerForm.reset();
+                if (passwordStrengthIndicator) {
+                    passwordStrengthIndicator.textContent = 'Força: ';
+                    passwordStrengthIndicator.style.color = 'grey';
                 }
-            } catch (error) { //
-                console.error('Erro de rede ao registrar:', error); //
-                showAuthMessage(registerMessage, 'Erro de conexão com o servidor.'); //
-                if (typeof grecaptcha !== 'undefined') grecaptcha.reset(1); // Resetar o reCAPTCHA do registro
-            }
-        });
-    }
 
-    // ... (logoutUser, lógica de navegação, funções de produto, dashboard, finanças, modais permanecem em grande parte as mesmas) ...
+                // 2. Exibe uma mensagem de sucesso clara e informativa
+                showAuthMessage(registerMessage, data.message + ' Redirecionando para o login...', true);
+                if (typeof grecaptcha !== 'undefined') grecaptcha.reset(1); // Reseta o reCAPTCHA
+
+                // 3. Após um breve intervalo, muda para a aba de login e prepara para o usuário logar
+                setTimeout(() => {
+                    // Simula o clique na aba de login
+                    const loginTabButton = document.querySelector('[data-auth-tab="login"]');
+                    if (loginTabButton) loginTabButton.click();
+                    
+                    // Preenche o campo de usuário e foca no campo de senha
+                    if (loginUsernameInput) loginUsernameInput.value = username;
+                    if (loginPasswordInput) loginPasswordInput.focus();
+
+                }, 2000); // Espera 2 segundos para o usuário ler a mensagem de sucesso
+
+            } else {
+                // Se a API retornar um erro (ex: usuário já existe)
+                showAuthMessage(registerMessage, data.message || 'Ocorreu um erro ao registrar.');
+                if (typeof grecaptcha !== 'undefined') grecaptcha.reset(1);
+            }
+        } catch (error) {
+            // Se ocorrer um erro de rede
+            console.error('Erro de rede ao registrar:', error);
+            showAuthMessage(registerMessage, 'Não foi possível conectar ao servidor. Tente novamente.');
+            if (typeof grecaptcha !== 'undefined') grecaptcha.reset(1);
+        }
+    });
+}
+
+// ... (logoutUser, lógica de navegação, funções de produto, dashboard, finanças, modais permanecem em grande parte as mesmas) ...
     // A função createProductCard, fetchAndRenderProducts, fetchAndRenderDashboardStats, renderGenericChart, 
     // fetchAndRenderFinances, clearFinanceForm, setupFinanceEdit, setupScrapeEventListeners,
     // handleSaveProduct, clearAddProductFormAddTab, clearProductScrapeFormProductsTab,
