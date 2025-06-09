@@ -952,7 +952,7 @@ setAppHeight(); // Executa na carga inicial e quando o DOM estiver pronto
     function clearAddProductFormAddTab() { //
         if (productUrlInputAddTab) productUrlInputAddTab.value = ''; //
         if (verifiedProductInfoDivAddTab) verifiedProductInfoDivAddTab.classList.add('hidden'); //
-        if (saveProductBtnAddTab) saveProductBtnAddTab.style.display = 'none'; //
+        if (saveProductBtnAddTab) saveProductBtnAddTab.style.display = 'inline-flex'; //
         scrapedProductData = null; //
 
         if (manualProductNameInput) manualProductNameInput.value = ''; //
