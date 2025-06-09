@@ -42,27 +42,49 @@ router.get('/category-distribution', auth, async (req, res) => {
     }
 });
 
-// ROTAS DE PRODUTOS
-router.post('/scrape-url', async (req, res) => { // Removido 'auth' daqui, pois é para pré-visualização
+// Em src/routes/products.js
+
+router.post('/scrape-url', async (req, res) => {
     const { url } = req.body;
     if (!url) { return res.status(400).json({ message: 'URL é obrigatória.' }); }
+    
     let productDetails = null;
-    try {
-        console.log(`[products.js /scrape-url] Tentando scraping com Gemini para: ${url}`);
-        productDetails = await scrapeProductDetails(url);
 
-        if (!productDetails || !productDetails.name || productDetails.price === null) {
-            console.warn(`[products.js /scrape-url] Gemini falhou. Tentando fallback com Cheerio para: ${url}`);
-            productDetails = await scrapeWithCheerio(url); // scrapeWithCheerio é importado de ../price-scraper.js
-            if (!productDetails || !productDetails.name || productDetails.price === null) {
-                console.error(`[products.js /scrape-url] Falha em extrair nome/preço com ambos os métodos para: ${url}`);
-                return res.status(422).json({ message: 'Não foi possível extrair nome e/ou preço da URL.' });
-            }
+    // Etapa 1: Tentar com Gemini (IA)
+    try {
+        console.log(`[products.js /scrape-url] Etapa 1: Tentando scraping com Gemini para: ${url}`);
+        const geminiResult = await scrapeProductDetails(url);
+        // Verifica se o resultado é minimamente válido
+        if (geminiResult && geminiResult.name && geminiResult.price) {
+            productDetails = geminiResult;
         }
-        res.status(200).json(productDetails);
-    } catch (error) {
-        console.error('[products.js /scrape-url] Erro geral no scraping:', error.message);
-        res.status(500).json({ message: `Erro ao realizar scraping: ${error.message}` });
+    } catch (geminiError) {
+        console.warn(`[products.js /scrape-url] Gemini falhou com erro: ${geminiError.message}. Tentando fallback.`);
+    }
+
+    // Etapa 2: Se o Gemini falhou ou retornou dados incompletos, tentar com Cheerio
+    if (!productDetails) {
+        try {
+            console.log(`[products.js /scrape-url] Etapa 2: Usando fallback com Cheerio para: ${url}`);
+            const cheerioResult = await scrapeWithCheerio(url);
+            // Verifica se o resultado é minimamente válido
+            if (cheerioResult && cheerioResult.name && cheerioResult.price) {
+                productDetails = cheerioResult;
+            }
+        } catch (cheerioError) {
+            console.error(`[products.js /scrape-url] Cheerio também falhou com erro: ${cheerioError.message}`);
+        }
+    }
+
+    // Etapa 3: Avaliar o resultado final
+    if (productDetails) {
+        // Sucesso! Enviar os detalhes encontrados.
+        console.log(`[products.js /scrape-url] Sucesso! Detalhes extraídos:`, productDetails);
+        return res.status(200).json(productDetails);
+    } else {
+        // Se ambos os métodos falharam, enviar uma mensagem de erro final amigável.
+        console.error(`[products.js /scrape-url] Falha em extrair nome/preço com ambos os métodos para: ${url}`);
+        return res.status(422).json({ message: 'Não conseguimos ler os detalhes do produto nesta página. Tente adicionar as informações manualmente.' });
     }
 });
 
