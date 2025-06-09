@@ -51,20 +51,23 @@ router.post('/scrape-url', async (req, res) => { // Removido 'auth' daqui, pois 
         console.log(`[products.js /scrape-url] Tentando scraping com Gemini para: ${url}`);
         productDetails = await scrapeProductDetails(url);
 
-        if (!productDetails || !productDetails.name || productDetails.price === null) {
-            console.warn(`[products.js /scrape-url] Gemini falhou. Tentando fallback com Cheerio para: ${url}`);
-            productDetails = await scrapeWithCheerio(url); // scrapeWithCheerio é importado de ../price-scraper.js
-            if (!productDetails || !productDetails.name || productDetails.price === null) {
-                console.error(`[products.js /scrape-url] Falha em extrair nome/preço com ambos os métodos para: ${url}`);
-                return res.status(422).json({ message: 'Não foi possível extrair nome e/ou preço da URL.' });
-            }
-        }
-        res.status(200).json(productDetails);
+        if (!productDetails || !productDetails.name || productData.price === null) {
+                    console.warn(`[products.js /scrape-url] Gemini falhou. Tentando fallback com Cheerio para: ${url}`);
+                    productDetails = await scrapeWithCheerio(url);
+                    if (!productDetails || !productDetails.name || productData.price === null) {
+                        console.error(`[products.js /scrape-url] Falha em extrair nome/preço com ambos os métodos para: ${url}`);
+                        // --- MENSAGEM DE ERRO ATUALIZADA ---
+                        return res.status(422).json({ message: 'Não conseguimos ler os detalhes do produto nesta página. Tente adicionar as informações manualmente.' });
+                    }
+                }       
+res.status(200).json(productDetails);
     } catch (error) {
         console.error('[products.js /scrape-url] Erro geral no scraping:', error.message);
-        res.status(500).json({ message: `Erro ao realizar scraping: ${error.message}` });
+        // --- MENSAGEM DE ERRO ATUALIZADA ---
+        res.status(500).json({ message: `Ocorreu um erro ao tentar acessar a URL. Verifique o link e tente novamente.` });
     }
 });
+
 
 router.post('/', auth, async (req, res) => {
     const userId = req.user.userId;

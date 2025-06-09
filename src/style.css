@@ -181,7 +181,6 @@ html, body {
 
 .nav-btn[data-tab="settings"] { /* Pushes settings to near bottom on desktop */
     margin-top: auto;
-    display: none !important;
 }
 /* ... (Rest of your existing CSS up to media queries) ... */
 
@@ -238,7 +237,7 @@ button:active, .primary-btn:active, .auth-submit-btn:active { transform: transla
 #verifiedProductImage-add-tab, #verifiedProductImage-products-tab { display: block; max-width: 100%; height: auto; max-height: 250px; border-radius: 8px; margin: 10px auto 15px; background-color: #FFFFFF; object-fit: contain; border: 1px solid var(--border-color-dark-elements); cursor: default; }
 .product-list-container h3 { font-size: 1.5em; font-family: 'Almarai', sans-serif; color: var(--text-on-dark-bg); margin-top: 30px; margin-bottom: 18px; text-align: center; font-weight: 700; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; letter-spacing: 0.05em; cursor: default; }
 .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 25px; list-style: none; padding: 0; margin: 0; cursor: default; }
-.product-card { background-color: var(--bg-secondary); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; box-shadow: var(--element-shadow-on-light-bg); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.product-card { background-color: var(--bg-secondary); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; box-shadow: var(--element-shadow-on-light-bg); transition: transform 0.2s ease, box-shadow 0.2s ease; position: relative; }
 .product-card:hover { transform: translateY(-5px); box-shadow: var(--element-hover-shadow-on-light-bg); cursor: pointer; }
 .card-image-container { width: 100%; height: 180px; background-color: #FFFFFF; border-radius: 12px 12px 0 0; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 10px; cursor: pointer; }
 .card-image { max-width: 100%; max-height: 100%; border-radius: 6px; object-fit: contain; cursor: pointer; }
@@ -346,6 +345,11 @@ a.product-link-btn:hover { background-color: var(--primary-action-hover); }
 .tab-message { margin-top: 15px; font-size: 0.9em; font-weight: 500; text-align: center; padding: 8px 12px; border-radius: 6px; background-color: transparent; transition: all 0.3s ease; }
 .tab-message.success { color: var(--highlight-action-text); background-color: var(--success-color); }
 .tab-message.error { color: var(--highlight-action-text); background-color: var(--error-color); }
+/* Em src/style.css, pode ser junto de outras classes de utilidade */
+.data-missing {
+    color: #9a9a9a;
+    font-style: italic;
+}
 
 @media (max-width: 1200px) {
     .product-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
@@ -510,7 +514,35 @@ a.product-link-btn:hover { background-color: var(--primary-action-hover); }
         background-color: var(--bg-page-primary); /* Fundo branco */
         border: 1px solid var(--border-color-light); /* Borda clara */
         box-shadow: var(--element-shadow-on-light-bg); /* Sombra escura sutil */
+        position: relative;
     }
+
+    .card-loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    border-radius: 12px;
+}
+
+.card-loading-overlay i {
+    font-size: 2em;
+    color: var(--primary-action);
+    animation: spin 1s linear infinite;
+}
+
+/* A animação @keyframes spin já deve existir no seu CSS, mas caso não, adicione-a */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
     .product-card .card-image-container {
         flex-shrink: 0;
         width: 90px; /* Largura da imagem um pouco menor */

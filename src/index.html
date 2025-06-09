@@ -268,10 +268,29 @@
             </section>
 
             <section id="settings-tab" class="tab-content">
-                <h2>Configurações</h2>
-                <p>Em desenvolvimento.</p>
-            </section>
-        </main>
+                <h2>Configurações da Conta</h2>
+                
+                <div class="form-container settings-form-container">
+                    <h3>Alterar Senha</h3>
+                    <form id="change-password-form">
+                        <div class="form-group">
+                            <label for="current-password">Senha Atual</label>
+                            <input type="password" id="current-password" placeholder="Digite sua senha atual" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="new-password">Nova Senha</label>
+                            <input type="password" id="new-password" placeholder="Mínimo de 8 caracteres" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="confirm-new-password">Confirmar Nova Senha</label>
+                            <input type="password" id="confirm-new-password" placeholder="Digite a nova senha novamente" required>
+                        </div>
+                        <p class="tab-message" id="change-password-message"></p>
+                        <button type="submit" id="change-password-btn" class="primary-btn">Salvar Nova Senha</button>
+                    </form>
+                </div>
+                </section>        
+            </main>
     </div>
     
 

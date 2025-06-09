@@ -9,7 +9,8 @@ const connectDB = require('../database');
 const productRoutes = require('../routes/products'); // Caminho corrigido
 const financeRoutes = require('../routes/finances');   // Caminho corrigido
 const registerRoute = require('../routes/auth/register'); // Caminho corrigido
-const loginRoute = require('../routes/auth/login');       // Caminho corrigido
+const loginRoute = require('../routes/auth/login');
+const userRoutes = require('../routes/user'); // <-- ADICIONE ESTA LINHA
 const connectionStates = mongoose.STATES || { 
   0: 'disconnected', 1: 'connected', 2: 'connecting', 3: 'disconnecting'
 };
@@ -97,6 +98,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/finances', financeRoutes);
 app.use('/api/auth/register', registerRoute);
 app.use('/api/auth/login', loginRoute);
+app.use('/api/user', userRoutes);
 
 // Para desenvolvimento local
 if (process.env.NODE_ENV !== 'production') {
