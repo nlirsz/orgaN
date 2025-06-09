@@ -586,20 +586,21 @@ a.product-link-btn:hover { background-color: var(--primary-action-hover); }
         font-weight: 700;
     }
     .product-card .card-actions { /* Ações com ícones escuros */
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        padding: 8px 5px; /* Padding ajustado */
-        border-top: none;
-        border-left: 1px solid var(--border-color-light); /* Borda clara */
-        width: auto;
-        flex-shrink: 0;
-        gap: 8px; /* Espaço entre ícones */
+        display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    place-items: center; /* Centraliza os ícones na grade */
+    padding: 8px;
+    gap: 4px; /* Espaço entre os ícones */
+    border-top: none;
+    border-left: 1px solid var(--border-color);
+    width: 90px; /* Largura fixa para a área de ações */
+    flex-shrink: 0;
     }
      .product-card .card-actions i {
-        font-size: 1.1em; /* Ícones um pouco menores */
-        padding: 4px;
-        color: var(--text-secondary-on-light-bg); /* Ícones cinza escuro */
+        font-size: 1.4em; /* Ícones maiores e mais fáceis de tocar */
+    padding: 8px;     /* Aumenta a área de toque */
+    color: var(--text-secondary);
     }
      .product-card .card-actions i:hover {
         color: var(--primary-action); /* Cor primária no hover */
