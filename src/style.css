@@ -84,6 +84,7 @@ html, body {
 .sidebar {
     width: 100px;
     background: #ececec;
+    flex-shrink: 0; /* <<< ADICIONE ESTA LINHA */
     padding: 35px 0;
     display: flex;
     flex-direction: column;
