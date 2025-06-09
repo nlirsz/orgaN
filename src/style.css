@@ -587,6 +587,7 @@ a.product-link-btn:hover { background-color: var(--primary-action-hover); }
     }
     .product-card .card-actions { /* Ações com ícones escuros */
         display: grid;
+        color: #e0e0e0;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr;
     place-items: center; /* Centraliza os ícones na grade */
@@ -600,7 +601,7 @@ a.product-link-btn:hover { background-color: var(--primary-action-hover); }
      .product-card .card-actions i {
         font-size: 1.4em; /* Ícones maiores e mais fáceis de tocar */
     padding: 8px;     /* Aumenta a área de toque */
-    color: var(--text-secondary);
+    color: #e0e0e0; /* Cor dos ícones */
     }
      .product-card .card-actions i:hover {
         color: var(--primary-action); /* Cor primária no hover */
