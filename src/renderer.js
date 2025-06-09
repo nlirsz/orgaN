@@ -1069,20 +1069,29 @@ if (mainContentArea) {
             }
         }
 
-         // --- Ação: Pesquisar na Web (NOVO) ---
-        // ▼▼▼ ADICIONE ESTE BLOCO "ELSE IF" ▼▼▼
-        else if (target.classList.contains('action-search')) {
-            e.stopPropagation();
-            if (productData.name) {
-                // Cria uma URL para o Google Shopping, que é ideal para comparar preços
-                const query = encodeURIComponent(productData.name);
-                const searchUrl = `https://www.google.com/search?tbm=shop&q=${query}`;
-                
-                // Usa a API segura que criamos no preload.js para abrir o link
-                window.electronAPI.openExternalLink(searchUrl);
-            }
+// Em src/renderer.js, dentro do listener mainContentArea.addEventListener('click', ...)
+
+// ... outros 'else if'
+
+// --- Ação: Pesquisar na Web (Lógica ATUALIZADA) ---
+else if (target.classList.contains('action-search')) {
+    e.stopPropagation();
+    if (productData.name) {
+        const query = encodeURIComponent(productData.name);
+        const searchUrl = `https://www.google.com/search?tbm=shop&q=${query}`;
+
+        // Verifica se estamos no Electron
+        if (window.electronAPI && typeof window.electronAPI.openExternalLink === 'function') {
+            // Se sim, usa o método seguro do Electron
+            window.electronAPI.openExternalLink(searchUrl);
+        } else {
+            // Se não (estamos no Vercel/navegador), usa o método padrão da web
+            window.open(searchUrl, '_blank', 'noopener,noreferrer');
         }
-        
+    }
+}
+
+// ... outros 'else if'        
         // --- Ação: Ampliar Imagem do Card ---
         else if (target.closest('.card-image-container')) {
             e.stopPropagation();

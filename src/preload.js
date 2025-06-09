@@ -1,16 +1,18 @@
+// src/preload.js
 const { contextBridge, ipcRenderer } = require('electron');
 
+// API para interações seguras com o processo principal (como abrir links)
 contextBridge.exposeInMainWorld("electronAPI", {
     openExternalLink: (url) => ipcRenderer.send('open-external-link', url)
 });
 
+// API para o banco de dados (mantendo a original)
 contextBridge.exposeInMainWorld("db", {
     // Produtos
     getProducts: () => ipcRenderer.invoke('db:get-products'),
     addProduct: (product) => ipcRenderer.invoke('db:add-product', product),
     updateProduct: (product) => ipcRenderer.invoke('db:update-product', product),
     deleteProduct: (productId) => ipcRenderer.invoke('db:delete-product', productId),
-    
 
     // Histórico
     getHistory: () => ipcRenderer.invoke('db:get-history'),
@@ -21,20 +23,18 @@ contextBridge.exposeInMainWorld("db", {
     getFinances: () => ipcRenderer.invoke('db:get-finances'),
     addFinanceEntry: (entry) => ipcRenderer.invoke('db:add-finance-entry', entry),
     deleteFinanceEntry: (entryId) => ipcRenderer.invoke('db:delete-finance-entry', entryId),
-
-    // Mantendo a API genérica caso precise para outras coisas não-DB
+    
     sendMessage: (channel, data) => {
         ipcRenderer.send(channel, data);
     },
     receiveMessage: (channel, callback) => {
-        // Garante que o listener seja removido se o callback mudar ou o componente for destruído (boa prática em frameworks)
         const listener = (event, ...args) => callback(...args);
         ipcRenderer.on(channel, listener);
-        return () => ipcRenderer.removeListener(channel, listener); // Retorna uma função para remover o listener
+        return () => ipcRenderer.removeListener(channel, listener);
     }
 });
 
-// Expor o caminho do userData para o renderer se necessário (ex: para debug ou caminhos de arquivo)
+// Expor o caminho do userData para o renderer se necessário
 contextBridge.exposeInMainWorld('electronPaths', {
-    userData: ipcRenderer.sendSync('get-user-data-path') // Precisará de um handler no main.js
+    userData: ipcRenderer.sendSync('get-user-data-path')
 });
