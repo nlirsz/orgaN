@@ -1,10 +1,10 @@
 // src/routes/products.js
 const express = require('express');
 const router = express.Router();
-const Product = require('../models/Product');
-const auth = require('../middleware/auth');
-const { scrapeProductDetails } = require('../api_helpers/scrape-gemini');
-const { obterProduto: scrapeWithCheerio } = require('../price-scraper');
+const Product = require('../models/Product'); // Este já estava correto
+const auth = require('../middleware/auth'); // CORRIGIDO
+const { scrapeProductDetails } = require('./api_helpers/scrape-gemini'); // CORRIGIDO
+const { obterProduto: scrapeWithCheerio } = require('../price-scraper'); // CORRIGIDO
 
 // ROTAS PARA DASHBOARD
 router.get('/stats', auth, async (req, res) => {
@@ -43,52 +43,28 @@ router.get('/category-distribution', auth, async (req, res) => {
 });
 
 // ROTAS DE PRODUTOS
-
-// ROTA DE SCRAPE ATUALIZADA E ROBUSTA
-router.post('/scrape-url', async (req, res) => {
+router.post('/scrape-url', async (req, res) => { // Removido 'auth' daqui, pois é para pré-visualização
     const { url } = req.body;
     if (!url) { return res.status(400).json({ message: 'URL é obrigatória.' }); }
-    
     let productDetails = null;
-
-    // Etapa 1: Tentar com Gemini (IA)
     try {
-        console.log(`[products.js /scrape-url] Etapa 1: Tentando scraping com Gemini para: ${url}`);
-        const geminiResult = await scrapeProductDetails(url);
-        // Verifica se o resultado é minimamente válido
-        if (geminiResult && geminiResult.name && geminiResult.price) {
-            productDetails = geminiResult;
-        }
-    } catch (geminiError) {
-        console.warn(`[products.js /scrape-url] Gemini falhou com erro: ${geminiError.message}. Tentando fallback.`);
-    }
+        console.log(`[products.js /scrape-url] Tentando scraping com Gemini para: ${url}`);
+        productDetails = await scrapeProductDetails(url);
 
-    // Etapa 2: Se o Gemini falhou ou retornou dados incompletos, tentar com Cheerio
-    if (!productDetails) {
-        try {
-            console.log(`[products.js /scrape-url] Etapa 2: Usando fallback com Cheerio para: ${url}`);
-            const cheerioResult = await scrapeWithCheerio(url);
-            // Verifica se o resultado é minimamente válido
-            if (cheerioResult && cheerioResult.name && cheerioResult.price) {
-                productDetails = cheerioResult;
+        if (!productDetails || !productDetails.name || productDetails.price === null) {
+            console.warn(`[products.js /scrape-url] Gemini falhou. Tentando fallback com Cheerio para: ${url}`);
+            productDetails = await scrapeWithCheerio(url); // scrapeWithCheerio é importado de ../price-scraper.js
+            if (!productDetails || !productDetails.name || productDetails.price === null) {
+                console.error(`[products.js /scrape-url] Falha em extrair nome/preço com ambos os métodos para: ${url}`);
+                return res.status(422).json({ message: 'Não foi possível extrair nome e/ou preço da URL.' });
             }
-        } catch (cheerioError) {
-            console.error(`[products.js /scrape-url] Cheerio também falhou com erro: ${cheerioError.message}`);
         }
-    }
-
-    // Etapa 3: Avaliar o resultado final
-    if (productDetails) {
-        // Sucesso! Enviar os detalhes encontrados.
-        console.log(`[products.js /scrape-url] Sucesso! Detalhes extraídos:`, productDetails);
-        return res.status(200).json(productDetails);
-    } else {
-        // Se ambos os métodos falharam, enviar uma mensagem de erro final amigável.
-        console.error(`[products.js /scrape-url] Falha em extrair nome/preço com ambos os métodos para: ${url}`);
-        return res.status(422).json({ message: 'Não conseguimos ler os detalhes do produto nesta página. Tente adicionar as informações manualmente.' });
+        res.status(200).json(productDetails);
+    } catch (error) {
+        console.error('[products.js /scrape-url] Erro geral no scraping:', error.message);
+        res.status(500).json({ message: `Erro ao realizar scraping: ${error.message}` });
     }
 });
-
 
 router.post('/', auth, async (req, res) => {
     const userId = req.user.userId;
@@ -156,7 +132,7 @@ router.patch('/:id/purchase', auth, async (req, res) => {
 
 router.put('/:id', auth, async (req, res) => {
     const userId = req.user.userId;
-    const { name, price, brand, description, image, urlOrigin, category, tags, priority, notes, status } = req.body;
+    const { name, price, brand, description, image, urlOrigin, category, tags, priority, notes, status } = req.body; // Adicionado status
     const updateData = {};
     if (name !== undefined) updateData.name = name;
     if (price !== undefined) {
@@ -172,7 +148,7 @@ router.put('/:id', auth, async (req, res) => {
     if (tags !== undefined) updateData.tags = Array.isArray(tags) ? tags.map(tag => tag.trim()).filter(tag => tag) : [];
     if (priority !== undefined) updateData.priority = priority;
     if (notes !== undefined) updateData.notes = notes;
-    if (status !== undefined) updateData.status = status;
+    if (status !== undefined) updateData.status = status; // Adicionado para atualizar status
     if (Object.keys(updateData).length === 0) { return res.status(400).json({ message: "Nenhum dado para atualização."}); }
 
     try {
