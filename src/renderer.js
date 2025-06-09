@@ -536,18 +536,19 @@ const createProductCard = (product) => {
         </div>
         <div class="card-content">
             <span class="card-title">${product.name || 'Nome Indisponível'}</span>
-            <span class="card-price">${product.price ? formattedPrice : 'Preço Indisponível'}</span>
+            <span class="card-price">${product.price ? `R$ ${parseFloat(product.price).toFixed(2)}` : 'Preço Indisponível'}</span>
         </div>
         <div class="card-actions">
-            <i class="fab fa-google action-search" title="Pesquisar produto na web"></i>
-            
             ${product.status === 'pendente' ? '<i class="fas fa-check-circle action-purchase" title="Marcar como Comprado"></i>' : ''}
             <i class="fas fa-edit action-edit" title="Editar"></i>
+            <i class="fab fa-google action-search" title="Pesquisar produto na web"></i>
             <i class="fas fa-trash-alt action-delete" title="Excluir"></i>
-        </div>
+            </div>
     `;
     return card;
 };
+
+
     const fetchAndRenderProducts = async () => { //
         if (!pendingList || !purchasedList) { //
             console.warn("Elementos das listas de produtos não encontrados."); //
