@@ -519,31 +519,35 @@ if (registerForm) {
         });
     }
     
-    // --- FUNÇÕES DE PRODUTOS ---
-    const createProductCard = (product) => { //
-        const card = document.createElement('li'); //
-        card.className = 'product-card'; //
-        card.dataset.productId = product._id; //
-        card.dataset.productJson = JSON.stringify(product); //
+// Em src/renderer.js
 
-        const formattedPrice = `R$ ${parseFloat(product.price || 0).toFixed(2)}`; //
-        card.innerHTML = `
-            <div class="card-image-container">
-                <img src="${product.image || 'https://via.placeholder.com/200x150?text=Indisponível'}" alt="${product.name || 'Produto'}" class="card-image">
-            </div>
-            <div class="card-content">
-                <span class="card-title">${product.name || 'Nome Indisponível'}</span>
-                <span class="card-price">${product.price ? formattedPrice : 'Preço Indisponível'}</span>
-            </div>
-            <div class="card-actions">
-                ${product.status === 'pendente' ? '<i class="fas fa-check-circle action-purchase" title="Marcar como Comprado"></i>' : ''}
-                <i class="fas fa-edit action-edit" title="Editar"></i>
-                <i class="fas fa-trash-alt action-delete" title="Excluir"></i>
-            </div>
-        `; //
-        return card; //
-    };
+const createProductCard = (product) => {
+    const card = document.createElement('li');
+    card.className = 'product-card';
+    card.dataset.productId = product._id;
+    card.dataset.productJson = JSON.stringify(product);
 
+    const formattedPrice = `R$ ${parseFloat(product.price || 0).toFixed(2)}`;
+    
+    // O conteúdo do card-image-container e card-content permanece o mesmo
+    card.innerHTML = `
+        <div class="card-image-container">
+            <img src="${product.image || 'https://via.placeholder.com/200x150?text=Indisponível'}" alt="${product.name || 'Produto'}" class="card-image">
+        </div>
+        <div class="card-content">
+            <span class="card-title">${product.name || 'Nome Indisponível'}</span>
+            <span class="card-price">${product.price ? formattedPrice : 'Preço Indisponível'}</span>
+        </div>
+        <div class="card-actions">
+            <i class="fab fa-google action-search" title="Pesquisar produto na web"></i>
+            
+            ${product.status === 'pendente' ? '<i class="fas fa-check-circle action-purchase" title="Marcar como Comprado"></i>' : ''}
+            <i class="fas fa-edit action-edit" title="Editar"></i>
+            <i class="fas fa-trash-alt action-delete" title="Excluir"></i>
+        </div>
+    `;
+    return card;
+};
     const fetchAndRenderProducts = async () => { //
         if (!pendingList || !purchasedList) { //
             console.warn("Elementos das listas de produtos não encontrados."); //
@@ -1064,6 +1068,21 @@ if (mainContentArea) {
                 if (editProductMessage) editProductMessage.textContent = '';
             }
         }
+
+         // --- Ação: Pesquisar na Web (NOVO) ---
+        // ▼▼▼ ADICIONE ESTE BLOCO "ELSE IF" ▼▼▼
+        else if (target.classList.contains('action-search')) {
+            e.stopPropagation();
+            if (productData.name) {
+                // Cria uma URL para o Google Shopping, que é ideal para comparar preços
+                const query = encodeURIComponent(productData.name);
+                const searchUrl = `https://www.google.com/search?tbm=shop&q=${query}`;
+                
+                // Usa a API segura que criamos no preload.js para abrir o link
+                window.electronAPI.openExternalLink(searchUrl);
+            }
+        }
+        
         // --- Ação: Ampliar Imagem do Card ---
         else if (target.closest('.card-image-container')) {
             e.stopPropagation();

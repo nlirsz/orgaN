@@ -68,6 +68,14 @@ app.whenReady().then(() => {
         event.returnValue = app.getPath('userData');
     });
 
+    // ▼▼▼ ADICIONE ESTE BLOCO DE CÓDIGO ▼▼▼
+    ipcMain.on('open-external-link', (event, url) => {
+        // Validação de segurança básica para garantir que apenas links web sejam abertos
+        if (url.startsWith('http:') || url.startsWith('https://')) {
+            shell.openExternal(url);
+        }
+    });
+
     app.on('activate', () => {
         // No macOS, é comum recriar uma janela no aplicativo quando o
         // ícone do dock é clicado e não há outras janelas abertas.

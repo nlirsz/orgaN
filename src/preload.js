@@ -1,11 +1,16 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
+contextBridge.exposeInMainWorld("electronAPI", {
+    openExternalLink: (url) => ipcRenderer.send('open-external-link', url)
+});
+
 contextBridge.exposeInMainWorld("db", {
     // Produtos
     getProducts: () => ipcRenderer.invoke('db:get-products'),
     addProduct: (product) => ipcRenderer.invoke('db:add-product', product),
     updateProduct: (product) => ipcRenderer.invoke('db:update-product', product),
     deleteProduct: (productId) => ipcRenderer.invoke('db:delete-product', productId),
+    
 
     // Histórico
     getHistory: () => ipcRenderer.invoke('db:get-history'),
