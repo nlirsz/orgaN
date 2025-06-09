@@ -874,7 +874,6 @@ setAppHeight(); // Executa na carga inicial e quando o DOM estiver pronto
                 } catch (error) { //
                     showTabMessage(messageEl, `Erro na verificação: ${error.message}`, false); //
                     if (infoDivEl) infoDivEl.classList.add('hidden'); //
-                    if (saveBtnEl) saveBtnEl.style.display = 'none'; //
                 }
                 finally { verifyBtnEl.disabled = false; verifyBtnEl.innerHTML = '<i class="fas fa-search-location"></i> Verificar URL'; } //
             });
