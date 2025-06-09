@@ -111,6 +111,8 @@ const newPasswordInput = getElem('new-password');
 const confirmNewPasswordInput = getElem('confirm-new-password');
 const changePasswordMessage = getElem('change-password-message');
 
+const themeToggleButton = getElem('theme-toggle-btn');
+
 
     // --- FUNÇÕES DE UTILIDADE ---
     // ... (authenticatedFetch, showAuthMessage, showTabMessage, showModal, hideModalWithDelay, showAuthSection, showDashboard permanecem as mesmas) ...
@@ -826,6 +828,40 @@ setAppHeight(); // Executa na carga inicial e quando o DOM estiver pronto
         editingFinanceId = financeEntry._id; //
         if(financeEntryMessage) financeEntryMessage.textContent = ''; //
     };
+
+
+    if (themeToggleButton) {
+        const themeIcon = themeToggleButton.querySelector('i');
+
+        // Função para aplicar o tema com base na preferência
+        const applyTheme = (theme) => {
+            if (theme === 'dark') {
+                document.body.classList.add('dark-mode');
+                if (themeIcon) {
+                    themeIcon.classList.remove('fa-moon');
+                    themeIcon.classList.add('fa-sun');
+                }
+            } else {
+                document.body.classList.remove('dark-mode');
+                if (themeIcon) {
+                    themeIcon.classList.remove('fa-sun');
+                    themeIcon.classList.add('fa-moon');
+                }
+            }
+        };
+
+        // Listener para o clique no botão
+        themeToggleButton.addEventListener('click', () => {
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            const newTheme = isDarkMode ? 'light' : 'dark';
+            localStorage.setItem('theme', newTheme);
+            applyTheme(newTheme);
+        });
+
+        // Verifica a preferência salva no carregamento da página
+        const savedTheme = localStorage.getItem('theme') || 'light'; // Padrão para 'light'
+        applyTheme(savedTheme);
+    }
     
     function setupScrapeEventListeners(urlInputEl, verifyBtnEl, infoDivEl, messageEl, saveBtnEl) { //
         if (verifyBtnEl && urlInputEl && infoDivEl) { //
@@ -1410,3 +1446,4 @@ if (mainContentArea) {
         showAuthSection(); //
     }
 });
+
