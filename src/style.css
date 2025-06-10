@@ -12,59 +12,32 @@
 }
 
 :root {
-    /* Tema Claro Principal */
-    --bg-page-primary: #FFFFFF;
-    --text-on-light-bg: #212529;
-    --text-secondary-on-light-bg: #6c757d;
-    --border-color-light: #dee2e6;
-    --bg-element-light: #F8F9FA;
-    --app-height: 100vh; /* Fallback para caso o JS não execute */
+    /* Paleta de Cores Única (Tema Claro) */
+    --bg-page: #F8F9FA;
+    --bg-element: #FFFFFF;
+    --bg-element-secondary: #F1F3F5;
+    --text-primary: #212529;
+    --text-secondary: #6c757d;
+    --border-color: #DEE2E6;
 
-    /* Para Elementos Escuros Contrastantes */
-    --bg-element-dark: #2B2B2B;
-    --text-on-dark-bg: #ececec;
-    --text-secondary-on-dark-bg: #424344;
-    --border-color-dark-elements: #495057;
-
-    /* Cores de Ação */
+    /* Cores de Ação (Verde) */
     --primary-action: #119423;
-    --primary-action-hover: #105e1a;
-    --menu-active-icon-bg: #119423;
-    --secondary-action-color: #FFC107;
+    --primary-action-hover: #0d7a1a;
+    --highlight-action-text: #FFFFFF;
+    
+    /* Rodapé do Card (Escuro para Contraste) */
+    --card-footer-bg: #2A2A2A;
+    --card-footer-text: #FFFFFF;
+    --card-footer-border: #444444;
 
-    /* Placeholders */
-    --text-placeholder-on-light-input: #6c757d;
-    --text-placeholder-on-dark-input: #868e96;
+    /* Cores de Status e Outras */
+    --error-color: #dc3545;
+    --success-color: #28a745;
+    --text-placeholder: #adb5bd;
 
     /* Sombras */
-    --element-shadow-on-light-bg: 0px 6px 12px rgba(0, 0, 0, 0.15);
-    --element-hover-shadow-on-light-bg: 0px 8px 18px rgba(0, 0, 0, 0.2);
-
-    /* Cores Específicas para o Menu Mobile Escuro (será ocultado, mas mantendo vars) */
-    --mobile-menu-bg: #1A1D24;
-    --mobile-menu-nav-items-container-bg: #2C3038;
-    --mobile-menu-icon-inactive-bg: #454A54;
-    --mobile-menu-icon-color: var(--text-on-dark-bg);
-    --mobile-menu-icon-active-color: #FFFFFF;
-    --mobile-menu-logout-icon-color: var(--secondary-action-color);
-    --mobile-menu-logout-border-color: var(--secondary-action-color);
-
-    /* Outras */
-    --success-color: #28a745;
-    --error-color: #dc3545;
-    --edit-color: #ffc107;
-    --highlight-action-text: #FFFFFF;
-
-    /* DEFINITIONS FOR COMMON VARIABLES */
-    --bg-primary: var(--bg-page-primary);
-    --text-primary: var(--text-on-light-bg);
-    --bg-secondary: #fff;
-    --bg-tertiary: #ffffff;
-    --bg-accent: #3a3f44;
-    --border-color: var(--border-color-dark-elements);
-    --input-light-bg: var(--bg-element-light);
-    --input-light-text: var(--text-on-light-bg);
-    --input-light-placeholder: var(--text-secondary-on-light-bg);
+    --element-shadow: 0px 4px 12px rgba(0, 0, 0, 0.08);
+    --element-hover-shadow: 0px 6px 16px rgba(0, 0, 0, 0.12);
 }
 
 html, body {
@@ -208,6 +181,24 @@ html, body {
     background-color: var(--error-color); /* Fundo vermelho no hover do logout */
     color: var(--highlight-action-text);
 }
+
+.url-scrape-container {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    background-color: var(--bg-element);
+    border: 1px solid var(--border-color);
+    padding: 15px;
+    border-radius: 12px;
+    max-width: 800px;
+    margin: 0 auto 30px auto;
+    box-shadow: var(--element-shadow);
+}
+.url-scrape-container input[type="url"] { flex-grow: 1; }
+.url-scrape-container button { width: auto; flex-shrink: 0; }
+
+
+
 /* ... (Rest of your existing CSS up to media queries) ... */
 
 /* Coloque o restante do seu CSS aqui (Auth, Forms, Modals, Dashboard, etc.) */
