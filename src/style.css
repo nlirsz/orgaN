@@ -269,7 +269,7 @@ html, body {
     gap: 10px;
     align-items: center;
     background-color: var(--bg-element);
-    border: 1px solid var(--border-color);
+    border: transparent;
     padding: 15px;
     border-radius: 12px;
     max-width: 800px;
@@ -461,7 +461,7 @@ a.product-link-btn:hover { background-color: var(--primary-action-hover); }
     box-shadow: var(--element-shadow-on-light-bg);
     font-family: 'Inter', sans-serif;
     font-weight: 500;
-    color: var(--text-on-dark-bg);
+    color: #121212;
     font-size: 0.95em;
     transition: background-color 0.2s, box-shadow 0.2s;
 
@@ -850,7 +850,8 @@ productUrlInput-add-tab {
 
     .url-scrape-container {
     background-color: var(--bg-element-secondary);
-    border: 1px solid var(--border-color);
+    width: 100%;
+    border: transparent;
     border-radius: 16px;
     padding: 20px;
     margin-bottom: 25px;
