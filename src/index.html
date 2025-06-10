@@ -83,19 +83,19 @@
         <div class="sidebar-header">
             <img src="/logo.png" alt="Logo" class="logo" />
         </div>
-        <button class="nav-btn active" data-tab="dashboard-main" title="Painel Principal">
+        <button class="nav-btn active" data-tab="dashboard-main" title="">
             <i class="fas fa-tachometer-alt"></i>
         </button>
-        <button class="nav-btn" data-tab="products" title="Meus Produtos">
+        <button class="nav-btn" data-tab="products" title="">
             <i class="fas fa-box-open"></i>
         </button>
-        <button class="nav-btn" data-tab="add-product" title="Adicionar Produto">
+        <button class="nav-btn" data-tab="add-product" title="">
             <i class="fas fa-plus-circle"></i>
         </button>
-        <button class="nav-btn" data-tab="history" title="Histórico de Compras">
+        <button class="nav-btn" data-tab="history" title="">
             <i class="fas fa-history"></i>
         </button>
-        <button class="nav-btn" data-tab="finance" title="Finanças">
+        <button class="nav-btn" data-tab="finance" title="">
             <i class="fas fa-chart-pie"></i>
         </button>
     </div>
@@ -144,8 +144,15 @@
 
             <section id="products-tab" class="tab-content">
                 <h2>Meus Produtos</h2>
-                <div class="product-list-container">
-                    <h3>Sua Lista de Desejos</h3>
+                <div class="url-scrape-container" id="scrape-form-products-tab">
+                        <input type="url" id="productUrlInput-products-tab" placeholder="Cole a URL para adicionar à lista...">
+                        <button id="verifyUrlBtn-products-tab" class="primary-btn">
+                            <i class="fas fa-search"></i> Verificar URL
+                        </button>
+                    </div>
+                    <div id="verifiedProductInfo-products-tab" class="hidden" style="margin-bottom: 25px;">
+                        </div>
+                    <div class="product-list-container">                    <h3></h3>
                     <div class="list-summary">
                         <span>Total a Gastar:</span>
                         <span id="pending-total-value">R$ 0,00</span>
@@ -175,7 +182,7 @@
                     <p><strong>Preço:</strong> <span id="verifiedProductPrice-add-tab"></span></p>
                 </div>
 
-                <p class="form-section-title">Ou Preencha Manualmente</p>
+                <p class="form-section-title"></p>
                 
                 <div class="form-container add-product-form-container">
                     <div class="form-group">
@@ -228,7 +235,7 @@
             <section id="history-tab" class="tab-content">
                 <h2>Histórico de Compras</h2>
                 <div class="product-list-container">
-                    <h3>Produtos Comprados ou Descartados</h3>
+                    <h3></h3>
                     <div class="list-summary">
                         <span>Total Gasto (Comprados):</span>
                         <span id="purchased-total-value">R$ 0,00</span>
@@ -242,7 +249,7 @@
             </section>
 
             <section id="finance-tab" class="tab-content">
-                <h2>Dashboard Financeiro Detalhado</h2>
+                <h2></h2>
                 <div class="finance-form-container">
                     <h3>Novo Registro Mensal</h3>
                      <div class="form-group">

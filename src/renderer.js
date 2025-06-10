@@ -105,6 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const imageModal = getElem('image-modal'); //
     const modalImageContent = getElem('modal-image-content'); //
 
+
     const changePasswordForm = getElem('change-password-form');
 const currentPasswordInput = getElem('current-password');
 const newPasswordInput = getElem('new-password');
@@ -550,27 +551,66 @@ const createProductCard = (product) => {
 };
 
 
-    const fetchAndRenderProducts = async () => { //
-        if (!pendingList || !purchasedList) { //
-            console.warn("Elementos das listas de produtos não encontrados."); //
-            return; //
-        }
-        if (!currentUserId) return; //
+// Em renderer.js, substitua a função inteira por esta:
 
-        try {
-            const response = await authenticatedFetch(`${API_BASE_URL}/products?userId=${currentUserId}`); //
-            if (!response.ok) throw new Error(`Erro ao buscar produtos: ${response.statusText}`); //
-            const products = await response.json(); //
+const fetchAndRenderProducts = async () => {
+    // Garante que os elementos da lista e dos totais existam
+    if (!pendingList || !purchasedList || !pendingTotalValueEl || !purchasedTotalValueEl) return;
+    if (!currentUserId) return;
 
-            if(pendingList) pendingList.innerHTML = ''; //
-            if(purchasedList) purchasedList.innerHTML = ''; //
-            products.forEach(product => { //
-                const card = createProductCard(product); //
-                if (product.status === 'pendente' && pendingList) pendingList.appendChild(card); //
-                else if ((product.status === 'comprado' || product.status === 'descartado') && purchasedList) purchasedList.appendChild(card); //
+    // Reseta os totais antes de buscar novos dados
+    pendingTotalValueEl.textContent = 'R$ 0,00';
+    purchasedTotalValueEl.textContent = 'R$ 0,00';
+
+    try {
+        const response = await authenticatedFetch(`${API_BASE_URL}/products?userId=${currentUserId}`);
+        if (!response.ok) throw new Error(`Erro ao buscar produtos: ${response.statusText}`);
+        
+        const products = await response.json();
+
+        // Filtra os produtos por status
+        const pendingProducts = products.filter(p => p.status === 'pendente');
+        const purchasedProducts = products.filter(p => p.status === 'comprado'); // Apenas 'comprado' para o total
+        const historyProducts = products.filter(p => p.status === 'comprado' || p.status === 'descartado'); // 'comprado' e 'descartado' para a lista do histórico
+
+        // Limpa as listas antes de adicionar os novos cards
+        pendingList.innerHTML = '';
+        purchasedList.innerHTML = '';
+
+        // --- CÁLCULO E EXIBIÇÃO DO TOTAL DA LISTA DE DESEJOS ---
+        const pendingTotal = pendingProducts.reduce((sum, product) => sum + (product.price || 0), 0);
+        pendingTotalValueEl.textContent = `R$ ${pendingTotal.toFixed(2).replace('.', ',')}`;
+
+        // --- CÁLCULO E EXIBIÇÃO DO TOTAL GASTO ---
+        const purchasedTotal = purchasedProducts.reduce((sum, product) => sum + (product.price || 0), 0);
+        purchasedTotalValueEl.textContent = `R$ ${purchasedTotal.toFixed(2).replace('.', ',')}`;
+
+        // Renderiza a lista de desejos (pendentes)
+        if (pendingProducts.length === 0) {
+            if (pendingEmptyState) pendingEmptyState.style.display = 'block';
+        } else {
+            if (pendingEmptyState) pendingEmptyState.style.display = 'none';
+            pendingProducts.forEach(product => {
+                const card = createProductCard(product);
+                pendingList.appendChild(card);
             });
-        } catch (error) { console.error("Erro em fetchAndRenderProducts:", error); } //
-    };
+        }
+        
+        // Renderiza a lista do histórico
+        if (historyProducts.length === 0) {
+            if (purchasedEmptyState) purchasedEmptyState.style.display = 'block';
+        } else {
+            if (purchasedEmptyState) purchasedEmptyState.style.display = 'none';
+            historyProducts.forEach(product => {
+                const card = createProductCard(product);
+                purchasedList.appendChild(card);
+            });
+        }
+
+    } catch (error) {
+        console.error("Erro em fetchAndRenderProducts:", error);
+    }
+};
 
     // Coloque isso no seu arquivo JavaScript principal (ex: renderer.js)
 const setAppHeight = () => {
