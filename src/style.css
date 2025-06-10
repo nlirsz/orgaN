@@ -450,6 +450,37 @@ a.product-link-btn:hover { background-color: var(--primary-action-hover); }
     font-style: italic;
 }
 
+.list-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 10px 15px;
+    background-color: var(--bg-secondary);
+    border-radius: 8px;
+    box-shadow: var(--element-shadow-on-light-bg);
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    color: var(--text-on-dark-bg);
+    font-size: 0.95em;
+    transition: background-color 0.2s, box-shadow 0.2s;
+
+}
+
+.productUrlInput-products-tab,
+productUrlInput-add-tab {
+    width: 100%;
+    padding: 10px;
+    border: transparent;
+    border-radius: 6px;
+    background-color: var(--bg-element-light);
+    color: #121212;
+    font-size: 0.95em;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+
+
 @media (max-width: 1200px) {
     .product-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
 }
