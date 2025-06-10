@@ -315,13 +315,59 @@
             </section>    
 
             <div id="image-modal" class="modal-overlay hidden">
-                </div>
-            <div id="product-details-modal" class="modal-overlay hidden">
-                </div>
-            <div id="edit-product-modal" class="modal-overlay hidden">
-                </div>
-        </main>
+    <div class="image-modal-content">
+        <span class="close-modal-btn" data-modal-id="image-modal">&times;</span>
+        <img id="modal-image-content" src="#" alt="Imagem do Produto Ampliada">
     </div>
+</div>
+
+<div id="product-details-modal" class="modal-overlay hidden">
+    <div class="product-details-modal-content">
+        <span class="close-modal-btn" data-modal-id="product-details-modal">&times;</span>
+        <div id="modal-product-image-container">
+            <img id="modal-product-image" src="#" alt="Imagem do Produto">
+        </div>
+        <h3 id="modal-product-name">Nome do Produto</h3>
+        <p class="modal-product-price" id="modal-product-price">R$ 0,00</p>
+        <div class="modal-product-info">
+            <p><strong>Status:</strong> <span id="modal-product-status"></span></p>
+            <p><strong>Categoria:</strong> <span id="modal-product-category"></span></p>
+            <p><strong>Marca:</strong> <span id="modal-product-brand"></span></p>
+            <p><strong>Adicionado em:</strong> <span id="modal-product-addedDate"></span></p>
+            <p><strong>Tags:</strong> <span id="modal-product-tags"></span></p>
+            <p><strong>Prioridade:</strong> <span id="modal-product-priority"></span></p>
+            <p><strong>Descrição:</strong> <span id="modal-product-description"></span></p>
+            <p><strong>Notas:</strong> <span id="modal-product-notes"></span></p>
+        </div>
+        <a id="modal-product-link" href="#" target="_blank" rel="noopener noreferrer" class="product-link-btn">Visitar Página do Produto <i class="fas fa-external-link-alt"></i></a>
+        <div class="modal-actions">
+            <button id="modal-action-purchase" class="modal-action-btn primary-btn" style="grid-column: span 2;"><i class="fas fa-check-circle"></i> Marcar como Comprado</button>
+            <button id="modal-action-edit" class="modal-action-btn edit"><i class="fas fa-edit"></i> Editar</button>
+            <button id="modal-action-delete" class="modal-action-btn delete"><i class="fas fa-trash-alt"></i> Excluir</button>
+        </div>
+    </div>
+</div>
+
+<div id="edit-product-modal" class="modal-overlay hidden">
+    <div class="modal-content edit-product-modal-content">
+        <span class="close-modal-btn" data-modal-id="edit-product-modal">&times;</span>
+        <h3>Editar Produto</h3>
+        <form id="edit-product-form">
+            <input type="hidden" id="edit-product-id">
+            <div class="form-row">
+                <div class="form-group"><label for="edit-product-name">Nome</label><input type="text" id="edit-product-name" required></div>
+                <div class="form-group"><label for="edit-product-price">Preço (R$)</label><input type="number" id="edit-product-price" step="0.01" required></div>
+            </div>
+            <div class="form-group"><label for="edit-product-url">URL de Origem</label><input type="url" id="edit-product-url"></div>
+            <div class="form-group"><label for="edit-product-image-url">URL da Imagem</label><input type="url" id="edit-product-image-url"></div>
+            <img id="edit-product-preview-image" src="#" alt="Preview" class="hidden" style="max-width: 150px; margin: 10px auto; border-radius: 8px;">
+            <div class="form-group"><label for="edit-product-status">Status</label><select id="edit-product-status"><option value="pendente">Pendente</option><option value="comprado">Comprado</option><option value="descartado">Descartado</option></select></div>
+            <div class="form-group"><label for="edit-product-notes">Notas Adicionais</label><textarea id="edit-product-notes" rows="3"></textarea></div>
+            <p class="tab-message" id="edit-product-message"></p>
+            <button type="submit" class="primary-btn"><i class="fas fa-save"></i> Salvar Alterações</button>
+        </form>
+    </div>
+</div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="/renderer.js"></script>
