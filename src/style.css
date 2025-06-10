@@ -450,6 +450,11 @@ a.product-link-btn:hover { background-color: var(--primary-action-hover); }
     font-style: italic;
 }
 
+/* Estilo para o cabeçalho mobile (escondido por padrão) */
+.mobile-header {
+    display: none;
+}
+
 /* Em style.css (substitua as regras existentes por estas) */
 
 .product-details-modal-content {
@@ -716,6 +721,41 @@ productUrlInput-add-tab {
         font-size: 1.5em; /* Títulos um pouco menores no mobile */
         margin-bottom: 20px;
     }
+
+    /* Dentro de @media (max-width: 767px) */
+
+/* Mostra e estiliza o cabeçalho mobile */
+.mobile-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 8px 0;
+    background-color: var(--bg-element);
+    border-bottom: 1px solid var(--border-color);
+    width: 100%;
+}
+
+.mobile-logo {
+    height: 35px;
+    width: auto;
+}
+
+/* Ajusta o conteúdo para não ficar atrás do novo cabeçalho */
+.dashboard-layout {
+    /* A altura total do layout agora não precisa considerar o cabeçalho */
+    height: auto; 
+}
+
+.main-content-area {
+    /* A altura se ajusta, e o padding superior acomoda o cabeçalho */
+    height: calc(var(--app-height) - 52px); /* Altura da tela menos o cabeçalho */
+    padding-top: 15px; /* Reset do padding para evitar duplicação */
+}
+
+/* Ajusta a tela de login também */
+.auth-section {
+    height: calc(100vh - 52px); /* Altura da tela menos o cabeçalho */
+}
 
     /* Oculta elementos desnecessários na barra inferior */
     .sidebar .sidebar-header,
