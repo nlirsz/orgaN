@@ -110,6 +110,7 @@ const currentPasswordInput = getElem('current-password');
 const newPasswordInput = getElem('new-password');
 const confirmNewPasswordInput = getElem('confirm-new-password');
 const changePasswordMessage = getElem('change-password-message');
+const financeEmptyState = getElem('finance-empty-state'); // <-- ADICIONE ESTA LINHA
 
 
     // --- FUNÇÕES DE UTILIDADE ---
@@ -761,56 +762,68 @@ setAppHeight(); // Executa na carga inicial e quando o DOM estiver pronto
     
     let financesData = []; //
 
-    const fetchAndRenderFinances = async () => { //
-        if (!financeList || !totalBalanceElem) return; //
-        if (!currentUserId) return; //
+const fetchAndRenderFinances = async () => {
+    if (!financeList || !totalBalanceElem) return;
+    if (!currentUserId) return;
 
-        if (financeMonthInput) financeMonthInput.disabled = false; //
-        if (financeRevenueInput) financeRevenueInput.disabled = false; //
-        if (financeExpensesInput) financeExpensesInput.disabled = false; //
+    // Garante que a mensagem de estado vazio está definida
+    const financeEmptyState = getElem('finance-empty-state');
 
-        try {
-            const response = await authenticatedFetch(`${API_BASE_URL}/finances?userId=${currentUserId}`); //
-            if (!response.ok) throw new Error(`Erro ao buscar finanças: ${response.statusText}`); //
-            financesData = await response.json(); //
-            // console.log("Finanças carregadas da API:", financesData); //
-        } catch (error) { //
-            console.error("Erro em fetchAndRenderFinances:", error); //
-            financesData = []; //
-            showTabMessage(financeEntryMessage, "Não foi possível carregar os dados financeiros. Verifique a conexão ou tente novamente.", false); //
-        }
+    try {
+        const response = await authenticatedFetch(`${API_BASE_URL}/finances?userId=${currentUserId}`);
+        if (!response.ok) throw new Error(`Erro ao buscar finanças: ${response.statusText}`);
+        
+        financesData = await response.json();
+    } catch (error) {
+        console.error("Erro em fetchAndRenderFinances:", error);
+        financesData = []; // Garante que a lista esteja vazia em caso de erro
+        showTabMessage(financeEntryMessage, "Não foi possível carregar os dados financeiros.", false);
+    }
 
-        if(financeList) financeList.innerHTML = ''; //
-        let totalBalance = 0; //
-        const sortedFinancesForList = [...financesData].sort((a, b) => b.mes_ano.localeCompare(a.mes_ano)); //
+    if (financeList) financeList.innerHTML = ''; // Limpa a lista atual
 
-        sortedFinancesForList.forEach(entry => { //
-            const balance = entry.receita - entry.gastos; //
-            totalBalance += balance; //
-            const li = document.createElement('li'); //
-            li.dataset.financeId = entry._id; //
-            li.dataset.financeJson = JSON.stringify(entry); //
+    // --- LÓGICA DE ESTADO VAZIO (PARTE QUE FALTAVA) ---
+    if (financesData.length === 0) {
+        if (financeEmptyState) financeEmptyState.style.display = 'block';
+        if (financeList) financeList.style.display = 'none'; // Esconde o contêiner da lista
+        if (totalBalanceElem) totalBalanceElem.textContent = 'R$ 0,00';
+    } else {
+        if (financeEmptyState) financeEmptyState.style.display = 'none';
+        if (financeList) financeList.style.display = 'block'; // Garante que a lista esteja visível
 
-            const formattedMonthYear = new Date(entry.mes_ano + "-02").toLocaleDateString('pt-BR', { month: 'long', year: 'numeric', timeZone: 'UTC' }); //
+        let totalBalance = 0;
+        const sortedFinancesForList = [...financesData].sort((a, b) => b.mes_ano.localeCompare(a.mes_ano));
+
+        sortedFinancesForList.forEach(entry => {
+            const balance = entry.receita - entry.gastos;
+            totalBalance += balance;
+            const li = document.createElement('li');
+            li.dataset.financeId = entry._id;
+            li.dataset.financeJson = JSON.stringify(entry);
+
+            const formattedMonthYear = new Date(entry.mes_ano + "-02").toLocaleDateString('pt-BR', { month: 'long', year: 'numeric', timeZone: 'UTC' });
 
             li.innerHTML = `
                 <div class="finance-item-details">
                     <strong>${formattedMonthYear}</strong>
-                    <span>Receita: <span class="revenue">R$ ${entry.receita.toFixed(2)}</span></span>
-                    <span>Gastos: <span class="expenses">R$ ${entry.gastos.toFixed(2)}</span></span>
-                    <span>Balanço: <span class="balance">R$ ${balance.toFixed(2)}</span></span>
+                    <span>Receita: <span class="revenue">R$ ${entry.receita.toFixed(2).replace('.', ',')}</span></span>
+                    <span>Gastos: <span class="expenses">R$ ${entry.gastos.toFixed(2).replace('.', ',')}</span></span>
+                    <span>Balanço: <span class="balance">R$ ${balance.toFixed(2).replace('.', ',')}</span></span>
                 </div>
                 <div class="finance-item-actions">
                     <button class="edit-finance-btn" data-id="${entry._id}" title="Editar Registro"><i class="fa fa-pen"></i></button>
                     <button class="delete-finance-btn" data-id="${entry._id}" title="Excluir Registro"><i class="fa fa-trash"></i></button>
                 </div>
-            `; //
-            if(financeList) financeList.appendChild(li); //
+            `;
+            if (financeList) financeList.appendChild(li);
         });
-        if(totalBalanceElem) totalBalanceElem.textContent = `R$ ${totalBalance.toFixed(2)}`; //
 
-        renderGenericChart(financeChartCanvas, 'line', financesData, financeChartInstance, 'financialLineChart'); //
-    };
+        if (totalBalanceElem) totalBalanceElem.textContent = `R$ ${totalBalance.toFixed(2).replace('.', ',')}`;
+    }
+
+    // Renderiza o gráfico com os dados (ou vazio, se não houver dados)
+    renderGenericChart(financeChartCanvas, 'line', financesData, financeChartInstance, 'financialLineChart');
+};
 
     const clearFinanceForm = () => { //
         if(financeMonthInput) financeMonthInput.value = ''; //
