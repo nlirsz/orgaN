@@ -109,6 +109,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const pendingEmptyState = getElem('pending-empty-state');
     const purchasedEmptyState = getElem('purchased-empty-state');
     const goToBtnFromEmpty = getElem('go-to-add-product-tab-btn-from-empty');
+    // No topo de renderer.js, na seção de seletores
+// ...
+    // ...
 
 
     const changePasswordForm = getElem('change-password-form');
@@ -903,77 +906,108 @@ const fetchAndRenderFinances = async () => {
         if(financeEntryMessage) financeEntryMessage.textContent = ''; //
     };
     
-    function setupScrapeEventListeners(urlInputEl, verifyBtnEl, infoDivEl, messageEl, saveBtnEl) { //
-        if (verifyBtnEl && urlInputEl && infoDivEl) { //
-            verifyBtnEl.addEventListener('click', async () => { //
-                const url = urlInputEl.value.trim(); //
-                if (!url) return showTabMessage(messageEl, 'Por favor, insira uma URL.', false); //
-                verifyBtnEl.disabled = true; //
-                verifyBtnEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...'; //
-                if(messageEl) messageEl.textContent = ''; //
+// Em renderer.js
 
-                try {
-                    const response = await fetch(`${API_BASE_URL}/products/scrape-url`, { //
-                        method: 'POST', //
-                        headers: { 'Content-Type': 'application/json' }, //
-                        body: JSON.stringify({ url }), //
-                    });
-                    if (!response.ok) { //
-                        const errorData = await response.json(); //
-                        throw new Error(errorData.message || `Erro HTTP ${response.status}`); //
-                    }
-                    scrapedProductData = await response.json(); //
+function setupScrapeEventListeners(urlInputEl, verifyBtnEl, infoDivEl, messageEl, saveBtnEl) {
+    if (verifyBtnEl && urlInputEl) {
+        verifyBtnEl.addEventListener('click', async () => {
+            const url = urlInputEl.value.trim();
+            if (!url) {
+                showTabMessage(messageEl, 'Por favor, insira uma URL.', false);
+                return;
+            }
 
-                    const verifiedImgEl = infoDivEl.querySelector('img[id^="verifiedProductImage"]'); //
-                    const verifiedNameEl = infoDivEl.querySelector('span[id^="verifiedProductName"]'); //
-                    const verifiedPriceEl = infoDivEl.querySelector('span[id^="verifiedProductPrice"]'); //
+            // --- Feedback Visual Imediato ---
+            verifyBtnEl.disabled = true;
+            verifyBtnEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
+            if (messageEl) messageEl.textContent = '';
+            if (infoDivEl) infoDivEl.classList.add('hidden'); // Esconde a caixa de info anterior
+            if (saveBtnEl) saveBtnEl.style.display = 'none';
 
-                    if(verifiedImgEl) verifiedImgEl.src = scrapedProductData.image || 'https://via.placeholder.com/100?text=Sem+Imagem'; //
-                    if(verifiedNameEl) verifiedNameEl.textContent = scrapedProductData.name || 'Nome não encontrado'; //
-                    if(verifiedPriceEl) verifiedPriceEl.textContent = scrapedProductData.price ? `R$ ${parseFloat(scrapedProductData.price).toFixed(2)}` : 'Preço não encontrado'; //
+            try {
+                // --- Requisição à API ---
+                const response = await fetch(`${API_BASE_URL}/products/scrape-url`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url }),
+                });
 
-                    if (manualProductNameInput) manualProductNameInput.value = scrapedProductData.name || ''; //
-                    if (manualProductPriceInput) manualProductPriceInput.value = scrapedProductData.price || ''; //
-                    if (manualProductUrlInput) manualProductUrlInput.value = url; //
-                    if (manualProductImageUrlInput) manualProductImageUrlInput.value = scrapedProductData.image || ''; //
-                    if (manualProductCategorySelect) manualProductCategorySelect.value = scrapedProductData.category || 'Outros'; //
-                    if (manualProductBrandInput) manualProductBrandInput.value = scrapedProductData.brand || ''; //
-                    if (manualProductDescriptionTextarea) manualProductDescriptionTextarea.value = scrapedProductData.description || ''; //
-
-
-                    if (infoDivEl) { //
-                        infoDivEl.classList.remove('hidden'); //
-                        if (saveBtnEl) saveBtnEl.style.display = 'inline-flex'; //
-                    }
-                    showTabMessage(messageEl, 'Produto verificado com sucesso! Você pode ajustar os detalhes e salvar.', true); //
-
-                } catch (error) { //
-                    showTabMessage(messageEl, `Erro na verificação: ${error.message}`, false); //
-                    if (infoDivEl) infoDivEl.classList.add('hidden'); //
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.message || `Erro HTTP ${response.status}`);
                 }
-                finally { verifyBtnEl.disabled = false; verifyBtnEl.innerHTML = '<i class="fas fa-search-location"></i> Verificar URL'; } //
-            });
+                scrapedProductData = data; // Armazena os dados globalmente
+
+                // --- Preenche a caixa de informações do produto verificado ---
+                const verifiedImgEl = infoDivEl.querySelector('img[id^="verifiedProductImage"]');
+                const verifiedNameEl = infoDivEl.querySelector('span[id^="verifiedProductName"]');
+                const verifiedPriceEl = infoDivEl.querySelector('span[id^="verifiedProductPrice"]');
+
+                if (verifiedImgEl) verifiedImgEl.src = scrapedProductData.image || 'https://via.placeholder.com/200x150?text=Sem+Imagem';
+                if (verifiedNameEl) verifiedNameEl.textContent = scrapedProductData.name || 'Nome não encontrado';
+                if (verifiedPriceEl) verifiedPriceEl.textContent = scrapedProductData.price ? `R$ ${parseFloat(scrapedProductData.price).toFixed(2).replace('.',',')}` : 'Preço não encontrado';
+
+                // --- Preenche o formulário de adição manual (APENAS se for a aba "Adicionar Produto") ---
+                // Esta verificação garante que não tentaremos preencher um formulário que não existe na aba "Meus Produtos"
+                if (urlInputEl.id === 'productUrlInput-add-tab') {
+                    if (manualProductNameInput) manualProductNameInput.value = scrapedProductData.name || '';
+                    if (manualProductPriceInput) manualProductPriceInput.value = scrapedProductData.price || '';
+                    if (manualProductUrlInput) manualProductUrlInput.value = url;
+                    if (manualProductImageUrlInput) manualProductImageUrlInput.value = scrapedProductData.image || '';
+                    if (manualProductCategorySelect) manualProductCategorySelect.value = scrapedProductData.category || 'Outros';
+                    if (manualProductBrandInput) manualProductBrandInput.value = scrapedProductData.brand || '';
+                    if (manualProductDescriptionTextarea) manualProductDescriptionTextarea.value = scrapedProductData.description || '';
+                }
+
+                // --- Exibe os resultados e o botão Salvar ---
+                if (infoDivEl) infoDivEl.classList.remove('hidden');
+                if (saveBtnEl) saveBtnEl.style.display = 'inline-flex';
+                
+                showTabMessage(messageEl, 'Produto verificado! Você pode salvar o produto agora.', true);
+
+            } catch (error) {
+                showTabMessage(messageEl, `Erro na verificação: ${error.message}`, false);
+                if (infoDivEl) infoDivEl.classList.add('hidden');
+            } finally {
+                verifyBtnEl.disabled = false;
+                verifyBtnEl.innerHTML = '<i class="fas fa-search"></i> Verificar URL';
+            }
+        });
+    }
+}
+
+// CORRETO: Um listener para CADA formulário de scrape, em blocos separados.
+
+if (productUrlInputAddTab && verifyUrlBtnAddTab) {
+    setupScrapeEventListeners(productUrlInputAddTab, verifyUrlBtnAddTab, verifiedProductInfoDivAddTab, addProductMessageAddTab, saveProductBtnAddTab); 
+}
+
+if (productUrlInputProductsTab && verifyUrlBtnProductsTab) {
+    setupScrapeEventListeners(productUrlInputProductsTab, verifyUrlBtnProductsTab, verifiedProductInfoDivProductsTab, addProductMessageProductsTab, saveProductBtnProductsTab);
+}
+
+
+// CORRETO: Um listener para CADA botão de salvar, em blocos separados.
+
+if (saveProductBtnAddTab) {
+    saveProductBtnAddTab.addEventListener('click', async () => {
+        // Salva o produto vindo da aba "Adicionar Produto"
+        await handleSaveProduct(addProductMessageAddTab);
+    });
+}
+
+if (saveProductBtnProductsTab) {
+    saveProductBtnProductsTab.addEventListener('click', async () => {
+        // Salva o produto vindo da aba "Meus Produtos"
+        await handleSaveProduct(addProductMessageProductsTab);
+        
+        // Bônus de UX: esconde a caixa de informações após salvar.
+        if (verifiedProductInfoDivProductsTab) {
+            verifiedProductInfoDivProductsTab.classList.add('hidden');
         }
-    }
-    
-    if (productUrlInputAddTab && verifyUrlBtnAddTab && verifiedProductInfoDivAddTab && addProductMessageAddTab && saveProductBtnAddTab) {
-        setupScrapeEventListeners(productUrlInputAddTab, verifyUrlBtnAddTab, verifiedProductInfoDivAddTab, addProductMessageAddTab, saveProductBtnAddTab); //
-    }
-    if (productUrlInputProductsTab && verifyUrlBtnProductsTab && verifiedProductInfoDivProductsTab && addProductMessageProductsTab && saveProductBtnProductsTab) {
-        setupScrapeEventListeners(productUrlInputProductsTab, verifyUrlBtnProductsTab, verifiedProductInfoDivProductsTab, addProductMessageProductsTab, saveProductBtnProductsTab); //
-    }
+    });
+}
 
-    if (saveProductBtnAddTab) { //
-        saveProductBtnAddTab.addEventListener('click', async () => { //
-            await handleSaveProduct(addProductMessageAddTab); //
-        });
-    }
-
-    if (saveProductBtnProductsTab) { //
-        saveProductBtnProductsTab.addEventListener('click', async () => { //
-            await handleSaveProduct(addProductMessageProductsTab); //
-        });
-    }
 
     async function handleSaveProduct(messageElement) { //
         if (!currentUserId) { showTabMessage(messageElement, 'Você precisa estar logado para adicionar produtos.', false); return; } //
