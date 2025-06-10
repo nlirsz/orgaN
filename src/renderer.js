@@ -104,14 +104,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const editProductMessage = getElem('edit-product-message'); //
     const imageModal = getElem('image-modal'); //
     const modalImageContent = getElem('modal-image-content'); //
+    const pendingTotalValueEl = getElem('pending-total-value');
+    const purchasedTotalValueEl = getElem('purchased-total-value');
 
 
     const changePasswordForm = getElem('change-password-form');
-const currentPasswordInput = getElem('current-password');
-const newPasswordInput = getElem('new-password');
-const confirmNewPasswordInput = getElem('confirm-new-password');
-const changePasswordMessage = getElem('change-password-message');
-const financeEmptyState = getElem('finance-empty-state'); // <-- ADICIONE ESTA LINHA
+    const currentPasswordInput = getElem('current-password');
+    const newPasswordInput = getElem('new-password');
+    const confirmNewPasswordInput = getElem('confirm-new-password');
+    const changePasswordMessage = getElem('change-password-message');
+    const financeEmptyState = getElem('finance-empty-state'); // <-- ADICIONE ESTA LINHA
 
 
     // --- FUNÇÕES DE UTILIDADE ---
