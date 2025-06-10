@@ -547,6 +547,7 @@ productUrlInput-add-tab {
         width: auto; 
         height: 100%;
         flex: 1; /* Para distribuir o espaço igualmente */
+        color: #121212;
         display: flex;
         flex-direction: column;
         align-items: center;
