@@ -575,6 +575,67 @@ a.product-link-btn:hover { background-color: var(--primary-action-hover); }
         margin-bottom: 20px;
     }
 
+    /* Oculta elementos desnecessários na barra inferior */
+    .sidebar .sidebar-header,
+    .sidebar .sidebar-footer {
+        display: none;
+    }
+    .sidebar .nav-btn[data-tab="finance"] {
+        display: none !important;
+    }
+
+    /* Faz os botões de navegação e logout serem itens diretos da barra */
+    .sidebar .sidebar-nav-main {
+        display: contents;
+    }
+    
+    /* --- Estilo UNIFICADO para TODOS os botões na barra inferior --- */
+    .sidebar .nav-btn {
+        width: auto; 
+        height: 100%;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0;
+        background-color: transparent; /* Garante fundo transparente para TODOS */
+        padding: 5px 0;
+        margin: 0;
+        gap: 2px;
+        transition: background-color 0.2s, color 0.2s;
+    }
+    
+    /* Estilo UNIFICADO para TODOS os ícones */
+    .sidebar .nav-btn i {
+        font-size: 22px;
+        line-height: 1;
+        color: var(--text-secondary); /* Usa a variável correta para cinza */
+    }
+
+    /* Efeito HOVER para todos os botões */
+    .sidebar .nav-btn:hover {
+        background-color: var(--bg-element-secondary);
+        transform: none;
+        box-shadow: none;
+    }
+    .sidebar .nav-btn:hover i {
+        color: var(--primary-action); /* Ícone fica verde no hover */
+    }
+
+    /* Botão ATIVO */
+    .sidebar .nav-btn.active {
+        background-color: transparent;
+    }
+    .sidebar .nav-btn.active i {
+        color: var(--primary-action); /* Ícone ativo fica verde */
+    }
+
+    /* Exceção para o hover do LOGOUT */
+    .sidebar #logout-btn:hover i {
+        color: var(--error-color); /* Ícone do logout fica vermelho no hover */
+    }
+
     /* Responsividade para o grupo de input "Verificar URL" */
     #scrape-form-products-tab.input-group {
         flex-wrap: wrap;
