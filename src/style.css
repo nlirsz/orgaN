@@ -450,6 +450,62 @@ a.product-link-btn:hover { background-color: var(--primary-action-hover); }
     font-style: italic;
 }
 
+/* Em style.css (substitua as regras existentes por estas) */
+
+.product-details-modal-content {
+    background-color: var(--bg-page);
+    color: var(--text-primary);
+    border-left: 1px solid var(--border-color);
+    max-width: 400px;
+    width: 90%;
+    height: 100vh; /* Ocupa toda a altura */
+    position: fixed;
+    top: 0;
+    right: 0;
+    padding: 25px;
+    transform: translateX(100%);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: -5px 0px 15px rgba(0,0,0,0.15);
+    
+    /* --- Correções de Layout e Scroll --- */
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto; /* Adiciona scroll APENAS se o conteúdo ultrapassar a altura */
+}
+
+#modal-product-image-container {
+    width: 100%;
+    max-height: 280px; /* Define uma altura máxima para a área da imagem */
+    flex-shrink: 0; /* Impede que o container da imagem encolha */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    background-color: var(--bg-element);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+}
+
+#modal-product-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain; /* Garante que a imagem inteira apareça sem distorção */
+    cursor: pointer;
+}
+
+/* Em style.css (pode ser na seção de modais) */
+
+/* Define a ordem das camadas dos modais */
+#edit-product-modal { z-index: 1001; }
+#product-details-modal { z-index: 1002; }
+#image-modal { z-index: 1003; } /* <-- O z-index mais alto, fica na frente de todos */
+
+.modal-product-info {
+    /* Esta área agora crescerá e rolará naturalmente dentro do painel */
+    line-height: 1.6;
+}
+
 .list-summary {
     display: flex;
     justify-content: space-between;
@@ -528,6 +584,14 @@ productUrlInput-add-tab {
         border-right: none;     /* Remove a borda direita do desktop */
         gap: 0;                 /* Reseta o gap do layout em coluna do desktop */
     }
+
+        .dashboard-layout.logged-in > .sidebar {
+            display: flex; /* Exibe a sidebar quando logado */
+        }
+
+        body.logged-in > #auth-section {
+            display: none; /* Oculta a seção de autenticação quando logado */
+        }
 
     /* Oculta elementos não necessários na barra inferior */
     .sidebar .sidebar-header { display: none !important; }
@@ -832,6 +896,38 @@ productUrlInput-add-tab {
         border-radius: 0;
     }
 
+    #modal-product-image-container {
+width: 100%; /* A imagem ocupa a largura total do container /
+max-height: 300px; / Define uma altura máxima para a imagem /
+overflow: hidden; / Recorta a imagem se exceder a altura /
+margin-bottom: 15px;
+display: flex;
+justify-content: center; / Centraliza a imagem horizontalmente /
+align-items: center; / Centraliza a imagem verticalmente */
+}
+
+#modal-product-image {
+max-width: 100%; /* A imagem não ultrapassa a largura do container /
+max-height: 100%; / A imagem não ultrapassa a altura do container /
+object-fit: contain; / Garante que a imagem inteira seja visível, mantendo a proporção */
+border-radius: 8px;
+}
+
+.modal-product-info {
+margin-bottom: 15px;
+}
+
+.modal-actions {
+margin-top: 20px;
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 10px;
+}
+
+.modal-actions button {
+width: 100%;
+}
+
     /* Modal de Edição de Produto */
     .edit-product-modal-content {
         /* Herdará width: 90% do .modal-content geral */
@@ -936,5 +1032,16 @@ productUrlInput-add-tab {
     .auth-tab-btn {
         font-size: 1em;
         padding: 10px; /* Padding menor nos botões de aba */
+    }
+    .auth-section {
+        padding: 20px;
+        background-color: var(--bg-secondary);
+        border-radius: 12px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.35);
+        width: calc(100% - 30px); /* Ocupa quase toda a largura com pequenas margens */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh; /* Garante que a seção de autenticação ocupa toda a tela */
     }
 }
