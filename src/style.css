@@ -390,7 +390,7 @@ button:active, .primary-btn:active, .auth-submit-btn:active { transform: transla
 #modal-product-image-container { width: 100%; max-height: 250px; background-color: var(--bg-element-light); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; overflow: hidden; }
 .close-modal-btn { color: var(--text-secondary-on-light-bg); position: absolute; top: 12px; right: 15px; font-size: 1.7em; cursor: pointer; transition: color 0.2s, transform 0.2s; line-height: 1; padding: 5px; border: none; background: none; z-index: 1002; }
 .close-modal-btn:hover { color: var(--primary-action); transform: scale(1.1); }
-.product-details-modal-content { background-color: #e0e0e0 ; color: var(--text-on-light-bg); border-left: 1px solid var(--border-color-light); max-width: 400px; width: 90%; height: 100vh; position: fixed; top: 0; right: 0; margin-left: auto; border-radius: 0; padding: 30px; transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: -5px 0px 15px rgba(0,0,0,0.15); }
+.product-details-modal-content { background-color: #fff ; color: var(--text-on-light-bg); border-left: 1px solid var(--border-color-light); max-width: 400px; width: 90%; height: 100vh; position: fixed; top: 0; right: 0; margin-left: auto; border-radius: 0; padding: 30px; transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: -5px 0px 15px rgba(0,0,0,0.15); }
 .modal-overlay.active .product-details-modal-content { transform: translateX(0); }
 .product-details-modal-content .close-modal-btn { color: var(--text-secondary-on-light-bg); }
 .product-details-modal-content .close-modal-btn:hover { color: var(--primary-action); }
@@ -453,7 +453,7 @@ a.product-link-btn:hover { background-color: var(--primary-action-hover); }
 /* Em style.css (substitua as regras existentes por estas) */
 
 .product-details-modal-content {
-    background-color: #e0e0e0;
+    background-color: #fff;
     color: var(--text-primary);
     border-left: 1px solid var(--border-color);
     max-width: 400px;

@@ -354,21 +354,85 @@
         <h3>Editar Produto</h3>
         <form id="edit-product-form">
             <input type="hidden" id="edit-product-id">
-            <div class="form-row">
-                <div class="form-group"><label for="edit-product-name">Nome</label><input type="text" id="edit-product-name" required></div>
-                <div class="form-group"><label for="edit-product-price">Preço (R$)</label><input type="number" id="edit-product-price" step="0.01" required></div>
+
+            <div class="form-group" style="text-align: center;">
+                <img id="edit-product-preview-image" src="#" alt="Preview" class="form-image-preview hidden">
+                <label for="edit-product-image-url">URL da Imagem</label>
+                <input type="url" id="edit-product-image-url" placeholder="https://exemplo.com/imagem.png">
             </div>
-            <div class="form-group"><label for="edit-product-url">URL de Origem</label><input type="url" id="edit-product-url"></div>
-            <div class="form-group"><label for="edit-product-image-url">URL da Imagem</label><input type="url" id="edit-product-image-url"></div>
-            <img id="edit-product-preview-image" src="#" alt="Preview" class="hidden" style="max-width: 150px; margin: 10px auto; border-radius: 8px;">
-            <div class="form-group"><label for="edit-product-status">Status</label><select id="edit-product-status"><option value="pendente">Pendente</option><option value="comprado">Comprado</option><option value="descartado">Descartado</option></select></div>
-            <div class="form-group"><label for="edit-product-notes">Notas Adicionais</label><textarea id="edit-product-notes" rows="3"></textarea></div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="edit-product-name">Nome do Produto*</label>
+                    <input type="text" id="edit-product-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-product-price">Preço (R$)*</label>
+                    <input type="number" id="edit-product-price" step="0.01" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="edit-product-url">URL de Origem*</label>
+                <input type="url" id="edit-product-url" required>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="edit-product-status">Status</label>
+                    <select id="edit-product-status">
+                        <option value="pendente">Pendente</option>
+                        <option value="comprado">Comprado</option>
+                        <option value="descartado">Descartado</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit-product-category">Categoria</label>
+                    <select id="edit-product-category">
+                        <option value="Outros">Outros</option>
+                        <option value="Eletrônicos">Eletrônicos</option>
+                        <option value="Roupas e Acessórios">Roupas e Acessórios</option>
+                        <option value="Casa e Decoração">Casa e Decoração</option>
+                        <option value="Livros e Mídia">Livros e Mídia</option>
+                        <option value="Esportes e Lazer">Esportes e Lazer</option>
+                        <option value="Ferramentas e Construção">Ferramentas e Construção</option>
+                        <option value="Alimentos e Bebidas">Alimentos e Bebidas</option>
+                        <option value="Saúde e Beleza">Saúde e Beleza</option>
+                        <option value="Automotivo">Automotivo</option>
+                        <option value="Pet Shop">Pet Shop</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="edit-product-priority">Prioridade</label>
+                    <select id="edit-product-priority">
+                        <option value="Baixa">Baixa</option>
+                        <option value="Média">Média</option>
+                        <option value="Alta">Alta</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit-product-tags">Tags</label>
+                    <input type="text" id="edit-product-tags" placeholder="Separadas por vírgula">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="edit-product-description">Descrição</label>
+                <textarea id="edit-product-description" rows="3" placeholder="Breve descrição do produto..."></textarea>
+            </div>
+            <div class="form-group">
+                <label for="edit-product-notes">Notas Adicionais</label>
+                <textarea id="edit-product-notes" rows="3" placeholder="Suas observações sobre o produto..."></textarea>
+            </div>
+            
             <p class="tab-message" id="edit-product-message"></p>
             <button type="submit" class="primary-btn"><i class="fas fa-save"></i> Salvar Alterações</button>
         </form>
     </div>
 </div>
-
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="/renderer.js"></script>
 </body>
