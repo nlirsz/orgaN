@@ -141,33 +141,43 @@
                     </div>
                 </div>
             </section>
-
-            <section id="products-tab" class="tab-content">
-                <h2></h2>
-                <div class="url-scrape-container" id="scrape-form-products-tab">
-                        <input type="url" id="productUrlInput-products-tab" placeholder="Cole a URL para adicionar à lista...">
-                        <button id="verifyUrlBtn-products-tab" class="primary-btn">
-                            <i class="fas fa-search"></i> Verificar URL
-                        </button>
-                    </div>
-                    <div id="verifiedProductInfo-products-tab" class="hidden" style="margin-bottom: 25px;">
-                        </div>
-                    <div class="product-list-container">
-    <h3></h3> <div class="list-summary">
-        <span>Total a Gastar:</span>
-        <span id="pending-total-value">R$ 0,00</span>
+<section id="products-tab" class="tab-content">
+    <h2></h2>
+    
+    <div class="url-scrape-container" id="scrape-form-products-tab">
+        <input type="url" id="productUrlInput-products-tab" placeholder="Cole a URL para adicionar à lista...">
+        <button id="verifyUrlBtn-products-tab" class="primary-btn">
+            <i class="fas fa-search"></i> Verificar URL
+        </button>
+    </div>
+    <div id="verifiedProductInfo-products-tab" class="hidden verified-product-info-box">
+        <img id="verifiedProductImage-products-tab" src="#" alt="Imagem Verificada">
+        <p><strong>Nome:</strong> <span id="verifiedProductName-products-tab"></span></p>
+        <p><strong>Preço:</strong> <span id="verifiedProductPrice-products-tab"></span></p>
+        <p class="tab-message" id="add-product-message-products-tab"></p>
+        <button id="save-product-btn-products-tab" class="primary-btn" style="display: none;"><i class="fas fa-save"></i> Salvar Produto</button>
     </div>
 
-    <ul id="pending-products-list" class="product-grid"></ul>
+    <div id="products-error-display" class="error-display hidden">
+        <i class="fas fa-exclamation-triangle"></i>
+        <p>Não foi possível carregar seus produtos.</p>
+        <button class="primary-btn">Tentar Novamente</button>
+    </div>
 
-
-                    <div id="pending-empty-state" class="empty-state-message" style="display: none; text-align: center; padding: 40px; color: #6c757d;">
-                        <i class="fas fa-dolly-flatbed fa-3x" style="margin-bottom: 15px;"></i>
-                        <p>Sua lista de desejos está vazia.</p>
-                        <button id="go-to-add-product-tab-btn-from-empty" class="primary-btn" style="margin-top: 15px; width: auto;">Adicionar primeiro item</button>
-                    </div>
-                </div>
-            </section>
+    <div class="product-list-container">
+        <h3></h3>
+        <div class="list-summary">
+            <span>Total a Gastar:</span>
+            <span id="pending-total-value">R$ 0,00</span>
+        </div>
+        <ul id="pending-products-list" class="product-grid"></ul>
+        <div id="pending-empty-state" class="empty-state-message" style="display: none;">
+             <i class="fas fa-dolly-flatbed fa-3x"></i>
+             <p>Sua lista de desejos está vazia.</p>
+             <button id="go-to-add-product-tab-btn-from-empty" class="primary-btn">Adicionar primeiro item</button>
+        </div>
+    </div>
+</section>
 
             <section id="add-product-tab" class="tab-content">
                 <h2></h2>
