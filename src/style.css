@@ -663,6 +663,31 @@ a.product-link-btn:hover { background-color: var(--primary-action-hover); }
     #edit-product-form label {
         font-size: 0.85em;
     }
+
+    .url-scrape-container {
+    background-color: var(--bg-element-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.url-scrape-container input[type="url"] {
+    text-align: center;
+    font-size: 1.05em;
+    padding: 12px;
+}
+
+.url-scrape-container button {
+    width: 100%;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    font-size: 1em;
+}
     /* Inputs dentro do modal de edição */
     #edit-product-form input[type="text"], 
     #edit-product-form input[type="number"], 
