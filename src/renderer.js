@@ -106,6 +106,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalImageContent = getElem('modal-image-content'); //
     const pendingTotalValueEl = getElem('pending-total-value');
     const purchasedTotalValueEl = getElem('purchased-total-value');
+    const pendingEmptyState = getElem('pending-empty-state');
+    const purchasedEmptyState = getElem('purchased-empty-state');
+    const goToBtnFromEmpty = getElem('go-to-add-product-tab-btn-from-empty');
 
 
     const changePasswordForm = getElem('change-password-form');
@@ -522,6 +525,18 @@ if (registerForm) {
             }
         });
     }
+
+    // Em renderer.js, após a seção de seletores
+
+if (goToBtnFromEmpty) {
+    goToBtnFromEmpty.addEventListener('click', () => {
+        // Encontra o botão da aba "Adicionar Produto" e simula um clique nele
+        const addProductTabButton = document.querySelector('.nav-btn[data-tab="add-product"]');
+        if (addProductTabButton) {
+            addProductTabButton.click();
+        }
+    });
+}
     
 // Em src/renderer.js
 
@@ -551,6 +566,7 @@ const createProductCard = (product) => {
     `;
     return card;
 };
+
 
 
 // Em renderer.js, substitua a função inteira por esta:
