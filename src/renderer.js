@@ -1008,6 +1008,8 @@ if (saveProductBtnProductsTab) {
 
 // Em renderer.js
 
+// Em renderer.js, substitua a função inteira
+
 async function handleSaveProduct(messageElement) {
     if (!currentUserId) {
         showTabMessage(messageElement, 'Você precisa estar logado para adicionar produtos.', false);
@@ -1016,7 +1018,7 @@ async function handleSaveProduct(messageElement) {
 
     let productPayload = {};
 
-    // 1. Verifica se há dados de um scrape recente. Se sim, usa-os.
+    // Prioriza o uso de dados recém-verificados pela URL, se existirem
     if (scrapedProductData && scrapedProductData.name) {
         console.log("Salvando a partir de dados de scrape...");
         productPayload = {
@@ -1029,32 +1031,30 @@ async function handleSaveProduct(messageElement) {
             description: scrapedProductData.description,
             status: 'pendente'
         };
-        // Limpa os dados de scrape após o uso para evitar re-salvamento acidental
         scrapedProductData = null; 
     
     } else {
-        // 2. Se não, pega os dados do formulário de adição manual.
+        // Se não, pega os dados do formulário de adição manual.
         console.log("Salvando a partir do formulário manual...");
         productPayload = {
             name: manualProductNameInput.value.trim(),
             price: manualProductPriceInput.value.trim(),
             urlOrigin: manualProductUrlInput.value.trim(),
-            image: document.getElementById('manual-product-image-url').value.trim(),
-            category: document.getElementById('manual-product-category').value,
-            brand: document.getElementById('manual-product-brand').value.trim(),
-            description: document.getElementById('manual-product-description').value.trim(),
+            // ... (resto dos campos do formulário manual)
             status: 'pendente'
-            // Adicione outros campos do formulário manual aqui se houver
         };
     }
 
-    // 3. Validação dos dados essenciais antes de enviar para a API
+    // --- LINHA DE DEPURAÇÃO ADICIONADA ---
+    console.log("Payload a ser enviado para a API:", productPayload);
+
+    // Validação dos dados essenciais antes de enviar para a API
     if (!productPayload.name || !productPayload.price || !productPayload.urlOrigin) {
         showTabMessage(messageElement, 'Nome, preço e URL de origem são obrigatórios!', false);
         return;
     }
 
-    // 4. Envia os dados para a API
+    // Envia os dados para a API
     try {
         const response = await authenticatedFetch(`${API_BASE_URL}/products`, {
             method: 'POST',
@@ -1068,21 +1068,20 @@ async function handleSaveProduct(messageElement) {
 
         showTabMessage(messageElement, "Produto salvo com sucesso!", true);
         
-        // Limpa os formulários e atualiza as listas na tela
-        clearAddProductFormAddTab(); // Limpa o formulário da aba "Adicionar"
+        clearAddProductFormAddTab();
         if(typeof clearProductScrapeFormProductsTab === "function") {
-             clearProductScrapeFormProductsTab(); // Limpa o formulário da aba "Produtos", se a função existir
+             clearProductScrapeFormProductsTab();
         }
        
         fetchAndRenderProducts();
         fetchAndRenderDashboardStats();
 
     } catch (error) {
-        console.error("Erro ao salvar produto:", error);
+        // --- LINHA DE DEPURAÇÃO ADICIONADA ---
+        console.error("ERRO DETALHADO AO SALVAR:", error);
         showTabMessage(messageElement, `Erro ao salvar: ${error.message}`, false);
     }
 }
-
 
     function clearAddProductFormAddTab() { //
         if (productUrlInputAddTab) productUrlInputAddTab.value = ''; //
