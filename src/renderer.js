@@ -411,7 +411,6 @@ if (registerForm) {
             const bodyPayload = {
                 username,
                 password,
-                recaptchaToken: recaptchaResponse
             };
 
             // Envia a requisição de registro para a API
