@@ -326,11 +326,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
     // ...
-            // --- NOVO: Validar reCAPTCHA no frontend (opcional, mas bom para UX) ---
-            if (typeof grecaptcha !== 'undefined' && !recaptchaResponse) { // Adicionar esta verificação
-                showAuthMessage(loginMessage, 'Por favor, complete o reCAPTCHA.');
-                return;
-            }
 
             // ...dentro do listener de submit do loginForm...
             try {
