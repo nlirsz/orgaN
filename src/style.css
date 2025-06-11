@@ -455,6 +455,84 @@ a.product-link-btn:hover { background-color: var(--primary-action-hover); }
     display: none;
 }
 
+/* Em style.css */
+
+.content-loader {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px; /* Garante que o spinner tenha espaço */
+    padding: 40px;
+}
+
+.spinner {
+    border: 5px solid var(--bg-element-secondary);
+    border-top: 5px solid var(--primary-action); /* Verde */
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+}
+
+/* A animação 'spin' já deve existir no seu CSS, mas caso não, adicione-a */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Em style.css */
+
+/* Estilos para a Tela de Carregamento */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #121212; /* Fundo escuro */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999; /* Garante que fique na frente de tudo */
+    transition: opacity 0.5s ease-out; /* Transição suave para desaparecer */
+}
+
+/* Esconde a tela com opacidade para a transição funcionar */
+.loading-overlay.hidden {
+    opacity: 0;
+    pointer-events: none; /* Impede cliques na tela escondida */
+}
+
+.loading-logo {
+    width: 120px; /* Ajuste o tamanho conforme necessário */
+    height: auto;
+    animation: pulsate 2s infinite ease-in-out; /* Aplica a animação */
+}
+
+.loading-text {
+    color: #FFFFFF;
+    margin-top: 20px;
+    font-size: 1.2em;
+    font-weight: 500;
+    opacity: 0.8;
+}
+
+/* Animação de Pulsar */
+@keyframes pulsate {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.08);
+    }
+}
+
+/* Remove a regra antiga do spinner, se ainda existir */
+.loading-spinner {
+    display: none;
+}
+
 /* Em style.css (substitua as regras existentes por estas) */
 
 .product-details-modal-content {

@@ -210,6 +210,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if(loginMessage) loginMessage.textContent = ''; //
         if(registerMessage) registerMessage.textContent = ''; //
+            if(loadingOverlay) loadingOverlay.classList.add('hidden'); // Esconde a tela de carregamento
+
     }
     const togglePasswordVisibilityBtn = getElem('toggle-password-visibility'); //
     // registerPasswordInput já foi definido anteriormente
@@ -228,33 +230,37 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    async function showDashboard() { //
-        if(authSection) authSection.classList.add('hidden'); //
-        if(dashboardLayout) dashboardLayout.classList.add('hidden'); //
-        if(loadingOverlay) loadingOverlay.classList.remove('hidden'); //
-        // console.log("Loading overlay should be visible now."); // Removido para limpeza
+// Em renderer.js
 
-        try {
-            await fetchAndRenderDashboardStats(); //
-            await fetchAndRenderProducts(); //
-            await fetchAndRenderFinances(); //
-            
-            if(dashboardLayout) dashboardLayout.classList.remove('hidden'); //
-            // console.log("Dashboard should be visible now."); // Removido
+async function showDashboard() {
+    // Garante que a tela de auth esteja escondida e o layout do dashboard preparado
+    if (authSection) authSection.classList.add('hidden');
+    if (dashboardLayout) dashboardLayout.classList.add('hidden'); // Mantém escondido até os dados carregarem
+    
+    // Mostra a nova tela de carregamento com a logo
+    if (loadingOverlay) loadingOverlay.classList.remove('hidden');
 
-            const initialActiveTabButton = document.querySelector('.nav-btn[data-tab="dashboard-main"]'); // Corrigido para pegar o botão do painel principal
-            if (initialActiveTabButton) { //
-                initialActiveTabButton.click(); //
-            }
-        } catch (error) { //
-            console.error("Erro ao carregar dados iniciais do dashboard:", error); //
-            showAuthMessage(loginMessage, 'Erro ao carregar dados. Tente fazer login novamente.', false); //
-            logoutUser(); //
-        } finally {
-            if(loadingOverlay) loadingOverlay.classList.add('hidden'); //
-            // console.log("Loading overlay should be hidden now."); // Removido
-        }
+    try {
+        // Usa Promise.all para buscar todos os dados iniciais em paralelo, melhorando a performance
+        await Promise.all([
+            fetchAndRenderDashboardStats(),
+            fetchAndRenderProducts(),
+            fetchAndRenderFinances()
+        ]);
+
+        // Após todos os dados carregarem com sucesso, mostra o dashboard
+        document.body.classList.add('app-logged-in'); // Adiciona a classe para controle de layout
+        if (dashboardLayout) dashboardLayout.classList.remove('hidden');
+
+    } catch (error) {
+        console.error("Erro ao carregar dados iniciais do dashboard:", error);
+        showAuthMessage(loginMessage, 'Erro ao carregar dados. Tente fazer login novamente.', false);
+        logoutUser(); // Desloga o usuário se houver erro crítico
+    } finally {
+        // No final, independente de sucesso ou falha, esconde a tela de carregamento
+        if (loadingOverlay) loadingOverlay.classList.add('hidden');
     }
+}
 
 
     // --- LÓGICA DE AUTENTICAÇÃO ---
@@ -315,62 +321,64 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    if (loginForm) { //
-        loginForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const username = loginUsernameInput.value.trim();
-    const password = loginPasswordInput.value.trim();
+// Em renderer.js
 
-    if (!username || !password) {
-        showAuthMessage(loginMessage, 'Por favor, preencha todos os campos.');
-        return;
-    }
-    // ...
+if (loginForm) {
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const username = loginUsernameInput.value.trim();
+        const password = loginPasswordInput.value.trim();
 
-            // ...dentro do listener de submit do loginForm...
-            try {
-                if(loadingOverlay) loadingOverlay.classList.remove('hidden'); // MOSTRAR OVERLAY
+        if (!username || !password) {
+            showAuthMessage(loginMessage, 'Por favor, preencha todos os campos.');
+            return;
+        }
 
-                const response = await fetch(`${API_BASE_URL}/auth/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        username, 
-                        password,
-                    }),
-                });
-                const data = await response.json();
+        // Mostra a tela de carregamento com a logo ASSIM que o usuário clica em Entrar
+        if (loadingOverlay) loadingOverlay.classList.remove('hidden');
 
-                if (response.ok) {
-                    authToken = data.token;
-                    currentUserId = data.userId;
-                    if (rememberMeCheckbox && rememberMeCheckbox.checked) {
-                        localStorage.setItem('authToken', authToken);
-                        localStorage.setItem('userId', currentUserId);
-                    } else {
-                        localStorage.removeItem('authToken');
-                        localStorage.removeItem('userId');
-                    }
-                    // Não precisa de showAuthMessage aqui, o showDashboard já cuida do overlay
-                    await showDashboard(); // showDashboard já tem seu próprio controle de overlay
+        try {
+            const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password }),
+            });
+            
+            const data = await response.json();
+
+            if (response.ok) {
+                authToken = data.token;
+                currentUserId = data.userId;
+                
+                if (rememberMeCheckbox && rememberMeCheckbox.checked) {
+                    localStorage.setItem('authToken', authToken);
+                    localStorage.setItem('userId', currentUserId);
                 } else {
-                    showAuthMessage(loginMessage, data.message || 'Erro ao fazer login.');
-                    if (typeof grecaptcha !== 'undefined') grecaptcha.reset(0);
+                    localStorage.removeItem('authToken');
+                    localStorage.removeItem('userId');
                 }
-            } catch (error) {
-                console.error('Erro de rede ao fazer login:', error);
-                showAuthMessage(loginMessage, 'Erro de conexão com o servidor.');
+                
+                // Chama a showDashboard, que já tem a lógica de esconder o loading no final.
+                await showDashboard();
+
+            } else {
+                // Se o login falhar (ex: senha errada), esconde o loading e mostra o erro.
+                if (loadingOverlay) loadingOverlay.classList.add('hidden');
+                showAuthMessage(loginMessage, data.message || 'Erro ao fazer login.');
                 if (typeof grecaptcha !== 'undefined') grecaptcha.reset(0);
-            } finally {
-                // Apenas esconde o overlay se showDashboard não foi chamado ou falhou antes
-                // showDashboard já tem seu próprio finally para esconder o overlay.
-                // Para garantir que seja escondido se o login falhar antes de chamar showDashboard:
-                if (!authToken && loadingOverlay) { // Se não autenticou, esconde o overlay aqui.
-                     loadingOverlay.classList.add('hidden'); // ESCONDER OVERLAY
-                }
             }
-        });
-    }
+        } catch (error) {
+            // Se der erro de rede, esconde o loading e mostra o erro.
+            if (loadingOverlay) loadingOverlay.classList.add('hidden');
+            console.error('Erro de rede ao fazer login:', error);
+            showAuthMessage(loginMessage, 'Erro de conexão com o servidor.');
+            if (typeof grecaptcha !== 'undefined') grecaptcha.reset(0);
+        }
+        // O bloco 'finally' foi removido, pois a lógica de esconder o overlay
+        // agora é tratada nos cenários de sucesso e falha, tornando o controle mais explícito.
+    });
+}
+
 if (registerForm) {
     registerForm.addEventListener('submit', async (e) => {
         e.preventDefault();
