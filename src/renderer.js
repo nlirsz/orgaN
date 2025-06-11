@@ -342,7 +342,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     body: JSON.stringify({ 
                         username, 
                         password,
-                        recaptchaToken: recaptchaResponse 
                     }),
                 });
                 const data = await response.json();
