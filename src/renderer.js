@@ -316,20 +316,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     if (loginForm) { //
-        loginForm.addEventListener('submit', async (e) => { //
-            e.preventDefault(); //
-            const username = loginUsernameInput.value.trim(); //
-            const password = loginPasswordInput.value.trim(); //
+        loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const username = loginUsernameInput.value.trim();
+    const password = loginPasswordInput.value.trim();
 
-            // --- NOVO: Obter resposta do reCAPTCHA ---
-            const recaptchaResponse = (typeof grecaptcha !== 'undefined') ? grecaptcha.getResponse(0) : ''; // 0 é o ID do widget se houver apenas um, ou deixe vazio
-            // O widget de login será o primeiro na ordem do HTML se você adicionar em ambos.
-            // Se você tiver IDs específicos para os widgets do reCAPTCHA, use grecaptcha.getResponse(widgetId)
-
-            if (!username || !password) { //
-                showAuthMessage(loginMessage, 'Por favor, preencha todos os campos.'); //
-                return; //
-            }
+    if (!username || !password) {
+        showAuthMessage(loginMessage, 'Por favor, preencha todos os campos.');
+        return;
+    }
+    // ...
             // --- NOVO: Validar reCAPTCHA no frontend (opcional, mas bom para UX) ---
             if (typeof grecaptcha !== 'undefined' && !recaptchaResponse) { // Adicionar esta verificação
                 showAuthMessage(loginMessage, 'Por favor, complete o reCAPTCHA.');
