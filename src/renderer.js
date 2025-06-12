@@ -540,15 +540,21 @@ if (goToBtnFromEmpty) {
     
 // Em src/renderer.js
 
+// Em renderer.js
+
 const createProductCard = (product) => {
     const card = document.createElement('li');
     card.className = 'product-card';
     card.dataset.productId = product._id;
     card.dataset.productJson = JSON.stringify(product);
 
+    // ADICIONE ESTAS 2 LINHAS AQUI
+    card.setAttribute('data-tilt', ''); // Ativa o efeito de inclinação
+    card.setAttribute('data-tilt-glare', ''); // Ativa o efeito de brilho
+    
     const formattedPrice = `R$ ${parseFloat(product.price || 0).toFixed(2)}`;
     
-    // O conteúdo do card-image-container e card-content permanece o mesmo
+    // O resto da sua função continua igual...
     card.innerHTML = `
         <div class="card-image-container">
             <img src="${product.image || 'https://via.placeholder.com/200x150?text=Indisponível'}" alt="${product.name || 'Produto'}" class="card-image">
@@ -562,14 +568,15 @@ const createProductCard = (product) => {
             <i class="fas fa-edit action-edit" title="Editar"></i>
             <i class="fab fa-google action-search" title="Pesquisar produto na web"></i>
             <i class="fas fa-trash-alt action-delete" title="Excluir"></i>
-            </div>
+        </div>
     `;
     return card;
 };
 
 
-
 // Em renderer.js, substitua a função inteira por esta:
+
+// Em renderer.js, substitua sua função fetchAndRenderProducts por esta:
 
 const fetchAndRenderProducts = async () => {
     // Garante que os elementos da lista e dos totais existam
@@ -611,6 +618,8 @@ const fetchAndRenderProducts = async () => {
             pendingProducts.forEach(product => {
                 const card = createProductCard(product);
                 pendingList.appendChild(card);
+                // ✨ PASSO 3.1: INICIALIZE O EFEITO AQUI ✨
+                VanillaTilt.init(card, { max: 15, speed: 300, glare: true, "max-glare": 0.5 });
             });
         }
         
@@ -622,6 +631,8 @@ const fetchAndRenderProducts = async () => {
             historyProducts.forEach(product => {
                 const card = createProductCard(product);
                 purchasedList.appendChild(card);
+                // ✨ PASSO 3.2: INICIALIZE O EFEITO AQUI TAMBÉM ✨
+                VanillaTilt.init(card, { max: 15, speed: 300, glare: true, "max-glare": 0.5 });
             });
         }
 
@@ -629,6 +640,7 @@ const fetchAndRenderProducts = async () => {
         console.error("Erro em fetchAndRenderProducts:", error);
     }
 };
+
 
     // Coloque isso no seu arquivo JavaScript principal (ex: renderer.js)
 const setAppHeight = () => {
