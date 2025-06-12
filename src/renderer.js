@@ -578,12 +578,13 @@ const createProductCard = (product) => {
 
 // Em renderer.js, substitua sua função fetchAndRenderProducts por esta:
 
+// Em renderer.js, substitua mais uma vez a função fetchAndRenderProducts
+
 const fetchAndRenderProducts = async () => {
-    // Garante que os elementos da lista e dos totais existam
+    // A primeira parte da função permanece a mesma...
     if (!pendingList || !purchasedList || !pendingTotalValueEl || !purchasedTotalValueEl) return;
     if (!currentUserId) return;
 
-    // Reseta os totais antes de buscar novos dados
     pendingTotalValueEl.textContent = 'R$ 0,00';
     purchasedTotalValueEl.textContent = 'R$ 0,00';
 
@@ -593,20 +594,16 @@ const fetchAndRenderProducts = async () => {
         
         const products = await response.json();
 
-        // Filtra os produtos por status
         const pendingProducts = products.filter(p => p.status === 'pendente');
-        const purchasedProducts = products.filter(p => p.status === 'comprado'); // Apenas 'comprado' para o total
-        const historyProducts = products.filter(p => p.status === 'comprado' || p.status === 'descartado'); // 'comprado' e 'descartado' para a lista do histórico
+        const purchasedProducts = products.filter(p => p.status === 'comprado');
+        const historyProducts = products.filter(p => p.status === 'comprado' || p.status === 'descartado');
 
-        // Limpa as listas antes de adicionar os novos cards
         pendingList.innerHTML = '';
         purchasedList.innerHTML = '';
 
-        // --- CÁLCULO E EXIBIÇÃO DO TOTAL DA LISTA DE DESEJOS ---
         const pendingTotal = pendingProducts.reduce((sum, product) => sum + (product.price || 0), 0);
         pendingTotalValueEl.textContent = `R$ ${pendingTotal.toFixed(2).replace('.', ',')}`;
 
-        // --- CÁLCULO E EXIBIÇÃO DO TOTAL GASTO ---
         const purchasedTotal = purchasedProducts.reduce((sum, product) => sum + (product.price || 0), 0);
         purchasedTotalValueEl.textContent = `R$ ${purchasedTotal.toFixed(2).replace('.', ',')}`;
 
@@ -618,8 +615,14 @@ const fetchAndRenderProducts = async () => {
             pendingProducts.forEach(product => {
                 const card = createProductCard(product);
                 pendingList.appendChild(card);
-                // ✨ PASSO 3.1: INICIALIZE O EFEITO AQUI ✨
-                VanillaTilt.init(card, { max: 15, speed: 300, glare: true, "max-glare": 0.5 });
+                
+                // ✨ MUDANÇA IMPORTANTE AQUI ✨
+                // Verifica se a biblioteca VanillaTilt foi carregada antes de usá-la
+                if (typeof VanillaTilt !== 'undefined') {
+                    VanillaTilt.init(card, { max: 15, speed: 300, glare: true, "max-glare": 0.5 });
+                } else {
+                    console.error('A biblioteca VanillaTilt não foi carregada a tempo.');
+                }
             });
         }
         
@@ -631,16 +634,21 @@ const fetchAndRenderProducts = async () => {
             historyProducts.forEach(product => {
                 const card = createProductCard(product);
                 purchasedList.appendChild(card);
-                // ✨ PASSO 3.2: INICIALIZE O EFEITO AQUI TAMBÉM ✨
-                VanillaTilt.init(card, { max: 15, speed: 300, glare: true, "max-glare": 0.5 });
+                
+                // ✨ MUDANÇA IMPORTANTE AQUI TAMBÉM ✨
+                if (typeof VanillaTilt !== 'undefined') {
+                    VanillaTilt.init(card, { max: 15, speed: 300, glare: true, "max-glare": 0.5 });
+                } else {
+                    console.error('A biblioteca VanillaTilt não foi carregada a tempo.');
+                }
             });
         }
 
     } catch (error) {
+        // Agora o erro virá do nosso console.error, ou de outra parte do código
         console.error("Erro em fetchAndRenderProducts:", error);
     }
 };
-
 
     // Coloque isso no seu arquivo JavaScript principal (ex: renderer.js)
 const setAppHeight = () => {
