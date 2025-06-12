@@ -344,7 +344,7 @@ button:active, .primary-btn:active, .auth-submit-btn:active { transform: transla
   box-shadow: var(--element-shadow-on-light-bg);
   
   /* Mantenha a transição, mas aplique a transformação aqui */
-  transition: transform 0.1s ease, box-shadow 0.2s ease;
+  transition: transform 0.7s ease, box-shadow 0.6s ease;
   transform-style: preserve-3d; /* Essencial para o efeito 3D */
   transform: perspective(600px); /* Adiciona perspectiva */
 
