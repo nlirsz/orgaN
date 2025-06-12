@@ -353,7 +353,7 @@ button:active, .primary-btn:active, .auth-submit-btn:active { transform: transla
 
 .product-card:hover {
   /* Removemos o transform daqui para o JS controlar */
-  box-shadow: var(--element-hover-shadow-on-light-bg);
+  box-shadow: #119423 0px 8px 18px rgba(0, 0, 0, 0.2);
   cursor: pointer;
 }
 
