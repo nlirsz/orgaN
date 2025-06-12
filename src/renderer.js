@@ -619,7 +619,7 @@ const fetchAndRenderProducts = async () => {
                 // ✨ MUDANÇA IMPORTANTE AQUI ✨
                 // Verifica se a biblioteca VanillaTilt foi carregada antes de usá-la
                 if (typeof VanillaTilt !== 'undefined') {
-                    VanillaTilt.init(card, { max: 15, speed: 300, glare: true, "max-glare": 0.5 });
+                    VanillaTilt.init(card, { max: 12, speed: 100, glare: true, "max-glare": 0.3 });
                 } else {
                     console.error('A biblioteca VanillaTilt não foi carregada a tempo.');
                 }
