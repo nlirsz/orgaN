@@ -680,7 +680,7 @@ productUrlInput-add-tab {
     border-radius: 6px;
     background-color: var(--bg-element-light);
     box-shadow: #000000 0px 2px 4px rgba(0, 0, 0, 0.1);
-    
+    outline: none; /* Remove o contorno padrão */
     color: #121212;
     font-size: 0.95em;
     transition: border-color 0.2s, box-shadow 0.2s;
@@ -1230,4 +1230,18 @@ width: 100%;
         align-items: center;
         height: 100vh; /* Garante que a seção de autenticação ocupa toda a tela */
     }
+    .productUrlInput-products-tab,
+productUrlInput-add-tab {
+    width: 100%;
+    border-radius: 6px;
+    background-color: var(--bg-element-light);
+    box-shadow: #000000 0px 2px 4px rgba(0, 0, 0, 0.1);
+    
+    color: #121212;
+    font-size: 0.95em;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    padding: 10px; /* Padding para o input */
+    box-sizing: border-box; /* Garante que o padding não afete a largura total */
+    outline: none; /* Remove o contorno padrão */
+}
 }
