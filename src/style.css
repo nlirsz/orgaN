@@ -359,7 +359,7 @@ button:active, .primary-btn:active, .auth-submit-btn:active { transform: transla
 
 .card-image-container { width: 100%; height: 180px; background-color: #FFFFFF; border-radius: 12px 12px 0 0; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 10px; cursor: pointer; }
 .card-image { max-width: 100%; max-height: 100%; border-radius: 6px; object-fit: contain; cursor: pointer; }
-.card-content { padding: 15px; background-color: #121212; border-radius: 12px 12px 0 0; flex-grow: 1; display: flex; flex-direction: column; text-align: center; z-index: 2; position: relative; }
+.card-content { padding: 15px; background-color: #121212; border-radius: 12px 12px 0 0; flex-grow: 1; display: flex; flex-direction: column; text-align: center; }
 .card-title { font-family: 'Almarai', sans-serif; font-size: 1.1em; font-weight: 700; color: var(--text-on-dark-bg); margin-bottom: 8px; line-height: 1.4; min-height: 2.8em; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; cursor: pointer; z-index: 2; position: relative; }
 .card-price { z-index: 2; position: relative; font-size: 1.8em; font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: var(--text-on-dark-bg); margin-top: auto; margin-bottom: 15px; }
 .card-actions { z-index: 2; position: relative; padding: 10px 15px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--border-color); background-color: #121212; }
