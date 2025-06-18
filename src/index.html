@@ -7,8 +7,8 @@
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://www.google.com https://www.gstatic.com https://unpkg.com;" />    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="/style.css">
     <link rel="icon" href="/logo.ico">
-    <!-- Removido 'async defer' para garantir que possamos chamar a função de renderização -->
-    <script src="https://www.google.com/recaptcha/api.js?onload=renderRecaptchas&render=explicit" async defer></script>
+    <!-- ALTERADO: O nome da função de callback foi atualizado -->
+    <script src="https://www.google.com/recaptcha/api.js?onload=renderRegistrationRecaptcha&render=explicit" async defer></script>
 </head>
 <body>
     
@@ -34,10 +34,7 @@
                         <input type="checkbox" id="remember-me-checkbox">
                         <label for="remember-me-checkbox">Lembrar de mim</label>
                     </div>
-                    <!-- NOVO: Container do reCAPTCHA para o login -->
-                    <div class="form-group">
-                        <div id="recaptcha-login-container"></div>
-                    </div>
+                    <!-- REMOVIDO: Container do reCAPTCHA do login foi retirado -->
                     <button type="submit" class="auth-submit-btn primary-btn">Entrar</button>
                     <p class="auth-message" id="login-message"></p>
                 </form>
@@ -66,7 +63,7 @@
                             Mínimo 8 caracteres, incluindo maiúscula, minúscula, número e caractere especial (ex: !@#$%^&*).
                         </small>
                     </div>
-                    <!-- ALTERADO: Removido data-sitekey e adicionado ID -->
+                    <!-- MANTIDO: Container do reCAPTCHA para o registro -->
                     <div class="form-group">
                          <div id="recaptcha-register-container"></div>
                     </div>

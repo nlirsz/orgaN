@@ -1,23 +1,11 @@
-// Adiciona as variáveis para os IDs dos widgets do reCAPTCHA no topo do arquivo
-let recaptchaLoginWidgetId = null;
+// --- CONFIGURAÇÃO DO RECAPTCHA ---
 let recaptchaRegisterWidgetId = null;
 const RECAPTCHA_SITE_KEY = '6Lfin1MrAAAAAKoExa3uVksnMFHyJasKJbj8htsA'; // Sua Site Key
 
-// Função para renderizar os reCAPTCHAs explicitamente
-// Esta função será chamada pelo callback 'onload' da API do Google
-window.renderRecaptchas = () => {
-    console.log('API do reCAPTCHA carregada, renderizando widgets...');
+// Função para renderizar o reCAPTCHA de registro. Chamada pelo 'onload' da API do Google.
+window.renderRegistrationRecaptcha = () => {
+    console.log('API do reCAPTCHA carregada, renderizando widget de registro...');
     
-    // Renderiza o reCAPTCHA de Login
-    const loginContainer = document.getElementById('recaptcha-login-container');
-    if (loginContainer && recaptchaLoginWidgetId === null) {
-        recaptchaLoginWidgetId = grecaptcha.render('recaptcha-login-container', {
-            'sitekey' : RECAPTCHA_SITE_KEY
-        });
-        console.log('Widget reCAPTCHA de Login renderizado com ID:', recaptchaLoginWidgetId);
-    }
-
-    // Renderiza o reCAPTCHA de Registro
     const registerContainer = document.getElementById('recaptcha-register-container');
     if (registerContainer && recaptchaRegisterWidgetId === null) {
         recaptchaRegisterWidgetId = grecaptcha.render('recaptcha-register-container', {
@@ -31,226 +19,208 @@ window.renderRecaptchas = () => {
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- VARIÁVEIS GLOBAIS E CONFIGURAÇÃO ---
-    const API_BASE_URL = '/api';  //
-    let currentUserId = null; //
-    let authToken = null; //
-    let scrapedProductData = null; //
-    let financeChartInstance = null; //
-    let financeOverviewChart = null; //
-    let categoryDistributionChart = null; //
-    let editingFinanceId = null; //
+    const API_BASE_URL = '/api';
+    let currentUserId = null;
+    let authToken = null;
+    let scrapedProductData = null;
+    let financeChartInstance = null;
+    let financeOverviewChart = null;
+    let categoryDistributionChart = null;
+    let editingFinanceId = null;
 
     // --- SELETORES DE ELEMENTOS ---
-    const getElem = (id) => document.getElementById(id); //
+    const getElem = (id) => document.getElementById(id);
 
     // Seção de Autenticação
-    const authSection = getElem('auth-section'); //
-    const dashboardLayout = document.querySelector('.dashboard-layout'); //
-    const authTabButtons = document.querySelectorAll('.auth-tab-btn'); //
-    const authTabContents = document.querySelectorAll('.auth-tab-content'); //
-    const loginForm = getElem('login-form'); //
-    const registerForm = getElem('register-form'); //
-    const loginUsernameInput = getElem('login-username'); //
-    const loginPasswordInput = getElem('login-password'); //
-    const registerUsernameInput = getElem('register-username'); //
-    const registerPasswordInput = getElem('register-password'); //
-    const loginMessage = getElem('login-message'); //
-    const registerMessage = getElem('register-message'); //
-    const logoutBtn = getElem('logout-btn'); //
-    const rememberMeCheckbox = getElem('remember-me-checkbox'); //
-
-    // --- NOVO: Seletor para feedback de força da senha ---
-    const passwordStrengthIndicator = getElem('password-strength-indicator'); // Crie um <div id="password-strength-indicator"></div> no seu HTML abaixo do input de senha do registro
-
-    // ... (outros seletores permanecem os mesmos) ...
-    const loadingOverlay = getElem('loading-overlay'); //
-    const sidebar = document.querySelector('.sidebar'); //
-    const tabButtons = document.querySelectorAll('.nav-btn'); //
-    const tabContents = document.querySelectorAll('.tab-content'); //
-    const productsTab = getElem('products-tab'); //
-    const pendingList = getElem('pending-products-list'); //
-    const purchasedList = getElem('purchased-products-list'); //
-    const goToAddProductTabBtn = getElem('go-to-add-product-tab-btn'); //
-    const addProductTab = getElem('add-product-tab'); //
-    const productUrlInputAddTab = getElem('productUrlInput-add-tab'); //
-    const verifyUrlBtnAddTab = getElem('verifyUrlBtn-add-tab'); //
-    const verifiedProductInfoDivAddTab = getElem('verifiedProductInfo-add-tab'); //
-    const addProductMessageAddTab = getElem('add-product-message-add-tab'); //
-    const saveProductBtnAddTab = getElem('save-product-btn-add-tab'); //
-    const manualProductNameInput = getElem('manual-product-name'); //
-    const manualProductPriceInput = getElem('manual-product-price'); //
-    const manualProductUrlInput = getElem('manual-product-url'); //
-    const manualProductImageUrlInput = getElem('manual-product-image-url'); //
-    const manualProductCategorySelect = getElem('manual-product-category'); //
-    const manualProductBrandInput = getElem('manual-product-brand'); //
-    const manualProductDescriptionTextarea = getElem('manual-product-description'); //
-    const productUrlInputProductsTab = getElem('productUrlInput-products-tab'); //
-    const verifyUrlBtnProductsTab = getElem('verifyUrlBtn-products-tab'); //
-    const verifiedProductInfoDivProductsTab = getElem('verifiedProductInfo-products-tab'); //
-    const addProductMessageProductsTab = getElem('add-product-message-products-tab'); //
-    const saveProductBtnProductsTab = getElem('save-product-btn-products-tab'); //
-    const financeMonthInput = getElem('financeMonth'); //
-    const financeRevenueInput = getElem('financeRevenue'); //
-    const financeExpensesInput = getElem('financeExpenses'); //
-    const addFinanceEntryBtn = getElem('add-finance-entry-btn'); //
-    const cancelFinanceEditBtn = getElem('cancel-finance-edit-btn'); //
-    const financeList = getElem('finance-list'); //
-    const totalBalanceElem = getElem('finance-total-balance'); //
-    const financeChartCanvas = getElem('financialLineChart'); //
-    const financeEntryMessage = getElem('finance-entry-message'); //
-    const financeFormContainer = document.querySelector('.finance-form-container');  //
-    const financeOverviewChartCanvasEl = getElem('financeOverviewChart'); //
-    const categoryDistributionChartCanvasEl = getElem('categoryDistributionChart'); //
-    const detailsModal = getElem('product-details-modal'); //
-    const modalProductImage = getElem('modal-product-image'); //
-    const modalProductName = getElem('modal-product-name'); //
-    const modalProductPrice = getElem('modal-product-price'); //
-    const modalProductStatus = getElem('modal-product-status'); //
-    const modalProductCategory = getElem('modal-product-category'); //
-    const modalProductBrand = getElem('modal-product-brand'); //
-    const modalProductAddedDate = getElem('modal-product-addedDate'); //
-    const modalProductDescription = getElem('modal-product-description'); //
-    const modalProductTags = getElem('modal-product-tags'); //
-    const modalProductPriority = getElem('modal-product-priority'); //
-    const modalProductNotes = getElem('modal-product-notes'); //
-    const modalProductLink = getElem('modal-product-link'); //
-    const modalActionPurchaseBtn = getElem('modal-action-purchase'); //
-    const modalActionEditBtn = getElem('modal-action-edit'); //
-    const modalActionDeleteBtn = getElem('modal-action-delete'); //
-    const editModal = getElem('edit-product-modal'); //
-    const editForm = getElem('edit-product-form'); //
-    const editProductIdInput = getElem('edit-product-id'); //
-    const editProductNameInput = getElem('edit-product-name'); //
-    const editProductPriceInput = getElem('edit-product-price'); //
-    const editProductUrlInput = getElem('edit-product-url'); //
-    const editProductImageUrlInput = getElem('edit-product-image-url'); //
-    const editProductCategorySelect = getElem('edit-product-category'); //
-    const editProductStatusSelect = getElem('edit-product-status'); //
-    const editProductTagsInput = getElem('edit-product-tags'); //
-    const editProductDescriptionTextarea = getElem('edit-product-description'); //
-    const editProductPreviewImage = getElem('edit-product-preview-image'); //
-    const editProductPrioritySelect = getElem('edit-product-priority'); //
-    const editProductNotesTextarea = getElem('edit-product-notes'); //
-    const editProductMessage = getElem('edit-product-message'); //
-    const imageModal = getElem('image-modal'); //
-    const modalImageContent = getElem('modal-image-content'); //
+    const authSection = getElem('auth-section');
+    const dashboardLayout = document.querySelector('.dashboard-layout');
+    const authTabButtons = document.querySelectorAll('.auth-tab-btn');
+    const authTabContents = document.querySelectorAll('.auth-tab-content');
+    const loginForm = getElem('login-form');
+    const registerForm = getElem('register-form');
+    const loginUsernameInput = getElem('login-username');
+    const loginPasswordInput = getElem('login-password');
+    const registerUsernameInput = getElem('register-username');
+    const registerPasswordInput = getElem('register-password');
+    const loginMessage = getElem('login-message');
+    const registerMessage = getElem('register-message');
+    const logoutBtn = getElem('logout-btn');
+    const rememberMeCheckbox = getElem('remember-me-checkbox');
+    const passwordStrengthIndicator = getElem('password-strength-indicator');
+    const loadingOverlay = getElem('loading-overlay');
+    const sidebar = document.querySelector('.sidebar');
+    const tabButtons = document.querySelectorAll('.nav-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+    const pendingList = getElem('pending-products-list');
+    const purchasedList = getElem('purchased-products-list');
+    const productUrlInputAddTab = getElem('productUrlInput-add-tab');
+    const verifyUrlBtnAddTab = getElem('verifyUrlBtn-add-tab');
+    const verifiedProductInfoDivAddTab = getElem('verifiedProductInfo-add-tab');
+    const addProductMessageAddTab = getElem('add-product-message-add-tab');
+    const saveProductBtnAddTab = getElem('save-product-btn-add-tab');
+    const manualProductNameInput = getElem('manual-product-name');
+    const manualProductPriceInput = getElem('manual-product-price');
+    const manualProductUrlInput = getElem('manual-product-url');
+    const manualProductImageUrlInput = getElem('manual-product-image-url');
+    const manualProductCategorySelect = getElem('manual-product-category');
+    const manualProductBrandInput = getElem('manual-product-brand');
+    const manualProductDescriptionTextarea = getElem('manual-product-description');
+    const productUrlInputProductsTab = getElem('productUrlInput-products-tab');
+    const verifyUrlBtnProductsTab = getElem('verifyUrlBtn-products-tab');
+    const verifiedProductInfoDivProductsTab = getElem('verifiedProductInfo-products-tab');
+    const addProductMessageProductsTab = getElem('add-product-message-products-tab');
+    const saveProductBtnProductsTab = getElem('save-product-btn-products-tab');
+    const financeMonthInput = getElem('financeMonth');
+    const financeRevenueInput = getElem('financeRevenue');
+    const financeExpensesInput = getElem('financeExpenses');
+    const addFinanceEntryBtn = getElem('add-finance-entry-btn');
+    const cancelFinanceEditBtn = getElem('cancel-finance-edit-btn');
+    const financeList = getElem('finance-list');
+    const totalBalanceElem = getElem('finance-total-balance');
+    const financeChartCanvas = getElem('financialLineChart');
+    const financeEntryMessage = getElem('finance-entry-message');
+    const financeFormContainer = document.querySelector('.finance-form-container');
+    const financeOverviewChartCanvasEl = getElem('financeOverviewChart');
+    const categoryDistributionChartCanvasEl = getElem('categoryDistributionChart');
+    const detailsModal = getElem('product-details-modal');
+    const modalProductImage = getElem('modal-product-image');
+    const modalProductName = getElem('modal-product-name');
+    const modalProductPrice = getElem('modal-product-price');
+    const modalProductStatus = getElem('modal-product-status');
+    const modalProductCategory = getElem('modal-product-category');
+    const modalProductBrand = getElem('modal-product-brand');
+    const modalProductAddedDate = getElem('modal-product-addedDate');
+    const modalProductDescription = getElem('modal-product-description');
+    const modalProductTags = getElem('modal-product-tags');
+    const modalProductPriority = getElem('modal-product-priority');
+    const modalProductNotes = getElem('modal-product-notes');
+    const modalProductLink = getElem('modal-product-link');
+    const modalActionPurchaseBtn = getElem('modal-action-purchase');
+    const modalActionEditBtn = getElem('modal-action-edit');
+    const modalActionDeleteBtn = getElem('modal-action-delete');
+    const editModal = getElem('edit-product-modal');
+    const editForm = getElem('edit-product-form');
+    const editProductIdInput = getElem('edit-product-id');
+    const editProductNameInput = getElem('edit-product-name');
+    const editProductPriceInput = getElem('edit-product-price');
+    const editProductUrlInput = getElem('edit-product-url');
+    const editProductImageUrlInput = getElem('edit-product-image-url');
+    const editProductCategorySelect = getElem('edit-product-category');
+    const editProductStatusSelect = getElem('edit-product-status');
+    const editProductTagsInput = getElem('edit-product-tags');
+    const editProductDescriptionTextarea = getElem('edit-product-description');
+    const editProductPreviewImage = getElem('edit-product-preview-image');
+    const editProductPrioritySelect = getElem('edit-product-priority');
+    const editProductNotesTextarea = getElem('edit-product-notes');
+    const editProductMessage = getElem('edit-product-message');
+    const imageModal = getElem('image-modal');
+    const modalImageContent = getElem('modal-image-content');
     const pendingTotalValueEl = getElem('pending-total-value');
     const purchasedTotalValueEl = getElem('purchased-total-value');
     const pendingEmptyState = getElem('pending-empty-state');
     const purchasedEmptyState = getElem('purchased-empty-state');
     const goToBtnFromEmpty = getElem('go-to-add-product-tab-btn-from-empty');
-    // No topo de renderer.js, na seção de seletores
-// ...
-    // ...
-
-
     const changePasswordForm = getElem('change-password-form');
     const currentPasswordInput = getElem('current-password');
     const newPasswordInput = getElem('new-password');
     const confirmNewPasswordInput = getElem('confirm-new-password');
     const changePasswordMessage = getElem('change-password-message');
-    const financeEmptyState = getElem('finance-empty-state'); // <-- ADICIONE ESTA LINHA
-
+    const financeEmptyState = getElem('finance-empty-state');
 
     // --- FUNÇÕES DE UTILIDADE ---
-    // ... (authenticatedFetch, showAuthMessage, showTabMessage, showModal, hideModalWithDelay, showAuthSection, showDashboard permanecem as mesmas) ...
-
-    async function authenticatedFetch(url, options = {}) { //
-        if (!authToken) { //
-            console.error("Token de autenticação não disponível. Redirecionando para login."); //
-            showAuthSection(); //
-            throw new Error("Não autenticado."); //
+    async function authenticatedFetch(url, options = {}) {
+        if (!authToken) {
+            console.error("Token de autenticação não disponível. Redirecionando para login.");
+            showAuthSection();
+            throw new Error("Não autenticado.");
         }
-        const headers = { //
-            'Content-Type': 'application/json', //
-            'x-auth-token': authToken, //
-            ...options.headers, //
+        const headers = {
+            'Content-Type': 'application/json',
+            'x-auth-token': authToken,
+            ...options.headers,
         };
-        const response = await fetch(url, { ...options, headers }); //
+        const response = await fetch(url, { ...options, headers });
 
-        if (response.status === 401 || response.status === 403) { //
-            showAuthMessage(loginMessage, 'Sessão expirada ou não autorizado. Por favor, faça login novamente.', false); //
-            logoutUser(); //
-            throw new Error("Não autorizado ou sessão expirada."); //
+        if (response.status === 401 || response.status === 403) {
+            showAuthMessage(loginMessage, 'Sessão expirada ou não autorizado. Por favor, faça login novamente.', false);
+            logoutUser();
+            throw new Error("Não autorizado ou sessão expirada.");
         }
-        return response; //
+        return response;
     }
 
-    function showAuthMessage(element, message, isSuccess = false) { //
-        if (element) { // Adicionado para segurança
-            element.textContent = message; //
-            element.className = 'auth-message ' + (isSuccess ? 'success' : 'error'); //
-            setTimeout(() => { //
-                element.textContent = ''; //
-                element.className = 'auth-message'; //
-            }, 5000); //
-        }
-    }
-
-    function showTabMessage(element, message, isSuccess = false) { //
-         if (element) { // Adicionado para segurança
-            element.textContent = message; //
-            element.className = 'tab-message ' + (isSuccess ? 'success' : 'error'); //
-            setTimeout(() => { //
-                element.textContent = ''; //
-                element.className = 'tab-message'; //
-            }, 5000); //
+    function showAuthMessage(element, message, isSuccess = false) {
+        if (element) {
+            element.textContent = message;
+            element.className = 'auth-message ' + (isSuccess ? 'success' : 'error');
+            setTimeout(() => {
+                element.textContent = '';
+                element.className = 'auth-message';
+            }, 5000);
         }
     }
 
-    function showModal(modalElement) { //
-        if (modalElement) { //
-            modalElement.classList.remove('hidden'); //
-            modalElement.classList.add('active'); //
+    function showTabMessage(element, message, isSuccess = false) {
+         if (element) {
+            element.textContent = message;
+            element.className = 'tab-message ' + (isSuccess ? 'success' : 'error');
+            setTimeout(() => {
+                element.textContent = '';
+                element.className = 'tab-message';
+            }, 5000);
         }
     }
 
-    function hideModalWithDelay(modalElement, messageElement = null) { //
-        if (modalElement) { //
-            modalElement.classList.remove('active'); //
-            setTimeout(() => { //
-                modalElement.classList.add('hidden'); //
-                if (messageElement) messageElement.textContent = ''; //
-            }, 300); //
+    function showModal(modalElement) {
+        if (modalElement) {
+            modalElement.classList.remove('hidden');
+            modalElement.classList.add('active');
         }
     }
 
-    function showAuthSection() { //
-        if(authSection) authSection.classList.remove('hidden'); //
-        if(dashboardLayout) dashboardLayout.classList.add('hidden'); //
-        if(loadingOverlay) loadingOverlay.classList.add('hidden'); //
-
-        currentUserId = null; //
-        authToken = null; //
-        localStorage.removeItem('authToken'); //
-        localStorage.removeItem('userId'); //
-
-        if(loginUsernameInput) loginUsernameInput.value = ''; //
-        if(loginPasswordInput) loginPasswordInput.value = ''; //
-        if(registerUsernameInput) registerUsernameInput.value = ''; //
-        if(registerPasswordInput) registerPasswordInput.value = ''; //
-
-        if(authTabButtons) authTabButtons.forEach(btn => btn.classList.remove('active')); //
-        const loginTabBtn = document.querySelector('[data-auth-tab="login"]'); //
-        if(loginTabBtn) loginTabBtn.classList.add('active'); //
-
-        if(authTabContents) authTabContents.forEach(tabContent => tabContent.classList.remove('active')); //
-        const loginTabContent = getElem('login-tab-content'); //
-        if(loginTabContent) loginTabContent.classList.add('active'); //
-
-        if(loginMessage) loginMessage.textContent = ''; //
-        if(registerMessage) registerMessage.textContent = ''; //
-            if(loadingOverlay) loadingOverlay.classList.add('hidden'); // Esconde a tela de carregamento
-
+    function hideModalWithDelay(modalElement, messageElement = null) {
+        if (modalElement) {
+            modalElement.classList.remove('active');
+            setTimeout(() => {
+                modalElement.classList.add('hidden');
+                if (messageElement) messageElement.textContent = '';
+            }, 300);
+        }
     }
-    const togglePasswordVisibilityBtn = getElem('toggle-password-visibility'); //
-    // registerPasswordInput já foi definido anteriormente
 
-    if (togglePasswordVisibilityBtn && registerPasswordInput) { //
+    function showAuthSection() {
+        if(authSection) authSection.classList.remove('hidden');
+        if(dashboardLayout) dashboardLayout.classList.add('hidden');
+        if(loadingOverlay) loadingOverlay.classList.add('hidden');
+
+        currentUserId = null;
+        authToken = null;
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('userId');
+
+        if(loginUsernameInput) loginUsernameInput.value = '';
+        if(loginPasswordInput) loginPasswordInput.value = '';
+        if(registerUsernameInput) registerUsernameInput.value = '';
+        if(registerPasswordInput) registerPasswordInput.value = '';
+
+        if(authTabButtons) authTabButtons.forEach(btn => btn.classList.remove('active'));
+        const loginTabBtn = document.querySelector('[data-auth-tab="login"]');
+        if(loginTabBtn) loginTabBtn.classList.add('active');
+
+        if(authTabContents) authTabContents.forEach(tabContent => tabContent.classList.remove('active'));
+        const loginTabContent = getElem('login-tab-content');
+        if(loginTabContent) loginTabContent.classList.add('active');
+
+        if(loginMessage) loginMessage.textContent = '';
+        if(registerMessage) registerMessage.textContent = '';
+        if(loadingOverlay) loadingOverlay.classList.add('hidden');
+    }
+    const togglePasswordVisibilityBtn = getElem('toggle-password-visibility');
+
+    if (togglePasswordVisibilityBtn && registerPasswordInput) {
         togglePasswordVisibilityBtn.addEventListener('click', () => {
             const type = registerPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
             registerPasswordInput.setAttribute('type', type);
-            // Altera o ícone do botão
             const icon = togglePasswordVisibilityBtn.querySelector('i');
             if (icon) {
                 icon.classList.toggle('fa-eye');
@@ -259,60 +229,48 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    async function showDashboard() {
+        if (authSection) authSection.classList.add('hidden');
+        if (dashboardLayout) dashboardLayout.classList.add('hidden'); 
+        if (loadingOverlay) loadingOverlay.classList.remove('hidden');
 
-// Em renderer.js
+        try {
+            await Promise.all([
+                fetchAndRenderDashboardStats(),
+                fetchAndRenderProducts(),
+                fetchAndRenderFinances()
+            ]);
+            document.body.classList.add('app-logged-in');
+            if (dashboardLayout) dashboardLayout.classList.remove('hidden');
 
-async function showDashboard() {
-    // Garante que a tela de auth esteja escondida e o layout do dashboard preparado
-    if (authSection) authSection.classList.add('hidden');
-    if (dashboardLayout) dashboardLayout.classList.add('hidden'); // Mantém escondido até os dados carregarem
-    
-    // Mostra a nova tela de carregamento com a logo
-    if (loadingOverlay) loadingOverlay.classList.remove('hidden');
-
-    try {
-        // Usa Promise.all para buscar todos os dados iniciais em paralelo, melhorando a performance
-        await Promise.all([
-            fetchAndRenderDashboardStats(),
-            fetchAndRenderProducts(),
-            fetchAndRenderFinances()
-        ]);
-
-        // Após todos os dados carregarem com sucesso, mostra o dashboard
-        document.body.classList.add('app-logged-in'); // Adiciona a classe para controle de layout
-        if (dashboardLayout) dashboardLayout.classList.remove('hidden');
-
-    } catch (error) {
-        console.error("Erro ao carregar dados iniciais do dashboard:", error);
-        showAuthMessage(loginMessage, 'Erro ao carregar dados. Tente fazer login novamente.', false);
-        logoutUser(); // Desloga o usuário se houver erro crítico
-    } finally {
-        // No final, independente de sucesso ou falha, esconde a tela de carregamento
-        if (loadingOverlay) loadingOverlay.classList.add('hidden');
+        } catch (error) {
+            console.error("Erro ao carregar dados iniciais do dashboard:", error);
+            showAuthMessage(loginMessage, 'Erro ao carregar dados. Tente fazer login novamente.', false);
+            logoutUser();
+        } finally {
+            if (loadingOverlay) loadingOverlay.classList.add('hidden');
+        }
     }
-}
-
 
     // --- LÓGICA DE AUTENTICAÇÃO ---
-    if (authTabButtons) authTabButtons.forEach(button => { //
-        button.addEventListener('click', () => { //
-            authTabButtons.forEach(btn => btn.classList.remove('active')); //
-            button.classList.add('active'); //
+    if (authTabButtons) authTabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            authTabButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
 
-            authTabContents.forEach(tabContent => tabContent.classList.remove('active')); //
-            const tabContentElement = getElem(`${button.dataset.authTab}-tab-content`); //
-            if (tabContentElement) tabContentElement.classList.add('active'); //
+            authTabContents.forEach(tabContent => tabContent.classList.remove('active'));
+            const tabContentElement = getElem(`${button.dataset.authTab}-tab-content`);
+            if (tabContentElement) tabContentElement.classList.add('active');
 
-            if(loginUsernameInput) loginUsernameInput.value = ''; //
-            if(loginPasswordInput) loginPasswordInput.value = ''; //
-            if(registerUsernameInput) registerUsernameInput.value = ''; //
-            if(registerPasswordInput) registerPasswordInput.value = ''; //
-            if(loginMessage) loginMessage.textContent = ''; //
-            if(registerMessage) registerMessage.textContent = ''; //
+            if(loginUsernameInput) loginUsernameInput.value = '';
+            if(loginPasswordInput) loginPasswordInput.value = '';
+            if(registerUsernameInput) registerUsernameInput.value = '';
+            if(registerPasswordInput) registerPasswordInput.value = '';
+            if(loginMessage) loginMessage.textContent = '';
+            if(registerMessage) registerMessage.textContent = '';
         });
     });
 
-    // --- NOVO: Listener para feedback de força de senha ---
     if (registerPasswordInput && passwordStrengthIndicator) {
         registerPasswordInput.addEventListener('input', () => {
             const password = registerPasswordInput.value;
@@ -320,13 +278,12 @@ async function showDashboard() {
             let strengthColor = 'grey';
             let score = 0;
 
-            // Critérios de Exemplo - AJUSTE CONFORME O NECESSÁRIO
             if (password.length >= 8) score++;
-            if (password.length >= 10) score++; // Bônus por comprimento maior
-            if (/[A-Z]/.test(password)) score++; // Letra maiúscula
-            if (/[a-z]/.test(password)) score++; // Letra minúscula
-            if (/[0-9]/.test(password)) score++; // Número
-            if (/[^A-Za-z0-9]/.test(password)) score++; // Caractere especial
+            if (password.length >= 10) score++;
+            if (/[A-Z]/.test(password)) score++;
+            if (/[a-z]/.test(password)) score++;
+            if (/[0-9]/.test(password)) score++;
+            if (/[^A-Za-z0-9]/.test(password)) score++;
 
             switch (score) {
                 case 0: case 1: case 2:
@@ -350,333 +307,258 @@ async function showDashboard() {
         });
     }
 
+    // Formulário de Login (SEM reCAPTCHA)
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = loginUsernameInput.value.trim();
+            const password = loginPasswordInput.value.trim();
 
-// Em renderer.js
-
-if (loginForm) {
-    loginForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const username = loginUsernameInput.value.trim();
-        const password = loginPasswordInput.value.trim();
-        
-        // ALTERADO: Pega a resposta usando o ID do widget de login
-        const recaptchaResponse = (typeof grecaptcha !== 'undefined' && recaptchaLoginWidgetId !== null) 
-            ? grecaptcha.getResponse(recaptchaLoginWidgetId) 
-            : '';
-
-        if (!username || !password) {
-            showAuthMessage(loginMessage, 'Por favor, preencha todos os campos.');
-            return;
-        }
-        
-        if (typeof grecaptcha !== 'undefined' && !recaptchaResponse) {
-            showAuthMessage(loginMessage, 'Por favor, complete o reCAPTCHA.');
-            return;
-        }
-
-        if (loadingOverlay) loadingOverlay.classList.remove('hidden');
-
-        try {
-            const response = await fetch(`${API_BASE_URL}/auth/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password, 'g-recaptcha-response': recaptchaResponse }),
-            });
+            if (!username || !password) {
+                showAuthMessage(loginMessage, 'Por favor, preencha todos os campos.');
+                return;
+            }
             
-            const data = await response.json();
+            if (loadingOverlay) loadingOverlay.classList.remove('hidden');
 
-            if (response.ok) {
-                authToken = data.token;
-                currentUserId = data.userId;
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password }),
+                });
                 
-                if (rememberMeCheckbox && rememberMeCheckbox.checked) {
-                    localStorage.setItem('authToken', authToken);
-                    localStorage.setItem('userId', currentUserId);
+                const data = await response.json();
+
+                if (response.ok) {
+                    authToken = data.token;
+                    currentUserId = data.userId;
+                    
+                    if (rememberMeCheckbox && rememberMeCheckbox.checked) {
+                        localStorage.setItem('authToken', authToken);
+                        localStorage.setItem('userId', currentUserId);
+                    } else {
+                        localStorage.removeItem('authToken');
+                        localStorage.removeItem('userId');
+                    }
+                    
+                    await showDashboard();
+
                 } else {
-                    localStorage.removeItem('authToken');
-                    localStorage.removeItem('userId');
+                    if (loadingOverlay) loadingOverlay.classList.add('hidden');
+                    showAuthMessage(loginMessage, data.message || 'Erro ao fazer login.');
                 }
-                
-                await showDashboard();
-
-            } else {
+            } catch (error) {
                 if (loadingOverlay) loadingOverlay.classList.add('hidden');
-                showAuthMessage(loginMessage, data.message || 'Erro ao fazer login.');
-                // ALTERADO: Reseta usando o ID do widget correto
-                if (typeof grecaptcha !== 'undefined' && recaptchaLoginWidgetId !== null) grecaptcha.reset(recaptchaLoginWidgetId);
+                console.error('Erro de rede ao fazer login:', error);
+                showAuthMessage(loginMessage, 'Erro de conexão com o servidor.');
             }
-        } catch (error) {
-            if (loadingOverlay) loadingOverlay.classList.add('hidden');
-            console.error('Erro de rede ao fazer login:', error);
-            showAuthMessage(loginMessage, 'Erro de conexão com o servidor.');
-             // ALTERADO: Reseta usando o ID do widget correto
-            if (typeof grecaptcha !== 'undefined' && recaptchaLoginWidgetId !== null) grecaptcha.reset(recaptchaLoginWidgetId);
-        }
-    });
-}
+        });
+    }
+    
+    // Formulário de Registro (COM reCAPTCHA)
+    if (registerForm) {
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
 
-if (registerForm) {
-    registerForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
+            const username = registerUsernameInput.value.trim();
+            const password = registerPasswordInput.value.trim();
 
-        const username = registerUsernameInput.value.trim();
-        const password = registerPasswordInput.value.trim();
+            const recaptchaResponse = (typeof grecaptcha !== 'undefined' && recaptchaRegisterWidgetId !== null) 
+                ? grecaptcha.getResponse(recaptchaRegisterWidgetId) 
+                : '';
 
-        // ALTERADO: Pega a resposta usando o ID do widget de registro
-        const recaptchaResponse = (typeof grecaptcha !== 'undefined' && recaptchaRegisterWidgetId !== null) 
-            ? grecaptcha.getResponse(recaptchaRegisterWidgetId) 
-            : '';
+            if (!username || !password) {
+                showAuthMessage(registerMessage, 'Por favor, preencha todos os campos.');
+                return;
+            }
 
-        if (!username || !password) {
-            showAuthMessage(registerMessage, 'Por favor, preencha todos os campos.');
-            return;
-        }
+            const passwordMinLength = 8;
+            if (password.length < passwordMinLength) {
+                showAuthMessage(registerMessage, `A senha deve ter no mínimo ${passwordMinLength} caracteres.`);
+                return;
+            }
 
-        const passwordMinLength = 8;
-        if (password.length < passwordMinLength) {
-            showAuthMessage(registerMessage, `A senha deve ter no mínimo ${passwordMinLength} caracteres.`);
-            return;
-        }
+            if (typeof grecaptcha !== 'undefined' && !recaptchaResponse) {
+                showAuthMessage(registerMessage, 'Por favor, complete o reCAPTCHA.');
+                return;
+            }
 
-        if (typeof grecaptcha !== 'undefined' && !recaptchaResponse) {
-            showAuthMessage(registerMessage, 'Por favor, complete o reCAPTCHA.');
-            return;
-        }
+            try {
+                const bodyPayload = {
+                    username,
+                    password,
+                    'g-recaptcha-response': recaptchaResponse
+                };
+
+                const response = await fetch(`${API_BASE_URL}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(bodyPayload),
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    registerForm.reset();
+                    if (passwordStrengthIndicator) {
+                        passwordStrengthIndicator.textContent = 'Força: ';
+                        passwordStrengthIndicator.style.color = 'grey';
+                    }
+
+                    showAuthMessage(registerMessage, data.message + ' Redirecionando para o login...', true);
+                    if (typeof grecaptcha !== 'undefined' && recaptchaRegisterWidgetId !== null) grecaptcha.reset(recaptchaRegisterWidgetId);
+
+                    setTimeout(() => {
+                        const loginTabButton = document.querySelector('[data-auth-tab="login"]');
+                        if (loginTabButton) loginTabButton.click();
+                        
+                        if (loginUsernameInput) loginUsernameInput.value = username;
+                        if (loginPasswordInput) loginPasswordInput.focus();
+
+                    }, 2000);
+
+                } else {
+                    showAuthMessage(registerMessage, data.message || 'Ocorreu um erro ao registrar.');
+                    if (typeof grecaptcha !== 'undefined' && recaptchaRegisterWidgetId !== null) grecaptcha.reset(recaptchaRegisterWidgetId);
+                }
+            } catch (error) {
+                console.error('Erro de rede ao registrar:', error);
+                showAuthMessage(registerMessage, 'Não foi possível conectar ao servidor. Tente novamente.');
+                if (typeof grecaptcha !== 'undefined' && recaptchaRegisterWidgetId !== null) grecaptcha.reset(recaptchaRegisterWidgetId);
+            }
+        });
+    }
+    
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', logoutUser);
+    }
+
+    function logoutUser() {
+        authToken = null;
+        currentUserId = null;
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('userId');
+        showAuthSection();
+    }
+
+    // --- LÓGICA DE NAVEGAÇÃO ---
+    if (sidebar && tabButtons.length > 0) {
+        sidebar.addEventListener('click', (e) => {
+            const navBtn = e.target.closest('.nav-btn');
+            if (!navBtn || navBtn.id === 'logout-btn') return;
+            const tabId = navBtn.dataset.tab;
+
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            navBtn.classList.add('active');
+
+            tabContents.forEach(tabContent => {
+                tabContent.classList.toggle('active', tabContent.id === `${tabId}-tab`);
+            });
+
+            if (tabId === 'dashboard-main') fetchAndRenderDashboardStats();
+            if (tabId === 'products' || tabId === 'history') fetchAndRenderProducts();
+            if (tabId === 'finance') fetchAndRenderFinances();
+            if (tabId === 'add-product') clearAddProductFormAddTab();
+        });
+    }
+
+    if (goToBtnFromEmpty) {
+        goToBtnFromEmpty.addEventListener('click', () => {
+            const addProductTabButton = document.querySelector('.nav-btn[data-tab="add-product"]');
+            if (addProductTabButton) addProductTabButton.click();
+        });
+    }
+    
+    // --- LÓGICA DE PRODUTOS ---
+    const createProductCard = (product) => {
+        const card = document.createElement('li');
+        card.className = 'product-card';
+        card.dataset.productId = product._id;
+        card.dataset.productJson = JSON.stringify(product);
+
+        card.setAttribute('data-tilt', '');
+        card.setAttribute('data-tilt-glare', '');
+        
+        card.innerHTML = `
+            <div class="card-image-container">
+                <img src="${product.image || 'https://via.placeholder.com/200x150?text=Indisponível'}" alt="${product.name || 'Produto'}" class="card-image">
+            </div>
+            <div class="card-content">
+                <span class="card-title">${product.name || 'Nome Indisponível'}</span>
+                <span class="card-price">${product.price ? `R$ ${parseFloat(product.price).toFixed(2)}` : 'Preço Indisponível'}</span>
+            </div>
+            <div class="card-actions">
+                ${product.status === 'pendente' ? '<i class="fas fa-check-circle action-purchase" title="Marcar como Comprado"></i>' : ''}
+                <i class="fas fa-edit action-edit" title="Editar"></i>
+                <i class="fab fa-google action-search" title="Pesquisar produto na web"></i>
+                <i class="fas fa-trash-alt action-delete" title="Excluir"></i>
+            </div>
+        `;
+        return card;
+    };
+
+    const fetchAndRenderProducts = async () => {
+        if (!pendingList || !purchasedList || !pendingTotalValueEl || !purchasedTotalValueEl) return;
+        if (!currentUserId) return;
+
+        pendingTotalValueEl.textContent = 'R$ 0,00';
+        purchasedTotalValueEl.textContent = 'R$ 0,00';
 
         try {
-            const bodyPayload = {
-                username,
-                password,
-                'g-recaptcha-response': recaptchaResponse // Envia o token para o backend
-            };
+            const response = await authenticatedFetch(`${API_BASE_URL}/products?userId=${currentUserId}`);
+            if (!response.ok) {
+                 const errorData = await response.json().catch(() => ({ message: response.statusText }));
+                 throw new Error(errorData.message || 'Erro ao buscar produtos');
+            }
+            
+            const products = await response.json();
 
-            const response = await fetch(`${API_BASE_URL}/auth/register`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(bodyPayload),
-            });
+            const pendingProducts = products.filter(p => p.status === 'pendente');
+            const historyProducts = products.filter(p => p.status === 'comprado' || p.status === 'descartado');
 
-            const data = await response.json();
+            pendingList.innerHTML = '';
+            purchasedList.innerHTML = '';
 
-            if (response.ok) {
-                registerForm.reset();
-                if (passwordStrengthIndicator) {
-                    passwordStrengthIndicator.textContent = 'Força: ';
-                    passwordStrengthIndicator.style.color = 'grey';
-                }
+            const pendingTotal = pendingProducts.reduce((sum, product) => sum + (product.price || 0), 0);
+            pendingTotalValueEl.textContent = `R$ ${pendingTotal.toFixed(2).replace('.', ',')}`;
 
-                showAuthMessage(registerMessage, data.message + ' Redirecionando para o login...', true);
-                // ALTERADO: Reseta usando o ID do widget correto
-                if (typeof grecaptcha !== 'undefined' && recaptchaRegisterWidgetId !== null) grecaptcha.reset(recaptchaRegisterWidgetId);
+            const purchasedTotal = products.filter(p => p.status === 'comprado').reduce((sum, product) => sum + (product.price || 0), 0);
+            purchasedTotalValueEl.textContent = `R$ ${purchasedTotal.toFixed(2).replace('.', ',')}`;
 
-                setTimeout(() => {
-                    const loginTabButton = document.querySelector('[data-auth-tab="login"]');
-                    if (loginTabButton) loginTabButton.click();
-                    
-                    if (loginUsernameInput) loginUsernameInput.value = username;
-                    if (loginPasswordInput) loginPasswordInput.focus();
-
-                }, 2000);
-
+            if (pendingProducts.length === 0) {
+                if (pendingEmptyState) pendingEmptyState.style.display = 'block';
             } else {
-                showAuthMessage(registerMessage, data.message || 'Ocorreu um erro ao registrar.');
-                // ALTERADO: Reseta usando o ID do widget correto
-                if (typeof grecaptcha !== 'undefined' && recaptchaRegisterWidgetId !== null) grecaptcha.reset(recaptchaRegisterWidgetId);
+                if (pendingEmptyState) pendingEmptyState.style.display = 'none';
+                pendingProducts.forEach(product => {
+                    const card = createProductCard(product);
+                    pendingList.appendChild(card);
+                    if (typeof VanillaTilt !== 'undefined') {
+                       VanillaTilt.init(card, { max: 15, speed: 300, glare: true, "max-glare": 0.5 });
+                    }
+                });
             }
+            
+            if (historyProducts.length === 0) {
+                if (purchasedEmptyState) purchasedEmptyState.style.display = 'block';
+            } else {
+                if (purchasedEmptyState) purchasedEmptyState.style.display = 'none';
+                historyProducts.forEach(product => {
+                    const card = createProductCard(product);
+                    purchasedList.appendChild(card);
+                    if (typeof VanillaTilt !== 'undefined') {
+                        VanillaTilt.init(card, { max: 15, speed: 300, glare: true, "max-glare": 0.5 });
+                    }
+                });
+            }
+
         } catch (error) {
-            console.error('Erro de rede ao registrar:', error);
-            showAuthMessage(registerMessage, 'Não foi possível conectar ao servidor. Tente novamente.');
-            // ALTERADO: Reseta usando o ID do widget correto
-            if (typeof grecaptcha !== 'undefined' && recaptchaRegisterWidgetId !== null) grecaptcha.reset(recaptchaRegisterWidgetId);
+            console.error("Erro em fetchAndRenderProducts:", error);
+            showTabMessage(addProductMessageAddTab, `Erro ao carregar produtos: ${error.message}`, false);
         }
-    });
-}
+    };
 
-// ... (logoutUser, lógica de navegação, funções de produto, dashboard, finanças, modais permanecem em grande parte as mesmas) ...
-    // A função createProductCard, fetchAndRenderProducts, fetchAndRenderDashboardStats, renderGenericChart, 
-    // fetchAndRenderFinances, clearFinanceForm, setupFinanceEdit, setupScrapeEventListeners,
-    // handleSaveProduct, clearAddProductFormAddTab, clearProductScrapeFormProductsTab,
-    // e todos os event listeners para modais e ações de card devem funcionar como antes.
-
-    // --- FUNÇÃO DE LOGOUT ---
-    if (logoutBtn) { //
-        logoutBtn.addEventListener('click', logoutUser); //
-    }
-
-    function logoutUser() { //
-        authToken = null; //
-        currentUserId = null; //
-        localStorage.removeItem('authToken'); //
-        localStorage.removeItem('userId'); //
-        showAuthSection(); //
-    }
-
-    // --- LÓGICA DE NAVEGAÇÃO (ABAS DO DASHBOARD) ---
-    if (sidebar && tabButtons.length > 0) { //
-        sidebar.addEventListener('click', (e) => { //
-            const navBtn = e.target.closest('.nav-btn'); //
-            if (!navBtn || navBtn.id === 'logout-btn') return; //
-            const tabId = navBtn.dataset.tab; //
-
-            tabButtons.forEach(btn => btn.classList.remove('active')); //
-            navBtn.classList.add('active'); //
-
-            tabContents.forEach(tabContent => { //
-                tabContent.classList.toggle('active', tabContent.id === `${tabId}-tab`); //
-            });
-
-            if (tabId === 'finance') { //
-                fetchAndRenderFinances(); //
-            }
-            if (tabId === 'dashboard-main') { //
-                fetchAndRenderDashboardStats(); //
-            }
-            if (tabId === 'products') { //
-                fetchAndRenderProducts(); //
-                clearProductScrapeFormProductsTab(); //
-            }
-            if (tabId === 'history') { //
-                fetchAndRenderProducts(); //
-            }
-            if (tabId === 'add-product') { //
-                clearAddProductFormAddTab(); //
-            }
-        });
-    }
-
-    if (goToAddProductTabBtn) { //
-        goToAddProductTabBtn.addEventListener('click', () => { //
-            const addProductNavBtn = document.querySelector('.nav-btn[data-tab="add-product"]'); //
-            if (addProductNavBtn) { //
-                addProductNavBtn.click(); //
-            }
-        });
-    }
-
-    // Em renderer.js, após a seção de seletores
-
-if (goToBtnFromEmpty) {
-    goToBtnFromEmpty.addEventListener('click', () => {
-        // Encontra o botão da aba "Adicionar Produto" e simula um clique nele
-        const addProductTabButton = document.querySelector('.nav-btn[data-tab="add-product"]');
-        if (addProductTabButton) {
-            addProductTabButton.click();
-        }
-    });
-}
     
-// Em src/renderer.js
-
-// Em renderer.js
-
-const createProductCard = (product) => {
-    const card = document.createElement('li');
-    card.className = 'product-card';
-    card.dataset.productId = product._id;
-    card.dataset.productJson = JSON.stringify(product);
-
-    // ADICIONE ESTAS 2 LINHAS AQUI
-    card.setAttribute('data-tilt', ''); // Ativa o efeito de inclinação
-    card.setAttribute('data-tilt-glare', ''); // Ativa o efeito de brilho
-    
-    const formattedPrice = `R$ ${parseFloat(product.price || 0).toFixed(2)}`;
-    
-    // O resto da sua função continua igual...
-    card.innerHTML = `
-        <div class="card-image-container">
-            <img src="${product.image || 'https://via.placeholder.com/200x150?text=Indisponível'}" alt="${product.name || 'Produto'}" class="card-image">
-        </div>
-        <div class="card-content">
-            <span class="card-title">${product.name || 'Nome Indisponível'}</span>
-            <span class="card-price">${product.price ? `R$ ${parseFloat(product.price).toFixed(2)}` : 'Preço Indisponível'}</span>
-        </div>
-        <div class="card-actions">
-            ${product.status === 'pendente' ? '<i class="fas fa-check-circle action-purchase" title="Marcar como Comprado"></i>' : ''}
-            <i class="fas fa-edit action-edit" title="Editar"></i>
-            <i class="fab fa-google action-search" title="Pesquisar produto na web"></i>
-            <i class="fas fa-trash-alt action-delete" title="Excluir"></i>
-        </div>
-    `;
-    return card;
-};
-
-
-// Em renderer.js, substitua a função inteira por esta:
-
-// Em renderer.js, substitua sua função fetchAndRenderProducts por esta:
-
-// Em renderer.js, substitua mais uma vez a função fetchAndRenderProducts
-
-const fetchAndRenderProducts = async () => {
-    // A primeira parte da função permanece a mesma...
-    if (!pendingList || !purchasedList || !pendingTotalValueEl || !purchasedTotalValueEl) return;
-    if (!currentUserId) return;
-
-    pendingTotalValueEl.textContent = 'R$ 0,00';
-    purchasedTotalValueEl.textContent = 'R$ 0,00';
-
-    try {
-        const response = await authenticatedFetch(`${API_BASE_URL}/products?userId=${currentUserId}`);
-        if (!response.ok) throw new Error(`Erro ao buscar produtos: ${response.statusText}`);
-        
-        const products = await response.json();
-
-        const pendingProducts = products.filter(p => p.status === 'pendente');
-        const purchasedProducts = products.filter(p => p.status === 'comprado');
-        const historyProducts = products.filter(p => p.status === 'comprado' || p.status === 'descartado');
-
-        pendingList.innerHTML = '';
-        purchasedList.innerHTML = '';
-
-        const pendingTotal = pendingProducts.reduce((sum, product) => sum + (product.price || 0), 0);
-        pendingTotalValueEl.textContent = `R$ ${pendingTotal.toFixed(2).replace('.', ',')}`;
-
-        const purchasedTotal = purchasedProducts.reduce((sum, product) => sum + (product.price || 0), 0);
-        purchasedTotalValueEl.textContent = `R$ ${purchasedTotal.toFixed(2).replace('.', ',')}`;
-
-        // Renderiza a lista de desejos (pendentes)
-        if (pendingProducts.length === 0) {
-            if (pendingEmptyState) pendingEmptyState.style.display = 'block';
-        } else {
-            if (pendingEmptyState) pendingEmptyState.style.display = 'none';
-            pendingProducts.forEach(product => {
-                const card = createProductCard(product);
-                pendingList.appendChild(card);
-                
-                // ✨ MUDANÇA IMPORTANTE AQUI ✨
-                // Verifica se a biblioteca VanillaTilt foi carregada antes de usá-la
-                if (typeof VanillaTilt !== 'undefined') {
-                   v
-                } else {
-                    console.error('A biblioteca VanillaTilt não foi carregada a tempo.');
-                }
-            });
-        }
-        
-        // Renderiza a lista do histórico
-        if (historyProducts.length === 0) {
-            if (purchasedEmptyState) purchasedEmptyState.style.display = 'block';
-        } else {
-            if (purchasedEmptyState) purchasedEmptyState.style.display = 'none';
-            historyProducts.forEach(product => {
-                const card = createProductCard(product);
-                purchasedList.appendChild(card);
-                
-                // ✨ MUDANÇA IMPORTANTE AQUI TAMBÉM ✨
-                if (typeof VanillaTilt !== 'undefined') {
-                    VanillaTilt.init(card, { max: 15, speed: 300, glare: true, "max-glare": 0.5 });
-                } else {
-                    console.error('A biblioteca VanillaTilt não foi carregada a tempo.');
-                }
-            });
-        }
-
-    } catch (error) {
-        // Agora o erro virá do nosso console.error, ou de outra parte do código
-        console.error("Erro em fetchAndRenderProducts:", error);
-    }
-};
-
     // Coloque isso no seu arquivo JavaScript principal (ex: renderer.js)
 const setAppHeight = () => {
   const doc = document.documentElement;
