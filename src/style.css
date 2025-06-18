@@ -41,16 +41,22 @@ body[data-theme="dark"] {
     --text-primary: #e0e0e0;
     --text-secondary: #a3b1c6;
     
-    /* Ajusta as cores padrão do Chart.js para o tema escuro */
     color-scheme: dark;
 }
 
 body[data-theme="dark"] .card-image-container {
-    background-color: #ffffff; /* Fundo da imagem sempre branco */
+    background-color: #ffffff;
 }
 
-body[data-theme="dark"] .auth-tab-btn.active {
-    color: var(--primary-action);
+body[data-theme="dark"] button.primary-btn, 
+body[data-theme="dark"] button.auth-submit-btn, 
+body[data-theme="dark"] #add-finance-entry-btn {
+    box-shadow: 2px 2px 4px #0c6b17, -2px -2px 4px #16c330;
+}
+body[data-theme="dark"] button.primary-btn:active, 
+body[data-theme="dark"] button.auth-submit-btn:active, 
+body[data-theme="dark"] #add-finance-entry-btn:active {
+    box-shadow: inset 2px 2px 4px #0c6b17, inset -2px -2px 4px #16c330;
 }
 
 body[data-theme="dark"] .slider-toggle {
@@ -280,14 +286,14 @@ button:active, .primary-btn:active, .auth-submit-btn:active, #add-finance-entry-
 button.primary-btn, button.auth-submit-btn, #add-finance-entry-btn {
     background-color: var(--primary-action);
     color: var(--highlight-action-text);
-    box-shadow: 4px 4px 6px #0c6b17, -4px -4px 6px #16c330;
+    box-shadow: 2px 2px 4px #0c6b17, -2px -2px 4px #16c330;
 }
 button.primary-btn:hover, button.auth-submit-btn:hover, #add-finance-entry-btn:hover {
     background-color: var(--primary-action-hover);
     color: var(--highlight-action-text);
 }
 button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn:active {
-    box-shadow: inset 4px 4px 6px #0c6b17, inset -4px -4px 6px #16c330;
+    box-shadow: inset 2px 2px 4px #0c6b17, inset -2px -2px 4px #16c330;
 }
 
 
@@ -377,7 +383,16 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
     background-color: #ffffff;
 }
 .card-image { max-width: 100%; max-height: 100%; object-fit: contain; }
-.card-content { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; text-align: center; transform: translateZ(20px); }
+.card-content { 
+    padding: 20px; 
+    flex-grow: 1; 
+    display: flex; 
+    flex-direction: column; 
+    text-align: center; 
+    transform: translateZ(20px); /* Garante que o conteúdo fique acima do brilho */
+    position: relative; /* Necessário para z-index funcionar */
+    z-index: 2; /* Garante que o conteúdo fique acima do brilho */
+}
 .card-title { 
     font-family: 'Almarai', sans-serif; font-size: 1.1em; font-weight: 700; color: var(--text-primary); 
     margin-bottom: 8px; 
@@ -405,9 +420,6 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
 .card-actions i:active { box-shadow: var(--shadow-inset); }
 
 /* === Card Colecionável (Histórico) === */
-#history-tab .product-card {
-    overflow: hidden; /* Garante que o brilho não saia do card */
-}
 #history-tab .product-card .card-price,
 #history-tab .product-card .card-actions {
     display: none; /* Esconde preço e ações */
@@ -415,8 +427,8 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
 #history-tab .product-card .card-content {
     justify-content: center; /* Centraliza o título verticalmente */
 }
-#history-tab .product-card .js-tilt-glare {
-    /* Efeito de brilho dourado */
+/* Estilo para o elemento de brilho injetado pelo tilt.js */
+#history-tab .product-card .js-tilt-glare-inner {
     background: linear-gradient(110deg, 
         rgba(255, 215, 0, 0) 20%, 
         rgba(255, 235, 100, 0.4) 45%, 
@@ -489,6 +501,56 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
     overflow-y: auto;
     width: 50%;
 }
+
+.product-details-modal-content {
+    display: flex;
+    flex-direction: column;
+}
+#modal-product-image-container {
+    width: 100%;
+    max-height: 300px; /* Limite de altura para a imagem */
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    background: var(--c-primary);
+    padding: 10px;
+    border-radius: 15px;
+    box-shadow: var(--shadow-inset);
+}
+#modal-product-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+.modal-product-info {
+    flex-grow: 1;
+    overflow-y: auto; /* Permite scroll se o conteúdo for longo */
+    line-height: 1.7;
+}
+.modal-product-info p {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    padding: 8px 4px;
+}
+body[data-theme="dark"] .modal-product-info p {
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.modal-product-info p strong {
+    color: var(--text-secondary);
+}
+.modal-actions {
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+.modal-actions .modal-action-btn.delete {
+    grid-column: 1 / -1; /* Botão de deletar ocupa a largura toda */
+}
+
 .close-modal-btn {
     color: var(--text-secondary);
     position: absolute;
