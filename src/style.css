@@ -42,18 +42,16 @@ body[data-theme="dark"] {
     --text-primary: #e0e0e0;
     --text-secondary: #a3b1c6;
     
-    color-scheme: dark; 
-}
+    color-scheme: dark; /* Garante que os elementos padrão do navegador (como scrollbars) se adaptem */
 
-/* AJUSTE: Sombras corretas no modo escuro */
-body[data-theme="dark"] {
+    /* AJUSTE: Garante que as sombras usem as variáveis do tema escuro */
     --shadow: 4px 4px 8px var(--c-dark), -4px -4px 8px var(--c-light);
     --shadow-inset: inset 4px 4px 8px var(--c-dark), inset -4px -4px 8px var(--c-light);
     --shadow-inset-light: inset 2px 2px 4px var(--c-dark), inset -2px -2px 4px var(--c-light);
 }
 
 body[data-theme="dark"] .card-image-container {
-    background-color: #ffffff;
+    background-color: #ffffff; /* Fundo da imagem sempre branco, mesmo no modo escuro */
 }
 
 body[data-theme="dark"] button.primary-btn, 
@@ -295,6 +293,9 @@ button:active, .primary-btn:active, .auth-submit-btn:active, #add-finance-entry-
 button.primary-btn, button.auth-submit-btn, #add-finance-entry-btn, a.product-link-btn {
     background-color: var(--primary-action);
     color: var(--highlight-action-text);
+}
+body:not([data-theme="dark"]) button.primary-btn, 
+body:not([data-theme="dark"]) a.product-link-btn {
     box-shadow: 2px 2px 4px #0c6b17, -2px -2px 4px #16c330;
 }
 button.primary-btn:hover, button.auth-submit-btn:hover, #add-finance-entry-btn:hover, a.product-link-btn:hover {
@@ -478,10 +479,11 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
 
 .chart-container {
     position: relative;
-    height: 350px; /* Altura ajustada */
+    height: 350px;
     display: flex;
     flex-direction: column;
-    padding: 25px 25px 40px 25px; /* Adiciona padding inferior para a legenda */
+    padding: 25px 25px 40px 25px; /* Adiciona padding inferior para a legenda caber */
+    color: var(--text-primary); /* Garante que o texto dentro herde a cor correta */
 }
 .chart-container canvas {
     flex-grow: 1;
@@ -526,7 +528,7 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
 }
 #modal-product-image-container {
     width: 100%;
-    max-height: 200px; /* Imagem ainda menor */
+    max-height: 180px; /* Imagem ainda menor */
     flex-shrink: 0;
     display: flex;
     align-items: center;
