@@ -126,6 +126,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const confirmNewPasswordInput = getElem('confirm-new-password');
     const changePasswordMessage = getElem('change-password-message');
     const financeEmptyState = getElem('finance-empty-state');
+    const themeSwitch = document.getElementById('theme-switch');
+
 
     // --- FUNÇÕES DE UTILIDADE ---
     async function authenticatedFetch(url, options = {}) {
@@ -586,6 +588,33 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         return card;
     };
+
+        const applySavedTheme = () => {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            document.body.setAttribute('data-theme', savedTheme);
+            if (themeSwitch) {
+                themeSwitch.checked = savedTheme === 'dark';
+            }
+        }
+    };
+
+    // Adiciona o listener para o evento de clique no botão
+    if (themeSwitch) {
+        themeSwitch.addEventListener('change', () => {
+            if (themeSwitch.checked) {
+                document.body.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.body.setAttribute('data-theme', 'light');
+                localStorage.setItem('theme', 'light');
+            }
+        });
+    }
+
+    // Aplica o tema salvo quando a página carrega
+    applySavedTheme();
+
 
     const fetchAndRenderProducts = async () => {
         if (!pendingList || !purchasedList || !pendingTotalValueEl || !purchasedTotalValueEl) return;
