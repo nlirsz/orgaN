@@ -91,7 +91,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalProductCategory = getElem('modal-product-category');
     const modalProductBrand = getElem('modal-product-brand');
     const modalProductAddedDate = getElem('modal-product-addedDate');
-    const modalProductDescription = getElem('modal-product-description');
     const modalProductTags = getElem('modal-product-tags');
     const modalProductPriority = getElem('modal-product-priority');
     const modalProductNotes = getElem('modal-product-notes');
