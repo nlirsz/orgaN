@@ -1372,7 +1372,7 @@ else if (target.classList.contains('action-search')) {
         // --- Ação: Abrir Modal de Detalhes ---
         else if (card) { // Se o clique foi em qualquer outra parte do card
             e.stopPropagation();
-            const allModalElementsFound = detailsModal && modalProductImage && modalProductName && modalProductPrice && modalProductStatus && modalProductCategory && modalProductBrand && modalProductAddedDate && modalProductDescription && modalProductTags && modalProductLink && modalProductPriority && modalProductNotes;
+            const allModalElementsFound = detailsModal && modalProductImage && modalProductName && modalProductPrice && modalProductStatus && modalProductCategory && modalProductBrand && modalProductAddedDate &&  modalProductTags && modalProductLink && modalProductPriority && modalProductNotes;
 
             if (!allModalElementsFound) {
                 console.error("Um ou mais elementos do modal de detalhes não foram encontrados. Verifique seus IDs no index.html.");
