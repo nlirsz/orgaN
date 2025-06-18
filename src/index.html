@@ -5,9 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>OrgaN</title>
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://www.google.com https://www.gstatic.com https://unpkg.com;" />    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="style.css">
     <link rel="icon" href="/logo.ico">
-    <!-- ALTERADO: O nome da função de callback foi atualizado -->
     <script src="https://www.google.com/recaptcha/api.js?onload=renderRegistrationRecaptcha&render=explicit" async defer></script>
 </head>
 <body>
@@ -34,7 +33,6 @@
                         <input type="checkbox" id="remember-me-checkbox">
                         <label for="remember-me-checkbox">Lembrar de mim</label>
                     </div>
-                    <!-- REMOVIDO: Container do reCAPTCHA do login foi retirado -->
                     <button type="submit" class="auth-submit-btn primary-btn">Entrar</button>
                     <p class="auth-message" id="login-message"></p>
                 </form>
@@ -63,7 +61,6 @@
                             Mínimo 8 caracteres, incluindo maiúscula, minúscula, número e caractere especial (ex: !@#$%^&*).
                         </small>
                     </div>
-                    <!-- MANTIDO: Container do reCAPTCHA para o registro -->
                     <div class="form-group">
                          <div id="recaptcha-register-container"></div>
                     </div>
@@ -75,42 +72,44 @@
     </div>
 
     <div id="loading-overlay" class="loading-overlay">
-    <img src="/logo.png" alt="OrgaN Logo" class="loading-logo">
-    <p class="loading-text">Carregando...</p>
-</div>
+		<div class="loading-logo">
+			<img src="/logo.png" alt="OrgaN Logo">
+		</div>
+		<p class="loading-text">Carregando...</p>
+	</div>
 
     <div class="dashboard-layout hidden">
-<aside class="sidebar">
-    <div class="sidebar-nav-main">
-        <div class="sidebar-header">
-            <img src="/logo.png" alt="Logo" class="logo" />
-        </div>
-        <button class="nav-btn active" data-tab="dashboard-main" title="">
-            <i class="fas fa-tachometer-alt"></i>
-        </button>
-        <button class="nav-btn" data-tab="products" title="">
-            <i class="fas fa-box-open"></i>
-        </button>
-        <button class="nav-btn" data-tab="add-product" title="">
-            <i class="fas fa-plus-circle"></i>
-        </button>
-        <button class="nav-btn" data-tab="history" title="">
-            <i class="fas fa-history"></i>
-        </button>
-        <button class="nav-btn" data-tab="finance" title="">
-            <i class="fas fa-chart-pie"></i>
-        </button>
-    </div>
-    
-    <div class="sidebar-footer">
-        <button class="nav-btn" data-tab="settings" title="Configurações">
-            <i class="fas fa-cog"></i>
-        </button>
-        <button class="nav-btn" id="logout-btn" title="Sair">
-            <i class="fas fa-sign-out-alt"></i>
-        </button>
-    </div>
-</aside>        
+		<aside class="sidebar">
+			<div class="sidebar-nav-main">
+				<div class="sidebar-header">
+					<img src="/logo.png" alt="Logo" class="logo" />
+				</div>
+				<button class="nav-btn active" data-tab="dashboard-main" title="Painel">
+					<i class="fas fa-tachometer-alt"></i>
+				</button>
+				<button class="nav-btn" data-tab="products" title="Produtos">
+					<i class="fas fa-box-open"></i>
+				</button>
+				<button class="nav-btn" data-tab="add-product" title="Adicionar Produto">
+					<i class="fas fa-plus-circle"></i>
+				</button>
+				<button class="nav-btn" data-tab="history" title="Histórico">
+					<i class="fas fa-history"></i>
+				</button>
+				<button class="nav-btn" data-tab="finance" title="Finanças">
+					<i class="fas fa-chart-pie"></i>
+				</button>
+			</div>
+			
+			<div class="sidebar-footer">
+				<button class="nav-btn" data-tab="settings" title="Configurações">
+					<i class="fas fa-cog"></i>
+				</button>
+				<button class="nav-btn" id="logout-btn" title="Sair">
+					<i class="fas fa-sign-out-alt"></i>
+				</button>
+			</div>
+		</aside>        
         <main class="main-content-area">
             <section id="dashboard-main-tab" class="tab-content active">
                 <h2>Painel Principal</h2>
@@ -143,46 +142,47 @@
                     </div>
                 </div>
             </section>
-<section id="products-tab" class="tab-content">
-    <h2></h2>
-    
-    <div class="url-scrape-container" id="scrape-form-products-tab">
-        <input type="url" id="productUrlInput-products-tab" placeholder="Cole a URL para adicionar à lista...">
-        <button id="verifyUrlBtn-products-tab" class="primary-btn">
-            <i class="fas fa-search"></i> Verificar URL
-        </button>
-    </div>
-    <div id="verifiedProductInfo-products-tab" class="hidden verified-product-info-box">
-        <img id="verifiedProductImage-products-tab" src="#" alt="Imagem Verificada">
-        <p><strong>Nome:</strong> <span id="verifiedProductName-products-tab"></span></p>
-        <p><strong>Preço:</strong> <span id="verifiedProductPrice-products-tab"></span></p>
-        <p class="tab-message" id="add-product-message-products-tab"></p>
-        <button id="save-product-btn-products-tab" class="primary-btn" style="display: none;"><i class="fas fa-save"></i> Salvar Produto</button>
-    </div>
+			<section id="products-tab" class="tab-content">
+				<h2>Meus Produtos</h2>
+				
+				<div class="url-scrape-container" id="scrape-form-products-tab">
+					<input type="url" id="productUrlInput-products-tab" placeholder="Cole a URL para adicionar à lista...">
+					<button id="verifyUrlBtn-products-tab" class="primary-btn">
+						<i class="fas fa-search"></i> Verificar URL
+					</button>
+				</div>
+				<div id="verifiedProductInfo-products-tab" class="hidden verified-product-info-box">
+					<img id="verifiedProductImage-products-tab" src="#" alt="Imagem Verificada">
+					<div class="verified-product-text">
+						<p><strong>Nome:</strong> <span id="verifiedProductName-products-tab"></span></p>
+						<p><strong>Preço:</strong> <span id="verifiedProductPrice-products-tab"></span></p>
+					</div>
+					<p class="tab-message" id="add-product-message-products-tab"></p>
+					<button id="save-product-btn-products-tab" class="primary-btn" style="display: none;"><i class="fas fa-save"></i> Salvar Produto</button>
+				</div>
 
-    <div id="products-error-display" class="error-display hidden">
-        <i class="fas fa-exclamation-triangle"></i>
-        <p>Não foi possível carregar seus produtos.</p>
-        <button class="primary-btn">Tentar Novamente</button>
-    </div>
+				<div id="products-error-display" class="error-display hidden">
+					<i class="fas fa-exclamation-triangle"></i>
+					<p>Não foi possível carregar seus produtos.</p>
+					<button class="primary-btn">Tentar Novamente</button>
+				</div>
 
-    <div class="product-list-container">
-        <h3></h3>
-        <div class="list-summary">
-            <span>Total a Gastar:</span>
-            <span id="pending-total-value">R$ 0,00</span>
-        </div>
-        <ul id="pending-products-list" class="product-grid"></ul>
-        <div id="pending-empty-state" class="empty-state-message" style="display: none;">
-             <i class="fas fa-dolly-flatbed fa-3x"></i>
-             <p>Sua lista de desejos está vazia.</p>
-             <button id="go-to-add-product-tab-btn-from-empty" class="primary-btn">Adicionar primeiro item</button>
-        </div>
-    </div>
-</section>
+				<div class="product-list-container">
+					<div class="list-summary">
+						<span>Total a Gastar:</span>
+						<span id="pending-total-value">R$ 0,00</span>
+					</div>
+					<ul id="pending-products-list" class="product-grid"></ul>
+					<div id="pending-empty-state" class="empty-state-message" style="display: none;">
+						 <i class="fas fa-dolly-flatbed fa-3x"></i>
+						 <p>Sua lista de desejos está vazia.</p>
+						 <button id="go-to-add-product-tab-btn-from-empty" class="primary-btn">Adicionar primeiro item</button>
+					</div>
+				</div>
+			</section>
 
             <section id="add-product-tab" class="tab-content">
-                <h2></h2>
+                <h2>Adicionar Novo Produto</h2>
                 
                 <div class="url-scrape-container">
                     <input type="url" id="productUrlInput-add-tab" placeholder="Cole a URL para preencher os dados...">
@@ -191,13 +191,15 @@
                     </button>
                 </div>
                 
-                <div id="verifiedProductInfo-add-tab" class="hidden">
+                <div id="verifiedProductInfo-add-tab" class="hidden verified-product-info-box">
                     <img id="verifiedProductImage-add-tab" src="#" alt="Imagem Verificada">
-                    <p><strong>Nome:</strong> <span id="verifiedProductName-add-tab"></span></p>
-                    <p><strong>Preço:</strong> <span id="verifiedProductPrice-add-tab"></span></p>
+					<div class="verified-product-text">
+						<p><strong>Nome:</strong> <span id="verifiedProductName-add-tab"></span></p>
+						<p><strong>Preço:</strong> <span id="verifiedProductPrice-add-tab"></span></p>
+					</div>
                 </div>
 
-                <p class="form-section-title"></p>
+                <p class="form-section-title">Ou adicione manualmente</p>
                 
                 <div class="form-container add-product-form-container">
                     <div class="form-group">
@@ -248,23 +250,23 @@
             </section>
 
             <section id="history-tab" class="tab-content">
-                <h2></h2>
+                <h2>Histórico de Compras</h2>
                 <div class="product-list-container">
-    <h3></h3> <div class="list-summary">
-        <span>Total Gasto (Comprados):</span>
-        <span id="purchased-total-value">R$ 0,00</span>
-    </div>
+					<div class="list-summary">
+						<span>Total Gasto (Comprados):</span>
+						<span id="purchased-total-value">R$ 0,00</span>
+					</div>
 
-    <ul id="purchased-products-list" class="product-grid"></ul>
-                     <div id="purchased-empty-state" class="empty-state-message" style="display: none; text-align: center; padding: 40px; color: #6c757d;">
-                        <i class="fas fa-receipt fa-3x" style="margin-bottom: 15px;"></i>
-                        <p>Você ainda não marcou nenhum produto como comprado.</p>
-                    </div>
+					<ul id="purchased-products-list" class="product-grid"></ul>
+					<div id="purchased-empty-state" class="empty-state-message" style="display: none; text-align: center; padding: 40px; color: #6c757d;">
+						<i class="fas fa-receipt fa-3x" style="margin-bottom: 15px;"></i>
+						<p>Você ainda não marcou nenhum produto como comprado.</p>
+					</div>
                 </div>
             </section>
 
             <section id="finance-tab" class="tab-content">
-                <h2></h2>
+                <h2>Minhas Finanças</h2>
                 <div class="finance-form-container">
                     <h3>Novo Registro Mensal</h3>
                      <div class="form-group">
@@ -305,6 +307,19 @@
 
             <section id="settings-tab" class="tab-content">
                 <h2>Configurações da Conta</h2>
+
+				<!-- Seção de Preferências com o seletor de tema -->
+				<div class="form-container settings-form-container">
+					<h3>Preferências</h3>
+					<div class="form-group theme-switch-wrapper">
+						<label for="theme-switch">Modo Escuro</label>
+						<div class="switch-container">
+							<input type="checkbox" id="theme-switch">
+							<label for="theme-switch" class="slider-toggle"></label>
+						</div>
+					</div>
+				</div>
+
                 <div class="form-container settings-form-container">
                     <h3>Alterar Senha</h3>
                     <form id="change-password-form">
@@ -327,130 +342,130 @@
             </section>    
 
             <div id="image-modal" class="modal-overlay hidden">
-    <div class="image-modal-content">
-        <span class="close-modal-btn" data-modal-id="image-modal">&times;</span>
-        <img id="modal-image-content" src="#" alt="Imagem do Produto Ampliada">
-    </div>
-</div>
+				<div class="image-modal-content">
+					<span class="close-modal-btn" data-modal-id="image-modal">&times;</span>
+					<img id="modal-image-content" src="#" alt="Imagem do Produto Ampliada">
+				</div>
+			</div>
 
-<div id="product-details-modal" class="modal-overlay hidden">
-    <div class="product-details-modal-content">
-        <span class="close-modal-btn" data-modal-id="product-details-modal">&times;</span>
-        <div id="modal-product-image-container">
-            <img id="modal-product-image" src="#" alt="Imagem do Produto">
-        </div>
-        <h3 id="modal-product-name">Nome do Produto</h3>
-        <p class="modal-product-price" id="modal-product-price">R$ 0,00</p>
-        <div class="modal-product-info">
-            <p><strong>Status:</strong> <span id="modal-product-status"></span></p>
-            <p><strong>Categoria:</strong> <span id="modal-product-category"></span></p>
-            <p><strong>Marca:</strong> <span id="modal-product-brand"></span></p>
-            <p><strong>Adicionado em:</strong> <span id="modal-product-addedDate"></span></p>
-            <p><strong>Tags:</strong> <span id="modal-product-tags"></span></p>
-            <p><strong>Prioridade:</strong> <span id="modal-product-priority"></span></p>
-            <p><strong>Descrição:</strong> <span id="modal-product-description"></span></p>
-            <p><strong>Notas:</strong> <span id="modal-product-notes"></span></p>
-        </div>
-        <a id="modal-product-link" href="#" target="_blank" rel="noopener noreferrer" class="product-link-btn">Visitar Página do Produto <i class="fas fa-external-link-alt"></i></a>
-        <div class="modal-actions">
-            <button id="modal-action-purchase" class="modal-action-btn primary-btn" ><i class="fas fa-check-circle"></i> Marcar como Comprado</button>
-            <button id="modal-action-edit" class="modal-action-btn edit"><i class="fas fa-edit"></i> Editar</button>
-            <button id="modal-action-delete" class="modal-action-btn delete"><i class="fas fa-trash-alt"></i> Excluir</button>
-        </div>
-    </div>
-</div>
+			<div id="product-details-modal" class="modal-overlay hidden">
+				<div class="product-details-modal-content">
+					<span class="close-modal-btn" data-modal-id="product-details-modal">&times;</span>
+					<div id="modal-product-image-container">
+						<img id="modal-product-image" src="#" alt="Imagem do Produto">
+					</div>
+					<h3 id="modal-product-name">Nome do Produto</h3>
+					<p class="modal-product-price" id="modal-product-price">R$ 0,00</p>
+					<div class="modal-product-info">
+						<p><strong>Status:</strong> <span id="modal-product-status"></span></p>
+						<p><strong>Categoria:</strong> <span id="modal-product-category"></span></p>
+						<p><strong>Marca:</strong> <span id="modal-product-brand"></span></p>
+						<p><strong>Adicionado em:</strong> <span id="modal-product-addedDate"></span></p>
+						<p><strong>Tags:</strong> <span id="modal-product-tags"></span></p>
+						<p><strong>Prioridade:</strong> <span id="modal-product-priority"></span></p>
+						<p><strong>Descrição:</strong> <span id="modal-product-description"></span></p>
+						<p><strong>Notas:</strong> <span id="modal-product-notes"></span></p>
+					</div>
+					<a id="modal-product-link" href="#" target="_blank" rel="noopener noreferrer" class="product-link-btn">Visitar Página do Produto <i class="fas fa-external-link-alt"></i></a>
+					<div class="modal-actions">
+						<button id="modal-action-purchase" class="modal-action-btn primary-btn" ><i class="fas fa-check-circle"></i> Marcar como Comprado</button>
+						<button id="modal-action-edit" class="modal-action-btn edit"><i class="fas fa-edit"></i> Editar</button>
+						<button id="modal-action-delete" class="modal-action-btn delete"><i class="fas fa-trash-alt"></i> Excluir</button>
+					</div>
+				</div>
+			</div>
 
-<div id="edit-product-modal" class="modal-overlay hidden">
-    <div class="modal-content edit-product-modal-content">
-        <span class="close-modal-btn" data-modal-id="edit-product-modal">&times;</span>
-        <h3>Editar Produto</h3>
-        <form id="edit-product-form">
-            <input type="hidden" id="edit-product-id">
+			<div id="edit-product-modal" class="modal-overlay hidden">
+				<div class="modal-content edit-product-modal-content">
+					<span class="close-modal-btn" data-modal-id="edit-product-modal">&times;</span>
+					<h3>Editar Produto</h3>
+					<form id="edit-product-form">
+						<input type="hidden" id="edit-product-id">
 
-            <div class="form-group" style="text-align: center;">
-                <img id="edit-product-preview-image" src="#" alt="Preview" class="form-image-preview hidden">
-                <label for="edit-product-image-url">URL da Imagem</label>
-                <input type="url" id="edit-product-image-url" placeholder="https://exemplo.com/imagem.png">
-            </div>
+						<div class="form-group" style="text-align: center;">
+							<img id="edit-product-preview-image" src="#" alt="Preview" class="form-image-preview hidden">
+							<label for="edit-product-image-url">URL da Imagem</label>
+							<input type="url" id="edit-product-image-url" placeholder="https://exemplo.com/imagem.png">
+						</div>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="edit-product-name">Nome do Produto*</label>
-                    <input type="text" id="edit-product-name" required>
-                </div>
-                <div class="form-group">
-                    <label for="edit-product-price">Preço (R$)*</label>
-                    <input type="number" id="edit-product-price" step="0.01" required>
-                </div>
-            </div>
+						<div class="form-row">
+							<div class="form-group">
+								<label for="edit-product-name">Nome do Produto*</label>
+								<input type="text" id="edit-product-name" required>
+							</div>
+							<div class="form-group">
+								<label for="edit-product-price">Preço (R$)*</label>
+								<input type="number" id="edit-product-price" step="0.01" required>
+							</div>
+						</div>
 
-            <div class="form-group">
-                <label for="edit-product-url">URL de Origem*</label>
-                <input type="url" id="edit-product-url" required>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="edit-product-status">Status</label>
-                    <select id="edit-product-status">
-                        <option value="pendente">Pendente</option>
-                        <option value="comprado">Comprado</option>
-                        <option value="descartado">Descartado</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="edit-product-category">Categoria</label>
-                    <select id="edit-product-category">
-                        <option value="Outros">Outros</option>
-                        <option value="Eletrônicos">Eletrônicos</option>
-                        <option value="Roupas e Acessórios">Roupas e Acessórios</option>
-                        <option value="Casa e Decoração">Casa e Decoração</option>
-                        <option value="Livros e Mídia">Livros e Mídia</option>
-                        <option value="Esportes e Lazer">Esportes e Lazer</option>
-                        <option value="Ferramentas e Construção">Ferramentas e Construção</option>
-                        <option value="Alimentos e Bebidas">Alimentos e Bebidas</option>
-                        <option value="Saúde e Beleza">Saúde e Beleza</option>
-                        <option value="Automotivo">Automotivo</option>
-                        <option value="Pet Shop">Pet Shop</option>
-                    </select>
-                </div>
-            </div>
+						<div class="form-group">
+							<label for="edit-product-url">URL de Origem*</label>
+							<input type="url" id="edit-product-url" required>
+						</div>
+						
+						<div class="form-row">
+							<div class="form-group">
+								<label for="edit-product-status">Status</label>
+								<select id="edit-product-status">
+									<option value="pendente">Pendente</option>
+									<option value="comprado">Comprado</option>
+									<option value="descartado">Descartado</option>
+								</select>
+							</div>
+							<div class="form-group">
+								<label for="edit-product-category">Categoria</label>
+								<select id="edit-product-category">
+									<option value="Outros">Outros</option>
+									<option value="Eletrônicos">Eletrônicos</option>
+									<option value="Roupas e Acessórios">Roupas e Acessórios</option>
+									<option value="Casa e Decoração">Casa e Decoração</option>
+									<option value="Livros e Mídia">Livros e Mídia</option>
+									<option value="Esportes e Lazer">Esportes e Lazer</option>
+									<option value="Ferramentas e Construção">Ferramentas e Construção</option>
+									<option value="Alimentos e Bebidas">Alimentos e Bebidas</option>
+									<option value="Saúde e Beleza">Saúde e Beleza</option>
+									<option value="Automotivo">Automotivo</option>
+									<option value="Pet Shop">Pet Shop</option>
+								</select>
+							</div>
+						</div>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="edit-product-priority">Prioridade</label>
-                    <select id="edit-product-priority">
-                        <option value="Baixa">Baixa</option>
-                        <option value="Média">Média</option>
-                        <option value="Alta">Alta</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="edit-product-tags">Tags</label>
-                    <input type="text" id="edit-product-tags" placeholder="Separadas por vírgula">
-                </div>
-            </div>
+						<div class="form-row">
+							<div class="form-group">
+								<label for="edit-product-priority">Prioridade</label>
+								<select id="edit-product-priority">
+									<option value="Baixa">Baixa</option>
+									<option value="Média">Média</option>
+									<option value="Alta">Alta</option>
+								</select>
+							</div>
+							<div class="form-group">
+								<label for="edit-product-tags">Tags</label>
+								<input type="text" id="edit-product-tags" placeholder="Separadas por vírgula">
+							</div>
+						</div>
 
-            <div class="form-group">
-                <label for="edit-product-description">Descrição</label>
-                <textarea id="edit-product-description" rows="3" placeholder="Breve descrição do produto..."></textarea>
-            </div>
-            <div class="form-group">
-                <label for="edit-product-notes">Notas Adicionais</label>
-                <textarea id="edit-product-notes" rows="3" placeholder="Suas observações sobre o produto..."></textarea>
-            </div>
-            
-            <p class="tab-message" id="edit-product-message"></p>
-            <button type="submit" class="primary-btn"><i class="fas fa-save"></i> Salvar Alterações</button>
-        </form>
-    </div>
-</div>
-</main>
+						<div class="form-group">
+							<label for="edit-product-description">Descrição</label>
+							<textarea id="edit-product-description" rows="3" placeholder="Breve descrição do produto..."></textarea>
+						</div>
+						<div class="form-group">
+							<label for="edit-product-notes">Notas Adicionais</label>
+							<textarea id="edit-product-notes" rows="3" placeholder="Suas observações sobre o produto..."></textarea>
+						</div>
+						
+						<p class="tab-message" id="edit-product-message"></p>
+						<button type="submit" class="primary-btn"><i class="fas fa-save"></i> Salvar Alterações</button>
+					</form>
+				</div>
+			</div>
+		</main>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script type="text/javascript" src="https://unpkg.com/vanilla-tilt@1.8.1/dist/vanilla-tilt.min.js"></script>
     
-    <script src="/renderer.js"></script>
+    <script src="renderer.js"></script>
 </body>
 </html>

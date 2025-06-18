@@ -12,7 +12,7 @@
 }
 
 :root {
-    /* === Paleta de Cores para Neumorfismo === */
+    /* === Paleta de Cores para Neumorfismo (Tema Claro) === */
     --c-primary: #e0e5ec; /* Fundo principal */
     --c-light: #ffffff;   /* Sombra clara */
     --c-dark: #a3b1c6;    /* Sombra escura */
@@ -30,6 +30,24 @@
     --shadow: 6px 6px 12px var(--c-dark), -6px -6px 12px var(--c-light);
     --shadow-inset: inset 6px 6px 12px var(--c-dark), inset -6px -6px 12px var(--c-light);
     --shadow-inset-light: inset 2px 2px 4px var(--c-dark), inset -2px -2px 4px var(--c-light);
+}
+
+/* === Tema Escuro === */
+body[data-theme="dark"] {
+    --c-primary: #292d32;
+    --c-light: #32373d;
+    --c-dark: #202327;
+    
+    --text-primary: #e0e5ec;
+    --text-secondary: #a3b1c6;
+}
+
+body[data-theme="dark"] .card-image-container {
+    background-color: #3a3f44;
+}
+
+body[data-theme="dark"] .auth-tab-btn.active {
+    color: var(--primary-action);
 }
 
 html, body {
@@ -104,7 +122,7 @@ html, body {
 }
 
 .nav-btn i {
-    font-size: 24px; /* Ajustado */
+    font-size: 24px;
     line-height: 1;
     color: var(--text-secondary);
     transition: color 0.2s ease-in-out;
@@ -152,12 +170,16 @@ html, body {
 
 
 /* === Formulários Neumórficos === */
-.form-container, .finance-form-container, .auth-container, .url-scrape-container, .summary-card, .chart-container, #finance-list li {
+.form-container, .finance-form-container, .auth-container, .url-scrape-container, .summary-card, .chart-container, #finance-list li, .verified-product-info-box, .list-summary {
     background: var(--c-primary);
     padding: 25px;
     border-radius: 20px;
     margin-bottom: 30px;
     box-shadow: var(--shadow);
+}
+
+.form-group {
+    margin-bottom: 20px;
 }
 
 .form-group label {
@@ -203,8 +225,15 @@ select {
 
 textarea { resize: vertical; min-height: 80px; }
 
+/* Adicionado mais espaço ao container da URL */
+.url-scrape-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
 /* === Botões Neumórficos === */
-button, .primary-btn, .auth-submit-btn {
+button, .primary-btn, .auth-submit-btn, #add-finance-entry-btn {
     padding: 12px 20px;
     background: var(--c-primary);
     color: var(--text-secondary);
@@ -222,12 +251,12 @@ button, .primary-btn, .auth-submit-btn {
     width: auto;
 }
 
-button:hover, .primary-btn:hover, .auth-submit-btn:hover {
+button:hover, .primary-btn:hover, .auth-submit-btn:hover, #add-finance-entry-btn:hover {
     color: var(--primary-action);
     transform: translateY(-1px);
 }
 
-button:active, .primary-btn:active, .auth-submit-btn:active {
+button:active, .primary-btn:active, .auth-submit-btn:active, #add-finance-entry-btn:active {
     box-shadow: var(--shadow-inset);
     color: var(--primary-action);
     transform: translateY(0);
@@ -237,18 +266,16 @@ button:active, .primary-btn:active, .auth-submit-btn:active {
     width: 100%;
 }
 
-button.primary-btn, button.auth-submit-btn {
+button.primary-btn, button.auth-submit-btn, #add-finance-entry-btn {
     background-color: var(--primary-action);
     color: var(--highlight-action-text);
-    /* AJUSTE: Blur da sombra reduzido para um efeito mais nítido */
     box-shadow: 4px 4px 6px #0c6b17, -4px -4px 6px #16c330;
 }
-button.primary-btn:hover, button.auth-submit-btn:hover {
+button.primary-btn:hover, button.auth-submit-btn:hover, #add-finance-entry-btn:hover {
     background-color: var(--primary-action-hover);
     color: var(--highlight-action-text);
 }
-button.primary-btn:active, button.auth-submit-btn:active {
-    /* AJUSTE: Blur da sombra reduzido para um efeito mais nítido */
+button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn:active {
     box-shadow: inset 4px 4px 6px #0c6b17, inset -4px -4px 6px #16c330;
 }
 
@@ -291,7 +318,7 @@ button.primary-btn:active, button.auth-submit-btn:active {
 .auth-tab-content { display: none; animation: fadeIn 0.4s ease-out; }
 .auth-tab-content.active { display: block; }
 .auth-form { margin-top: 20px; }
-.auth-form .form-group { text-align: left; }
+.auth-form .form-group { text-align: left; margin-bottom: 25px; }
 
 .form-group.remember-me-group { 
     display: flex; align-items: center; gap: 8px; margin-bottom: 15px; color: var(--text-secondary); 
@@ -322,29 +349,26 @@ button.primary-btn:active, button.auth-submit-btn:active {
     display: flex;
     flex-direction: column;
     box-shadow: var(--shadow);
-    /* AJUSTE: Transição alterada para não conflitar com a animação tilt.js */
     transition: box-shadow 0.2s ease-in-out;
+    transform-style: preserve-3d;
 }
 .product-card:hover {
-    /* AJUSTE: Transformação de hover removida para deixar o tilt.js controlar */
     box-shadow: 8px 8px 16px var(--c-dark), -8px -8px 16px var(--c-light);
 }
 .card-image-container { 
     width: 100%; height: 180px; padding: 10px;
     box-shadow: var(--shadow-inset-light);
     border-radius: 20px 20px 0 0;
-    /* AJUSTE: Adicionado para centralizar a imagem e definir fundo branco */
     display: flex;
     align-items: center;
     justify-content: center;
     background-color: var(--c-light);
 }
 .card-image { max-width: 100%; max-height: 100%; object-fit: contain; }
-.card-content { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; text-align: center; }
+.card-content { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; text-align: center; transform: translateZ(20px); }
 .card-title { 
     font-family: 'Almarai', sans-serif; font-size: 1.1em; font-weight: 700; color: var(--text-primary); 
     margin-bottom: 8px; 
-    /* AJUSTE: Limita o título a 2 linhas com "..." */
     height: 2.8em; 
     overflow: hidden;
     text-overflow: ellipsis;
@@ -368,19 +392,50 @@ button.primary-btn:active, button.auth-submit-btn:active {
 .card-actions i:hover { color: var(--primary-action); }
 .card-actions i:active { box-shadow: var(--shadow-inset); }
 
+/* === Info do Produto Verificado === */
+.verified-product-info-box {
+    align-items: center;
+    text-align: center;
+}
+#verifiedProductImage-add-tab, #verifiedProductImage-products-tab {
+    max-width: 100%;
+    max-height: 250px;
+    object-fit: contain;
+    border-radius: 10px;
+    margin-bottom: 15px;
+}
+.verified-product-text {
+    width: 100%;
+    padding: 15px;
+    border-radius: 15px;
+    box-shadow: var(--shadow-inset);
+    margin-bottom: 15px;
+}
+
+
 /* === Dashboard & Finance === */
 .dashboard-summary-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
 .summary-card h4 { font-size: 0.95em; color: var(--text-secondary); margin-bottom: 8px; }
 .summary-card p { font-size: 1.8em; font-weight: 700; color: var(--text-primary); }
 .dashboard-charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 30px; }
+
+/* Correção do Gráfico Crescendo */
+#finance-overview-chart-container {
+    position: relative;
+    height: 400px;
+}
 .chart-container h3 { font-size: 1.1em; text-align: center; color: var(--text-primary); margin-bottom: 15px; }
 .finance-summary { text-align: center; }
+.finance-detail-chart {
+    height: 450px; /* Aumenta a altura */
+    position: relative;
+}
 #finance-list li { display: flex; justify-content: space-between; align-items: center; }
 
 
 /* === Modais Neumórficos === */
 .modal-overlay { 
-    background: rgba(224, 229, 236, 0.7); 
+    background: rgba(0, 0, 0, 0.4); 
     backdrop-filter: blur(4px); 
     position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
     display: flex; align-items: center; justify-content: center; z-index: 1001; 
@@ -423,8 +478,82 @@ button.primary-btn:active, button.auth-submit-btn:active {
     color: var(--primary-action);
 }
 
+/* Modal de Imagem */
+.image-modal-content {
+    padding: 15px;
+    background: var(--c-primary);
+}
+#modal-image-content {
+    max-width: 80vw;
+    max-height: 80vh;
+    object-fit: contain;
+    border-radius: 10px;
+}
 
-/* === OUTROS ESTILOS (Mantidos ou ajustados) === */
+/* Modal de Edição */
+#edit-product-preview-image {
+    display: block;
+    max-width: 150px;
+    max-height: 150px;
+    border-radius: 15px;
+    margin: 10px auto 20px;
+    object-fit: contain;
+    box-shadow: var(--shadow);
+}
+
+/* === Seletor de Tema (Adicionar no HTML em Configurações) === */
+.theme-switch-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+}
+.theme-switch-wrapper label {
+    margin-bottom: 0;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+.switch-container {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+.switch-container input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+.slider-toggle {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--c-primary);
+    box-shadow: var(--shadow-inset);
+    border-radius: 34px;
+    transition: .4s;
+}
+.slider-toggle:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: var(--c-primary);
+    box-shadow: var(--shadow);
+    border-radius: 50%;
+    transition: .4s;
+}
+input:checked + .slider-toggle:before {
+    transform: translateX(26px);
+}
+
+
+/* === OUTROS ESTILOS === */
 .hidden { display: none !important; }
 
 .password-wrapper { position: relative; display: flex; align-items: center; }
@@ -462,7 +591,7 @@ button.primary-btn:active, button.auth-submit-btn:active {
 .tab-message.success { color: var(--highlight-action-text); background-color: var(--success-color); }
 .tab-message.error { color: var(--highlight-action-text); background-color: var(--error-color); }
 
-/* === Media Queries (Mantidas e ajustadas para responsividade) === */
+/* === Media Queries === */
 @media (max-width: 1024px) {
     .main-content-area { padding: 20px; }
     .product-details-modal-content {
