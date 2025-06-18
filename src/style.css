@@ -637,7 +637,7 @@ body[data-theme="dark"] #product-details-modal .modal-product-info p {
 #finance-list li { display: flex; justify-content: space-between; align-items: center; }
 
 
-/* === Modais Neumórficos === */
+/* === Modais Neumórficos (CORRIGIDO) === */
 .modal-overlay { 
     background: rgba(0, 0, 0, 0.4); 
     backdrop-filter: blur(4px); 
@@ -648,41 +648,31 @@ body[data-theme="dark"] #product-details-modal .modal-product-info p {
 .modal-overlay.active { opacity: 1; visibility: visible; pointer-events: auto; }
 
 .modal-content {
-    background: var(--c-primary);
-    color: var(--text-primary);
+    background: #ffffff; /* Fundo branco, conforme solicitado anteriormente */
+    color: #3a3f44;      /* Texto escuro, conforme solicitado anteriormente */
     border-radius: 20px;
     box-shadow: var(--shadow);
-    max-width: 500px;
-    padding: 25px;
-    position: relative;
-    max-height: 90vh;
-    overflow-y: auto;
     width: 90%;
-}
+    max-width: 500px;
+    max-height: 90vh; /* O modal nunca será maior que 90% da altura da tela */
+    position: relative;
+    padding: 25px;
 
-.product-details-modal-content {
+    /* --- INÍCIO DAS MUDANÇAS CRÍTICAS PARA O SCROLL --- */
     display: flex;
     flex-direction: column;
-    text-align: center;
-    background: var(--c-primary);
-    padding: 25px;
-    border-radius: 20px;
-    box-shadow: var(--shadow);
-    max-width: 900px;
-    width: 90%;
-    
-
+    overflow: hidden; /* Esconde o overflow do container principal; a rolagem será interna */
 }
+
 #modal-product-image-container {
     width: 100%;
     height: 180px;
-    flex-shrink: 0;
+    flex-shrink: 0; /* Impede que o container da imagem encolha */
     display: flex;
     align-items: center;
     justify-content: center;
     margin-bottom: 20px;
-    background: var(--c-primary);
-    padding: 10px;
+    background: #ffffff;
     border-radius: 15px;
     box-shadow: var(--shadow-inset);
 }
@@ -695,29 +685,33 @@ body[data-theme="dark"] #product-details-modal .modal-product-info p {
     font-size: 1.4em;
     font-weight: 700;
     margin-bottom: 4px;
+    flex-shrink: 0;
 }
 .modal-product-price {
     font-size: 1.1em;
     font-weight: 500;
     color: var(--text-secondary);
     margin-bottom: 20px;
+    flex-shrink: 0;
 }
+
+/* Área de informações que irá rolar */
 .modal-product-info {
-    flex-grow: 1;
-    overflow-y: auto;
+    flex-grow: 1;      /* Faz esta seção ocupar todo o espaço vertical disponível */
+    overflow-y: auto;  /* Adiciona a barra de rolagem APENAS quando o conteúdo for maior que a área */
+    min-height: 0;     /* CORREÇÃO ESSENCIAL: Permite que o container encolha e o overflow funcione */
     line-height: 1.7;
     text-align: left;
     margin-bottom: 20px;
+    padding-right: 10px; /* Espaço para a barra de rolagem não sobrepor o texto */
 }
+
 .modal-product-info p {
     display: flex;
     justify-content: space-between;
-    border-bottom: 1px solid rgba(0,0,0,0.05);
+    border-bottom: 1px solid rgba(0,0,0,0.08);
     padding: 8px 4px;
     gap: 15px;
-}
-body[data-theme="dark"] .modal-product-info p {
-    border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 .modal-product-info p strong {
     color: var(--text-secondary);
@@ -738,6 +732,7 @@ a.product-link-btn {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 15px;
+    flex-shrink: 0; /* Impede que a área de botões encolha */
 }
 .modal-actions .modal-action-btn.delete {
     grid-column: 1 / -1;
@@ -766,7 +761,7 @@ a.product-link-btn {
     color: var(--primary-action);
 }
 
-/* Modal de Imagem */
+/* Modal de Imagem (sem alterações) */
 .image-modal-content {
     padding: 15px;
     background: var(--c-primary);
@@ -778,7 +773,7 @@ a.product-link-btn {
     border-radius: 10px;
 }
 
-/* Modal de Edição */
+/* Modal de Edição (sem alterações) */
 .edit-product-modal-content {
     max-width: 600px;
 }
