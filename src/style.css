@@ -137,7 +137,7 @@ html, body {
 }
 
 .nav-btn:hover {
-    transform: translateY(-2px);
+    scale: 1.05;
 }
 
 .nav-btn:active, .nav-btn.active {
