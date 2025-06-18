@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let financeChartInstance = null;
     let financeOverviewChart = null;
     let categoryDistributionChart = null;
+    let financialLineChart = null;
     let editingFinanceId = null;
 
     // --- SELETORES DE ELEMENTOS ---
@@ -589,12 +590,36 @@ document.addEventListener('DOMContentLoaded', () => {
         return card;
     };
 
-const applySavedTheme = () => {
-        const savedTheme = localStorage.getItem('theme') || 'light'; // Padrão para 'light' se não houver nada salvo
+    // Função para obter a cor do texto principal do CSS
+    const getTextColor = () => getComputedStyle(document.body).getPropertyValue('--text-primary').trim();
+
+    // Função para atualizar a cor dos gráficos
+    const updateChartColors = () => {
+        const textColor = getTextColor();
+        const chartInstances = [financeOverviewChart, categoryDistributionChart, financialLineChart];
+        
+        chartInstances.forEach(chart => {
+            if (chart) {
+                // Atualiza a cor das legendas e eixos
+                chart.options.plugins.legend.labels.color = textColor;
+                chart.options.scales.x.ticks.color = textColor;
+                chart.options.scales.y.ticks.color = textColor;
+                chart.options.scales.x.grid.color = 'rgba(128, 128, 128, 0.1)';
+                chart.options.scales.y.grid.color = 'rgba(128, 128, 128, 0.1)';
+                chart.update();
+            }
+        });
+    };
+
+    // Função para aplicar o tema salvo
+    const applySavedTheme = () => {
+        const savedTheme = localStorage.getItem('theme') || 'light';
         document.body.setAttribute('data-theme', savedTheme);
         if (themeSwitch) {
             themeSwitch.checked = savedTheme === 'dark';
         }
+        // Atraso mínimo para garantir que as variáveis CSS foram aplicadas antes de atualizar os gráficos
+        setTimeout(updateChartColors, 50);
     };
 
     // Adiciona o listener para o evento de clique no botão de tema
@@ -607,10 +632,11 @@ const applySavedTheme = () => {
                 document.body.setAttribute('data-theme', 'light');
                 localStorage.setItem('theme', 'light');
             }
+            updateChartColors();
         });
     }
 
-    // Aplica o tema salvo assim que a página carrega
+    // Aplica o tema salvo quando a página carrega
     applySavedTheme();
 
     const fetchAndRenderProducts = async () => {
@@ -649,7 +675,7 @@ const applySavedTheme = () => {
                     const card = createProductCard(product);
                     pendingList.appendChild(card);
                     if (typeof VanillaTilt !== 'undefined') {
-                       VanillaTilt.init(card, { max: 15, speed: 300, glare: true, "max-glare": 0.5 });
+                       VanillaTilt.init(card, { max: 8, speed: 300, glare: true, "max-glare": 0.5 });
                     }
                 });
             }
@@ -663,18 +689,20 @@ const applySavedTheme = () => {
                     purchasedList.appendChild(card);
                     if (typeof VanillaTilt !== 'undefined') {
                             VanillaTilt.init(document.querySelectorAll("#products-tab .product-card"), {
-                                    max: 15,
-                                    speed: 400,
-                                    glare: false, // O brilho padrão pode ser desativado se preferir
-                                });
+                                max: 8,
+                                speed: 400,
+                            });
 
                                 // Inicializa o tilt com brilho dourado para os cards do histórico
                                 VanillaTilt.init(document.querySelectorAll("#history-tab .product-card"), {
-                                    max: 15,
-                                    speed: 400,
-                                    glare: true,
-                                    "max-glare": 0.4, // Intensidade do brilho
-                                });                    }
+            max: 8,      // Menos inclinação para um efeito mais sutil
+            speed: 1000,    // Mais lento para um movimento mais "premium"
+            glare: true,  // Ativa o brilho
+            "max-glare": 0.3, // Intensidade do brilho
+            "glare-prerender": false, // Garante que o brilho seja dinâmico
+            "full-page-listening": true
+        });
+            }
                 });
             }
 
