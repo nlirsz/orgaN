@@ -429,46 +429,105 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
 .card-actions i:hover { color: var(--primary-action); }
 .card-actions i:active { box-shadow: var(--shadow-inset); }
 
-/* === Card Colecionável (Histórico) === */
+/* === Card Colecionável (Histórico) - Estilo Pokémon Holo === */
 #history-tab .product-card {
-    transform: perspective(1000px) rotateX(var(--rotate-x, 0)) rotateY(var(--rotate-y, 0));
-    background: linear-gradient(145deg, #FFD700, #F0E68C, #B8860B);
+    /* Define as cores do espectro para o gradiente e o ângulo do brilho */
+    --red: #f80e35;
+    --yellow: #eedf10;
+    --green: #21e985;
+    --blue: #0dbde9;
+    --violet: #c929f1;
+    --angle: 150deg;
+
+    /* Variáveis para a posição do ponteiro, que serão atualizadas via JS */
+    --pointer-x: 50%;
+    --pointer-y: 50%;
+    
+    background-color: #e0e0e0; /* Fundo cinza claro para o efeito de metal */
     box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    position: relative; 
+    overflow: hidden; /* Garante que os efeitos não vazem do card */
+    transform-style: preserve-3d; /* Essencial para o VanillaTilt.js */
 }
-#history-tab .product-card::before { /* Camada de brilho branco */
+
+/* Camada do Efeito Holográfico de Cor (fica por baixo do conteúdo) */
+#history-tab .product-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: repeating-conic-gradient(
+        from var(--angle),
+        var(--red) 0%, var(--yellow) 15%, var(--green) 30%, 
+        var(--blue) 45%, var(--violet) 60%, var(--red) 75%,
+        var(--yellow) 90%, var(--green) 100%
+    );
+    background-size: 200% 200%; /* Tamanho maior para permitir o movimento do gradiente */
+    opacity: 0; /* Começa invisível, aparece no hover */
+    mix-blend-mode: screen; /* Modo de mesclagem para um efeito de luz */
+    animation: holo-spin 10s linear infinite; /* Animação sutil de rotação do gradiente */
+    transition: opacity 0.4s ease;
+    z-index: 1; /* Fica acima do fundo, mas abaixo do conteúdo do card */
+}
+
+/* Camada de Brilho Branco (a que segue o mouse) */
+#history-tab .product-card::after {
     content: "";
     position: absolute;
     left: 0; right: 0; bottom: 0; top: 0;
-    border-radius: 20px;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
+    border-radius: 20px; /* Mesmo radius do card */
+    pointer-events: none; /* Permite que eventos de clique passem através dele */
     background: radial-gradient(
         circle at var(--pointer-x) var(--pointer-y),
-        rgba(255, 255, 255, 0.8) 0%,
-        rgba(255, 255, 255, 0) 50%
+        rgba(255, 255, 255, 0.7) 0%,
+        rgba(255, 255, 255, 0) 25% /* O brilho é mais concentrado */
     );
-    z-index: 3;
-    opacity: 0;
+    opacity: 0; /* Começa invisível, aparece no hover */
+    transition: opacity 0.3s ease;
+    z-index: 3; /* Fica no topo de tudo, sobrepondo até o conteúdo */
 }
+
+/* Ativa os efeitos no hover */
 #history-tab .product-card:hover::before {
-    opacity: 1;
+    opacity: 0.3; /* Aumenta a intensidade do holográfico */
 }
+#history-tab .product-card:hover::after {
+    opacity: 1; /* Mostra o brilho branco */
+}
+
+/* Animação que rotaciona o gradiente de fundo lentamente */
+@keyframes holo-spin {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 200% 50%; }
+}
+
+/* Garante que o conteúdo do card fique acima do efeito ::before */
+#history-tab .product-card .card-image-container,
+#history-tab .product-card .card-content {
+    position: relative;
+    z-index: 2;
+    background: transparent; /* Remove fundos que possam cobrir o efeito */
+}
+
+/* Container da imagem com fundo branco, como solicitado */
 #history-tab .product-card .card-image-container {
-    background: rgba(255,255,255,0.8);
+    background: #ffffff; 
     box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
 }
-#history-tab .product-card .card-content {
-    background: transparent;
-    justify-content: center;
-}
+
+/* Ajustes no texto para melhor legibilidade sobre o efeito */
 #history-tab .product-card .card-title {
     color: #1c1c1c;
-    text-shadow: 1px 1px 2px rgba(255,255,255,0.4);
+    font-weight: 700;
+    text-shadow: 1px 1px 2px rgba(255,255,255,0.6);
 }
+
+/* Oculta elementos desnecessários, mantendo a lógica original */
 #history-tab .product-card .card-price,
-#history-tab .product-card > .card-actions {
+#history-tab .product-card .card-actions {
     display: none;
 }
+
+/* As ações que aparecem no hover (mantidas do CSS original) */
 .card-hover-actions {
     position: absolute;
     top: 10px;
@@ -479,7 +538,7 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.2s ease, visibility 0.2s ease;
-    z-index: 4;
+    z-index: 4; /* Tem que ser o mais alto para ser clicável */
 }
 #history-tab .product-card:hover .card-hover-actions {
     opacity: 1;
@@ -499,6 +558,7 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
     color: #000;
     background: rgba(255,255,255,0.7);
 }
+
 
 /* === Info do Produto Verificado === */
 .verified-product-info-box {

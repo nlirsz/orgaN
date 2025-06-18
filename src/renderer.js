@@ -688,20 +688,42 @@ document.addEventListener('DOMContentLoaded', () => {
                     const card = createProductCard(product);
                     purchasedList.appendChild(card);
                     if (typeof VanillaTilt !== 'undefined') {
-                            VanillaTilt.init(document.querySelectorAll("#products-tab .product-card"), {
-                                max: 15,
-                                speed: 400,
-                            });
-
-                                // Inicializa o tilt com brilho dourado para os cards do histórico
-                                VanillaTilt.init(document.querySelectorAll("#history-tab .product-card"), {
-                                    max: 15,
-                                    speed: 400,
-                                    glare: true,
-                                    "max-glare": 0.4, // Intensidade do brilho
-                                });                    }
+                        VanillaTilt.init(document.querySelectorAll("#history-tab .product-card"), {
+                            max: 15,
+                            speed: 400,
+                            glare: true,
+                            "max-glare": 0.4,
+                        });
+                    }
                 });
             }
+
+            // ===================================================================
+            // ▼▼▼ ADICIONE O CÓDIGO ABAIXO NESTE LOCAL ▼▼▼
+            // ===================================================================
+
+            // Adiciona listeners para o efeito de brilho holográfico nos cards de histórico
+            const historyCards = document.querySelectorAll("#history-tab .product-card");
+            historyCards.forEach(card => {
+                card.addEventListener('pointermove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    // Atualiza as variáveis CSS no estilo do próprio card
+                    card.style.setProperty('--pointer-x', `${(x / rect.width) * 100}%`);
+                    card.style.setProperty('--pointer-y', `${(y / rect.height) * 100}%`);
+                });
+
+                // Opcional: Reseta a posição do brilho quando o mouse sai do card
+                card.addEventListener('pointerleave', () => {
+                    card.style.setProperty('--pointer-x', `50%`);
+                    card.style.setProperty('--pointer-y', `50%`);
+                });
+            });
+
+            // ===================================================================
+            // ▲▲▲ FIM DO CÓDIGO A SER ADICIONADO ▲▲▲
+            // ===================================================================
 
         } catch (error) {
             console.error("Erro em fetchAndRenderProducts:", error);
