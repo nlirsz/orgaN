@@ -520,12 +520,28 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
 #product-details-modal .modal-content {
     background-color: #ffffff; /* Fundo branco sólido */
     color: #3a3f44;           /* Cor de texto escura para garantir contraste */
+    box-shadow: var(--shadow); /* Sombra suave para o modal */
+    border-radius: 20px; /* Mantém o arredondamento do modal */
+    padding: 25px; /* Espaçamento interno consistente */
+    display: flex;
+    flex-direction: column; /* Garante que o conteúdo seja empilhado verticalmente */
+    overflow: hidden; /* Impede que o conteúdo transborde do modal */
+    
 }
 
 /* Garante que o container da imagem dentro do modal também tenha fundo branco */
 #product-details-modal #modal-product-image-container {
     background-color: #ffffff;
     box-shadow: var(--shadow-inset-light); /* Mantém uma sombra interna suave */
+    border-radius: 15px; /* Arredondamento consistente */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 180px; /* Altura fixa para o container da imagem */
+    margin-bottom: 20px; /* Espaçamento abaixo do container da imagem */
+    overflow: hidden; /* Impede que a imagem transborde do container */
+
 }
 
 /* Garante que o texto dentro do modal de detalhes seja sempre escuro */
@@ -534,6 +550,7 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
 #product-details-modal #modal-product-name,
 #product-details-modal .modal-product-price {
     color: var(--text-primary); /* Usa a variável de texto primário do tema claro */
+
 }
 
 /* Ajusta a borda inferior dos detalhes para ser visível no fundo branco */
@@ -648,16 +665,26 @@ body[data-theme="dark"] #product-details-modal .modal-product-info p {
 .modal-overlay.active { opacity: 1; visibility: visible; pointer-events: auto; }
 
 .modal-content {
-    background: #ffffff; /* Fundo branco, conforme solicitado anteriormente */
-    color: #3a3f44;      /* Texto escuro, conforme solicitado anteriormente */
-    border-radius: 20px;
-    box-shadow: var(--shadow);
-    width: 90%;
-    max-width: 500px;
-    max-height: 90vh; /* O modal nunca será maior que 90% da altura da tela */
-    position: relative;
-    padding: 25px;
 
+background: var(--c-primary);
+
+color: var(--text-primary);
+
+border-radius: 20px;
+
+box-shadow: var(--shadow);
+
+max-width: 500px;
+
+padding: 25px;
+
+position: relative;
+
+max-height: 90vh;
+
+overflow-y: auto;
+
+width: 90%;
     /* --- INÍCIO DAS MUDANÇAS CRÍTICAS PARA O SCROLL --- */
     display: flex;
     flex-direction: column;
@@ -1025,6 +1052,17 @@ input:checked + .slider-toggle:before {
     .modal-content {
         width: 95%;
         padding: 20px 15px;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: var(--shadow);
+        border-radius: 15px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        position: relative;
+        background: var(--c-primary);
+
+        
     }
     
     .form-container, .finance-form-container, .auth-container, .url-scrape-container, .summary-card, .chart-container, #finance-list li {
