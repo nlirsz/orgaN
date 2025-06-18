@@ -482,12 +482,12 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
     height: 350px;
     display: flex;
     flex-direction: column;
-    padding: 25px; /* Padding ajustado para dar espaço */
+    padding: 25px; 
     color: var(--text-primary); 
 }
 .chart-container canvas {
     flex-grow: 1;
-    max-height: calc(100% - 40px); /* Deixa espaço para o título */
+    max-height: calc(100% - 40px); 
 }
 .chart-container h3 { font-size: 1.1em; text-align: center; color: var(--text-primary); margin-bottom: 15px; flex-shrink: 0; }
 .finance-summary { text-align: center; }
@@ -525,7 +525,7 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
     display: flex;
     flex-direction: column;
     text-align: center;
-    max-width: 500px; /* Largura fixa */
+    max-width: 500px; 
 }
 #modal-product-image-container {
     width: 100%;
@@ -879,3 +879,4 @@ input:checked + .slider-toggle:before {
         padding: 20px;
     }
 }
+
