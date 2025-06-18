@@ -648,13 +648,21 @@ body[data-theme="dark"] #product-details-modal .modal-product-info p {
     overflow-y: auto; /* Permite rolagem se o conteúdo for maior que a tela */
     overflow-x: hidden; /* Garante que não haja rolagem horizontal */
     /* Garante que o modal não se sobreponha ao conteúdo principal */
-    top: 0; left: 0; right: 0; bottom: 0; /* Garante que cubra toda a tela */
     z-index: 1001; /* Garante que fique acima de outros elementos */
     transition: opacity 0.3s ease, visibility 0.3s ease;
     /* Garante que o modal não se sobreponha ao conteúdo principal */
     
 }
-.modal-overlay.active { opacity: 1; visibility: visible; pointer-events: auto; }
+.modal-overlay.active { opacity: 1; visibility: visible; pointer-events: auto; 
+    z-index: 1001; /* Garante que fique acima de outros elementos */
+    margin: auto;
+    padding: 20px; /* Adiciona espaçamento ao redor do modal */
+    overflow-y: auto; /* Permite rolagem se o conteúdo for maior que a tela */
+    overflow-x: hidden; /* Garante que não haja rolagem horizontal */
+    z-index: 1001; /* Garante que fique acima de outros elementos */
+
+}
+
 
 .modal-content {
     background: var(--c-primary);
