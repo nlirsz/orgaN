@@ -240,14 +240,16 @@ button:active, .primary-btn:active, .auth-submit-btn:active {
 button.primary-btn, button.auth-submit-btn {
     background-color: var(--primary-action);
     color: var(--highlight-action-text);
-    box-shadow: 4px 4px 8px #0c6b17, -4px -4px 8px #16c330;
+    /* AJUSTE: Blur da sombra reduzido para um efeito mais nítido */
+    box-shadow: 4px 4px 6px #0c6b17, -4px -4px 6px #16c330;
 }
 button.primary-btn:hover, button.auth-submit-btn:hover {
     background-color: var(--primary-action-hover);
     color: var(--highlight-action-text);
 }
 button.primary-btn:active, button.auth-submit-btn:active {
-    box-shadow: inset 4px 4px 8px #0c6b17, inset -4px -4px 8px #16c330;
+    /* AJUSTE: Blur da sombra reduzido para um efeito mais nítido */
+    box-shadow: inset 4px 4px 6px #0c6b17, inset -4px -4px 6px #16c330;
 }
 
 
@@ -320,22 +322,35 @@ button.primary-btn:active, button.auth-submit-btn:active {
     display: flex;
     flex-direction: column;
     box-shadow: var(--shadow);
-    transition: all 0.2s ease-in-out;
+    /* AJUSTE: Transição alterada para não conflitar com a animação tilt.js */
+    transition: box-shadow 0.2s ease-in-out;
 }
 .product-card:hover {
-    transform: translateY(-5px);
+    /* AJUSTE: Transformação de hover removida para deixar o tilt.js controlar */
     box-shadow: 8px 8px 16px var(--c-dark), -8px -8px 16px var(--c-light);
 }
 .card-image-container { 
-    width: 100%; height: 180px; padding: 20px;
+    width: 100%; height: 180px; padding: 10px;
     box-shadow: var(--shadow-inset-light);
     border-radius: 20px 20px 0 0;
+    /* AJUSTE: Adicionado para centralizar a imagem e definir fundo branco */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--c-light);
 }
 .card-image { max-width: 100%; max-height: 100%; object-fit: contain; }
 .card-content { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; text-align: center; }
 .card-title { 
     font-family: 'Almarai', sans-serif; font-size: 1.1em; font-weight: 700; color: var(--text-primary); 
-    margin-bottom: 8px; min-height: 2.8em;
+    margin-bottom: 8px; 
+    /* AJUSTE: Limita o título a 2 linhas com "..." */
+    height: 2.8em; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
 }
 .card-price { 
     font-size: 1.8em; font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: var(--text-primary); 
