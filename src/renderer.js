@@ -589,17 +589,15 @@ document.addEventListener('DOMContentLoaded', () => {
         return card;
     };
 
-        const applySavedTheme = () => {
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme) {
-            document.body.setAttribute('data-theme', savedTheme);
-            if (themeSwitch) {
-                themeSwitch.checked = savedTheme === 'dark';
-            }
+const applySavedTheme = () => {
+        const savedTheme = localStorage.getItem('theme') || 'light'; // Padrão para 'light' se não houver nada salvo
+        document.body.setAttribute('data-theme', savedTheme);
+        if (themeSwitch) {
+            themeSwitch.checked = savedTheme === 'dark';
         }
     };
 
-    // Adiciona o listener para o evento de clique no botão
+    // Adiciona o listener para o evento de clique no botão de tema
     if (themeSwitch) {
         themeSwitch.addEventListener('change', () => {
             if (themeSwitch.checked) {
@@ -612,9 +610,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Aplica o tema salvo quando a página carrega
+    // Aplica o tema salvo assim que a página carrega
     applySavedTheme();
-
 
     const fetchAndRenderProducts = async () => {
         if (!pendingList || !purchasedList || !pendingTotalValueEl || !purchasedTotalValueEl) return;
@@ -665,8 +662,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     const card = createProductCard(product);
                     purchasedList.appendChild(card);
                     if (typeof VanillaTilt !== 'undefined') {
-                        VanillaTilt.init(card, { max: 15, speed: 300, glare: true, "max-glare": 0.5 });
-                    }
+                            VanillaTilt.init(document.querySelectorAll("#products-tab .product-card"), {
+                                    max: 15,
+                                    speed: 400,
+                                    glare: false, // O brilho padrão pode ser desativado se preferir
+                                });
+
+                                // Inicializa o tilt com brilho dourado para os cards do histórico
+                                VanillaTilt.init(document.querySelectorAll("#history-tab .product-card"), {
+                                    max: 15,
+                                    speed: 400,
+                                    glare: true,
+                                    "max-glare": 0.4, // Intensidade do brilho
+                                });                    }
                 });
             }
 

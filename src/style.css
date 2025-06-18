@@ -34,16 +34,19 @@
 
 /* === Tema Escuro === */
 body[data-theme="dark"] {
-    --c-primary: #292d32;
-    --c-light: #32373d;
-    --c-dark: #202327;
+    --c-primary: #121212;
+    --c-light: #1e1e1e;
+    --c-dark: #000000;
     
-    --text-primary: #e0e5ec;
+    --text-primary: #e0e0e0;
     --text-secondary: #a3b1c6;
+    
+    /* Ajusta as cores padrão do Chart.js para o tema escuro */
+    color-scheme: dark;
 }
 
 body[data-theme="dark"] .card-image-container {
-    background-color: #3a3f44;
+    background-color: #ffffff; /* Fundo da imagem sempre branco */
 }
 
 body[data-theme="dark"] .auth-tab-btn.active {
@@ -359,6 +362,7 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
     box-shadow: var(--shadow);
     transition: box-shadow 0.2s ease-in-out;
     transform-style: preserve-3d;
+    position: relative;
 }
 .product-card:hover {
     box-shadow: 8px 8px 16px var(--c-dark), -8px -8px 16px var(--c-light);
@@ -370,7 +374,7 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: var(--c-light);
+    background-color: #ffffff;
 }
 .card-image { max-width: 100%; max-height: 100%; object-fit: contain; }
 .card-content { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; text-align: center; transform: translateZ(20px); }
@@ -399,6 +403,28 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
 }
 .card-actions i:hover { color: var(--primary-action); }
 .card-actions i:active { box-shadow: var(--shadow-inset); }
+
+/* === Card Colecionável (Histórico) === */
+#history-tab .product-card {
+    overflow: hidden; /* Garante que o brilho não saia do card */
+}
+#history-tab .product-card .card-price,
+#history-tab .product-card .card-actions {
+    display: none; /* Esconde preço e ações */
+}
+#history-tab .product-card .card-content {
+    justify-content: center; /* Centraliza o título verticalmente */
+}
+#history-tab .product-card .js-tilt-glare {
+    /* Efeito de brilho dourado */
+    background: linear-gradient(110deg, 
+        rgba(255, 215, 0, 0) 20%, 
+        rgba(255, 235, 100, 0.4) 45%, 
+        rgba(255, 255, 255, 0.6) 50%, 
+        rgba(255, 235, 100, 0.4) 55%, 
+        rgba(255, 215, 0, 0) 80%
+    );
+}
 
 /* === Info do Produto Verificado === */
 .verified-product-info-box {
@@ -653,7 +679,7 @@ input:checked + .slider-toggle:before {
         border-radius: 10px;
         background-color: var(--c-primary);
         box-shadow: var(--shadow);
-        overflow: visible; /* Permite que a sombra do tilt apareça */
+        overflow: hidden; /* Mudado para hidden para conter o brilho */
         transform: none; /* Reset para mobile */
     }
 
@@ -664,7 +690,7 @@ input:checked + .slider-toggle:before {
         padding: 8px;
         border-radius: 10px 0 0 10px;
         align-self: stretch;
-        background-color: var(--c-light);
+        background-color: #ffffff;
         box-shadow: none;
         border-right: 1px solid var(--c-dark);
         display: flex;
