@@ -520,6 +520,7 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
 #product-details-modal .modal-content {
     background-color: #ffffff; /* Fundo branco sólido */
     color: #3a3f44;           /* Cor de texto escura para garantir contraste */
+    overflow: auto;
 }
 
 /* Garante que o container da imagem dentro do modal também tenha fundo branco */
@@ -690,6 +691,7 @@ body[data-theme="dark"] #product-details-modal .modal-product-info p {
     box-shadow: var(--shadow);
     max-width: 900px;
     width: 90%;
+    overflow: auto;
 }
 
 #modal-product-image-container {
