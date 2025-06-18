@@ -663,6 +663,10 @@ body[data-theme="dark"] #product-details-modal .modal-product-info p {
 
 }
 
+.modal-product-description {
+   display: none; /* Esconde a descrição do produto por padrão */
+}
+
 
 .modal-content {
     background: var(--c-primary);
