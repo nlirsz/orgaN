@@ -558,7 +558,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    
+
     // Coloque isso no seu arquivo JavaScript principal (ex: renderer.js)
 const setAppHeight = () => {
   const doc = document.documentElement;
