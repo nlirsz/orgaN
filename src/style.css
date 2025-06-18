@@ -514,6 +514,33 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
     box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
 }
 
+/* === Correção para o Fundo do Modal de Detalhes do Produto === */
+
+/* Força o fundo branco para o conteúdo principal do modal de detalhes */
+#product-details-modal .modal-content {
+    background-color: #ffffff; /* Fundo branco sólido */
+    color: #3a3f44;           /* Cor de texto escura para garantir contraste */
+}
+
+/* Garante que o container da imagem dentro do modal também tenha fundo branco */
+#product-details-modal #modal-product-image-container {
+    background-color: #ffffff;
+    box-shadow: var(--shadow-inset-light); /* Mantém uma sombra interna suave */
+}
+
+/* Garante que o texto dentro do modal de detalhes seja sempre escuro */
+#product-details-modal .modal-product-info p,
+#product-details-modal .modal-product-info p strong,
+#product-details-modal #modal-product-name,
+#product-details-modal .modal-product-price {
+    color: var(--text-primary); /* Usa a variável de texto primário do tema claro */
+}
+
+/* Ajusta a borda inferior dos detalhes para ser visível no fundo branco */
+body[data-theme="dark"] #product-details-modal .modal-product-info p {
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+}
+
 /* Ajustes no texto para melhor legibilidade sobre o efeito */
 #history-tab .product-card .card-title {
     color: #1c1c1c;
