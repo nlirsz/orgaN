@@ -1,8 +1,7 @@
 // --- CONFIGURAÇÃO DO RECAPTCHA ---
 let recaptchaRegisterWidgetId = null;
-const RECAPTCHA_SITE_KEY = '6Lfin1MrAAAAAKoExa3uVksnMFHyJasKJbj8htsA'; // A sua Site Key
+const RECAPTCHA_SITE_KEY = '6Lfin1MrAAAAAKoExa3uVksnMFHyJasKJbj8htsA';
 
-// Função para renderizar o reCAPTCHA de registo. Chamada pelo 'onload' da API do Google.
 window.renderRegistrationRecaptcha = () => {
     console.log('API do reCAPTCHA carregada, a renderizar o widget de registo...');
     
@@ -32,7 +31,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- SELETORES DE ELEMENTOS ---
     const getElem = (id) => document.getElementById(id);
 
-    // Seção de Autenticação
     const authSection = getElem('auth-section');
     const dashboardLayout = document.querySelector('.dashboard-layout');
     const authTabButtons = document.querySelectorAll('.auth-tab-btn');
@@ -129,7 +127,97 @@ document.addEventListener('DOMContentLoaded', () => {
     const financeEmptyState = getElem('finance-empty-state');
     const themeSwitch = document.getElementById('theme-switch');
 
+    // --- LÓGICA DE TROCA DE TEMA E GRÁFICOS ---
+    const getTextColor = () => getComputedStyle(document.body).getPropertyValue('--text-primary').trim();
 
+    const updateChartColors = () => {
+        const textColor = getTextColor();
+        const chartInstances = [financeOverviewChart, categoryDistributionChart, financialLineChart];
+        
+        chartInstances.forEach(chart => {
+            if (chart) {
+                if (chart.options.plugins.legend) {
+                    chart.options.plugins.legend.labels.color = textColor;
+                }
+                if (chart.options.scales.x) {
+                    chart.options.scales.x.ticks.color = textColor;
+                    chart.options.scales.x.grid.color = 'rgba(128, 128, 128, 0.1)';
+                    if(chart.options.scales.x.title) chart.options.scales.x.title.color = textColor;
+                }
+                if (chart.options.scales.y) {
+                    chart.options.scales.y.ticks.color = textColor;
+                    chart.options.scales.y.grid.color = 'rgba(128, 128, 128, 0.1)';
+                     if(chart.options.scales.y.title) chart.options.scales.y.title.color = textColor;
+                }
+                chart.update();
+            }
+        });
+    };
+
+    const applySavedTheme = () => {
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.body.setAttribute('data-theme', savedTheme);
+        if (themeSwitch) {
+            themeSwitch.checked = savedTheme === 'dark';
+        }
+        setTimeout(updateChartColors, 50);
+    };
+
+    if (themeSwitch) {
+        themeSwitch.addEventListener('change', () => {
+            if (themeSwitch.checked) {
+                document.body.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.body.setAttribute('data-theme', 'light');
+                localStorage.setItem('theme', 'light');
+            }
+            updateChartColors();
+        });
+    }
+
+    applySavedTheme();
+
+    // --- LÓGICA DO EFEITO HOLOGRÁFICO ---
+    function initHoloCards() {
+        const cards = document.querySelectorAll("#history-tab .product-card");
+
+        cards.forEach(card => {
+            card.addEventListener("mousemove", e => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                const rotateX = (y - centerY) / 10;
+                const rotateY = (x - centerX) / -10;
+
+                card.style.setProperty("--rotate-x", `${rotateX}deg`);
+                card.style.setProperty("--rotate-y", `${rotateY}deg`);
+                card.style.setProperty("--pointer-x", `${(x / rect.width) * 100}%`);
+                card.style.setProperty("--pointer-y", `${(y / rect.height) * 100}%`);
+            });
+
+            card.addEventListener("mouseleave", () => {
+                card.style.setProperty("--rotate-x", "0deg");
+                card.style.setProperty("--rotate-y", "0deg");
+            });
+        });
+    }
+
+    // --- INICIALIZAÇÃO DOS CARDS COM MUTATION OBSERVER ---
+    const observer = new MutationObserver((mutationsList) => {
+        for(const mutation of mutationsList) {
+            if (mutation.type === 'childList') {
+                initHoloCards(); 
+                VanillaTilt.init(document.querySelectorAll("#products-tab .product-card"), { max: 15, speed: 400 });
+            }
+        }
+    });
+
+    if(pendingList) observer.observe(pendingList, { childList: true });
+    if(purchasedList) observer.observe(purchasedList, { childList: true });
+    
     // --- FUNÇÕES DE UTILIDADE ---
     async function authenticatedFetch(url, options = {}) {
         if (!authToken) {
@@ -218,6 +306,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if(registerMessage) registerMessage.textContent = '';
         if(loadingOverlay) loadingOverlay.classList.add('hidden');
     }
+    
+    // O resto do seu código permanece aqui...
+});
+
+
     const togglePasswordVisibilityBtn = getElem('toggle-password-visibility');
 
     if (togglePasswordVisibilityBtn && registerPasswordInput) {
@@ -758,7 +851,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initHoloCards();
     VanillaTilt.init(document.querySelectorAll("#products-tab .product-card"), { max: 15, speed: 400 });
 
-});
 
 
     function clearAddProductFormAddTab() {
