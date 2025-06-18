@@ -712,6 +712,55 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+        function initHoloCards() {
+        const cards = document.querySelectorAll("#history-tab .product-card");
+
+        cards.forEach(card => {
+            card.addEventListener("mousemove", e => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                const rotateX = (y - centerY) / 10;
+                const rotateY = (x - centerX) / -10;
+
+                card.style.setProperty("--rotate-x", `${rotateX}deg`);
+                card.style.setProperty("--rotate-y", `${rotateY}deg`);
+                card.style.setProperty("--pointer-x", `${(x / rect.width) * 100}%`);
+                card.style.setProperty("--pointer-y", `${(y / rect.height) * 100}%`);
+            });
+
+            card.addEventListener("mouseleave", () => {
+                card.style.setProperty("--rotate-x", "0deg");
+                card.style.setProperty("--rotate-y", "0deg");
+            });
+        });
+    }
+
+    // --- INICIALIZAÇÃO DOS CARDS ---
+    // Use um MutationObserver para aplicar os efeitos quando os cards forem adicionados ao DOM
+    const observer = new MutationObserver((mutationsList, observer) => {
+        for(const mutation of mutationsList) {
+            if (mutation.type === 'childList') {
+                // Se novos nós foram adicionados, reinicialize os efeitos
+                initHoloCards(); 
+                VanillaTilt.init(document.querySelectorAll("#products-tab .product-card"), { max: 15, speed: 400 });
+            }
+        }
+    });
+
+    // Observe as listas de produtos por mudanças
+    if(pendingList) observer.observe(pendingList, { childList: true });
+    if(purchasedList) observer.observe(purchasedList, { childList: true });
+
+    // Inicialização inicial
+    initHoloCards();
+    VanillaTilt.init(document.querySelectorAll("#products-tab .product-card"), { max: 15, speed: 400 });
+
+});
+
+
     function clearAddProductFormAddTab() {
         if (productUrlInputAddTab) productUrlInputAddTab.value = '';
         if (verifiedProductInfoDivAddTab) verifiedProductInfoDivAddTab.classList.add('hidden');
@@ -1676,4 +1725,8 @@ else if (target.classList.contains('action-search')) {
     } else { //
         showAuthSection(); //
     }
-});
+
+
+
+    
+

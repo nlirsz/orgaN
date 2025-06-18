@@ -431,8 +431,27 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
 
 /* === Card Colecionável (Histórico) === */
 #history-tab .product-card {
-    background: linear-gradient(145deg, #FFD700, #F0E68C); /* Gradiente dourado */
-    box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+    transform: perspective(1000px) rotateX(var(--rotate-x, 0)) rotateY(var(--rotate-y, 0));
+    background: linear-gradient(145deg, #FFD700, #F0E68C, #B8860B);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+#history-tab .product-card::before { /* Camada de brilho branco */
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: 0; top: 0;
+    border-radius: 20px;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    background: radial-gradient(
+        circle at var(--pointer-x) var(--pointer-y),
+        rgba(255, 255, 255, 0.8) 0%,
+        rgba(255, 255, 255, 0) 50%
+    );
+    z-index: 3;
+    opacity: 0;
+}
+#history-tab .product-card:hover::before {
+    opacity: 1;
 }
 #history-tab .product-card .card-image-container {
     background: rgba(255,255,255,0.8);
@@ -443,20 +462,12 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
     justify-content: center;
 }
 #history-tab .product-card .card-title {
-    color: #1c1c1c; /* Cor preta para o texto */
+    color: #1c1c1c;
     text-shadow: 1px 1px 2px rgba(255,255,255,0.4);
 }
 #history-tab .product-card .card-price,
-#history-tab .product-card > .card-actions { /* Esconde ações principais */
+#history-tab .product-card > .card-actions {
     display: none;
-}
-#history-tab .product-card .js-tilt-glare-inner {
-    background: linear-gradient(110deg, 
-        rgba(255, 255, 255, 0) 30%, 
-        rgba(255, 255, 255, 0.8) 50%, 
-        rgba(255, 255, 255, 0) 70%
-    );
-    z-index: 3; /* Garante que o brilho fique sobre a imagem e fundo, mas abaixo do texto */
 }
 .card-hover-actions {
     position: absolute;
@@ -468,7 +479,7 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.2s ease, visibility 0.2s ease;
-    z-index: 4; /* Fica acima de todo o resto */
+    z-index: 4;
 }
 #history-tab .product-card:hover .card-hover-actions {
     opacity: 1;
@@ -835,10 +846,10 @@ input:checked + .slider-toggle:before {
     }
     #history-tab .product-card {
         background: var(--c-primary); 
+        transform: none !important;
     }
-    #history-tab .product-card .card-hover-actions,
-    .product-card .card-hover-actions {
-        display: none; 
+    #history-tab .product-card .card-hover-actions {
+        display: none;
     }
     #history-tab .product-card > .card-actions {
         display: grid;
@@ -920,11 +931,8 @@ input:checked + .slider-toggle:before {
         box-shadow: none;
         color: var(--text-secondary);
     }
-     #history-tab .product-card .card-actions {
-        display: grid;
-     }
 
-    .modal-content, .product-details-modal-content {
+    .modal-content {
         width: 95%;
         padding: 20px 15px;
     }
