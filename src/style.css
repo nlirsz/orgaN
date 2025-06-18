@@ -27,9 +27,9 @@
     --success-color: #28a745;
     --highlight-action-text: #FFFFFF;
 
-    /* AJUSTE: Sombras mais suaves */
-    --shadow: 4px 4px 8px var(--c-dark), -4px -4px 8px var(--c-light);
-    --shadow-inset: inset 4px 4px 8px var(--c-dark), inset -4px -4px 8px var(--c-light);
+    /* AJUSTE: Sombras ainda mais suaves */
+    --shadow: 3px 3px 6px var(--c-dark), -3px -3px 6px var(--c-light);
+    --shadow-inset: inset 3px 3px 6px var(--c-dark), inset -3px -3px 6px var(--c-light);
     --shadow-inset-light: inset 2px 2px 4px var(--c-dark), inset -2px -2px 4px var(--c-light);
 }
 
@@ -42,10 +42,10 @@ body[data-theme="dark"] {
     --text-primary: #e0e0e0;
     --text-secondary: #a3b1c6;
     
-    color-scheme: dark; /* Ajuda a ajustar cores padrão de elementos como scrollbars */
+    color-scheme: dark; 
 }
 
-/* AJUSTE: Garante que a sombra no modo escuro use as variáveis escuras */
+/* AJUSTE: Sombras corretas no modo escuro */
 body[data-theme="dark"] {
     --shadow: 4px 4px 8px var(--c-dark), -4px -4px 8px var(--c-light);
     --shadow-inset: inset 4px 4px 8px var(--c-dark), inset -4px -4px 8px var(--c-light);
@@ -258,7 +258,7 @@ textarea { resize: vertical; min-height: 80px; }
 }
 
 /* === Botões Neumórficos === */
-button, .primary-btn, .auth-submit-btn, #add-finance-entry-btn {
+button, .primary-btn, .auth-submit-btn, #add-finance-entry-btn, .product-link-btn {
     padding: 12px 20px;
     background: var(--c-primary);
     color: var(--text-secondary);
@@ -274,14 +274,15 @@ button, .primary-btn, .auth-submit-btn, #add-finance-entry-btn {
     box-shadow: var(--shadow);
     transition: all 0.2s ease-in-out;
     width: auto;
+    text-decoration: none; /* Remove sublinhado de links estilizados como botões */
 }
 
-button:hover, .primary-btn:hover, .auth-submit-btn:hover, #add-finance-entry-btn:hover {
+button:hover, .primary-btn:hover, .auth-submit-btn:hover, #add-finance-entry-btn:hover, .product-link-btn:hover {
     color: var(--primary-action);
     transform: translateY(-1px);
 }
 
-button:active, .primary-btn:active, .auth-submit-btn:active, #add-finance-entry-btn:active {
+button:active, .primary-btn:active, .auth-submit-btn:active, #add-finance-entry-btn:active, .product-link-btn:active {
     box-shadow: var(--shadow-inset);
     color: var(--primary-action);
     transform: translateY(0);
@@ -291,16 +292,16 @@ button:active, .primary-btn:active, .auth-submit-btn:active, #add-finance-entry-
     width: 100%;
 }
 
-button.primary-btn, button.auth-submit-btn, #add-finance-entry-btn {
+button.primary-btn, button.auth-submit-btn, #add-finance-entry-btn, a.product-link-btn {
     background-color: var(--primary-action);
     color: var(--highlight-action-text);
     box-shadow: 2px 2px 4px #0c6b17, -2px -2px 4px #16c330;
 }
-button.primary-btn:hover, button.auth-submit-btn:hover, #add-finance-entry-btn:hover {
+button.primary-btn:hover, button.auth-submit-btn:hover, #add-finance-entry-btn:hover, a.product-link-btn:hover {
     background-color: var(--primary-action-hover);
     color: var(--highlight-action-text);
 }
-button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn:active {
+button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn:active, a.product-link-btn:active {
     box-shadow: inset 2px 2px 4px #0c6b17, inset -2px -2px 4px #16c330;
 }
 
@@ -379,7 +380,7 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
     position: relative;
 }
 .product-card:hover {
-    box-shadow: 8px 8px 16px var(--c-dark), -8px -8px 16px var(--c-light);
+    box-shadow: 6px 6px 12px var(--c-dark), -6px -6px 12px var(--c-light);
 }
 .card-image-container { 
     width: 100%; height: 180px; padding: 10px;
@@ -443,6 +444,7 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
         rgba(255, 235, 100, 0.4) 55%, 
         rgba(255, 215, 0, 0) 80%
     );
+    z-index: 1;
 }
 
 /* === Info do Produto Verificado === */
@@ -476,9 +478,10 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
 
 .chart-container {
     position: relative;
-    height: 400px; /* Altura consistente para os containers */
+    height: 350px; /* Altura ajustada */
     display: flex;
     flex-direction: column;
+    padding: 25px 25px 40px 25px; /* Adiciona padding inferior para a legenda */
 }
 .chart-container canvas {
     flex-grow: 1;
@@ -503,12 +506,12 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
 }
 .modal-overlay.active { opacity: 1; visibility: visible; pointer-events: auto; }
 
-.modal-content, .product-details-modal-content {
+.modal-content {
     background: var(--c-primary);
     color: var(--text-primary);
     border-radius: 20px;
     box-shadow: var(--shadow);
-    max-width: 600px; /* Largura ajustada */
+    max-width: 600px;
     padding: 30px;
     position: relative;
     max-height: 90vh;
@@ -519,10 +522,11 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
 .product-details-modal-content {
     display: flex;
     flex-direction: column;
+    text-align: center;
 }
 #modal-product-image-container {
     width: 100%;
-    max-height: 250px; /* Limite de altura para a imagem */
+    max-height: 200px; /* Imagem ainda menor */
     flex-shrink: 0;
     display: flex;
     align-items: center;
@@ -539,12 +543,12 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
     object-fit: contain;
 }
 #modal-product-name {
-    font-size: 1.5em;
+    font-size: 1.4em;
     font-weight: 700;
     margin-bottom: 4px;
 }
 .modal-product-price {
-    font-size: 1.2em;
+    font-size: 1.1em;
     font-weight: 500;
     color: var(--text-secondary);
     margin-bottom: 20px;
@@ -561,6 +565,7 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
     justify-content: space-between;
     border-bottom: 1px solid rgba(0,0,0,0.05);
     padding: 8px 4px;
+    gap: 15px; /* Espaço entre a chave e o valor */
 }
 body[data-theme="dark"] .modal-product-info p {
     border-bottom: 1px solid rgba(255,255,255,0.08);
@@ -568,16 +573,15 @@ body[data-theme="dark"] .modal-product-info p {
 .modal-product-info p strong {
     color: var(--text-secondary);
     margin-right: 15px;
+    flex-shrink: 0; /* Impede que o label encolha */
 }
 .modal-product-info p span {
     text-align: right;
+    word-break: break-all;
 }
 a.product-link-btn {
-    display: block;
     width: 100%;
-    text-align: center;
-    text-decoration: none;
-    margin-bottom: 10px;
+    margin-bottom: 15px; /* Espaço maior */
 }
 .modal-actions {
     margin-top: auto;
@@ -869,4 +873,3 @@ input:checked + .slider-toggle:before {
         padding: 20px;
     }
 }
-
