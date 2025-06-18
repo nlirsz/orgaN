@@ -803,6 +803,15 @@ a.product-link-btn {
 /* Modal de Edição */
 .edit-product-modal-content {
     max-width: 600px;
+    width: 90%;
+    background: var(--c-primary);
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    overflow: auto;
 }
 #edit-product-preview-image {
     display: block;
