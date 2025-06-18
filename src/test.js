@@ -1,33 +1,3 @@
-// Adiciona as variáveis para os IDs dos widgets do reCAPTCHA no topo do arquivo
-let recaptchaLoginWidgetId = null;
-let recaptchaRegisterWidgetId = null;
-const RECAPTCHA_SITE_KEY = '6Lfin1MrAAAAAKoExa3uVksnMFHyJasKJbj8htsA'; // Sua Site Key
-
-// Função para renderizar os reCAPTCHAs explicitamente
-// Esta função será chamada pelo callback 'onload' da API do Google
-window.renderRecaptchas = () => {
-    console.log('API do reCAPTCHA carregada, renderizando widgets...');
-    
-    // Renderiza o reCAPTCHA de Login
-    const loginContainer = document.getElementById('recaptcha-login-container');
-    if (loginContainer && recaptchaLoginWidgetId === null) {
-        recaptchaLoginWidgetId = grecaptcha.render('recaptcha-login-container', {
-            'sitekey' : RECAPTCHA_SITE_KEY
-        });
-        console.log('Widget reCAPTCHA de Login renderizado com ID:', recaptchaLoginWidgetId);
-    }
-
-    // Renderiza o reCAPTCHA de Registro
-    const registerContainer = document.getElementById('recaptcha-register-container');
-    if (registerContainer && recaptchaRegisterWidgetId === null) {
-        recaptchaRegisterWidgetId = grecaptcha.render('recaptcha-register-container', {
-            'sitekey' : RECAPTCHA_SITE_KEY
-        });
-        console.log('Widget reCAPTCHA de Registro renderizado com ID:', recaptchaRegisterWidgetId);
-    }
-};
-
-
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- VARIÁVEIS GLOBAIS E CONFIGURAÇÃO ---
@@ -358,29 +328,20 @@ if (loginForm) {
         e.preventDefault();
         const username = loginUsernameInput.value.trim();
         const password = loginPasswordInput.value.trim();
-        
-        // ALTERADO: Pega a resposta usando o ID do widget de login
-        const recaptchaResponse = (typeof grecaptcha !== 'undefined' && recaptchaLoginWidgetId !== null) 
-            ? grecaptcha.getResponse(recaptchaLoginWidgetId) 
-            : '';
 
         if (!username || !password) {
             showAuthMessage(loginMessage, 'Por favor, preencha todos os campos.');
             return;
         }
-        
-        if (typeof grecaptcha !== 'undefined' && !recaptchaResponse) {
-            showAuthMessage(loginMessage, 'Por favor, complete o reCAPTCHA.');
-            return;
-        }
 
+        // Mostra a tela de carregamento com a logo ASSIM que o usuário clica em Entrar
         if (loadingOverlay) loadingOverlay.classList.remove('hidden');
 
         try {
             const response = await fetch(`${API_BASE_URL}/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password, 'g-recaptcha-response': recaptchaResponse }),
+                body: JSON.stringify({ username, password }),
             });
             
             const data = await response.json();
@@ -397,21 +358,24 @@ if (loginForm) {
                     localStorage.removeItem('userId');
                 }
                 
+                // Chama a showDashboard, que já tem a lógica de esconder o loading no final.
                 await showDashboard();
 
             } else {
+                // Se o login falhar (ex: senha errada), esconde o loading e mostra o erro.
                 if (loadingOverlay) loadingOverlay.classList.add('hidden');
                 showAuthMessage(loginMessage, data.message || 'Erro ao fazer login.');
-                // ALTERADO: Reseta usando o ID do widget correto
-                if (typeof grecaptcha !== 'undefined' && recaptchaLoginWidgetId !== null) grecaptcha.reset(recaptchaLoginWidgetId);
+                if (typeof grecaptcha !== 'undefined') grecaptcha.reset(0);
             }
         } catch (error) {
+            // Se der erro de rede, esconde o loading e mostra o erro.
             if (loadingOverlay) loadingOverlay.classList.add('hidden');
             console.error('Erro de rede ao fazer login:', error);
             showAuthMessage(loginMessage, 'Erro de conexão com o servidor.');
-             // ALTERADO: Reseta usando o ID do widget correto
-            if (typeof grecaptcha !== 'undefined' && recaptchaLoginWidgetId !== null) grecaptcha.reset(recaptchaLoginWidgetId);
+            if (typeof grecaptcha !== 'undefined') grecaptcha.reset(0);
         }
+        // O bloco 'finally' foi removido, pois a lógica de esconder o overlay
+        // agora é tratada nos cenários de sucesso e falha, tornando o controle mais explícito.
     });
 }
 
@@ -419,37 +383,40 @@ if (registerForm) {
     registerForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
+        // Extrai os valores dos campos do formulário
         const username = registerUsernameInput.value.trim();
         const password = registerPasswordInput.value.trim();
 
-        // ALTERADO: Pega a resposta usando o ID do widget de registro
-        const recaptchaResponse = (typeof grecaptcha !== 'undefined' && recaptchaRegisterWidgetId !== null) 
-            ? grecaptcha.getResponse(recaptchaRegisterWidgetId) 
-            : '';
+        // Obtém o token do reCAPTCHA. O "1" assume que este é o segundo widget reCAPTCHA na página (o primeiro sendo o de login).
+        const recaptchaResponse = (typeof grecaptcha !== 'undefined') ? grecaptcha.getResponse(1) : '';
 
+        // --- Validações no Frontend ---
         if (!username || !password) {
             showAuthMessage(registerMessage, 'Por favor, preencha todos os campos.');
             return;
         }
 
+        // Validação simples de comprimento da senha
         const passwordMinLength = 8;
         if (password.length < passwordMinLength) {
             showAuthMessage(registerMessage, `A senha deve ter no mínimo ${passwordMinLength} caracteres.`);
             return;
         }
 
+        // Validação do reCAPTCHA
         if (typeof grecaptcha !== 'undefined' && !recaptchaResponse) {
             showAuthMessage(registerMessage, 'Por favor, complete o reCAPTCHA.');
             return;
         }
 
         try {
+            // Monta o corpo da requisição para a API
             const bodyPayload = {
                 username,
                 password,
-                'g-recaptcha-response': recaptchaResponse // Envia o token para o backend
             };
 
+            // Envia a requisição de registro para a API
             const response = await fetch(`${API_BASE_URL}/auth/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -459,35 +426,41 @@ if (registerForm) {
             const data = await response.json();
 
             if (response.ok) {
+                // --- Ações de UX para registro bem-sucedido ---
+
+                // 1. Limpa o formulário de registro e o indicador de força da senha
                 registerForm.reset();
                 if (passwordStrengthIndicator) {
                     passwordStrengthIndicator.textContent = 'Força: ';
                     passwordStrengthIndicator.style.color = 'grey';
                 }
 
+                // 2. Exibe uma mensagem de sucesso clara e informativa
                 showAuthMessage(registerMessage, data.message + ' Redirecionando para o login...', true);
-                // ALTERADO: Reseta usando o ID do widget correto
-                if (typeof grecaptcha !== 'undefined' && recaptchaRegisterWidgetId !== null) grecaptcha.reset(recaptchaRegisterWidgetId);
+                if (typeof grecaptcha !== 'undefined') grecaptcha.reset(1); // Reseta o reCAPTCHA
 
+                // 3. Após um breve intervalo, muda para a aba de login e prepara para o usuário logar
                 setTimeout(() => {
+                    // Simula o clique na aba de login
                     const loginTabButton = document.querySelector('[data-auth-tab="login"]');
                     if (loginTabButton) loginTabButton.click();
                     
+                    // Preenche o campo de usuário e foca no campo de senha
                     if (loginUsernameInput) loginUsernameInput.value = username;
                     if (loginPasswordInput) loginPasswordInput.focus();
 
-                }, 2000);
+                }, 2000); // Espera 2 segundos para o usuário ler a mensagem de sucesso
 
             } else {
+                // Se a API retornar um erro (ex: usuário já existe)
                 showAuthMessage(registerMessage, data.message || 'Ocorreu um erro ao registrar.');
-                // ALTERADO: Reseta usando o ID do widget correto
-                if (typeof grecaptcha !== 'undefined' && recaptchaRegisterWidgetId !== null) grecaptcha.reset(recaptchaRegisterWidgetId);
+                if (typeof grecaptcha !== 'undefined') grecaptcha.reset(1);
             }
         } catch (error) {
+            // Se ocorrer um erro de rede
             console.error('Erro de rede ao registrar:', error);
             showAuthMessage(registerMessage, 'Não foi possível conectar ao servidor. Tente novamente.');
-            // ALTERADO: Reseta usando o ID do widget correto
-            if (typeof grecaptcha !== 'undefined' && recaptchaRegisterWidgetId !== null) grecaptcha.reset(recaptchaRegisterWidgetId);
+            if (typeof grecaptcha !== 'undefined') grecaptcha.reset(1);
         }
     });
 }
@@ -1621,3 +1594,5 @@ else if (target.classList.contains('action-search')) {
         showAuthSection(); //
     }
 });
+
+// Em src/renderer.js
