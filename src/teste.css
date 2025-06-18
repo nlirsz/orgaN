@@ -1,0 +1,2507 @@
+/* Reset & Fontes Globais */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Almarai:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+:root {
+
+    /* Tema Claro Principal */
+
+    --bg-page-primary: #FFFFFF;
+
+    --text-on-light-bg: #212529;
+
+    --text-secondary-on-light-bg: #6c757d;
+
+    --border-color-light: #dee2e6;
+
+    --bg-element-light: #F8F9FA;
+
+    --app-height: 100vh; /* Fallback para caso o JS não execute */
+
+
+
+    /* Para Elementos Escuros Contrastantes */
+
+    --bg-element-dark: #2B2B2B;
+
+    --text-on-dark-bg: #ececec;
+
+    --text-secondary-on-dark-bg: #424344;
+
+    --border-color-dark-elements: #495057;
+
+
+
+    /* Cores de Ação */
+
+    --primary-action: #119423;
+
+    --primary-action-hover: #105e1a;
+
+    --menu-active-icon-bg: #119423;
+
+    --secondary-action-color: #FFC107;
+
+
+
+    /* Placeholders */
+
+    --text-placeholder-on-light-input: #6c757d;
+
+    --text-placeholder-on-dark-input: #868e96;
+
+
+
+    /* Sombras */
+
+    --element-shadow-on-light-bg: 0px 6px 12px rgba(0, 0, 0, 0.15);
+
+    --element-hover-shadow-on-light-bg: 0px 8px 18px rgba(0, 0, 0, 0.2);
+
+
+
+    /* Cores Específicas para o Menu Mobile Escuro (será ocultado, mas mantendo vars) */
+
+    --mobile-menu-bg: #1A1D24;
+
+    --mobile-menu-nav-items-container-bg: #2C3038;
+
+    --mobile-menu-icon-inactive-bg: #454A54;
+
+    --mobile-menu-icon-color: var(--text-on-dark-bg);
+
+    --mobile-menu-icon-active-color: #FFFFFF;
+
+    --mobile-menu-logout-icon-color: var(--secondary-action-color);
+
+    --mobile-menu-logout-border-color: var(--secondary-action-color);
+
+
+
+    /* Outras */
+
+    --success-color: #28a745;
+
+    --error-color: #dc3545;
+
+    --edit-color: #ffc107;
+
+    --highlight-action-text: #FFFFFF;
+
+
+
+    /* DEFINITIONS FOR COMMON VARIABLES */
+
+    --bg-primary: var(--bg-page-primary);
+
+    --text-primary: var(--text-on-light-bg);
+
+    --bg-secondary: #fff;
+
+    --bg-tertiary: #ffffff;
+
+    --bg-accent: #3a3f44;
+
+    --border-color: var(--border-color-dark-elements);
+
+    --input-light-bg: var(--bg-element-light);
+
+    --input-light-text: var(--text-on-light-bg);
+
+    --input-light-placeholder: var(--text-secondary-on-light-bg);
+
+}
+
+
+html, body {
+    font-family: 'Inter', sans-serif;
+    color: var(--text-primary);
+    background-color: var(--bg-primary);
+    height: 100%;
+    overflow: hidden;
+    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.dashboard-layout {
+    display: flex;
+    height: 100vh;
+}
+
+/* === DESKTOP SIDEBAR === */
+.sidebar {
+    width: 100px;
+    background: #ececec;
+    flex-shrink: 0;
+    padding: 35px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+    z-index: 100; /* Lower than mobile bottom bar if they could overlap on resize */
+    border-right: 1px solid var(--border-color);
+    box-shadow: 5px 0px 15px rgba(0, 0, 0, 0.2);
+}
+
+.sidebar-header .logo {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    box-shadow: 0px 0px 9.7px rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-nav-main {
+    width: 60px;
+    background: #121212;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.25);
+    border-radius: 56px;
+    padding: 10px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 35px;
+}
+
+.sidebar-title { display: none; }
+.sidebar-title.active {
+    display: block;
+    font-size: 1.2em;
+    color: var(--text-on-dark-bg);
+    font-weight: 600;
+    margin-bottom: 20px;
+    text-align: center;
+}
+.sidebar-nav { /* Not used in current HTML structure provided */
+    width: 100%;
+    flex-grow: 1;
+}
+.nav-btn {
+    width: 45px;
+    height: 45px;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s, transform 0.2s;
+}
+.nav-btn:hover {
+    transform: scale(1.12);
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+}
+.nav-btn i {
+    font-size: 28px;
+    line-height: 1;
+}
+
+.sidebar-nav-main .nav-btn {
+    background: var(--bg-accent);
+}
+.sidebar-nav-main .nav-btn i {
+    color: var(--text-on-dark-bg);
+}
+.sidebar-nav-main .nav-btn.active {
+    background-color: var(--primary-action);
+}
+.sidebar-nav-main .nav-btn.active i {
+    color: var(--highlight-action-text);
+}
+.sidebar-nav-main .nav-btn:hover {
+    background-color: var(--primary-action-hover);
+}
+.sidebar-nav-main .nav-btn:hover i {
+    color: var(--highlight-action-text);
+}
+
+.sidebar > .nav-btn { /* For Settings and Logout on desktop */
+    background-color: var(--bg-accent);
+}
+.sidebar > .nav-btn i {
+    color: var(--text-on-dark-bg);
+}
+.sidebar > .nav-btn:hover {
+    background-color: var(--primary-action-hover);
+}
+.sidebar > .nav-btn:hover i {
+    color: var(--highlight-action-text);
+}
+
+
+/* ADICIONE estas novas regras no lugar (pode ser após a regra de .sidebar): */
+.sidebar-footer {
+    margin-top: auto; /* Esta é a linha mágica que empurra o bloco para o fundo */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px; /* Espaço entre os botões de rodapé */
+    padding-bottom: 20px; /* Um respiro na parte de baixo */
+}
+
+/* Estilo para os botões dentro do rodapé */
+.sidebar-footer .nav-btn {
+    background-color: var(--bg-element-secondary);
+    color: var(--text-secondary);
+}
+
+.sidebar-footer .nav-btn#logout-btn:hover {
+    background-color: var(--error-color); /* Fundo vermelho no hover do logout */
+    color: var(--highlight-action-text);
+}
+
+.url-scrape-container {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    background-color: var(--bg-element);
+    border: transparent;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: var(--element-shadow);
+}
+.url-scrape-container input[type="url"] { flex-grow: 1; }
+.url-scrape-container button { width: auto; flex-shrink: 0; }
+
+
+
+/* ... (Rest of your existing CSS up to media queries) ... */
+
+/* Coloque o restante do seu CSS aqui (Auth, Forms, Modals, Dashboard, etc.) */
+/* ... (Vou omitir o meio do CSS para economizar espaço, as mudanças principais estão no :root e no @media) ... */
+
+html, body { font-family: 'Montserrat', sans-serif; color: var(--text-primary); background-color: var(--bg-primary); height: 100%; overflow: hidden; }
+.dashboard-layout { display: flex; height: 100vh; }
+.password-wrapper { position: relative; display: flex; align-items: center; }
+.password-wrapper input[type="password"], .password-wrapper input[type="text"] { padding-right: 40px; }
+.toggle-password-btn { position: absolute; right: 1px; top: 1px; bottom: 1px; border: none; background: transparent; padding: 0 10px; cursor: pointer; color: var(--text-secondary-on-dark-bg); display: flex; align-items: center; justify-content: center; z-index: 2; border-radius: 0 20px 20px 0; }
+.toggle-password-btn:hover { color: var(--primary-action); }
+.toggle-password-btn i { font-size: 1em; }
+#password-requirements-legend { font-size: 0.75em; color: var(--text-secondary-on-dark-bg); line-height: 1.4; }
+#password-strength-indicator { font-size: 0.8em; margin-top: 5px; color: var(--text-secondary-on-dark-bg); }
+.g-recaptcha { margin-bottom: 15px; display: flex; justify-content: center; }
+.main-content-area { flex-grow: 1; padding: 25px 35px; overflow-y: auto; height: 100vh; background-color: var(--bg-page-primary); }
+.main-content-area h2 { font-family: 'Almarai', sans-serif; font-size: 1.8em; color: var(--text-on-light-bg); margin-bottom: 25px; border-bottom: none; padding-bottom: 10px; text-align: center; font-weight: 700; }
+.tab-content { display: none; }
+.tab-content.active { display: block; animation: fadeIn 0.4s ease-out; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.products-tab-add-section.form-container { padding: 0; box-shadow: none; border-radius: 0; background-color: transparent; }
+.products-tab-add-section.form-container h3 { display: none; }
+#scrape-form-products-tab.input-group { background-color: var(--input-light-bg); border-radius: 78px; padding: 8px; display: flex; align-items: center; box-shadow: -2px 8px 16.8px rgba(0, 0, 0, 0.15); border: 1px solid #D9D9D9; max-width: 1150px; margin: 0 auto 35px auto; }
+#scrape-form-products-tab.input-group input[type="url"] { flex-grow: 1; border: none; background: transparent; padding: 10px 20px; font-size: 1.1em; font-family: 'Almarai', sans-serif; color: var(--input-light-text); box-shadow: none; border-radius: 78px; min-width: 100px; }
+#scrape-form-products-tab.input-group input[type="url"]::placeholder { color: var(--input-light-placeholder); font-weight: 700; }
+#scrape-form-products-tab.input-group input[type="url"]:focus { box-shadow: none; }
+#scrape-form-products-tab.input-group button { background-color: var(--primary-action); color: var(--highlight-action-text); font-family: 'Almarai', sans-serif; font-weight: 700; font-size: 1.1em; border-radius: 78px; padding: 12px 30px; margin: 0; width: auto; white-space: nowrap; box-shadow: none; border: none; flex-shrink: 0; }
+#scrape-form-products-tab.input-group button:hover { background-color: var(--primary-action-hover); transform: none; }
+#scrape-form-products-tab.input-group button i.fa-search { margin-left: 8px; }
+.form-container, .finance-form-container, .auth-container { background-color: #fff; padding: 25px; border-radius: 10px; margin-bottom: 30px; box-shadow: var(--element-shadow-on-light-bg); }
+.add-product-form-container { margin-left: auto; margin-right: auto; }
+.form-section-title { font-size: 1.5em; font-family: 'Almarai', sans-serif; color: #121212; margin-top: 25px; margin-bottom: 20px; text-align: center; font-weight: 700; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
+.form-container h3, .finance-form-container h3, .auth-container h2 { font-size: 1.4em; margin-top: 0; margin-bottom: 20px; color: #121212; text-align: center; }
+.form-group { margin-bottom: 18px; display: flex; flex-direction: column; gap: 6px; }
+.form-group label { display: block; margin-bottom: 6px; font-size: 0.9em; color: var(--text-secondary-on-dark-bg); font-weight: 500; }
+.input-group { display: flex; gap: 10px; margin-bottom: 15px; align-items: center; flex-wrap: wrap; justify-content: space-between; width: 100%; }
+input[type="url"], input[type="text"], input[type="number"], input[type="month"], input[type="password"], select, textarea, input[type="email"] { flex-grow: 1; padding: 10px 12px; font-size: 0.95em; background-color: var(--bg-tertiary); border: 1px solid var(--border-color); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); color: #121212; border-radius: 20px; transition: border-color 0.2s, box-shadow 0.2s; box-sizing: border-box; font-family: 'Inter', sans-serif; font-weight: 400; cursor: text; }
+input::placeholder, textarea::placeholder { color: var(--text-placeholder-on-dark-input); }
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary-action); box-shadow: 0 0 0 3px rgba(0, 119, 255, 0.3); cursor: text; }
+textarea { resize: vertical; min-height: 70px; }
+select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%23A0A0A0'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd' /%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.8rem center; background-size: 1.1em; padding-right: 2.5rem; cursor: pointer; width: 100%; height: 40px; font-family: 'Space Grotesk', sans-serif; }
+button, .primary-btn, .auth-submit-btn { padding: 10px 18px; background-color: var(--primary-action); color: var(--highlight-action-text); font-weight: 500; border: none; border-radius: 20px; cursor: pointer; transition: background-color 0.2s, transform 0.1s; font-size: 0.9em; display: inline-flex; align-items: center; gap: 8px; justify-content: center; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); width: auto; flex-shrink: 0; }
+button:hover, .primary-btn:hover, .auth-submit-btn:hover { background-color: var(--primary-action-hover); transform: translateY(-1px); box-shadow: 0 4px 6px rgba(0, 0, 0, 0.25); }
+button:active, .primary-btn:active, .auth-submit-btn:active { transform: translateY(0px); }
+.primary-btn, .auth-submit-btn { width: 100%; }
+.secondary-btn { background-color: var(--bg-accent); border: 1px solid var(--border-color); color: var(--text-on-dark-bg); font-weight: 500; transition: background-color 0.2s, color 0.2s; padding: 10px 18px; border-radius: 6px; cursor: pointer; display: inline-flex; }
+.secondary-btn:hover { background-color: var(--border-color); color: var(--text-on-dark-bg); }
+.hidden { display: none !important; }
+#verifiedProductInfo-add-tab, #verifiedProductInfo-products-tab { margin: 20px auto; padding: 20px; background-color: #ffffff; color: #121212; border-radius: 12px; border: 1px solid var(--border-color-dark-elements); box-shadow: var(--element-shadow-on-light-bg); max-width: 480px; overflow-y: auto; max-height: 500px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+#verifiedProductInfo-add-tab h4, #verifiedProductInfo-products-tab h4 { font-size: 1.2em; margin-bottom: 12px; color: var(--text-on-dark-bg); }
+#verifiedProductInfo-add-tab p, #verifiedProductInfo-products-tab p { margin-bottom: 8px; font-size: 0.95em; color: var(--text-secondary-on-dark-bg); }
+#verifiedProductInfo-add-tab p strong, #verifiedProductInfo-products-tab p strong { color: #121212; }
+#verifiedProductImage-add-tab, #verifiedProductImage-products-tab { display: block; max-width: 100%; height: auto; max-height: 250px; border-radius: 8px; margin: 10px auto 15px; background-color: #FFFFFF; object-fit: contain; border: 1px solid var(--border-color-dark-elements); cursor: default; }
+.product-list-container h3 { font-size: 1.5em; font-family: 'Almarai', sans-serif; color: var(--text-on-dark-bg); margin-top: 30px; margin-bottom: 18px; text-align: center; font-weight: 700; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; letter-spacing: 0.05em; cursor: default; }
+.product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 25px; list-style: none; padding: 0; margin: 0; cursor: default; }
+/* Seu CSS original, com uma pequena alteração */
+.product-card {
+  background-color: var(--bg-secondary);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--element-shadow-on-light-bg);
+  
+  /* Mantenha a transição, mas aplique a transformação aqui */
+  transition: transform 0.2s ease, box-shadow 0.6s ease;
+  transform-style: preserve-3d; /* Essencial para o efeito 3D */
+  transform: perspective(1000px); /* Adiciona perspectiva */
+
+  position: relative;
+}
+
+.product-card:hover {
+  /* Removemos o transform daqui para o JS controlar */
+  box-shadow: #119423 0px 8px 18px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+}
+
+
+.card-actions {
+    --card-bg-gradient: linear-gradient(50deg, rgba(21, 22, 24, 0.724) 0%, rgba(4, 19, 34, 0.86) 100%);
+    scale: 1.1;
+    transition: scale 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-image-container { width: 100%; height: 180px; background-color: #FFFFFF; border-radius: 12px 12px 0 0; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 10px; cursor: pointer; }
+.card-image { max-width: 100%; max-height: 100%; border-radius: 6px; object-fit: contain; cursor: pointer; }
+.card-content { padding: 15px; background-color: #121212; border-radius: 12px 12px 0 0; flex-grow: 1; display: flex; flex-direction: column; text-align: center; }
+.card-title { font-family: 'Almarai', sans-serif; font-size: 1.1em; font-weight: 700; color: var(--text-on-dark-bg); margin-bottom: 8px; line-height: 1.4; min-height: 2.8em; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; cursor: pointer; z-index: 2; position: relative; }
+.card-price { z-index: 2; position: relative; font-size: 1.8em; font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: var(--text-on-dark-bg); margin-top: auto; margin-bottom: 15px; }
+.card-actions { padding: 10px 15px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--border-color); background-color: #121212; }
+.card-actions i { z-index: 2; position: relative; font-size: 1.3em; color: #ececec; cursor: pointer; transition: color 0.2s, transform 0.2s; padding: 8px; }
+.card-actions i:hover { color: #119423; transform: scale(1.15); z-index: 2; position: relative; }
+#dashboard-main-tab h2 { margin-bottom: 20px; text-align: left; color: var(--text-on-light-bg); }
+.dashboard-summary-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 20px; margin-bottom: 30px; }
+.summary-card { background-color: var(--bg-secondary); padding: 20px; border-radius: 8px; box-shadow: var(--element-shadow-on-light-bg); transition: transform 0.2s ease, box-shadow 0.2s ease; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+.summary-card h4 { font-size: 0.95em; color: var(--text-secondary-on-dark-bg); margin-bottom: 8px; font-weight: 500; letter-spacing: 0.05em; }
+.summary-card p { font-size: 1.8em; font-weight: 700; color: #121212; margin: 0; transition: color 0.2s; }
+.dashboard-charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 20px; margin-bottom: 30px; }
+.dashboard-charts .chart-container { height: 400px; background: var(--bg-secondary); padding: 20px; margin-top: 0; margin-bottom: 0; border-radius: 10px; box-shadow: var(--element-shadow-on-light-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.chart-container h3 { font-size: 1.1em; text-align: center; color: #121212; margin-bottom: 15px; font-weight: 500; letter-spacing: 0.05em; }
+.loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.65); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; }
+.loading-overlay.active { opacity: 1; visibility: visible; }
+.loading-spinner { border: 6px solid #f3f3f3; border-top: 6px solid var(--primary-action); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 20px; }
+.loading-overlay p { color: #FFFFFF; font-size: 1.1em; font-weight: 500; }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+.finance-form-container { background-color: #fff; padding: 25px; border-radius: 10px; margin-bottom: 30px; box-shadow: var(--element-shadow-on-light-bg); display: flex; flex-direction: column; }
+.finance-summary { background-color: var(--bg-secondary); padding: 20px; border-radius: 10px; margin-bottom: 25px; text-align: center; box-shadow: var(--element-shadow-on-light-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.finance-summary h3 { font-size: 1.2em; margin-bottom: 8px; color: var(--text-secondary-on-dark-bg); font-weight: 500; letter-spacing: 0.05em; }
+.finance-summary p { font-size: 1.6em; font-weight: 600; color: #121212; margin: 0; transition: color 0.2s; }
+.chart-container.finance-detail-chart { background: var(--bg-secondary); padding: 20px; border-radius: 10px; margin-bottom: 25px; height: 380px; box-shadow: var(--element-shadow-on-light-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.finance-list-container h3 { font-size: 1.5em; color: #121212; margin-top: 0; margin-bottom: 18px; text-align: center; font-weight: 600; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; letter-spacing: 0.05em; }
+#finance-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; max-height: calc(100vh - 200px); }
+#finance-list li { background-color: var(--bg-tertiary); padding: 18px; border-radius: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid var(--primary-action); box-shadow: 0 3px 8px rgba(0,0,0,0.2); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+#finance-list .finance-item-details { font-size: 0.95em; line-height: 1.5; }
+#finance-list .finance-item-details strong { display: block; margin-bottom: 6px; font-size: 1.1em; color: var(--text-on-light-bg); font-weight: 600; }
+#finance-list .finance-item-details span { margin-right: 18px; color: var(--text-secondary-on-dark-bg); font-weight: 500; }
+#finance-list .finance-item-details .revenue { color: var(--success-color); font-weight: 500; }
+#finance-list .finance-item-details .expenses { color: var(--error-color); font-weight: 500;}
+#finance-list .finance-item-details .balance { color: var(--text-on-light-bg); font-weight: 600;}
+.finance-item-actions { display: flex; gap: 8px; align-items: center; justify-content: center; flex-shrink: 0; margin-left: 12px; }
+.finance-item-actions button { background: none; border: 1px solid var(--border-color); color: var(--text-secondary-on-dark-bg); padding: 6px 10px; border-radius: 5px; cursor: pointer; transition: background-color 0.2s, color 0.2s; font-size: 0.9em; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; flex-shrink: 0; }
+.finance-item-actions button:hover { background-color: #119423; color: var(--text-on-dark-bg); transform: scale(1.05); }
+.form-group.action-buttons { display: flex; gap: 12px; margin-top: 20px; justify-content: center; }
+#cancel-finance-edit-btn { background-color: #4B5563; }
+#cancel-finance-edit-btn:hover { background-color: #6B7280; }
+.modal-overlay { background: rgba(30, 30, 30, 0.75); backdrop-filter: blur(4px); position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; z-index: 1001; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.3s ease, visibility 0s linear 0.3s; }
+.modal-overlay.active { opacity: 1; visibility: visible; pointer-events: auto; transition: opacity 0.3s ease, visibility 0s linear 0s; }
+.modal-content { background: var(--bg-secondary); color: var(--text-on-dark-bg); border-radius: 10px; box-shadow: 0 8px 30px rgba(0,0,0,0.20); border: 1px solid var(--border-color-dark-elements); font-family: 'Inter', sans-serif; max-width: 800px; height: auto; padding: 25px 30px; position: relative; max-height: 90vh; overflow-y: auto; width: 50%; transition: transform 0.3s ease, opacity 0.3s ease; }
+.image-modal-content { padding: 10px; background: #333; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.5); width: auto; height: auto; display: inline-block; max-width: calc(400px + 20px); }
+.image-modal-content img#modal-image-content { background-color: transparent; border: none; max-width: 400px; max-height: 400px; object-fit: contain; border-radius: 6px; margin: 0; display: block; }
+.image-modal-content .close-modal-btn { color: #ccc; top: 10px; right: 10px; font-size: 2em; }
+.image-modal-content .close-modal-btn:hover { color: #fff; }
+.modal-content img#modal-product-image, .modal-content img#edit-product-preview-image { background-color: var(--bg-element-light); border: 1px solid var(--border-color-light); max-width: 100%; height: auto; display: block; margin: 15px auto; border-radius: 8px; cursor: pointer; transition: transform 0.2s ease; object-fit: contain; }
+#modal-product-image-container { width: 100%; max-height: 250px; background-color: var(--bg-element-light); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; overflow: hidden; }
+.close-modal-btn { color: var(--text-secondary-on-light-bg); position: absolute; top: 12px; right: 15px; font-size: 1.7em; cursor: pointer; transition: color 0.2s, transform 0.2s; line-height: 1; padding: 5px; border: none; background: none; z-index: 1002; }
+.close-modal-btn:hover { color: var(--primary-action); transform: scale(1.1); }
+.product-details-modal-content { background-color: #fff ; color: var(--text-on-light-bg); border-left: 1px solid var(--border-color-light); max-width: 400px; width: 90%; height: 100vh; position: fixed; top: 0; right: 0; margin-left: auto; border-radius: 0; padding: 30px; transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: -5px 0px 15px rgba(0,0,0,0.15); }
+.modal-overlay.active .product-details-modal-content { transform: translateX(0); }
+.product-details-modal-content .close-modal-btn { color: var(--text-secondary-on-light-bg); }
+.product-details-modal-content .close-modal-btn:hover { color: var(--primary-action); }
+#modal-product-image { border-radius: 6px; }
+.product-details-modal-content h3#modal-product-name { color: var(--text-on-light-bg); font-size: 1.6em; margin-bottom: 10px; text-align: center; border-bottom: none; padding-bottom: 0; }
+.product-details-modal-content .modal-product-info { margin-bottom: 20px; }
+.product-details-modal-content .modal-product-info p { color: var(--text-secondary-on-light-bg); margin-bottom: 8px; font-size: 0.9em; line-height: 1.5; }
+.product-details-modal-content .modal-product-info p strong { color: var(--text-on-light-bg); }
+.edit-product-modal-content { background-color: var(--bg-page-primary); color: var(--text-on-light-bg); border: 1px solid var(--border-color-light); max-width: 750px; padding: 30px; }
+.edit-product-modal-content .close-modal-btn { color: var(--text-secondary-on-light-bg); }
+.edit-product-modal-content .close-modal-btn:hover { color: var(--primary-action); }
+.edit-product-modal-content h3 { color: var(--text-on-light-bg); border-bottom: 1px solid var(--border-color-light); font-size: 1.7em; margin-bottom: 25px; text-align: center; padding-bottom: 15px; }
+#edit-product-form label { color: var(--text-secondary-on-light-bg); font-weight: 500; }
+#edit-product-form input[type="text"], #edit-product-form input[type="number"], #edit-product-form input[type="url"], #edit-product-form select, #edit-product-form textarea { background-color: #FFFFFF; border: 1px solid var(--border-color-light); color: #121212; }
+#edit-product-form input::placeholder, #edit-product-form textarea::placeholder { color: var(--text-placeholder-on-light-input); }
+#edit-product-form input:focus, #edit-product-form select:focus, #edit-product-form textarea:focus { border-color: var(--primary-action); box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2); }
+#edit-product-form img#edit-product-preview-image { display: block; max-width: 150px; max-height: 150px; border-radius: 8px; margin: 10px auto 20px; background-color: var(--bg-element-light); object-fit: contain; border: 1px solid var(--border-color-light); }
+.edit-product-modal-content textarea::-webkit-scrollbar { width: 8px; }
+.edit-product-modal-content textarea::-webkit-scrollbar-track { background: var(--bg-element-light); border-radius: 4px; }
+.edit-product-modal-content textarea::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
+.edit-product-modal-content textarea::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+a.product-link-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-bottom: 15px; padding: 10px 15px; background-color: var(--primary-action); color: var(--highlight-action-text); text-decoration: none; border-radius: 6px; font-weight: 500; transition: background-color 0.2s; }
+a.product-link-btn:hover { background-color: var(--primary-action-hover); }
+.product-details-modal-content .modal-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; margin-bottom: 10px; }
+.product-details-modal-content .modal-actions .modal-action-btn { padding: 10px; }
+.product-details-modal-content .modal-actions .modal-action-btn.edit { background-color: var(--edit-color); color: #121212; }
+.product-details-modal-content .modal-actions .modal-action-btn.edit:hover { background-color: #D68910; color: #000000; }
+.product-details-modal-content .modal-actions .modal-action-btn.delete { background-color: var(--error-color); color: var(--highlight-action-text); grid-column: span 2; }
+.product-details-modal-content .modal-actions .modal-action-btn.delete:hover { background-color: #C0392B; }
+#edit-product-form .form-row { display: flex; gap: 20px; margin-bottom: 0; }
+#edit-product-form .form-row .form-group { flex: 1; margin-bottom: 18px; }
+#edit-product-form .form-group { margin-bottom: 18px; }
+#edit-product-form button[type="submit"] { margin-top: 25px; background-color: var(--success-color); font-size: 1em; }
+#edit-product-form button[type="submit"]:hover { background-color: #0D8A61; }
+.auth-section { display: flex; justify-content: center; align-items: center; height: 100vh; background-color: var(--bg-primary); animation: fadeIn 0.5s ease-out; }
+.auth-container { max-width: 450px; width: 100%; padding: 40px; border-radius: 12px; box-shadow: 0 10px 20px rgba(0,0,0,0.35); text-align: center; background-color: var(--bg-secondary); }
+.auth-tabs { display: flex; justify-content: center; margin-bottom: 30px; border-bottom: 1px solid var(--border-color); }
+.auth-tab-btn { background: none; border: none; padding: 12px 20px; font-size: 1.1em; font-weight: 600; color: var(--text-secondary-on-dark-bg); cursor: pointer; transition: color 0.2s, border-bottom 0.2s; border-bottom: 3px solid transparent; }
+.auth-tab-btn.active { color: var(--primary-action); border-bottom-color: var(--primary-action); }
+.auth-tab-btn:hover { color: var(--text-on-dark-bg); }
+.auth-tab-content { display: none; animation: fadeIn 0.4s ease-out; }
+.auth-tab-content.active { display: block; }
+.auth-form { margin-top: 20px; }
+.auth-form .form-group { text-align: left; }
+.form-group.remember-me-group { display: flex; align-items: center; gap: 8px; margin-bottom: 15px; color: var(--text-secondary-on-dark-bg); }
+.form-group.remember-me-group input[type="checkbox"] { width: auto; flex-grow: 0; margin-top: 0; accent-color: var(--primary-action); }
+.form-group.remember-me-group label { display: inline-block; margin-bottom: 0; cursor: pointer; font-weight: normal; }
+.auth-message { margin-top: 15px; font-size: 0.9em; font-weight: 500; color: var(--text-secondary-on-dark-bg); }
+.auth-message.success { color: var(--success-color); }
+.auth-message.error { color: var(--error-color); }
+.tab-message { margin-top: 15px; font-size: 0.9em; font-weight: 500; text-align: center; padding: 8px 12px; border-radius: 6px; background-color: transparent; transition: all 0.3s ease; }
+.tab-message.success { color: var(--highlight-action-text); background-color: var(--success-color); }
+.tab-message.error { color: var(--highlight-action-text); background-color: var(--error-color); }
+/* Em src/style.css, pode ser junto de outras classes de utilidade */
+.data-missing {
+    color: #9a9a9a;
+    font-style: italic;
+}
+.card-title:hover {
+    color: var(--primary-action);
+}
+
+/* Estilo para o cabeçalho mobile (escondido por padrão) */
+.mobile-header {
+    display: none;
+}
+
+/* Em style.css */
+
+.content-loader {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px; /* Garante que o spinner tenha espaço */
+    padding: 40px;
+}
+
+.spinner {
+    border: 5px solid var(--bg-element-secondary);
+    border-top: 5px solid var(--primary-action); /* Verde */
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+}
+
+/* A animação 'spin' já deve existir no seu CSS, mas caso não, adicione-a */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Em style.css */
+
+/* Estilos para a Tela de Carregamento */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #121212; /* Fundo escuro */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999; /* Garante que fique na frente de tudo */
+    transition: opacity 0.5s ease-out; /* Transição suave para desaparecer */
+}
+
+/* Esconde a tela com opacidade para a transição funcionar */
+.loading-overlay.hidden {
+    opacity: 0;
+    pointer-events: none; /* Impede cliques na tela escondida */
+}
+
+.loading-logo {
+    width: 120px; /* Ajuste o tamanho conforme necessário */
+    height: auto;
+    animation: pulsate 2s infinite ease-in-out; /* Aplica a animação */
+}
+
+.loading-text {
+    color: #FFFFFF;
+    margin-top: 20px;
+    font-size: 1.2em;
+    font-weight: 500;
+    opacity: 0.8;
+}
+
+/* Animação de Pulsar */
+@keyframes pulsate {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.08);
+    }
+}
+
+/* Remove a regra antiga do spinner, se ainda existir */
+.loading-spinner {
+    display: none;
+}
+
+/* Em style.css (substitua as regras existentes por estas) */
+
+.product-details-modal-content {
+    background-color: #fff;
+    color: var(--text-primary);
+    border-left: 1px solid var(--border-color);
+    max-width: 400px;
+    width: 90%;
+    height: 100vh; /* Ocupa toda a altura */
+    position: fixed;
+    top: 0;
+    right: 0;
+    padding: 25px;
+    transform: translateX(100%);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: -5px 0px 15px rgba(0,0,0,0.15);
+    
+    /* --- Correções de Layout e Scroll --- */
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto; /* Adiciona scroll APENAS se o conteúdo ultrapassar a altura */
+}
+
+/* Adicione esta regra ao seu style.css */
+.verified-product-info-box {
+    text-align: center;
+    max-width: 480px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: var(--bg-element);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: var(--element-shadow);
+}
+.verified-product-info-box img {
+    max-width: 100%;
+    max-height: 250px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    object-fit: contain;
+}
+.verified-product-info-box button {
+    width: 100%;
+    margin-top: 15px;
+}
+
+/* Adicione esta regra ao seu style.css */
+.error-display {
+    text-align: center;
+    padding: 40px 20px;
+    background-color: var(--bg-element-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    margin: 20px auto;
+    max-width: 600px;
+}
+.error-display i {
+    font-size: 2.5em;
+    color: var(--error-color);
+    margin-bottom: 15px;
+}
+.error-display p {
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+}
+.error-display button {
+    width: auto;
+}
+
+#modal-product-image-container {
+    width: 100%;
+    max-height: 280px; /* Define uma altura máxima para a área da imagem */
+    flex-shrink: 0; /* Impede que o container da imagem encolha */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    background-color: var(--bg-element);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+}
+
+#modal-product-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain; /* Garante que a imagem inteira apareça sem distorção */
+    cursor: pointer;
+}
+
+/* Em style.css (pode ser na seção de modais) */
+
+/* Define a ordem das camadas dos modais */
+#edit-product-modal { z-index: 1001; }
+#product-details-modal { z-index: 1002; }
+#image-modal { z-index: 1003; } /* <-- O z-index mais alto, fica na frente de todos */
+
+.modal-product-info {
+    /* Esta área agora crescerá e rolará naturalmente dentro do painel */
+    line-height: 1.6;
+}
+
+.list-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 10px 15px;
+    background-color: var(--bg-secondary);
+    border-radius: 8px;
+    box-shadow: var(--element-shadow-on-light-bg);
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    color: #121212;
+    font-size: 0.95em;
+    transition: background-color 0.2s, box-shadow 0.2s;
+
+}
+
+.productUrlInput-products-tab,
+productUrlInput-add-tab {
+    width: 100%;
+    border-radius: 6px;
+    background-color: var(--bg-element-light);
+    box-shadow: #000000 0px 2px 4px rgba(0, 0, 0, 0.1);
+    outline: none; /* Remove o contorno padrão */
+    color: #121212;
+    font-size: 0.95em;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+
+
+@media (max-width: 1200px) {
+    .product-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+}
+
+@media (max-width: 1024px) {
+    /* .sidebar { width: 80px; } */ /* Desktop sidebar hidden on mobile by later rule */
+    .main-content-area { padding: 20px; }
+    .main-content-area h2 { font-size: 1.6em; }
+    .product-grid { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); }
+    .card-image-container { height: 150px; }
+    .product-details-modal-content { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.95); width: auto; max-width: 90%; height: auto; max-height: 85vh; right: auto; border-radius: 12px; border-left: none; transition: opacity 0.3s ease, transform 0.3s ease; }
+    .modal-overlay.active .product-details-modal-content { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    #modal-product-image-container { flex-basis: auto; height: 180px; }
+    .auth-container { max-width: 90%; padding: 30px; }
+    .auth-tab-btn { font-size: 1em; padding: 10px 15px; }
+}
+
+.mobile-menu-overlay { /* Will be hidden */
+    /* ... existing styles ... */
+}
+
+@media (max-width: 767px) {
+    /* === IMPLEMENTAÇÃO DA BARRA DE NAVEGAÇÃO INFERIOR MOBILE === */
+
+    /* Oculta o menu mobile deslizante original (se houver) */
+    .mobile-menu { display: none !important; }
+    .mobile-menu-overlay { display: none !important; }
+
+    /* Transforma a .sidebar desktop em uma barra inferior fixa */
+    .dashboard-layout > .sidebar {
+        display: flex !important; /* Garante que esteja visível e como flex */
+        flex-direction: row;    /* Itens em linha */
+        position: fixed;        /* Fixa na tela */
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 60px;           /* Altura da barra */
+        background-color: var(--bg-page-primary); /* Fundo branco, conforme tema */
+        padding: 0 5px;         /* Padding horizontal mínimo */
+        justify-content: space-around; /* Distribui os ícones */
+        align-items: center;
+        box-shadow: 0 -2px 5px rgba(0,0,0,0.08); /* Sombra para destacar */
+        z-index: 1001;          /* Acima do conteúdo, abaixo de modais superiores */
+        border-top: 1px solid var(--border-color-light); /* Borda superior clara */
+        border-right: none;     /* Remove a borda direita do desktop */
+        gap: 0;                 /* Reseta o gap do layout em coluna do desktop */
+    }
+
+        .dashboard-layout.logged-in > .sidebar {
+            display: flex; /* Exibe a sidebar quando logado */
+        }
+
+        body.logged-in > #auth-section {
+            display: none; /* Oculta a seção de autenticação quando logado */
+        }
+
+    /* Oculta elementos não necessários na barra inferior */
+    .sidebar .sidebar-header { display: none !important; }
+    .sidebar .nav-btn[data-tab="finance"] { display: none !important; }
+    /* O botão de configurações já deve estar oculto pela regra global:
+       .nav-btn[data-tab="settings"] { display: none !important; }
+       Se precisar garantir especificamente para este contexto: */
+    .sidebar .nav-btn[data-tab="settings"] { display: none !important; }
+
+    /* Faz os botões dentro de .sidebar-nav-main serem itens diretos da .sidebar */
+    .sidebar .sidebar-nav-main {
+        display: contents;
+    }
+    
+    /* Estilo para os botões de navegação na barra inferior branca */
+    .sidebar .nav-btn {
+        width: auto; 
+        height: 100%;
+        flex: 1; /* Para distribuir o espaço igualmente */
+        color: #121212;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0; /* Sem bordas arredondadas */
+        background-color: transparent; /* Fundo transparente */
+        padding: 5px 0;
+        margin: 0;
+        gap: 2px; /* Pequeno espaço (útil se houvesse texto abaixo do ícone) */
+        transition: background-color 0.2s, color 0.2s;
+    }
+    .sidebar .nav-btn i {
+        font-size: 22px; /* Tamanho do ícone ajustado */
+        line-height: 1;
+        color: var(--text-secondary-on-light-bg); /* Ícones cinza escuro na barra branca */
+    }
+    .sidebar .nav-btn:hover {
+        background-color: var(--bg-element-light); /* Fundo cinza claro no hover */
+        transform: none; /* Sem transformação de escala */
+        box-shadow: none; /* Sem sombra extra no hover */
+    }
+    .sidebar .nav-btn:hover i {
+        color: var(--primary-action); /* Ícone azul no hover */
+    }
+    .sidebar .nav-btn.active {
+        background-color: transparent; /* Fundo transparente para o ativo */
+    }
+    .sidebar .nav-btn.active i {
+        color: var(--primary-action); /* Ícone ativo azul */
+    }
+    /* Estilo específico para o ícone de logout na barra inferior */
+    .sidebar #logout-btn i {
+         color: var(--text-secondary-on-light-bg); /* Cor padrão do ícone */
+    }
+     .sidebar #logout-btn:hover i {
+        color: var(--error-color); /* Cor de erro (vermelho) no hover do logout */
+    }
+    /* === FIM DA IMPLEMENTAÇÃO DA BARRA INFERIOR MOBILE === */
+
+        /* Elementos que precisam da altura total da viewport */
+        .dashboard-layout {
+        height: var(--app-height);
+        display: flex; /* Já deve estar assim */
+        flex-direction: column; /* Se a barra inferior fosse parte do fluxo, mas é fixed */
+        }
+
+        .main-content-area {
+        height: var(--app-height); /* Usa a altura calculada */
+        /* Ou, se .dashboard-layout é o container flex principal e a barra é fixed: */
+        /* height: 100%; /* Se .dashboard-layout já tem a altura correta */
+        overflow-y: auto;
+        padding-bottom: 75px; /* Para a barra inferior de 60px + buffer */
+        flex-grow: 1; /* Se .dashboard-layout for flex-direction: column */
+        }    
+    .main-content-area h2 {
+        font-size: 1.5em; /* Títulos um pouco menores no mobile */
+        margin-bottom: 20px;
+    }
+
+    /* Dentro de @media (max-width: 767px) */
+
+/* Mostra e estiliza o cabeçalho mobile */
+.mobile-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 8px 0;
+    background-color: var(--bg-element);
+    border-bottom: 1px solid var(--border-color);
+    width: 100%;
+}
+
+.mobile-logo {
+    height: 35px;
+    width: auto;
+}
+
+/* Ajusta o conteúdo para não ficar atrás do novo cabeçalho */
+.dashboard-layout {
+    /* A altura total do layout agora não precisa considerar o cabeçalho */
+    height: auto; 
+}
+
+.main-content-area {
+    /* A altura se ajusta, e o padding superior acomoda o cabeçalho */
+    height: calc(var(--app-height) - 52px); /* Altura da tela menos o cabeçalho */
+    padding-top: 15px; /* Reset do padding para evitar duplicação */
+}
+
+/* Ajusta a tela de login também */
+.auth-section {
+    height: calc(100vh - 52px); /* Altura da tela menos o cabeçalho */
+}
+
+    /* Oculta elementos desnecessários na barra inferior */
+    .sidebar .sidebar-header,
+    .sidebar .sidebar-footer {
+        display: none;
+    }
+    .sidebar .nav-btn[data-tab="finance"] {
+        display: none !important;
+    }
+
+    /* Faz os botões de navegação e logout serem itens diretos da barra */
+    .sidebar .sidebar-nav-main {
+        display: contents;
+    }
+    
+    /* --- Estilo UNIFICADO para TODOS os botões na barra inferior --- */
+    .sidebar .nav-btn {
+        width: auto; 
+        height: 100%;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0;
+        background-color: transparent; /* Garante fundo transparente para TODOS */
+        padding: 5px 0;
+        margin: 0;
+        gap: 2px;
+        transition: background-color 0.2s, color 0.2s;
+    }
+    
+    /* Estilo UNIFICADO para TODOS os ícones */
+    .sidebar .nav-btn i {
+        font-size: 22px;
+        line-height: 1;
+        color: var(--text-secondary); /* Usa a variável correta para cinza */
+    }
+
+    /* Efeito HOVER para todos os botões */
+    .sidebar .nav-btn:hover {
+        background-color: var(--bg-element-secondary);
+        transform: none;
+        box-shadow: none;
+    }
+    .sidebar .nav-btn:hover i {
+        color: var(--primary-action); /* Ícone fica verde no hover */
+    }
+
+    /* Botão ATIVO */
+    .sidebar .nav-btn.active {
+        background-color: transparent;
+    }
+    .sidebar .nav-btn.active i {
+        color: var(--primary-action); /* Ícone ativo fica verde */
+    }
+
+    /* Exceção para o hover do LOGOUT */
+    .sidebar #logout-btn:hover i {
+        color: var(--error-color); /* Ícone do logout fica vermelho no hover */
+    }
+
+    /* Responsividade para o grupo de input "Verificar URL" */
+    #scrape-form-products-tab.input-group {
+        flex-wrap: wrap;
+        justify-content: center;
+        padding: 8px 15px; /* Padding interno do grupo */
+        border-radius: 30px; /* Raio de borda ajustado */
+        max-width: 95%;     /* Largura máxima para permitir centralização */
+        margin-left: auto;  /* Centraliza o bloco */
+        margin-right: auto; /* Centraliza o bloco */
+        margin-bottom: 25px; /* Margem inferior */
+    }
+    #scrape-form-products-tab.input-group input[type="url"] {
+        flex-basis: 100%; /* Input ocupa a largura total */
+        width: 100%;
+        margin-bottom: 10px; /* Espaço entre input e botão quando quebrado */
+        text-align: center;  /* Centraliza o placeholder */
+        font-size: 1em;      /* Tamanho da fonte do input */
+    }
+    #scrape-form-products-tab.input-group button {
+        width: 100%; /* Botão ocupa a largura total */
+        padding: 12px 20px;
+        font-size: 1em; /* Tamanho da fonte do botão */
+    }
+
+    /* Ajustes nos cards de produto para mobile */
+    .product-grid {
+        grid-template-columns: 1fr; /* Um card por linha */
+        gap: 15px; /* Espaçamento entre cards */
+    }
+    .product-card { /* Card com fundo branco e texto escuro */
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+        border-radius: 10px; /* Borda um pouco menos arredondada */
+        position: relative;
+        background-color: var(--bg-page-primary); /* Fundo branco */
+        border: 1px solid var(--border-color-light); /* Borda clara */
+        box-shadow: var(--element-shadow-on-light-bg); /* Sombra escura sutil */
+        position: relative;
+    }
+
+    .card-loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    border-radius: 12px;
+}
+
+.card-loading-overlay i {
+    font-size: 2em;
+    color: var(--primary-action);
+    animation: spin 1s linear infinite;
+}
+
+/* A animação @keyframes spin já deve existir no seu CSS, mas caso não, adicione-a */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+    .product-card .card-image-container {
+        flex-shrink: 0;
+        width: 90px; /* Largura da imagem um pouco menor */
+        height: auto;
+        min-height: 90px;
+        padding: 8px;
+        border-radius: 10px 0 0 10px; /* Ajusta o raio para a borda */
+        align-self: stretch;
+        background-color: #FFFFFF; /* Fundo da imagem sempre branco */
+        border-right: 1px solid var(--border-color-light); /* Linha separadora */
+    }
+    .product-card .card-image {
+        border-radius: 6px;
+    }
+    .product-card .card-content { /* Conteúdo do card com texto escuro */
+        flex-grow: 1;
+        padding: 10px 12px; /* Padding ajustado */
+        text-align: left;
+        border-radius: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        background-color: var(--bg-page-primary); /* Fundo branco */
+    }
+    .product-card .card-title {
+        font-size: 0.95em; /* Título um pouco menor */
+        min-height: 0;
+        -webkit-line-clamp: 2; /* Máximo de 2 linhas para o título */
+        line-clamp: 2;
+        margin-bottom: 4px;
+        color: var(--text-on-light-bg); /* Texto escuro */
+        font-weight: 600;
+    }
+    .product-card .card-price {
+        font-size: 1.3em; /* Preço um pouco menor */
+        margin-bottom: 6px;
+        margin-top: 4px;
+        text-align: left;
+        color: var(--text-on-light-bg); /* Texto escuro */
+        font-weight: 700;
+    }
+    .product-card .card-actions { /* Ações com ícones escuros */
+        display: grid;
+        color: #e0e0e0;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    place-items: center; /* Centraliza os ícones na grade */
+    padding: 8px;
+    gap: 4px; /* Espaço entre os ícones */
+    border-top: none;
+    border-left: 1px solid var(--border-color);
+    width: 90px; /* Largura fixa para a área de ações */
+    flex-shrink: 0;
+    }
+     .product-card .card-actions i {
+        font-size: 1.4em; /* Ícones maiores e mais fáceis de tocar */
+    padding: 8px;     /* Aumenta a área de toque */
+    color: #e0e0e0; /* Cor dos ícones */
+    }
+     .product-card .card-actions i:hover {
+        color: var(--primary-action); /* Cor primária no hover */
+    }
+
+    /* Caixa de Informação do Produto Verificado */
+    #verifiedProductInfo-add-tab,
+    #verifiedProductInfo-products-tab {
+        max-width: 95%; /* Ocupa mais a largura da tela */
+        padding: 15px;
+    }
+    #verifiedProductImage-add-tab,
+    #verifiedProductImage-products-tab {
+        max-height: 180px; /* Imagem da prévia um pouco menor */
+    }
+
+    /* Ajustes Gerais para Modais em Telas Pequenas */
+    .modal-content {
+        width: 90%;
+        max-width: calc(100vw - 30px); /* Pequenas margens laterais */
+        margin-top: 20px;
+        margin-bottom: 20px;
+        padding: 15px; /* Padding geral para modais no mobile */
+        max-height: 90vh; /* Aumenta um pouco a altura máxima permitida */
+        overflow-y: auto;
+    }
+
+    /* Modal de Detalhes do Produto (Slide-in) */
+    .product-details-modal-content {
+        width: 85%; /* Slide-in ocupa um pouco menos da tela */
+        max-width: 360px; /* Max width para o slide-in */
+        padding: 20px 15px; /* Padding ajustado */
+        height: 100vh; /* Ocupa toda a altura */
+        margin-left: auto;
+        margin-top: 0;
+        margin-bottom: 0;
+        border-radius: 0;
+    }
+
+    #modal-product-image-container {
+width: 100%; /* A imagem ocupa a largura total do container /
+max-height: 300px; / Define uma altura máxima para a imagem /
+overflow: hidden; / Recorta a imagem se exceder a altura /
+margin-bottom: 15px;
+display: flex;
+justify-content: center; / Centraliza a imagem horizontalmente /
+align-items: center; / Centraliza a imagem verticalmente */
+}
+
+#modal-product-image {
+max-width: 100%; /* A imagem não ultrapassa a largura do container /
+max-height: 100%; / A imagem não ultrapassa a altura do container /
+object-fit: contain; / Garante que a imagem inteira seja visível, mantendo a proporção */
+border-radius: 8px;
+}
+
+.modal-product-info {
+margin-bottom: 15px;
+}
+
+.modal-actions {
+margin-top: 20px;
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 10px;
+}
+
+.modal-actions button {
+width: 100%;
+}
+
+    /* Modal de Edição de Produto */
+    .edit-product-modal-content {
+        /* Herdará width: 90% do .modal-content geral */
+        padding: 20px 15px; /* Padding ajustado */
+    }
+    #edit-product-form .form-row {
+        flex-direction: column; /* Empilha campos que estavam lado a lado */
+        gap: 0;
+    }
+    #edit-product-form .form-row .form-group {
+        margin-bottom: 15px; /* Espaçamento entre campos empilhados */
+    }
+    #edit-product-form label {
+        font-size: 0.85em;
+    }
+
+    .url-scrape-container {
+    background-color: var(--bg-element-secondary);
+    width: 100%;
+    border: transparent;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.url-scrape-container input[type="url"] {
+    text-align: center;
+    font-size: 1.05em;
+    padding: 12px;
+}
+
+.url-scrape-container button {
+    width: 100%;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    font-size: 1em;
+}
+    /* Inputs dentro do modal de edição */
+    #edit-product-form input[type="text"], 
+    #edit-product-form input[type="number"], 
+    #edit-product-form input[type="url"], 
+    #edit-product-form select, 
+    #edit-product-form textarea {
+        font-size: 0.9em;
+        padding: 8px 10px;
+    }
+
+    /* Ajustes para Dashboard e Resumo Financeiro Mobile */
+    .dashboard-summary-cards {
+        grid-template-columns: 1fr; /* Empilha os cards de resumo */
+        gap: 10px; /* Espaçamento menor */
+    }
+    .summary-card {
+        padding: 12px; /* Padding menor */
+    }
+    .summary-card h4 {
+        font-size: 0.85em;
+    }
+    .summary-card p {
+        font-size: 1.5em;
+    }
+
+    .dashboard-charts {
+        grid-template-columns: 1fr; /* Empilha os gráficos */
+        gap: 15px;
+    }
+    .dashboard-charts .chart-container {
+        padding: 10px; /* Padding menor */
+        height: 280px; /* Altura fixa menor para gráficos */
+        min-height: unset; /* Remove min-height para usar a altura fixa */
+        overflow: hidden; /* Evita estouro do gráfico */
+    }
+    .dashboard-charts .chart-container h3 {
+        font-size: 0.9em; /* Título do gráfico menor */
+        margin-bottom: 8px;
+    }
+    .dashboard-charts .chart-container canvas {
+        max-width: 100%;
+        max-height: 100%; /* Garante que o canvas não ultrapasse o container */
+    }
+    /* Específico para o gráfico problemático, se necessário */
+    #finance-overview-chart-container {
+        height: 280px;
+        overflow: hidden;
+    }
+    #financeOverviewChart {
+        max-width: 100%;
+        max-height: 100%;
+    }
+    
+    /* Ajustes para Auth Container no Mobile */
+    .auth-container {
+        padding: 20px;
+        max-width: 100%;
+        width: calc(100% - 30px); /* Ocupa quase toda a largura com pequenas margens */
+        margin: 20px 15px;
+    }
+    .auth-tab-btn {
+        font-size: 1em;
+        padding: 10px; /* Padding menor nos botões de aba */
+    }
+    .auth-section {
+        padding: 20px;
+        background-color: var(--bg-secondary);
+        border-radius: 12px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.35);
+        width: calc(100% - 30px); /* Ocupa quase toda a largura com pequenas margens */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh; /* Garante que a seção de autenticação ocupa toda a tela */
+    }
+    .productUrlInput-products-tab,
+productUrlInput-add-tab {
+    width: 100%;
+    border-radius: 6px;
+    background-color: var(--bg-element-light);
+    box-shadow: #000000 0px 2px 4px rgba(0, 0, 0, 0.1);
+    
+    color: #121212;
+    font-size: 0.95em;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    padding: 10px; /* Padding para o input */
+    box-sizing: border-box; /* Garante que o padding não afete a largura total */
+    outline: none; /* Remove o contorno padrão */
+}
+}/* Reset & Fontes Globais */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Almarai:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+:root {
+
+    /* Tema Claro Principal */
+
+    --bg-page-primary: #FFFFFF;
+
+    --text-on-light-bg: #212529;
+
+    --text-secondary-on-light-bg: #6c757d;
+
+    --border-color-light: #dee2e6;
+
+    --bg-element-light: #F8F9FA;
+
+    --app-height: 100vh; /* Fallback para caso o JS não execute */
+
+
+
+    /* Para Elementos Escuros Contrastantes */
+
+    --bg-element-dark: #2B2B2B;
+
+    --text-on-dark-bg: #ececec;
+
+    --text-secondary-on-dark-bg: #424344;
+
+    --border-color-dark-elements: #495057;
+
+
+
+    /* Cores de Ação */
+
+    --primary-action: #119423;
+
+    --primary-action-hover: #105e1a;
+
+    --menu-active-icon-bg: #119423;
+
+    --secondary-action-color: #FFC107;
+
+
+
+    /* Placeholders */
+
+    --text-placeholder-on-light-input: #6c757d;
+
+    --text-placeholder-on-dark-input: #868e96;
+
+
+
+    /* Sombras */
+
+    --element-shadow-on-light-bg: 0px 6px 12px rgba(0, 0, 0, 0.15);
+
+    --element-hover-shadow-on-light-bg: 0px 8px 18px rgba(0, 0, 0, 0.2);
+
+
+
+    /* Cores Específicas para o Menu Mobile Escuro (será ocultado, mas mantendo vars) */
+
+    --mobile-menu-bg: #1A1D24;
+
+    --mobile-menu-nav-items-container-bg: #2C3038;
+
+    --mobile-menu-icon-inactive-bg: #454A54;
+
+    --mobile-menu-icon-color: var(--text-on-dark-bg);
+
+    --mobile-menu-icon-active-color: #FFFFFF;
+
+    --mobile-menu-logout-icon-color: var(--secondary-action-color);
+
+    --mobile-menu-logout-border-color: var(--secondary-action-color);
+
+
+
+    /* Outras */
+
+    --success-color: #28a745;
+
+    --error-color: #dc3545;
+
+    --edit-color: #ffc107;
+
+    --highlight-action-text: #FFFFFF;
+
+
+
+    /* DEFINITIONS FOR COMMON VARIABLES */
+
+    --bg-primary: var(--bg-page-primary);
+
+    --text-primary: var(--text-on-light-bg);
+
+    --bg-secondary: #fff;
+
+    --bg-tertiary: #ffffff;
+
+    --bg-accent: #3a3f44;
+
+    --border-color: var(--border-color-dark-elements);
+
+    --input-light-bg: var(--bg-element-light);
+
+    --input-light-text: var(--text-on-light-bg);
+
+    --input-light-placeholder: var(--text-secondary-on-light-bg);
+
+}
+
+
+html, body {
+    font-family: 'Inter', sans-serif;
+    color: var(--text-primary);
+    background-color: var(--bg-primary);
+    height: 100%;
+    overflow: hidden;
+    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.dashboard-layout {
+    display: flex;
+    height: 100vh;
+}
+
+/* === DESKTOP SIDEBAR === */
+.sidebar {
+    width: 100px;
+    background: #ececec;
+    flex-shrink: 0;
+    padding: 35px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+    z-index: 100; /* Lower than mobile bottom bar if they could overlap on resize */
+    border-right: 1px solid var(--border-color);
+    box-shadow: 5px 0px 15px rgba(0, 0, 0, 0.2);
+}
+
+.sidebar-header .logo {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    box-shadow: 0px 0px 9.7px rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-nav-main {
+    width: 60px;
+    background: #121212;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.25);
+    border-radius: 56px;
+    padding: 10px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 35px;
+}
+
+.sidebar-title { display: none; }
+.sidebar-title.active {
+    display: block;
+    font-size: 1.2em;
+    color: var(--text-on-dark-bg);
+    font-weight: 600;
+    margin-bottom: 20px;
+    text-align: center;
+}
+.sidebar-nav { /* Not used in current HTML structure provided */
+    width: 100%;
+    flex-grow: 1;
+}
+.nav-btn {
+    width: 45px;
+    height: 45px;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s, transform 0.2s;
+}
+.nav-btn:hover {
+    transform: scale(1.12);
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+}
+.nav-btn i {
+    font-size: 28px;
+    line-height: 1;
+}
+
+.sidebar-nav-main .nav-btn {
+    background: var(--bg-accent);
+}
+.sidebar-nav-main .nav-btn i {
+    color: var(--text-on-dark-bg);
+}
+.sidebar-nav-main .nav-btn.active {
+    background-color: var(--primary-action);
+}
+.sidebar-nav-main .nav-btn.active i {
+    color: var(--highlight-action-text);
+}
+.sidebar-nav-main .nav-btn:hover {
+    background-color: var(--primary-action-hover);
+}
+.sidebar-nav-main .nav-btn:hover i {
+    color: var(--highlight-action-text);
+}
+
+.sidebar > .nav-btn { /* For Settings and Logout on desktop */
+    background-color: var(--bg-accent);
+}
+.sidebar > .nav-btn i {
+    color: var(--text-on-dark-bg);
+}
+.sidebar > .nav-btn:hover {
+    background-color: var(--primary-action-hover);
+}
+.sidebar > .nav-btn:hover i {
+    color: var(--highlight-action-text);
+}
+
+
+/* ADICIONE estas novas regras no lugar (pode ser após a regra de .sidebar): */
+.sidebar-footer {
+    margin-top: auto; /* Esta é a linha mágica que empurra o bloco para o fundo */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px; /* Espaço entre os botões de rodapé */
+    padding-bottom: 20px; /* Um respiro na parte de baixo */
+}
+
+/* Estilo para os botões dentro do rodapé */
+.sidebar-footer .nav-btn {
+    background-color: var(--bg-element-secondary);
+    color: var(--text-secondary);
+}
+
+.sidebar-footer .nav-btn#logout-btn:hover {
+    background-color: var(--error-color); /* Fundo vermelho no hover do logout */
+    color: var(--highlight-action-text);
+}
+
+.url-scrape-container {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    background-color: var(--bg-element);
+    border: transparent;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: var(--element-shadow);
+}
+.url-scrape-container input[type="url"] { flex-grow: 1; }
+.url-scrape-container button { width: auto; flex-shrink: 0; }
+
+
+
+/* ... (Rest of your existing CSS up to media queries) ... */
+
+/* Coloque o restante do seu CSS aqui (Auth, Forms, Modals, Dashboard, etc.) */
+/* ... (Vou omitir o meio do CSS para economizar espaço, as mudanças principais estão no :root e no @media) ... */
+
+html, body { font-family: 'Montserrat', sans-serif; color: var(--text-primary); background-color: var(--bg-primary); height: 100%; overflow: hidden; }
+.dashboard-layout { display: flex; height: 100vh; }
+.password-wrapper { position: relative; display: flex; align-items: center; }
+.password-wrapper input[type="password"], .password-wrapper input[type="text"] { padding-right: 40px; }
+.toggle-password-btn { position: absolute; right: 1px; top: 1px; bottom: 1px; border: none; background: transparent; padding: 0 10px; cursor: pointer; color: var(--text-secondary-on-dark-bg); display: flex; align-items: center; justify-content: center; z-index: 2; border-radius: 0 20px 20px 0; }
+.toggle-password-btn:hover { color: var(--primary-action); }
+.toggle-password-btn i { font-size: 1em; }
+#password-requirements-legend { font-size: 0.75em; color: var(--text-secondary-on-dark-bg); line-height: 1.4; }
+#password-strength-indicator { font-size: 0.8em; margin-top: 5px; color: var(--text-secondary-on-dark-bg); }
+.g-recaptcha { margin-bottom: 15px; display: flex; justify-content: center; }
+.main-content-area { flex-grow: 1; padding: 25px 35px; overflow-y: auto; height: 100vh; background-color: var(--bg-page-primary); }
+.main-content-area h2 { font-family: 'Almarai', sans-serif; font-size: 1.8em; color: var(--text-on-light-bg); margin-bottom: 25px; border-bottom: none; padding-bottom: 10px; text-align: center; font-weight: 700; }
+.tab-content { display: none; }
+.tab-content.active { display: block; animation: fadeIn 0.4s ease-out; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.products-tab-add-section.form-container { padding: 0; box-shadow: none; border-radius: 0; background-color: transparent; }
+.products-tab-add-section.form-container h3 { display: none; }
+#scrape-form-products-tab.input-group { background-color: var(--input-light-bg); border-radius: 78px; padding: 8px; display: flex; align-items: center; box-shadow: -2px 8px 16.8px rgba(0, 0, 0, 0.15); border: 1px solid #D9D9D9; max-width: 1150px; margin: 0 auto 35px auto; }
+#scrape-form-products-tab.input-group input[type="url"] { flex-grow: 1; border: none; background: transparent; padding: 10px 20px; font-size: 1.1em; font-family: 'Almarai', sans-serif; color: var(--input-light-text); box-shadow: none; border-radius: 78px; min-width: 100px; }
+#scrape-form-products-tab.input-group input[type="url"]::placeholder { color: var(--input-light-placeholder); font-weight: 700; }
+#scrape-form-products-tab.input-group input[type="url"]:focus { box-shadow: none; }
+#scrape-form-products-tab.input-group button { background-color: var(--primary-action); color: var(--highlight-action-text); font-family: 'Almarai', sans-serif; font-weight: 700; font-size: 1.1em; border-radius: 78px; padding: 12px 30px; margin: 0; width: auto; white-space: nowrap; box-shadow: none; border: none; flex-shrink: 0; }
+#scrape-form-products-tab.input-group button:hover { background-color: var(--primary-action-hover); transform: none; }
+#scrape-form-products-tab.input-group button i.fa-search { margin-left: 8px; }
+.form-container, .finance-form-container, .auth-container { background-color: #fff; padding: 25px; border-radius: 10px; margin-bottom: 30px; box-shadow: var(--element-shadow-on-light-bg); }
+.add-product-form-container { margin-left: auto; margin-right: auto; }
+.form-section-title { font-size: 1.5em; font-family: 'Almarai', sans-serif; color: #121212; margin-top: 25px; margin-bottom: 20px; text-align: center; font-weight: 700; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
+.form-container h3, .finance-form-container h3, .auth-container h2 { font-size: 1.4em; margin-top: 0; margin-bottom: 20px; color: #121212; text-align: center; }
+.form-group { margin-bottom: 18px; display: flex; flex-direction: column; gap: 6px; }
+.form-group label { display: block; margin-bottom: 6px; font-size: 0.9em; color: var(--text-secondary-on-dark-bg); font-weight: 500; }
+.input-group { display: flex; gap: 10px; margin-bottom: 15px; align-items: center; flex-wrap: wrap; justify-content: space-between; width: 100%; }
+input[type="url"], input[type="text"], input[type="number"], input[type="month"], input[type="password"], select, textarea, input[type="email"] { flex-grow: 1; padding: 10px 12px; font-size: 0.95em; background-color: var(--bg-tertiary); border: 1px solid var(--border-color); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); color: #121212; border-radius: 20px; transition: border-color 0.2s, box-shadow 0.2s; box-sizing: border-box; font-family: 'Inter', sans-serif; font-weight: 400; cursor: text; }
+input::placeholder, textarea::placeholder { color: var(--text-placeholder-on-dark-input); }
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary-action); box-shadow: 0 0 0 3px rgba(0, 119, 255, 0.3); cursor: text; }
+textarea { resize: vertical; min-height: 70px; }
+select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%23A0A0A0'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd' /%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.8rem center; background-size: 1.1em; padding-right: 2.5rem; cursor: pointer; width: 100%; height: 40px; font-family: 'Space Grotesk', sans-serif; }
+button, .primary-btn, .auth-submit-btn { padding: 10px 18px; background-color: var(--primary-action); color: var(--highlight-action-text); font-weight: 500; border: none; border-radius: 20px; cursor: pointer; transition: background-color 0.2s, transform 0.1s; font-size: 0.9em; display: inline-flex; align-items: center; gap: 8px; justify-content: center; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); width: auto; flex-shrink: 0; }
+button:hover, .primary-btn:hover, .auth-submit-btn:hover { background-color: var(--primary-action-hover); transform: translateY(-1px); box-shadow: 0 4px 6px rgba(0, 0, 0, 0.25); }
+button:active, .primary-btn:active, .auth-submit-btn:active { transform: translateY(0px); }
+.primary-btn, .auth-submit-btn { width: 100%; }
+.secondary-btn { background-color: var(--bg-accent); border: 1px solid var(--border-color); color: var(--text-on-dark-bg); font-weight: 500; transition: background-color 0.2s, color 0.2s; padding: 10px 18px; border-radius: 6px; cursor: pointer; display: inline-flex; }
+.secondary-btn:hover { background-color: var(--border-color); color: var(--text-on-dark-bg); }
+.hidden { display: none !important; }
+#verifiedProductInfo-add-tab, #verifiedProductInfo-products-tab { margin: 20px auto; padding: 20px; background-color: #ffffff; color: #121212; border-radius: 12px; border: 1px solid var(--border-color-dark-elements); box-shadow: var(--element-shadow-on-light-bg); max-width: 480px; overflow-y: auto; max-height: 500px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+#verifiedProductInfo-add-tab h4, #verifiedProductInfo-products-tab h4 { font-size: 1.2em; margin-bottom: 12px; color: var(--text-on-dark-bg); }
+#verifiedProductInfo-add-tab p, #verifiedProductInfo-products-tab p { margin-bottom: 8px; font-size: 0.95em; color: var(--text-secondary-on-dark-bg); }
+#verifiedProductInfo-add-tab p strong, #verifiedProductInfo-products-tab p strong { color: #121212; }
+#verifiedProductImage-add-tab, #verifiedProductImage-products-tab { display: block; max-width: 100%; height: auto; max-height: 250px; border-radius: 8px; margin: 10px auto 15px; background-color: #FFFFFF; object-fit: contain; border: 1px solid var(--border-color-dark-elements); cursor: default; }
+.product-list-container h3 { font-size: 1.5em; font-family: 'Almarai', sans-serif; color: var(--text-on-dark-bg); margin-top: 30px; margin-bottom: 18px; text-align: center; font-weight: 700; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; letter-spacing: 0.05em; cursor: default; }
+.product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 25px; list-style: none; padding: 0; margin: 0; cursor: default; }
+/* Seu CSS original, com uma pequena alteração */
+.product-card {
+  background-color: var(--bg-secondary);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--element-shadow-on-light-bg);
+  
+  /* Mantenha a transição, mas aplique a transformação aqui */
+  transition: transform 0.2s ease, box-shadow 0.6s ease;
+  transform-style: preserve-3d; /* Essencial para o efeito 3D */
+  transform: perspective(1000px); /* Adiciona perspectiva */
+
+  position: relative;
+}
+
+.product-card:hover {
+  /* Removemos o transform daqui para o JS controlar */
+  box-shadow: #119423 0px 8px 18px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+}
+
+
+.card-actions {
+    --card-bg-gradient: linear-gradient(50deg, rgba(21, 22, 24, 0.724) 0%, rgba(4, 19, 34, 0.86) 100%);
+    scale: 1.1;
+    transition: scale 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-image-container { width: 100%; height: 180px; background-color: #FFFFFF; border-radius: 12px 12px 0 0; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 10px; cursor: pointer; }
+.card-image { max-width: 100%; max-height: 100%; border-radius: 6px; object-fit: contain; cursor: pointer; }
+.card-content { padding: 15px; background-color: #121212; border-radius: 12px 12px 0 0; flex-grow: 1; display: flex; flex-direction: column; text-align: center; }
+.card-title { font-family: 'Almarai', sans-serif; font-size: 1.1em; font-weight: 700; color: var(--text-on-dark-bg); margin-bottom: 8px; line-height: 1.4; min-height: 2.8em; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; cursor: pointer; z-index: 2; position: relative; }
+.card-price { z-index: 2; position: relative; font-size: 1.8em; font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: var(--text-on-dark-bg); margin-top: auto; margin-bottom: 15px; }
+.card-actions { padding: 10px 15px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--border-color); background-color: #121212; }
+.card-actions i { z-index: 2; position: relative; font-size: 1.3em; color: #ececec; cursor: pointer; transition: color 0.2s, transform 0.2s; padding: 8px; }
+.card-actions i:hover { color: #119423; transform: scale(1.15); z-index: 2; position: relative; }
+#dashboard-main-tab h2 { margin-bottom: 20px; text-align: left; color: var(--text-on-light-bg); }
+.dashboard-summary-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 20px; margin-bottom: 30px; }
+.summary-card { background-color: var(--bg-secondary); padding: 20px; border-radius: 8px; box-shadow: var(--element-shadow-on-light-bg); transition: transform 0.2s ease, box-shadow 0.2s ease; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+.summary-card h4 { font-size: 0.95em; color: var(--text-secondary-on-dark-bg); margin-bottom: 8px; font-weight: 500; letter-spacing: 0.05em; }
+.summary-card p { font-size: 1.8em; font-weight: 700; color: #121212; margin: 0; transition: color 0.2s; }
+.dashboard-charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 20px; margin-bottom: 30px; }
+.dashboard-charts .chart-container { height: 400px; background: var(--bg-secondary); padding: 20px; margin-top: 0; margin-bottom: 0; border-radius: 10px; box-shadow: var(--element-shadow-on-light-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.chart-container h3 { font-size: 1.1em; text-align: center; color: #121212; margin-bottom: 15px; font-weight: 500; letter-spacing: 0.05em; }
+.loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.65); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; }
+.loading-overlay.active { opacity: 1; visibility: visible; }
+.loading-spinner { border: 6px solid #f3f3f3; border-top: 6px solid var(--primary-action); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 20px; }
+.loading-overlay p { color: #FFFFFF; font-size: 1.1em; font-weight: 500; }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+.finance-form-container { background-color: #fff; padding: 25px; border-radius: 10px; margin-bottom: 30px; box-shadow: var(--element-shadow-on-light-bg); display: flex; flex-direction: column; }
+.finance-summary { background-color: var(--bg-secondary); padding: 20px; border-radius: 10px; margin-bottom: 25px; text-align: center; box-shadow: var(--element-shadow-on-light-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.finance-summary h3 { font-size: 1.2em; margin-bottom: 8px; color: var(--text-secondary-on-dark-bg); font-weight: 500; letter-spacing: 0.05em; }
+.finance-summary p { font-size: 1.6em; font-weight: 600; color: #121212; margin: 0; transition: color 0.2s; }
+.chart-container.finance-detail-chart { background: var(--bg-secondary); padding: 20px; border-radius: 10px; margin-bottom: 25px; height: 380px; box-shadow: var(--element-shadow-on-light-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.finance-list-container h3 { font-size: 1.5em; color: #121212; margin-top: 0; margin-bottom: 18px; text-align: center; font-weight: 600; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; letter-spacing: 0.05em; }
+#finance-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; max-height: calc(100vh - 200px); }
+#finance-list li { background-color: var(--bg-tertiary); padding: 18px; border-radius: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid var(--primary-action); box-shadow: 0 3px 8px rgba(0,0,0,0.2); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+#finance-list .finance-item-details { font-size: 0.95em; line-height: 1.5; }
+#finance-list .finance-item-details strong { display: block; margin-bottom: 6px; font-size: 1.1em; color: var(--text-on-light-bg); font-weight: 600; }
+#finance-list .finance-item-details span { margin-right: 18px; color: var(--text-secondary-on-dark-bg); font-weight: 500; }
+#finance-list .finance-item-details .revenue { color: var(--success-color); font-weight: 500; }
+#finance-list .finance-item-details .expenses { color: var(--error-color); font-weight: 500;}
+#finance-list .finance-item-details .balance { color: var(--text-on-light-bg); font-weight: 600;}
+.finance-item-actions { display: flex; gap: 8px; align-items: center; justify-content: center; flex-shrink: 0; margin-left: 12px; }
+.finance-item-actions button { background: none; border: 1px solid var(--border-color); color: var(--text-secondary-on-dark-bg); padding: 6px 10px; border-radius: 5px; cursor: pointer; transition: background-color 0.2s, color 0.2s; font-size: 0.9em; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; flex-shrink: 0; }
+.finance-item-actions button:hover { background-color: #119423; color: var(--text-on-dark-bg); transform: scale(1.05); }
+.form-group.action-buttons { display: flex; gap: 12px; margin-top: 20px; justify-content: center; }
+#cancel-finance-edit-btn { background-color: #4B5563; }
+#cancel-finance-edit-btn:hover { background-color: #6B7280; }
+.modal-overlay { background: rgba(30, 30, 30, 0.75); backdrop-filter: blur(4px); position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; z-index: 1001; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.3s ease, visibility 0s linear 0.3s; }
+.modal-overlay.active { opacity: 1; visibility: visible; pointer-events: auto; transition: opacity 0.3s ease, visibility 0s linear 0s; }
+.modal-content { background: var(--bg-secondary); color: var(--text-on-dark-bg); border-radius: 10px; box-shadow: 0 8px 30px rgba(0,0,0,0.20); border: 1px solid var(--border-color-dark-elements); font-family: 'Inter', sans-serif; max-width: 800px; height: auto; padding: 25px 30px; position: relative; max-height: 90vh; overflow-y: auto; width: 50%; transition: transform 0.3s ease, opacity 0.3s ease; }
+.image-modal-content { padding: 10px; background: #333; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.5); width: auto; height: auto; display: inline-block; max-width: calc(400px + 20px); }
+.image-modal-content img#modal-image-content { background-color: transparent; border: none; max-width: 400px; max-height: 400px; object-fit: contain; border-radius: 6px; margin: 0; display: block; }
+.image-modal-content .close-modal-btn { color: #ccc; top: 10px; right: 10px; font-size: 2em; }
+.image-modal-content .close-modal-btn:hover { color: #fff; }
+.modal-content img#modal-product-image, .modal-content img#edit-product-preview-image { background-color: var(--bg-element-light); border: 1px solid var(--border-color-light); max-width: 100%; height: auto; display: block; margin: 15px auto; border-radius: 8px; cursor: pointer; transition: transform 0.2s ease; object-fit: contain; }
+#modal-product-image-container { width: 100%; max-height: 250px; background-color: var(--bg-element-light); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; overflow: hidden; }
+.close-modal-btn { color: var(--text-secondary-on-light-bg); position: absolute; top: 12px; right: 15px; font-size: 1.7em; cursor: pointer; transition: color 0.2s, transform 0.2s; line-height: 1; padding: 5px; border: none; background: none; z-index: 1002; }
+.close-modal-btn:hover { color: var(--primary-action); transform: scale(1.1); }
+.product-details-modal-content { background-color: #fff ; color: var(--text-on-light-bg); border-left: 1px solid var(--border-color-light); max-width: 400px; width: 90%; height: 100vh; position: fixed; top: 0; right: 0; margin-left: auto; border-radius: 0; padding: 30px; transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: -5px 0px 15px rgba(0,0,0,0.15); }
+.modal-overlay.active .product-details-modal-content { transform: translateX(0); }
+.product-details-modal-content .close-modal-btn { color: var(--text-secondary-on-light-bg); }
+.product-details-modal-content .close-modal-btn:hover { color: var(--primary-action); }
+#modal-product-image { border-radius: 6px; }
+.product-details-modal-content h3#modal-product-name { color: var(--text-on-light-bg); font-size: 1.6em; margin-bottom: 10px; text-align: center; border-bottom: none; padding-bottom: 0; }
+.product-details-modal-content .modal-product-info { margin-bottom: 20px; }
+.product-details-modal-content .modal-product-info p { color: var(--text-secondary-on-light-bg); margin-bottom: 8px; font-size: 0.9em; line-height: 1.5; }
+.product-details-modal-content .modal-product-info p strong { color: var(--text-on-light-bg); }
+.edit-product-modal-content { background-color: var(--bg-page-primary); color: var(--text-on-light-bg); border: 1px solid var(--border-color-light); max-width: 750px; padding: 30px; }
+.edit-product-modal-content .close-modal-btn { color: var(--text-secondary-on-light-bg); }
+.edit-product-modal-content .close-modal-btn:hover { color: var(--primary-action); }
+.edit-product-modal-content h3 { color: var(--text-on-light-bg); border-bottom: 1px solid var(--border-color-light); font-size: 1.7em; margin-bottom: 25px; text-align: center; padding-bottom: 15px; }
+#edit-product-form label { color: var(--text-secondary-on-light-bg); font-weight: 500; }
+#edit-product-form input[type="text"], #edit-product-form input[type="number"], #edit-product-form input[type="url"], #edit-product-form select, #edit-product-form textarea { background-color: #FFFFFF; border: 1px solid var(--border-color-light); color: #121212; }
+#edit-product-form input::placeholder, #edit-product-form textarea::placeholder { color: var(--text-placeholder-on-light-input); }
+#edit-product-form input:focus, #edit-product-form select:focus, #edit-product-form textarea:focus { border-color: var(--primary-action); box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2); }
+#edit-product-form img#edit-product-preview-image { display: block; max-width: 150px; max-height: 150px; border-radius: 8px; margin: 10px auto 20px; background-color: var(--bg-element-light); object-fit: contain; border: 1px solid var(--border-color-light); }
+.edit-product-modal-content textarea::-webkit-scrollbar { width: 8px; }
+.edit-product-modal-content textarea::-webkit-scrollbar-track { background: var(--bg-element-light); border-radius: 4px; }
+.edit-product-modal-content textarea::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
+.edit-product-modal-content textarea::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+a.product-link-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-bottom: 15px; padding: 10px 15px; background-color: var(--primary-action); color: var(--highlight-action-text); text-decoration: none; border-radius: 6px; font-weight: 500; transition: background-color 0.2s; }
+a.product-link-btn:hover { background-color: var(--primary-action-hover); }
+.product-details-modal-content .modal-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; margin-bottom: 10px; }
+.product-details-modal-content .modal-actions .modal-action-btn { padding: 10px; }
+.product-details-modal-content .modal-actions .modal-action-btn.edit { background-color: var(--edit-color); color: #121212; }
+.product-details-modal-content .modal-actions .modal-action-btn.edit:hover { background-color: #D68910; color: #000000; }
+.product-details-modal-content .modal-actions .modal-action-btn.delete { background-color: var(--error-color); color: var(--highlight-action-text); grid-column: span 2; }
+.product-details-modal-content .modal-actions .modal-action-btn.delete:hover { background-color: #C0392B; }
+#edit-product-form .form-row { display: flex; gap: 20px; margin-bottom: 0; }
+#edit-product-form .form-row .form-group { flex: 1; margin-bottom: 18px; }
+#edit-product-form .form-group { margin-bottom: 18px; }
+#edit-product-form button[type="submit"] { margin-top: 25px; background-color: var(--success-color); font-size: 1em; }
+#edit-product-form button[type="submit"]:hover { background-color: #0D8A61; }
+.auth-section { display: flex; justify-content: center; align-items: center; height: 100vh; background-color: var(--bg-primary); animation: fadeIn 0.5s ease-out; }
+.auth-container { max-width: 450px; width: 100%; padding: 40px; border-radius: 12px; box-shadow: 0 10px 20px rgba(0,0,0,0.35); text-align: center; background-color: var(--bg-secondary); }
+.auth-tabs { display: flex; justify-content: center; margin-bottom: 30px; border-bottom: 1px solid var(--border-color); }
+.auth-tab-btn { background: none; border: none; padding: 12px 20px; font-size: 1.1em; font-weight: 600; color: var(--text-secondary-on-dark-bg); cursor: pointer; transition: color 0.2s, border-bottom 0.2s; border-bottom: 3px solid transparent; }
+.auth-tab-btn.active { color: var(--primary-action); border-bottom-color: var(--primary-action); }
+.auth-tab-btn:hover { color: var(--text-on-dark-bg); }
+.auth-tab-content { display: none; animation: fadeIn 0.4s ease-out; }
+.auth-tab-content.active { display: block; }
+.auth-form { margin-top: 20px; }
+.auth-form .form-group { text-align: left; }
+.form-group.remember-me-group { display: flex; align-items: center; gap: 8px; margin-bottom: 15px; color: var(--text-secondary-on-dark-bg); }
+.form-group.remember-me-group input[type="checkbox"] { width: auto; flex-grow: 0; margin-top: 0; accent-color: var(--primary-action); }
+.form-group.remember-me-group label { display: inline-block; margin-bottom: 0; cursor: pointer; font-weight: normal; }
+.auth-message { margin-top: 15px; font-size: 0.9em; font-weight: 500; color: var(--text-secondary-on-dark-bg); }
+.auth-message.success { color: var(--success-color); }
+.auth-message.error { color: var(--error-color); }
+.tab-message { margin-top: 15px; font-size: 0.9em; font-weight: 500; text-align: center; padding: 8px 12px; border-radius: 6px; background-color: transparent; transition: all 0.3s ease; }
+.tab-message.success { color: var(--highlight-action-text); background-color: var(--success-color); }
+.tab-message.error { color: var(--highlight-action-text); background-color: var(--error-color); }
+/* Em src/style.css, pode ser junto de outras classes de utilidade */
+.data-missing {
+    color: #9a9a9a;
+    font-style: italic;
+}
+.card-title:hover {
+    color: var(--primary-action);
+}
+
+/* Estilo para o cabeçalho mobile (escondido por padrão) */
+.mobile-header {
+    display: none;
+}
+
+/* Em style.css */
+
+.content-loader {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px; /* Garante que o spinner tenha espaço */
+    padding: 40px;
+}
+
+.spinner {
+    border: 5px solid var(--bg-element-secondary);
+    border-top: 5px solid var(--primary-action); /* Verde */
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+}
+
+/* A animação 'spin' já deve existir no seu CSS, mas caso não, adicione-a */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Em style.css */
+
+/* Estilos para a Tela de Carregamento */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #121212; /* Fundo escuro */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999; /* Garante que fique na frente de tudo */
+    transition: opacity 0.5s ease-out; /* Transição suave para desaparecer */
+}
+
+/* Esconde a tela com opacidade para a transição funcionar */
+.loading-overlay.hidden {
+    opacity: 0;
+    pointer-events: none; /* Impede cliques na tela escondida */
+}
+
+.loading-logo {
+    width: 120px; /* Ajuste o tamanho conforme necessário */
+    height: auto;
+    animation: pulsate 2s infinite ease-in-out; /* Aplica a animação */
+}
+
+.loading-text {
+    color: #FFFFFF;
+    margin-top: 20px;
+    font-size: 1.2em;
+    font-weight: 500;
+    opacity: 0.8;
+}
+
+/* Animação de Pulsar */
+@keyframes pulsate {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.08);
+    }
+}
+
+/* Remove a regra antiga do spinner, se ainda existir */
+.loading-spinner {
+    display: none;
+}
+
+/* Em style.css (substitua as regras existentes por estas) */
+
+.product-details-modal-content {
+    background-color: #fff;
+    color: var(--text-primary);
+    border-left: 1px solid var(--border-color);
+    max-width: 400px;
+    width: 90%;
+    height: 100vh; /* Ocupa toda a altura */
+    position: fixed;
+    top: 0;
+    right: 0;
+    padding: 25px;
+    transform: translateX(100%);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: -5px 0px 15px rgba(0,0,0,0.15);
+    
+    /* --- Correções de Layout e Scroll --- */
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto; /* Adiciona scroll APENAS se o conteúdo ultrapassar a altura */
+}
+
+/* Adicione esta regra ao seu style.css */
+.verified-product-info-box {
+    text-align: center;
+    max-width: 480px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: var(--bg-element);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: var(--element-shadow);
+}
+.verified-product-info-box img {
+    max-width: 100%;
+    max-height: 250px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    object-fit: contain;
+}
+.verified-product-info-box button {
+    width: 100%;
+    margin-top: 15px;
+}
+
+/* Adicione esta regra ao seu style.css */
+.error-display {
+    text-align: center;
+    padding: 40px 20px;
+    background-color: var(--bg-element-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    margin: 20px auto;
+    max-width: 600px;
+}
+.error-display i {
+    font-size: 2.5em;
+    color: var(--error-color);
+    margin-bottom: 15px;
+}
+.error-display p {
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+}
+.error-display button {
+    width: auto;
+}
+
+#modal-product-image-container {
+    width: 100%;
+    max-height: 280px; /* Define uma altura máxima para a área da imagem */
+    flex-shrink: 0; /* Impede que o container da imagem encolha */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    background-color: var(--bg-element);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+}
+
+#modal-product-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain; /* Garante que a imagem inteira apareça sem distorção */
+    cursor: pointer;
+}
+
+/* Em style.css (pode ser na seção de modais) */
+
+/* Define a ordem das camadas dos modais */
+#edit-product-modal { z-index: 1001; }
+#product-details-modal { z-index: 1002; }
+#image-modal { z-index: 1003; } /* <-- O z-index mais alto, fica na frente de todos */
+
+.modal-product-info {
+    /* Esta área agora crescerá e rolará naturalmente dentro do painel */
+    line-height: 1.6;
+}
+
+.list-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 10px 15px;
+    background-color: var(--bg-secondary);
+    border-radius: 8px;
+    box-shadow: var(--element-shadow-on-light-bg);
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    color: #121212;
+    font-size: 0.95em;
+    transition: background-color 0.2s, box-shadow 0.2s;
+
+}
+
+.productUrlInput-products-tab,
+productUrlInput-add-tab {
+    width: 100%;
+    border-radius: 6px;
+    background-color: var(--bg-element-light);
+    box-shadow: #000000 0px 2px 4px rgba(0, 0, 0, 0.1);
+    outline: none; /* Remove o contorno padrão */
+    color: #121212;
+    font-size: 0.95em;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+
+
+@media (max-width: 1200px) {
+    .product-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+}
+
+@media (max-width: 1024px) {
+    /* .sidebar { width: 80px; } */ /* Desktop sidebar hidden on mobile by later rule */
+    .main-content-area { padding: 20px; }
+    .main-content-area h2 { font-size: 1.6em; }
+    .product-grid { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); }
+    .card-image-container { height: 150px; }
+    .product-details-modal-content { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.95); width: auto; max-width: 90%; height: auto; max-height: 85vh; right: auto; border-radius: 12px; border-left: none; transition: opacity 0.3s ease, transform 0.3s ease; }
+    .modal-overlay.active .product-details-modal-content { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    #modal-product-image-container { flex-basis: auto; height: 180px; }
+    .auth-container { max-width: 90%; padding: 30px; }
+    .auth-tab-btn { font-size: 1em; padding: 10px 15px; }
+}
+
+.mobile-menu-overlay { /* Will be hidden */
+    /* ... existing styles ... */
+}
+
+@media (max-width: 767px) {
+    /* === IMPLEMENTAÇÃO DA BARRA DE NAVEGAÇÃO INFERIOR MOBILE === */
+
+    /* Oculta o menu mobile deslizante original (se houver) */
+    .mobile-menu { display: none !important; }
+    .mobile-menu-overlay { display: none !important; }
+
+    /* Transforma a .sidebar desktop em uma barra inferior fixa */
+    .dashboard-layout > .sidebar {
+        display: flex !important; /* Garante que esteja visível e como flex */
+        flex-direction: row;    /* Itens em linha */
+        position: fixed;        /* Fixa na tela */
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 60px;           /* Altura da barra */
+        background-color: var(--bg-page-primary); /* Fundo branco, conforme tema */
+        padding: 0 5px;         /* Padding horizontal mínimo */
+        justify-content: space-around; /* Distribui os ícones */
+        align-items: center;
+        box-shadow: 0 -2px 5px rgba(0,0,0,0.08); /* Sombra para destacar */
+        z-index: 1001;          /* Acima do conteúdo, abaixo de modais superiores */
+        border-top: 1px solid var(--border-color-light); /* Borda superior clara */
+        border-right: none;     /* Remove a borda direita do desktop */
+        gap: 0;                 /* Reseta o gap do layout em coluna do desktop */
+    }
+
+        .dashboard-layout.logged-in > .sidebar {
+            display: flex; /* Exibe a sidebar quando logado */
+        }
+
+        body.logged-in > #auth-section {
+            display: none; /* Oculta a seção de autenticação quando logado */
+        }
+
+    /* Oculta elementos não necessários na barra inferior */
+    .sidebar .sidebar-header { display: none !important; }
+    .sidebar .nav-btn[data-tab="finance"] { display: none !important; }
+    /* O botão de configurações já deve estar oculto pela regra global:
+       .nav-btn[data-tab="settings"] { display: none !important; }
+       Se precisar garantir especificamente para este contexto: */
+    .sidebar .nav-btn[data-tab="settings"] { display: none !important; }
+
+    /* Faz os botões dentro de .sidebar-nav-main serem itens diretos da .sidebar */
+    .sidebar .sidebar-nav-main {
+        display: contents;
+    }
+    
+    /* Estilo para os botões de navegação na barra inferior branca */
+    .sidebar .nav-btn {
+        width: auto; 
+        height: 100%;
+        flex: 1; /* Para distribuir o espaço igualmente */
+        color: #121212;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0; /* Sem bordas arredondadas */
+        background-color: transparent; /* Fundo transparente */
+        padding: 5px 0;
+        margin: 0;
+        gap: 2px; /* Pequeno espaço (útil se houvesse texto abaixo do ícone) */
+        transition: background-color 0.2s, color 0.2s;
+    }
+    .sidebar .nav-btn i {
+        font-size: 22px; /* Tamanho do ícone ajustado */
+        line-height: 1;
+        color: var(--text-secondary-on-light-bg); /* Ícones cinza escuro na barra branca */
+    }
+    .sidebar .nav-btn:hover {
+        background-color: var(--bg-element-light); /* Fundo cinza claro no hover */
+        transform: none; /* Sem transformação de escala */
+        box-shadow: none; /* Sem sombra extra no hover */
+    }
+    .sidebar .nav-btn:hover i {
+        color: var(--primary-action); /* Ícone azul no hover */
+    }
+    .sidebar .nav-btn.active {
+        background-color: transparent; /* Fundo transparente para o ativo */
+    }
+    .sidebar .nav-btn.active i {
+        color: var(--primary-action); /* Ícone ativo azul */
+    }
+    /* Estilo específico para o ícone de logout na barra inferior */
+    .sidebar #logout-btn i {
+         color: var(--text-secondary-on-light-bg); /* Cor padrão do ícone */
+    }
+     .sidebar #logout-btn:hover i {
+        color: var(--error-color); /* Cor de erro (vermelho) no hover do logout */
+    }
+    /* === FIM DA IMPLEMENTAÇÃO DA BARRA INFERIOR MOBILE === */
+
+        /* Elementos que precisam da altura total da viewport */
+        .dashboard-layout {
+        height: var(--app-height);
+        display: flex; /* Já deve estar assim */
+        flex-direction: column; /* Se a barra inferior fosse parte do fluxo, mas é fixed */
+        }
+
+        .main-content-area {
+        height: var(--app-height); /* Usa a altura calculada */
+        /* Ou, se .dashboard-layout é o container flex principal e a barra é fixed: */
+        /* height: 100%; /* Se .dashboard-layout já tem a altura correta */
+        overflow-y: auto;
+        padding-bottom: 75px; /* Para a barra inferior de 60px + buffer */
+        flex-grow: 1; /* Se .dashboard-layout for flex-direction: column */
+        }    
+    .main-content-area h2 {
+        font-size: 1.5em; /* Títulos um pouco menores no mobile */
+        margin-bottom: 20px;
+    }
+
+    /* Dentro de @media (max-width: 767px) */
+
+/* Mostra e estiliza o cabeçalho mobile */
+.mobile-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 8px 0;
+    background-color: var(--bg-element);
+    border-bottom: 1px solid var(--border-color);
+    width: 100%;
+}
+
+.mobile-logo {
+    height: 35px;
+    width: auto;
+}
+
+/* Ajusta o conteúdo para não ficar atrás do novo cabeçalho */
+.dashboard-layout {
+    /* A altura total do layout agora não precisa considerar o cabeçalho */
+    height: auto; 
+}
+
+.main-content-area {
+    /* A altura se ajusta, e o padding superior acomoda o cabeçalho */
+    height: calc(var(--app-height) - 52px); /* Altura da tela menos o cabeçalho */
+    padding-top: 15px; /* Reset do padding para evitar duplicação */
+}
+
+/* Ajusta a tela de login também */
+.auth-section {
+    height: calc(100vh - 52px); /* Altura da tela menos o cabeçalho */
+}
+
+    /* Oculta elementos desnecessários na barra inferior */
+    .sidebar .sidebar-header,
+    .sidebar .sidebar-footer {
+        display: none;
+    }
+    .sidebar .nav-btn[data-tab="finance"] {
+        display: none !important;
+    }
+
+    /* Faz os botões de navegação e logout serem itens diretos da barra */
+    .sidebar .sidebar-nav-main {
+        display: contents;
+    }
+    
+    /* --- Estilo UNIFICADO para TODOS os botões na barra inferior --- */
+    .sidebar .nav-btn {
+        width: auto; 
+        height: 100%;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0;
+        background-color: transparent; /* Garante fundo transparente para TODOS */
+        padding: 5px 0;
+        margin: 0;
+        gap: 2px;
+        transition: background-color 0.2s, color 0.2s;
+    }
+    
+    /* Estilo UNIFICADO para TODOS os ícones */
+    .sidebar .nav-btn i {
+        font-size: 22px;
+        line-height: 1;
+        color: var(--text-secondary); /* Usa a variável correta para cinza */
+    }
+
+    /* Efeito HOVER para todos os botões */
+    .sidebar .nav-btn:hover {
+        background-color: var(--bg-element-secondary);
+        transform: none;
+        box-shadow: none;
+    }
+    .sidebar .nav-btn:hover i {
+        color: var(--primary-action); /* Ícone fica verde no hover */
+    }
+
+    /* Botão ATIVO */
+    .sidebar .nav-btn.active {
+        background-color: transparent;
+    }
+    .sidebar .nav-btn.active i {
+        color: var(--primary-action); /* Ícone ativo fica verde */
+    }
+
+    /* Exceção para o hover do LOGOUT */
+    .sidebar #logout-btn:hover i {
+        color: var(--error-color); /* Ícone do logout fica vermelho no hover */
+    }
+
+    /* Responsividade para o grupo de input "Verificar URL" */
+    #scrape-form-products-tab.input-group {
+        flex-wrap: wrap;
+        justify-content: center;
+        padding: 8px 15px; /* Padding interno do grupo */
+        border-radius: 30px; /* Raio de borda ajustado */
+        max-width: 95%;     /* Largura máxima para permitir centralização */
+        margin-left: auto;  /* Centraliza o bloco */
+        margin-right: auto; /* Centraliza o bloco */
+        margin-bottom: 25px; /* Margem inferior */
+    }
+    #scrape-form-products-tab.input-group input[type="url"] {
+        flex-basis: 100%; /* Input ocupa a largura total */
+        width: 100%;
+        margin-bottom: 10px; /* Espaço entre input e botão quando quebrado */
+        text-align: center;  /* Centraliza o placeholder */
+        font-size: 1em;      /* Tamanho da fonte do input */
+    }
+    #scrape-form-products-tab.input-group button {
+        width: 100%; /* Botão ocupa a largura total */
+        padding: 12px 20px;
+        font-size: 1em; /* Tamanho da fonte do botão */
+    }
+
+    /* Ajustes nos cards de produto para mobile */
+    .product-grid {
+        grid-template-columns: 1fr; /* Um card por linha */
+        gap: 15px; /* Espaçamento entre cards */
+    }
+    .product-card { /* Card com fundo branco e texto escuro */
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+        border-radius: 10px; /* Borda um pouco menos arredondada */
+        position: relative;
+        background-color: var(--bg-page-primary); /* Fundo branco */
+        border: 1px solid var(--border-color-light); /* Borda clara */
+        box-shadow: var(--element-shadow-on-light-bg); /* Sombra escura sutil */
+        position: relative;
+    }
+
+    .card-loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    border-radius: 12px;
+}
+
+.card-loading-overlay i {
+    font-size: 2em;
+    color: var(--primary-action);
+    animation: spin 1s linear infinite;
+}
+
+/* A animação @keyframes spin já deve existir no seu CSS, mas caso não, adicione-a */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+    .product-card .card-image-container {
+        flex-shrink: 0;
+        width: 90px; /* Largura da imagem um pouco menor */
+        height: auto;
+        min-height: 90px;
+        padding: 8px;
+        border-radius: 10px 0 0 10px; /* Ajusta o raio para a borda */
+        align-self: stretch;
+        background-color: #FFFFFF; /* Fundo da imagem sempre branco */
+        border-right: 1px solid var(--border-color-light); /* Linha separadora */
+    }
+    .product-card .card-image {
+        border-radius: 6px;
+    }
+    .product-card .card-content { /* Conteúdo do card com texto escuro */
+        flex-grow: 1;
+        padding: 10px 12px; /* Padding ajustado */
+        text-align: left;
+        border-radius: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        background-color: var(--bg-page-primary); /* Fundo branco */
+    }
+    .product-card .card-title {
+        font-size: 0.95em; /* Título um pouco menor */
+        min-height: 0;
+        -webkit-line-clamp: 2; /* Máximo de 2 linhas para o título */
+        line-clamp: 2;
+        margin-bottom: 4px;
+        color: var(--text-on-light-bg); /* Texto escuro */
+        font-weight: 600;
+    }
+    .product-card .card-price {
+        font-size: 1.3em; /* Preço um pouco menor */
+        margin-bottom: 6px;
+        margin-top: 4px;
+        text-align: left;
+        color: var(--text-on-light-bg); /* Texto escuro */
+        font-weight: 700;
+    }
+    .product-card .card-actions { /* Ações com ícones escuros */
+        display: grid;
+        color: #e0e0e0;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    place-items: center; /* Centraliza os ícones na grade */
+    padding: 8px;
+    gap: 4px; /* Espaço entre os ícones */
+    border-top: none;
+    border-left: 1px solid var(--border-color);
+    width: 90px; /* Largura fixa para a área de ações */
+    flex-shrink: 0;
+    }
+     .product-card .card-actions i {
+        font-size: 1.4em; /* Ícones maiores e mais fáceis de tocar */
+    padding: 8px;     /* Aumenta a área de toque */
+    color: #e0e0e0; /* Cor dos ícones */
+    }
+     .product-card .card-actions i:hover {
+        color: var(--primary-action); /* Cor primária no hover */
+    }
+
+    /* Caixa de Informação do Produto Verificado */
+    #verifiedProductInfo-add-tab,
+    #verifiedProductInfo-products-tab {
+        max-width: 95%; /* Ocupa mais a largura da tela */
+        padding: 15px;
+    }
+    #verifiedProductImage-add-tab,
+    #verifiedProductImage-products-tab {
+        max-height: 180px; /* Imagem da prévia um pouco menor */
+    }
+
+    /* Ajustes Gerais para Modais em Telas Pequenas */
+    .modal-content {
+        width: 90%;
+        max-width: calc(100vw - 30px); /* Pequenas margens laterais */
+        margin-top: 20px;
+        margin-bottom: 20px;
+        padding: 15px; /* Padding geral para modais no mobile */
+        max-height: 90vh; /* Aumenta um pouco a altura máxima permitida */
+        overflow-y: auto;
+    }
+
+    /* Modal de Detalhes do Produto (Slide-in) */
+    .product-details-modal-content {
+        width: 85%; /* Slide-in ocupa um pouco menos da tela */
+        max-width: 360px; /* Max width para o slide-in */
+        padding: 20px 15px; /* Padding ajustado */
+        height: 100vh; /* Ocupa toda a altura */
+        margin-left: auto;
+        margin-top: 0;
+        margin-bottom: 0;
+        border-radius: 0;
+    }
+
+    #modal-product-image-container {
+width: 100%; /* A imagem ocupa a largura total do container /
+max-height: 300px; / Define uma altura máxima para a imagem /
+overflow: hidden; / Recorta a imagem se exceder a altura /
+margin-bottom: 15px;
+display: flex;
+justify-content: center; / Centraliza a imagem horizontalmente /
+align-items: center; / Centraliza a imagem verticalmente */
+}
+
+#modal-product-image {
+max-width: 100%; /* A imagem não ultrapassa a largura do container /
+max-height: 100%; / A imagem não ultrapassa a altura do container /
+object-fit: contain; / Garante que a imagem inteira seja visível, mantendo a proporção */
+border-radius: 8px;
+}
+
+.modal-product-info {
+margin-bottom: 15px;
+}
+
+.modal-actions {
+margin-top: 20px;
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 10px;
+}
+
+.modal-actions button {
+width: 100%;
+}
+
+    /* Modal de Edição de Produto */
+    .edit-product-modal-content {
+        /* Herdará width: 90% do .modal-content geral */
+        padding: 20px 15px; /* Padding ajustado */
+    }
+    #edit-product-form .form-row {
+        flex-direction: column; /* Empilha campos que estavam lado a lado */
+        gap: 0;
+    }
+    #edit-product-form .form-row .form-group {
+        margin-bottom: 15px; /* Espaçamento entre campos empilhados */
+    }
+    #edit-product-form label {
+        font-size: 0.85em;
+    }
+
+    .url-scrape-container {
+    background-color: var(--bg-element-secondary);
+    width: 100%;
+    border: transparent;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.url-scrape-container input[type="url"] {
+    text-align: center;
+    font-size: 1.05em;
+    padding: 12px;
+}
+
+.url-scrape-container button {
+    width: 100%;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    font-size: 1em;
+}
+    /* Inputs dentro do modal de edição */
+    #edit-product-form input[type="text"], 
+    #edit-product-form input[type="number"], 
+    #edit-product-form input[type="url"], 
+    #edit-product-form select, 
+    #edit-product-form textarea {
+        font-size: 0.9em;
+        padding: 8px 10px;
+    }
+
+    /* Ajustes para Dashboard e Resumo Financeiro Mobile */
+    .dashboard-summary-cards {
+        grid-template-columns: 1fr; /* Empilha os cards de resumo */
+        gap: 10px; /* Espaçamento menor */
+    }
+    .summary-card {
+        padding: 12px; /* Padding menor */
+    }
+    .summary-card h4 {
+        font-size: 0.85em;
+    }
+    .summary-card p {
+        font-size: 1.5em;
+    }
+
+    .dashboard-charts {
+        grid-template-columns: 1fr; /* Empilha os gráficos */
+        gap: 15px;
+    }
+    .dashboard-charts .chart-container {
+        padding: 10px; /* Padding menor */
+        height: 280px; /* Altura fixa menor para gráficos */
+        min-height: unset; /* Remove min-height para usar a altura fixa */
+        overflow: hidden; /* Evita estouro do gráfico */
+    }
+    .dashboard-charts .chart-container h3 {
+        font-size: 0.9em; /* Título do gráfico menor */
+        margin-bottom: 8px;
+    }
+    .dashboard-charts .chart-container canvas {
+        max-width: 100%;
+        max-height: 100%; /* Garante que o canvas não ultrapasse o container */
+    }
+    /* Específico para o gráfico problemático, se necessário */
+    #finance-overview-chart-container {
+        height: 280px;
+        overflow: hidden;
+    }
+    #financeOverviewChart {
+        max-width: 100%;
+        max-height: 100%;
+    }
+    
+    /* Ajustes para Auth Container no Mobile */
+    .auth-container {
+        padding: 20px;
+        max-width: 100%;
+        width: calc(100% - 30px); /* Ocupa quase toda a largura com pequenas margens */
+        margin: 20px 15px;
+    }
+    .auth-tab-btn {
+        font-size: 1em;
+        padding: 10px; /* Padding menor nos botões de aba */
+    }
+    .auth-section {
+        padding: 20px;
+        background-color: var(--bg-secondary);
+        border-radius: 12px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.35);
+        width: calc(100% - 30px); /* Ocupa quase toda a largura com pequenas margens */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh; /* Garante que a seção de autenticação ocupa toda a tela */
+    }
+    .productUrlInput-products-tab,
+productUrlInput-add-tab {
+    width: 100%;
+    border-radius: 6px;
+    background-color: var(--bg-element-light);
+    box-shadow: #000000 0px 2px 4px rgba(0, 0, 0, 0.1);
+    
+    color: #121212;
+    font-size: 0.95em;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    padding: 10px; /* Padding para o input */
+    box-sizing: border-box; /* Garante que o padding não afete a largura total */
+    outline: none; /* Remove o contorno padrão */
+}
+}

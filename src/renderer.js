@@ -1,17 +1,17 @@
 // --- CONFIGURAÇÃO DO RECAPTCHA ---
 let recaptchaRegisterWidgetId = null;
-const RECAPTCHA_SITE_KEY = '6Lfin1MrAAAAAKoExa3uVksnMFHyJasKJbj8htsA'; // Sua Site Key
+const RECAPTCHA_SITE_KEY = '6Lfin1MrAAAAAKoExa3uVksnMFHyJasKJbj8htsA'; // A sua Site Key
 
-// Função para renderizar o reCAPTCHA de registro. Chamada pelo 'onload' da API do Google.
+// Função para renderizar o reCAPTCHA de registo. Chamada pelo 'onload' da API do Google.
 window.renderRegistrationRecaptcha = () => {
-    console.log('API do reCAPTCHA carregada, renderizando widget de registro...');
+    console.log('API do reCAPTCHA carregada, a renderizar o widget de registo...');
     
     const registerContainer = document.getElementById('recaptcha-register-container');
     if (registerContainer && recaptchaRegisterWidgetId === null) {
         recaptchaRegisterWidgetId = grecaptcha.render('recaptcha-register-container', {
             'sitekey' : RECAPTCHA_SITE_KEY
         });
-        console.log('Widget reCAPTCHA de Registro renderizado com ID:', recaptchaRegisterWidgetId);
+        console.log('Widget reCAPTCHA de Registo renderizado com ID:', recaptchaRegisterWidgetId);
     }
 };
 
@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- FUNÇÕES DE UTILIDADE ---
     async function authenticatedFetch(url, options = {}) {
         if (!authToken) {
-            console.error("Token de autenticação não disponível. Redirecionando para login.");
+            console.error("Token de autenticação não disponível. A redirecionar para o login.");
             showAuthSection();
             throw new Error("Não autenticado.");
         }
@@ -142,7 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const response = await fetch(url, { ...options, headers });
 
         if (response.status === 401 || response.status === 403) {
-            showAuthMessage(loginMessage, 'Sessão expirada ou não autorizado. Por favor, faça login novamente.', false);
+            showAuthMessage(loginMessage, 'Sessão expirada ou não autorizado. Por favor, faça o login novamente.', false);
             logoutUser();
             throw new Error("Não autorizado ou sessão expirada.");
         }
@@ -245,7 +245,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             console.error("Erro ao carregar dados iniciais do dashboard:", error);
-            showAuthMessage(loginMessage, 'Erro ao carregar dados. Tente fazer login novamente.', false);
+            showAuthMessage(loginMessage, 'Erro ao carregar dados. Tente fazer o login novamente.', false);
             logoutUser();
         } finally {
             if (loadingOverlay) loadingOverlay.classList.add('hidden');
@@ -346,17 +346,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 } else {
                     if (loadingOverlay) loadingOverlay.classList.add('hidden');
-                    showAuthMessage(loginMessage, data.message || 'Erro ao fazer login.');
+                    showAuthMessage(loginMessage, data.message || 'Erro ao fazer o login.');
                 }
             } catch (error) {
                 if (loadingOverlay) loadingOverlay.classList.add('hidden');
-                console.error('Erro de rede ao fazer login:', error);
+                console.error('Erro de rede ao fazer o login:', error);
                 showAuthMessage(loginMessage, 'Erro de conexão com o servidor.');
             }
         });
     }
     
-    // Formulário de Registro (COM reCAPTCHA)
+    // Formulário de Registo (COM reCAPTCHA)
     if (registerForm) {
         registerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -406,7 +406,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         passwordStrengthIndicator.style.color = 'grey';
                     }
 
-                    showAuthMessage(registerMessage, data.message + ' Redirecionando para o login...', true);
+                    showAuthMessage(registerMessage, data.message + ' A redirecionar para o login...', true);
                     if (typeof grecaptcha !== 'undefined' && recaptchaRegisterWidgetId !== null) grecaptcha.reset(recaptchaRegisterWidgetId);
 
                     setTimeout(() => {
@@ -419,12 +419,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     }, 2000);
 
                 } else {
-                    showAuthMessage(registerMessage, data.message || 'Ocorreu um erro ao registrar.');
+                    showAuthMessage(registerMessage, data.message || 'Ocorreu um erro ao registar.');
                     if (typeof grecaptcha !== 'undefined' && recaptchaRegisterWidgetId !== null) grecaptcha.reset(recaptchaRegisterWidgetId);
                 }
             } catch (error) {
-                console.error('Erro de rede ao registrar:', error);
-                showAuthMessage(registerMessage, 'Não foi possível conectar ao servidor. Tente novamente.');
+                console.error('Erro de rede ao registar:', error);
+                showAuthMessage(registerMessage, 'Não foi possível ligar ao servidor. Tente novamente.');
                 if (typeof grecaptcha !== 'undefined' && recaptchaRegisterWidgetId !== null) grecaptcha.reset(recaptchaRegisterWidgetId);
             }
         });
@@ -471,6 +471,95 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // --- LÓGICA DE PRODUTOS ---
+
+    async function handleSaveProduct(context) {
+        if (!currentUserId) {
+            showTabMessage(context.messageElement, 'Precisa de estar autenticado para adicionar produtos.', false);
+            return;
+        }
+
+        let productPayload = {};
+        
+        const isScrapeSave = context.source === 'scrape' && scrapedProductData && scrapedProductData.name;
+
+        if (isScrapeSave) {
+            console.log("A guardar a partir de dados de scrape...");
+            productPayload = { ...scrapedProductData, status: 'pendente' };
+        } else {
+            console.log("A guardar a partir do formulário manual...");
+            productPayload = {
+                name: manualProductNameInput.value.trim(),
+                price: manualProductPriceInput.value.trim(),
+                urlOrigin: manualProductUrlInput.value.trim(),
+                image: manualProductImageUrlInput.value.trim(),
+                category: manualProductCategorySelect.value,
+                brand: manualProductBrandInput.value.trim(),
+                description: manualProductDescriptionTextarea.value.trim(),
+                status: 'pendente'
+            };
+        }
+
+        if (!productPayload.name || !productPayload.price || !productPayload.urlOrigin) {
+            showTabMessage(context.messageElement, 'Nome, preço e URL de origem são obrigatórios!', false);
+            return;
+        }
+
+        context.buttonElement.disabled = true;
+        context.buttonElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i> A Guardar...';
+
+        try {
+            const response = await authenticatedFetch(`${API_BASE_URL}/products`, {
+                method: 'POST',
+                body: JSON.stringify(productPayload),
+            });
+
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.message || `Erro HTTP ${response.status}`);
+            }
+
+            showTabMessage(context.messageElement, "Produto guardado com sucesso!", true);
+            
+            if (isScrapeSave) {
+                scrapedProductData = null; 
+            }
+            clearAddProductFormAddTab();
+            clearProductScrapeFormProductsTab();
+            
+            fetchAndRenderProducts();
+            fetchAndRenderDashboardStats();
+
+        } catch (error) {
+            console.error("Erro ao guardar o produto:", error);
+            showTabMessage(context.messageElement, `Erro ao guardar: ${error.message}`, false);
+        } finally {
+            context.buttonElement.disabled = false;
+            context.buttonElement.innerHTML = '<i class="fas fa-save"></i> Guardar Produto';
+        }
+    }
+    
+    if (saveProductBtnAddTab) {
+        saveProductBtnAddTab.addEventListener('click', () => {
+            const source = (scrapedProductData && scrapedProductData.name) ? 'scrape' : 'manual';
+            handleSaveProduct({
+                buttonElement: saveProductBtnAddTab,
+                messageElement: addProductMessageAddTab,
+                source: source
+            });
+        });
+    }
+
+    if (saveProductBtnProductsTab) {
+        saveProductBtnProductsTab.addEventListener('click', () => {
+            handleSaveProduct({
+                buttonElement: saveProductBtnProductsTab,
+                messageElement: addProductMessageProductsTab,
+                source: 'scrape'
+            });
+        });
+    }
+
+
     const createProductCard = (product) => {
         const card = document.createElement('li');
         card.className = 'product-card';
@@ -509,7 +598,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await authenticatedFetch(`${API_BASE_URL}/products?userId=${currentUserId}`);
             if (!response.ok) {
                  const errorData = await response.json().catch(() => ({ message: response.statusText }));
-                 throw new Error(errorData.message || 'Erro ao buscar produtos');
+                 throw new Error(errorData.message || 'Erro ao procurar produtos');
             }
             
             const products = await response.json();
@@ -557,6 +646,26 @@ document.addEventListener('DOMContentLoaded', () => {
             showTabMessage(addProductMessageAddTab, `Erro ao carregar produtos: ${error.message}`, false);
         }
     };
+
+    function clearAddProductFormAddTab() {
+        if (productUrlInputAddTab) productUrlInputAddTab.value = '';
+        if (verifiedProductInfoDivAddTab) verifiedProductInfoDivAddTab.classList.add('hidden');
+        if (manualProductNameInput) manualProductNameInput.value = '';
+        if (manualProductPriceInput) manualProductPriceInput.value = '';
+        if (manualProductUrlInput) manualProductUrlInput.value = '';
+        if (manualProductImageUrlInput) manualProductImageUrlInput.value = '';
+        if (manualProductCategorySelect) manualProductCategorySelect.value = 'Outros';
+        if (manualProductBrandInput) manualProductBrandInput.value = '';
+        if (manualProductDescriptionTextarea) manualProductDescriptionTextarea.value = '';
+        if(addProductMessageAddTab) addProductMessageAddTab.textContent = '';
+    }
+
+    function clearProductScrapeFormProductsTab() {
+        if (productUrlInputProductsTab) productUrlInputProductsTab.value = '';
+        if (verifiedProductInfoDivProductsTab) verifiedProductInfoDivProductsTab.classList.add('hidden');
+        if (saveProductBtnProductsTab) saveProductBtnProductsTab.style.display = 'none';
+        if(addProductMessageProductsTab) addProductMessageProductsTab.textContent = '';
+    }
 
 
     // Coloque isso no seu arquivo JavaScript principal (ex: renderer.js)
