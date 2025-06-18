@@ -42,7 +42,7 @@ body[data-theme="dark"] {
     --text-primary: #e0e0e0;
     --text-secondary: #a3b1c6;
     
-    color-scheme: dark; /* Garante que os elementos padrão do navegador (como scrollbars) se adaptem */
+    color-scheme: dark; 
 
     /* AJUSTE: Garante que as sombras usem as variáveis do tema escuro */
     --shadow: 4px 4px 8px var(--c-dark), -4px -4px 8px var(--c-light);
@@ -51,7 +51,7 @@ body[data-theme="dark"] {
 }
 
 body[data-theme="dark"] .card-image-container {
-    background-color: #ffffff; /* Fundo da imagem sempre branco, mesmo no modo escuro */
+    background-color: #ffffff;
 }
 
 body[data-theme="dark"] button.primary-btn, 
@@ -482,8 +482,8 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
     height: 350px;
     display: flex;
     flex-direction: column;
-    padding: 25px 25px 40px 25px; /* Adiciona padding inferior para a legenda caber */
-    color: var(--text-primary); /* Garante que o texto dentro herde a cor correta */
+    padding: 25px 25px 40px 25px; 
+    color: var(--text-primary); 
 }
 .chart-container canvas {
     flex-grow: 1;
@@ -528,7 +528,7 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
 }
 #modal-product-image-container {
     width: 100%;
-    max-height: 180px; /* Imagem ainda menor */
+    height: 180px; /* Altura fixa e menor */
     flex-shrink: 0;
     display: flex;
     align-items: center;
@@ -567,7 +567,7 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
     justify-content: space-between;
     border-bottom: 1px solid rgba(0,0,0,0.05);
     padding: 8px 4px;
-    gap: 15px; /* Espaço entre a chave e o valor */
+    gap: 15px;
 }
 body[data-theme="dark"] .modal-product-info p {
     border-bottom: 1px solid rgba(255,255,255,0.08);
@@ -575,7 +575,7 @@ body[data-theme="dark"] .modal-product-info p {
 .modal-product-info p strong {
     color: var(--text-secondary);
     margin-right: 15px;
-    flex-shrink: 0; /* Impede que o label encolha */
+    flex-shrink: 0;
 }
 .modal-product-info p span {
     text-align: right;
@@ -583,7 +583,7 @@ body[data-theme="dark"] .modal-product-info p {
 }
 a.product-link-btn {
     width: 100%;
-    margin-bottom: 15px; /* Espaço maior */
+    margin-bottom: 15px;
 }
 .modal-actions {
     margin-top: auto;
@@ -632,6 +632,9 @@ a.product-link-btn {
 }
 
 /* Modal de Edição */
+.edit-product-modal-content {
+    max-width: 600px;
+}
 #edit-product-preview-image {
     display: block;
     max-width: 150px;
