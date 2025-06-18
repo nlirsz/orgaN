@@ -639,7 +639,7 @@ body[data-theme="dark"] #product-details-modal .modal-product-info p {
 
 /* === Modais Neumórficos === */
 .modal-overlay { 
-    background: #e0e0e0; 
+    background: rgba(0, 0, 0, 0.4); 
     backdrop-filter: blur(4px); 
     position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
     display: flex; align-items: center; justify-content: center; z-index: 1001; 
@@ -664,6 +664,14 @@ body[data-theme="dark"] #product-details-modal .modal-product-info p {
     display: flex;
     flex-direction: column;
     text-align: center;
+    background: var(--c-primary);
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    max-width: 900px;
+    width: 90%;
+    
+
 }
 #modal-product-image-container {
     width: 100%;
