@@ -1398,7 +1398,6 @@ else if (target.classList.contains('action-search')) {
                 setDetail(modalProductCategory, productData.category, 'Não definida');
                 setDetail(modalProductBrand, productData.brand);
                 setDetail(modalProductAddedDate, productData.createdAt ? new Date(productData.createdAt).toLocaleDateString('pt-BR') : '', 'Data indisponível');
-                setDetail(modalProductDescription, productData.description, 'Nenhuma descrição.');
                 setDetail(modalProductTags, (productData.tags && productData.tags.length > 0) ? productData.tags.join(', ') : '', 'Nenhuma');
                 setDetail(modalProductPriority, productData.priority, 'Não definida');
                 setDetail(modalProductNotes, productData.notes, 'Nenhuma.');

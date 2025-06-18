@@ -654,12 +654,7 @@ body[data-theme="dark"] #product-details-modal .modal-product-info p {
     
 }
 .modal-overlay.active { opacity: 1; visibility: visible; pointer-events: auto; 
-    z-index: 1001; /* Garante que fique acima de outros elementos */
-    margin: auto;
-    padding: 20px; /* Adiciona espaçamento ao redor do modal */
-    overflow-y: auto; /* Permite rolagem se o conteúdo for maior que a tela */
-    overflow-x: hidden; /* Garante que não haja rolagem horizontal */
-    z-index: 1001; /* Garante que fique acima de outros elementos */
+    
 
 }
 
