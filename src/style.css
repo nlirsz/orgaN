@@ -520,28 +520,12 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
 #product-details-modal .modal-content {
     background-color: #ffffff; /* Fundo branco sólido */
     color: #3a3f44;           /* Cor de texto escura para garantir contraste */
-    box-shadow: var(--shadow); /* Sombra suave para o modal */
-    border-radius: 20px; /* Mantém o arredondamento do modal */
-    padding: 25px; /* Espaçamento interno consistente */
-    display: flex;
-    flex-direction: column; /* Garante que o conteúdo seja empilhado verticalmente */
-    overflow: hidden; /* Impede que o conteúdo transborde do modal */
-    
 }
 
 /* Garante que o container da imagem dentro do modal também tenha fundo branco */
 #product-details-modal #modal-product-image-container {
     background-color: #ffffff;
     box-shadow: var(--shadow-inset-light); /* Mantém uma sombra interna suave */
-    border-radius: 15px; /* Arredondamento consistente */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 180px; /* Altura fixa para o container da imagem */
-    margin-bottom: 20px; /* Espaçamento abaixo do container da imagem */
-    overflow: hidden; /* Impede que a imagem transborde do container */
-
 }
 
 /* Garante que o texto dentro do modal de detalhes seja sempre escuro */
@@ -550,7 +534,6 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
 #product-details-modal #modal-product-name,
 #product-details-modal .modal-product-price {
     color: var(--text-primary); /* Usa a variável de texto primário do tema claro */
-
 }
 
 /* Ajusta a borda inferior dos detalhes para ser visível no fundo branco */
@@ -654,52 +637,53 @@ body[data-theme="dark"] #product-details-modal .modal-product-info p {
 #finance-list li { display: flex; justify-content: space-between; align-items: center; }
 
 
-/* === Modais Neumórficos (CORRIGIDO) === */
-.modal-overlay { 
-    background: rgba(0, 0, 0, 0.4); 
-    backdrop-filter: blur(4px); 
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-    display: flex; align-items: center; justify-content: center; z-index: 1001; 
-    opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.3s ease; 
+/* === Modais Neumórficos === */
+.modal-overlay {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center; z-index: 1001;
+    opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.3s ease;
 }
 .modal-overlay.active { opacity: 1; visibility: visible; pointer-events: auto; }
 
 .modal-content {
-
-background: var(--c-primary);
-
-color: var(--text-primary);
-
-border-radius: 20px;
-
-box-shadow: var(--shadow);
-
-max-width: 500px;
-
-padding: 25px;
-
-position: relative;
-
-max-height: 90vh;
-
-overflow-y: auto;
-
-width: 90%;
-    /* --- INÍCIO DAS MUDANÇAS CRÍTICAS PARA O SCROLL --- */
+    background: var(--c-primary);
+    color: var(--text-primary);
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    max-width: 500px;
+    padding: 25px;
+    position: relative;
+    max-height: 90vh;
+    overflow-y: auto;
+    width: 90%;
     display: flex;
     flex-direction: column;
     overflow: hidden; /* Esconde o overflow do container principal; a rolagem será interna */
+}
+.product-details-modal-content {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    background: var(--c-primary);
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    max-width: 900px;
+    width: 90%;
 }
 
 #modal-product-image-container {
     width: 100%;
     height: 180px;
-    flex-shrink: 0; /* Impede que o container da imagem encolha */
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     margin-bottom: 20px;
-    background: #ffffff;
+    background: var(--c-primary);
+    padding: 10px;
     border-radius: 15px;
     box-shadow: var(--shadow-inset);
 }
@@ -712,17 +696,13 @@ width: 90%;
     font-size: 1.4em;
     font-weight: 700;
     margin-bottom: 4px;
-    flex-shrink: 0;
 }
 .modal-product-price {
     font-size: 1.1em;
     font-weight: 500;
     color: var(--text-secondary);
     margin-bottom: 20px;
-    flex-shrink: 0;
 }
-
-/* Área de informações que irá rolar */
 .modal-product-info {
     flex-grow: 1;      /* Faz esta seção ocupar todo o espaço vertical disponível */
     overflow-y: auto;  /* Adiciona a barra de rolagem APENAS quando o conteúdo for maior que a área */
@@ -736,9 +716,12 @@ width: 90%;
 .modal-product-info p {
     display: flex;
     justify-content: space-between;
-    border-bottom: 1px solid rgba(0,0,0,0.08);
+    border-bottom: 1px solid rgba(0,0,0,0.05);
     padding: 8px 4px;
     gap: 15px;
+}
+body[data-theme="dark"] .modal-product-info p {
+    border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 .modal-product-info p strong {
     color: var(--text-secondary);
@@ -759,7 +742,6 @@ a.product-link-btn {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 15px;
-    flex-shrink: 0; /* Impede que a área de botões encolha */
 }
 .modal-actions .modal-action-btn.delete {
     grid-column: 1 / -1;
@@ -788,7 +770,7 @@ a.product-link-btn {
     color: var(--primary-action);
 }
 
-/* Modal de Imagem (sem alterações) */
+/* Modal de Imagem */
 .image-modal-content {
     padding: 15px;
     background: var(--c-primary);
@@ -800,7 +782,7 @@ a.product-link-btn {
     border-radius: 10px;
 }
 
-/* Modal de Edição (sem alterações) */
+/* Modal de Edição */
 .edit-product-modal-content {
     max-width: 600px;
 }
@@ -813,7 +795,6 @@ a.product-link-btn {
     object-fit: contain;
     box-shadow: var(--shadow);
 }
-
 /* === Seletor de Tema === */
 .theme-switch-wrapper {
     display: flex;
@@ -1052,17 +1033,6 @@ input:checked + .slider-toggle:before {
     .modal-content {
         width: 95%;
         padding: 20px 15px;
-        max-height: 90vh;
-        overflow-y: auto;
-        box-shadow: var(--shadow);
-        border-radius: 15px;
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-        position: relative;
-        background: var(--c-primary);
-
-        
     }
     
     .form-container, .finance-form-container, .auth-container, .url-scrape-container, .summary-card, .chart-container, #finance-list li {
