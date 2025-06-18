@@ -594,22 +594,37 @@ document.addEventListener('DOMContentLoaded', () => {
     const getTextColor = () => getComputedStyle(document.body).getPropertyValue('--text-primary').trim();
 
     // Função para atualizar a cor dos gráficos
-    const updateChartColors = () => {
-        const textColor = getTextColor();
-        const chartInstances = [financeOverviewChart, categoryDistributionChart, financialLineChart];
-        
-        chartInstances.forEach(chart => {
-            if (chart) {
-                // Atualiza a cor das legendas e eixos
+// Em renderer.js
+
+// Função para atualizar a cor dos gráficos
+const updateChartColors = () => {
+    const textColor = getTextColor();
+    const chartInstances = [financeOverviewChart, categoryDistributionChart, financialLineChart];
+    
+    chartInstances.forEach(chart => {
+        // ▼▼▼ INÍCIO DA CORREÇÃO ▼▼▼
+        if (chart) {
+            // Atualiza a cor da legenda (todos os gráficos têm)
+            if (chart.options.plugins.legend) {
                 chart.options.plugins.legend.labels.color = textColor;
-                chart.options.scales.x.ticks.color = textColor;
-                chart.options.scales.y.ticks.color = textColor;
-                chart.options.scales.x.grid.color = 'rgba(128, 128, 128, 0.1)';
-                chart.options.scales.y.grid.color = 'rgba(128, 128, 128, 0.1)';
-                chart.update();
             }
-        });
-    };
+
+            // ATUALIZA OS EIXOS APENAS SE ELES EXISTIREM
+            if (chart.options.scales) {
+                if (chart.options.scales.x) {
+                    chart.options.scales.x.ticks.color = textColor;
+                    chart.options.scales.x.grid.color = 'rgba(128, 128, 128, 0.1)';
+                }
+                if (chart.options.scales.y) {
+                    chart.options.scales.y.ticks.color = textColor;
+                    chart.options.scales.y.grid.color = 'rgba(128, 128, 128, 0.1)';
+                }
+            }
+            chart.update();
+        }
+        // ▲▲▲ FIM DA CORREÇÃO ▲▲▲
+    });
+};
 
     // Função para aplicar o tema salvo
     const applySavedTheme = () => {
@@ -1109,24 +1124,22 @@ if (productUrlInputProductsTab && verifyUrlBtnProductsTab) {
 // CORRETO: Um listener para CADA botão de salvar, em blocos separados.
 
 if (saveProductBtnAddTab) {
-    saveProductBtnAddTab.addEventListener('click', async () => {
-        // Salva o produto vindo da aba "Adicionar Produto"
-        await handleSaveProduct(addProductMessageAddTab);
+    saveProductBtnAddTab.addEventListener('click', () => {
+        // Chama a função passando o elemento de mensagem da aba "Adicionar Produto"
+        handleSaveProduct(addProductMessageAddTab);
     });
 }
 
 if (saveProductBtnProductsTab) {
-    saveProductBtnProductsTab.addEventListener('click', async () => {
-        // Salva o produto vindo da aba "Meus Produtos"
-        await handleSaveProduct(addProductMessageProductsTab);
+    saveProductBtnProductsTab.addEventListener('click', () => {
+        // Chama a função passando o elemento de mensagem da aba "Meus Produtos"
+        handleSaveProduct(addProductMessageProductsTab);
         
-        // Bônus de UX: esconde a caixa de informações após salvar.
         if (verifiedProductInfoDivProductsTab) {
             verifiedProductInfoDivProductsTab.classList.add('hidden');
         }
     });
 }
-
 
 // Em renderer.js
 
