@@ -694,24 +694,56 @@ const updateChartColors = () => {
                 });
             }
             
-            if (historyProducts.length === 0) {
-                if (purchasedEmptyState) purchasedEmptyState.style.display = 'block';
-            } else {
-                if (purchasedEmptyState) purchasedEmptyState.style.display = 'none';
-                historyProducts.forEach(product => {
-                    const card = createProductCard(product);
-                    purchasedList.appendChild(card);
-                    if (typeof VanillaTilt !== 'undefined') {
-                        VanillaTilt.init(document.querySelectorAll("#history-tab .product-card"), {
-                            max: 15,
-                            speed: 400,
-                            glare: true,
-                            "max-glare": 0.4,
-                        });
-                    }
-                });
-            }
+// ▼▼▼ COLE ESTE NOVO BLOCO NO LUGAR DO ANTIGO ▼▼▼
+if (historyProducts.length === 0) {
+    if (purchasedEmptyState) purchasedEmptyState.style.display = 'block';
+} else {
+    if (purchasedEmptyState) purchasedEmptyState.style.display = 'none';
+    
+    // Renderiza os cards do histórico
+    historyProducts.forEach(product => {
+        const card = createProductCard(product);
+        purchasedList.appendChild(card);
+    });
 
+    // --- INÍCIO DA NOVA LÓGICA DO CARTÃO HOLOGRÁFICO (DO CODEPEN) ---
+    const historyCards = document.querySelectorAll("#history-tab .product-card");
+
+    historyCards.forEach(card => {
+        card.addEventListener("mousemove", e => {
+            const rect = card.getBoundingClientRect();
+            const {
+                width,
+                height,
+                top,
+                left
+            } = rect;
+            const mouseX = e.clientX - left;
+            const mouseY = e.clientY - top;
+
+            const xPct = mouseX / width - 0.5;
+            const yPct = mouseY / height - 0.5;
+
+            // Variáveis para o CSS
+            card.style.setProperty("--mx", mouseX);
+            card.style.setProperty("--my", mouseY);
+            card.style.setProperty("--tx", xPct * 20); // Multiplicador de translação X
+            card.style.setProperty("--ty", yPct * 20); // Multiplicador de translação Y
+            card.style.setProperty("--rx", yPct * -25); // Multiplicador de rotação X
+            card.style.setProperty("--ry", xPct * 25); // Multiplicador de rotação Y
+            card.style.setProperty("--pos", (mouseX / width) * 100);
+        });
+
+        card.addEventListener("mouseleave", () => {
+            // Reseta as variáveis quando o mouse sai
+            card.style.setProperty("--tx", 0);
+            card.style.setProperty("--ty", 0);
+            card.style.setProperty("--rx", 0);
+            card.style.setProperty("--ry", 0);
+        });
+    });
+    // --- FIM DA NOVA LÓGICA ---
+}
             // ===================================================================
             // ▼▼▼ ADICIONE O CÓDIGO ABAIXO NESTE LOCAL ▼▼▼
             // ===================================================================
