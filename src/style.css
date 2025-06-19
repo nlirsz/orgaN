@@ -429,84 +429,113 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
 .card-actions i:hover { color: var(--primary-action); }
 .card-actions i:active { box-shadow: var(--shadow-inset); }
 
-/* === Card Colecionável (Histórico) - Estilo Vidro Fosco (Glassmorphism) === */
+/* === Card Colecionável (Histórico) - Estilo Híbrido: Vidro + Interativo === */
 #history-tab .product-card {
-    --w: 220px;  /* Largura base do card */
-    --h: calc(var(--w) * 1.4); /* Altura proporcional */
+    --w: 220px;
+    --h: calc(var(--w) * 1.4);
     
     width: var(--w);
     height: var(--h);
     position: relative;
-    border-radius: 20px; /* Cantos mais arredondados */
-    overflow: hidden; /* Essencial para o efeito de vidro */
+    border-radius: 20px;
+    overflow: hidden;
     
-    /* --- Efeito de "Vidro Fosco" --- */
-    /* Gradiente de fundo com transparência */
+    /* ROTAÇÃO 3D: Re-adicionando o transform que lê as variáveis do JS */
+    transform-style: preserve-3d;
+    transform: 
+        perspective(1000px) 
+        translateX(calc(var(--tx, 0) * 1px)) 
+        translateY(calc(var(--ty, 0) * 1px)) 
+        rotateX(calc(var(--rx, 0) * 1deg)) 
+        rotateY(calc(var(--ry, 0) * 1deg));
+    transition: transform 0.1s ease; /* Transição suave para o movimento */
+
+    /* EFEITO DE VIDRO: Fundo com gradiente e desfoque */
     background: linear-gradient(
       175deg,
-      rgba(191, 215, 255, 0.5), /* Azul claro semi-transparente */
-      rgba(159, 134, 192, 0.3) 50%, /* Roxo semi-transparente */
-      rgba(224, 177, 203, 0.5) 100% /* Rosa/Laranja semi-transparente */
+      rgba(191, 215, 255, 0.4),
+      rgba(159, 134, 192, 0.2) 50%,
+      rgba(224, 177, 203, 0.4) 100%
     );
-    /* Borda sutil que ajuda a definir o efeito de vidro */
     border: 1px solid rgba(255, 255, 255, 0.18);
-    /* O desfoque que se aplica a qualquer coisa que esteja ATRÁS do card */
     backdrop-filter: blur(10px);
-    
-    /* --- Sombra Suave --- */
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-
-    /* Removemos o transform dinâmico, pois o estilo agora é estático */
-    transform: none;
-    transition: all 0.2s ease-in-out; /* Adiciona uma transição suave para hover */
 }
 
-/* Efeito de hover sutil (opcional) */
-#history-tab .product-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
+/* CAMADA 1 (FUNDO): Re-adicionando o fundo holográfico colorido */
+#history-tab .product-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 20px;
+    background: linear-gradient(
+        -45deg,
+        #ffc93d 0, #ffc93d 20%,
+        #a23dff 30%, #a23dff 40%,
+        #3ddaff 50%, #3ddaff 60%,
+        #ff3d3d 70%, #ff3d3d 80%,
+        #ffc93d 90%, #ffc9d 100%
+    );
+    background-size: 200% 200%;
+    background-position: calc(var(--pos, 0) * 1%) 50%;
+    filter: brightness(0.8) blur(3px); /* Aumentei um pouco o blur para combinar com o vidro */
+    opacity: 0.6; /* Opacidade ajustada */
+    z-index: 1; 
 }
 
-/* As camadas de efeito ::before e ::after não são mais necessárias e foram removidas */
+/* CAMADA 3 (TOPO): Re-adicionando o brilho de luz e partículas */
+#history-tab .product-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 20px;
+    background-image: radial-gradient(
+        circle at calc(var(--mx, 0) * 1px) calc(var(--my, 0) * 1px),
+        rgba(255, 255, 255, 0.6), /* Brilho um pouco mais sutil */
+        transparent 150px
+    ), url("https://media.tenor.com/images/1585f524251b147325a77a495914a515/tenor.gif");
+    background-size: auto, 100px;
+    mix-blend-mode: overlay;
+    opacity: 0.7;
+    z-index: 3;
+}
 
-/* Garante que o conteúdo do card (imagem, texto) fique bem posicionado */
+/* CAMADA 2 (MEIO): O conteúdo do seu card */
 #history-tab .product-card .card-image-container,
 #history-tab .product-card .card-content {
+    position: relative;
+    z-index: 2; /* O conteúdo fica entre as duas camadas de efeito */
     background: transparent;
     width: 100%;
     height: 100%;
     display: flex;
     flex-direction: column;
-    box-sizing: border-box; /* Garante que o padding não afete o layout */
+    box-sizing: border-box;
 }
 
-/* Ajustes no container da imagem */
 #history-tab .product-card .card-image-container {
-    flex-grow: 1; /* Faz a área da imagem ocupar o espaço disponível */
+    flex-grow: 1;
     justify-content: center;
     align-items: center;
     padding: 10px;
-    background: rgba(255, 255, 255, 0.2); /* Fundo branco mais transparente */
-    box-shadow: none; /* Remove a sombra interna desnecessária */
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: none;
     border-radius: 0;
-    height: 65%; /* Define uma altura para a área da imagem */
+    height: 65%;
 }
 
-/* Ajustes na área de conteúdo (título) */
 #history-tab .product-card .card-content {
-    height: 35%; /* Define uma altura para a área do título */
+    height: 35%;
     padding: 15px;
-    justify-content: center; /* Centraliza o título verticalmente */
+    justify-content: center;
     text-align: center;
 }
 
-/* Ajustes no título para melhor legibilidade */
 #history-tab .product-card .card-title {
     color: #ffffff;
     font-weight: 600;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); /* Sombra mais forte para contraste */
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
-
 
 /* === Correção para o Fundo do Modal de Detalhes do Produto === */
 
