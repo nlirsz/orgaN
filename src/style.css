@@ -689,6 +689,7 @@ body[data-theme="dark"] #product-details-modal .modal-product-info p {
     text-align: center;
     background: var(--c-primary);
     padding: 25px;
+    margin: 40px auto;
     border-radius: 20px;
     box-shadow: var(--shadow);
     max-width: 900px;
