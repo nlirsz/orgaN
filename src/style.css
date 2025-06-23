@@ -430,22 +430,22 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
 .card-actions i:active { box-shadow: var(--shadow-inset); }
 
 
-/* === Card Colecionável (Histórico) - Efeito Pokémon em Camadas === */
+/* === Card Colecionável (Histórico) - Efeito Pokémon com Nome === */
 
-/* CAMADA 1 (FUNDO): O container principal do card */
+/* O container principal do card, que organiza a imagem e o texto */
 #history-tab .product-card {
     --w: 220px;
     --h: calc(var(--w) * 1.4);
     
     width: var(--w);
     height: var(--h);
-    position: relative; /* Essencial para o z-index e posicionamento das camadas */
+    position: relative;
     border-radius: 15px;
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
-    background-color: #ffffff; /* Fundo branco sólido, conforme pedido */
+    background-color: #ffffff; /* Fundo branco sólido como base */
     border: 1px solid rgba(0,0,0,0.1);
     
-    /* O JavaScript controla estas variáveis para o efeito de TILT */
+    /* Mantém a lógica de rotação com o mouse */
     transform-style: preserve-3d;
     transform: 
         perspective(1000px) 
@@ -453,45 +453,61 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
         rotateY(calc(var(--ry, 0) * 1deg));
     transition: transform 0.1s ease-out;
     
-    /* Garante que o conteúdo interno se organize corretamente */
+    /* Organiza o card em uma coluna (imagem em cima, texto embaixo) */
     display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden; /* Esconde qualquer coisa que saia das bordas arredondadas */
+    flex-direction: column;
+    overflow: hidden;
 }
 
-/* Os pseudo-elementos são removidos daqui e aplicados ao container da imagem */
-#history-tab .product-card::before,
-#history-tab .product-card::after {
+/* O pseudo-elemento ::before não é mais necessário nesta abordagem */
+#history-tab .product-card::before {
     content: none;
 }
 
-/* CAMADA 2 (MEIO): A imagem do produto */
+/* CAMADA 2 (MEIO): O conteúdo (imagem e texto) */
+/* O container da imagem ocupa a maior parte do espaço superior */
 #history-tab .product-card .card-image-container {
+    height: 65%; /* Define que a imagem ocupa 65% da altura */
     width: 100%;
-    height: 100%;
-    position: absolute; /* Permite que ocupe o mesmo espaço que o card pai */
-    top: 0;
-    left: 0;
-    
-    /* Removemos estilos desnecessários para esta nova lógica */
     background: transparent;
-    padding: 0;
+    padding: 15px; /* Adiciona um respiro para a imagem */
     box-shadow: none;
-    
-    /* A imagem dentro do container preenche todo o espaço */
     display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 #history-tab .product-card .card-image-container .card-image {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* A imagem cobre todo o card, sem distorcer */
-    border-radius: 15px;
+    object-fit: contain; /* 'contain' para garantir que a imagem inteira apareça */
 }
 
-/* CAMADA 3 (TOPO): O efeito holográfico Pokémon */
-#history-tab .product-card .card-image-container::after {
+/* A área de conteúdo para o nome do produto */
+#history-tab .product-card .card-content {
+    display: flex; /* Reativamos o display */
+    height: 35%; /* Ocupa os 35% restantes da altura */
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    box-sizing: border-box;
+    /* Linha sutil para separar a imagem do texto */
+    border-top: 1px solid rgba(0, 0, 0, 0.08); 
+    background-color: rgba(255, 255, 255, 0.5); /* Fundo levemente branco para destacar o texto */
+}
+
+#history-tab .product-card .card-title {
+    font-family: 'Almarai', sans-serif;
+    font-size: 1.1em;
+    font-weight: 700;
+    color: #3a3f44; /* Texto escuro para bom contraste */
+    text-shadow: none; /* Removemos a sombra antiga */
+    text-align: center;
+}
+
+/* CAMADA 3 (TOPO): O efeito holográfico agora cobre o card inteiro */
+#history-tab .product-card::after {
     content: "";
     position: absolute;
     top: 0;
@@ -500,7 +516,6 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
     height: 100%;
     border-radius: 15px;
 
-    /* A textura holográfica com gradiente e linhas diagonais */
     background-image: 
         repeating-linear-gradient(
             120deg,
@@ -517,13 +532,20 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
         );
     
     background-size: 100%, 200% 200%;
-    /* A posição do fundo é controlada pela variável --pos do JavaScript */
     background-position: 0% 0%, calc(var(--pos, 0) * 1%) 50%;
     
-    /* AQUI ESTÁ O SEGREDO: Mistura esta camada com a imagem abaixo */
     mix-blend-mode: color-dodge;
+    opacity: 0.6;
     
-    opacity: 0.6; /* Ajuste a opacidade para controlar a intensidade do efeito */
+    /* Garante que o efeito fique por cima de tudo */
+    z-index: 5;
+    /* Impede que o efeito capture eventos do mouse */
+    pointer-events: none; 
+}
+
+/* Ocultamos as actions, que não fazem parte deste design */
+#history-tab .product-card .card-actions {
+    display: none;
 }
 
 /* Ocultamos o card-content e actions, pois o foco agora é na imagem com o efeito por cima */
