@@ -430,9 +430,9 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
 .card-actions i:active { box-shadow: var(--shadow-inset); }
 
 
-/* === Card Colecionável (Histórico) - Estilo CodePen Fiel === */
+/* === Card Colecionável (Histórico) - Efeito com Transição no Hover === */
 
-/* O container principal que aplica a rotação e perspectiva */
+/* ESTADO NORMAL (MOUSE FORA): Um card simples e estático */
 #history-tab .product-card {
     --w: 220px;
     --h: calc(var(--w) * 1.4);
@@ -442,44 +442,41 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
     position: relative;
     border-radius: 15px;
     
-    /* Removemos o fundo e a borda daqui, pois a imagem será o fundo */
-    background: none;
-    border: none;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    /* Estilo base do seu tema */
+    background-color: var(--c-primary);
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(0,0,0,0.05);
 
-    /* Mantém a lógica de rotação com o mouse do JS */
-    transform-style: preserve-3d;
-    transform: 
-        perspective(1000px) 
-        rotateX(calc(var(--rx, 0) * 1deg)) 
-        rotateY(calc(var(--ry, 0) * 1deg));
-    transition: transform 0.1s ease;
+    /* O card começa sem rotação 3D */
+    transform: perspective(1000px) rotateX(0deg) rotateY(0deg);
+    
+    /* A transição suave para todas as propriedades que vamos alterar */
+    transition: transform 0.4s ease-out, box-shadow 0.4s ease-out;
+
+    /* Organiza a imagem e o texto */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
-/* CAMADA 1 (FUNDO): A IMAGEM DO PRODUTO */
-#history-tab .product-card .card-image-container {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    border-radius: 15px;
-    overflow: hidden; /* Garante que a imagem respeite a borda arredondada */
-    z-index: 1;
-}
-
-#history-tab .product-card .card-image-container .card-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* A imagem cobre todo o card */
-}
-
-/* CAMADA 2: FUNDO HOLOGRÁFICO (como no ::after do CodePen) */
-#history-tab .product-card::before {
+/* CAMADAS DE EFEITO (COMEÇAM INVISÍVEIS) */
+#history-tab .product-card::before,
+#history-tab .product-card::after {
     content: "";
     position: absolute;
     inset: 0;
     border-radius: 15px;
+    
+    /* Começam invisíveis */
+    opacity: 0;
+    /* Transição suave para a opacidade */
+    transition: opacity 0.4s ease-out;
+    /* Garante que não interfiram com o mouse quando invisíveis */
+    pointer-events: none; 
+}
 
+/* Camada de fundo holográfico */
+#history-tab .product-card::before {
     background: linear-gradient(
         135deg,
         #ff3d3d 0%, #ffc93d 20%,
@@ -488,53 +485,78 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
     );
     background-size: 400% 400%;
     background-position: calc(var(--pos, 0) * 1%) 50%;
-    
     mix-blend-mode: screen;
     filter: brightness(0.8) contrast(2);
-    opacity: 0.7;
-    z-index: 2; /* Fica sobre a imagem do produto */
+    z-index: 2;
 }
 
-
-/* CAMADA 3: BRILHO E PARTÍCULAS (como no ::before do CodePen) */
+/* Camada de brilho e partículas */
 #history-tab .product-card::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: 15px;
-    
     background-image: 
         radial-gradient(
             circle at calc(var(--mx, 0) * 1px) calc(var(--my, 0) * 1px),
             rgba(255, 255, 255, 0.8),
             transparent 150px
         ),
-        /* A imagem de partículas da referência original */
         url("https://assets.codepen.io/13471/sparkles.gif");
-    
     background-size: auto, 100px;
     mix-blend-mode: overlay;
-    z-index: 3; /* Fica sobre a camada holográfica */
+    z-index: 3;
 }
 
 
-/* CAMADA 4 (TOPO): O NOME DO PRODUTO */
+/* ESTADO ATIVO (MOUSE EM CIMA) */
+#history-tab .product-card:hover {
+    box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+    /* Ativa a rotação 3D usando as variáveis do JavaScript */
+    transform: 
+        perspective(1000px) 
+        translateX(calc(var(--tx, 0) * 1px)) 
+        translateY(calc(var(--ty, 0) * 1px)) 
+        rotateX(calc(var(--rx, 0) * 1deg)) 
+        rotateY(calc(var(--ry, 0) * 1deg))
+        scale(1.05); /* Efeito de "saltar" para frente */
+}
+
+/* Torna as camadas de efeito visíveis no hover */
+#history-tab .product-card:hover::before,
+#history-tab .product-card:hover::after {
+    opacity: 0.7; /* Você pode ajustar este valor para mais ou menos intensidade */
+}
+#history-tab .product-card:hover::after {
+    opacity: 1; /* O brilho branco fica um pouco mais forte */
+}
+
+
+/* CONTEÚDO DO CARD (IMAGEM E NOME) */
+/* A imagem do produto fica na base */
+#history-tab .product-card .card-image-container {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+}
+
+#history-tab .product-card .card-image-container .card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 15px;
+}
+
+/* O nome do produto, sempre visível e no topo */
 #history-tab .product-card .card-content {
     display: flex;
-    position: absolute;
-    bottom: 0;
-    left: 0;
+    position: relative;
     width: 100%;
-    height: 30%; /* Ocupa a parte inferior do card */
-    
-    /* Um gradiente para dar um fundo escuro e legibilidade ao texto */
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 40%, transparent);
-    
-    align-items: flex-end; /* Alinha o texto na base da área de conteúdo */
+    height: 100%;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 10%, transparent 50%);
+    align-items: flex-end;
     justify-content: center;
     padding: 15px;
     box-sizing: border-box;
-    z-index: 4; /* Fica no topo de todos os efeitos */
+    z-index: 4; /* Garante que o texto fique sobre todos os efeitos */
 }
 
 #history-tab .product-card .card-title {
@@ -546,11 +568,10 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
     text-align: center;
 }
 
-#history-tab .product-card .card-content,
+/* Oculta as actions, que não são usadas neste design */
 #history-tab .product-card .card-actions {
     display: none;
 }
-
 
 /* === Correção para o Fundo do Modal de Detalhes do Produto === */
 #product-details-modal .modal-content {
