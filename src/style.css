@@ -430,9 +430,9 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
 .card-actions i:active { box-shadow: var(--shadow-inset); }
 
 
-/* === Card Colecionável (Histórico) - Efeito Pokémon com Nome === */
+/* === Card Colecionável (Histórico) - Efeito Final === */
 
-/* O container principal do card, que organiza a imagem e o texto */
+/* O container principal do card */
 #history-tab .product-card {
     --w: 220px;
     --h: calc(var(--w) * 1.4);
@@ -442,8 +442,12 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
     position: relative;
     border-radius: 15px;
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
-    background-color: #ffffff; /* Fundo branco sólido como base */
-    border: 1px solid rgba(0,0,0,0.1);
+    overflow: hidden; /* Importante para conter o pseudo-elemento */
+
+    /* Efeito de vidro: um fundo semi-transparente que desfocará o efeito holográfico atrás dele */
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(5px);
     
     /* Mantém a lógica de rotação com o mouse */
     transform-style: preserve-3d;
@@ -456,99 +460,78 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
     /* Organiza o card em uma coluna (imagem em cima, texto embaixo) */
     display: flex;
     flex-direction: column;
-    overflow: hidden;
 }
 
-/* O pseudo-elemento ::before não é mais necessário nesta abordagem */
+/* CAMADA 1 (FUNDO): Todo o efeito holográfico agora fica aqui, no ::before */
 #history-tab .product-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 1; /* Garante que fique atrás do conteúdo */
+
+    /* Efeito 1: O gradiente de cores que se move */
+    background-image: 
+        linear-gradient(
+           -45deg,
+           #ff8d3d 0%, #ff3d8d 25%, #3dffff 50%,
+           #3dff8d 75%, #ff8d3d 100%
+        );
+    background-size: 200% 200%;
+    background-position: calc(var(--pos, 0) * 1%) 50%;
+
+    /* Opcional: Adiciona um leve desfoque para suavizar o fundo */
+    filter: blur(10px);
+}
+
+/* O ::after não é mais necessário, toda a mágica está no ::before e no card principal */
+#history-tab .product-card::after {
     content: none;
 }
 
-/* CAMADA 2 (MEIO): O conteúdo (imagem e texto) */
-/* O container da imagem ocupa a maior parte do espaço superior */
-#history-tab .product-card .card-image-container {
-    height: 65%; /* Define que a imagem ocupa 65% da altura */
+
+/* CAMADA 2 (TOPO): Conteúdo visível (Imagem e Nome) */
+#history-tab .product-card .card-image-container,
+#history-tab .product-card .card-content {
+    position: relative; /* Garante que fiquem sobre o ::before */
+    z-index: 2;
+    background: transparent; /* Fundo transparente para ver a base de vidro */
     width: 100%;
-    background: transparent;
-    padding: 15px; /* Adiciona um respiro para a imagem */
-    box-shadow: none;
+    box-sizing: border-box;
+}
+
+/* Container da imagem */
+#history-tab .product-card .card-image-container {
+    height: 65%;
+    padding: 15px;
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
 }
 
 #history-tab .product-card .card-image-container .card-image {
     width: 100%;
     height: 100%;
-    object-fit: contain; /* 'contain' para garantir que a imagem inteira apareça */
+    object-fit: contain;
 }
 
-/* A área de conteúdo para o nome do produto */
+/* Container do nome do produto (agora visível) */
 #history-tab .product-card .card-content {
-    display: flex; /* Reativamos o display */
-    height: 35%; /* Ocupa os 35% restantes da altura */
-    width: 100%;
-    justify-content: center;
+    display: flex; /* Reativado */
+    height: 35%;
     align-items: center;
+    justify-content: center;
+    text-align: center;
     padding: 10px;
-    box-sizing: border-box;
-    /* Linha sutil para separar a imagem do texto */
-    border-top: 1px solid rgba(0, 0, 0, 0.08); 
-    background-color: rgba(255, 255, 255, 0.5); /* Fundo levemente branco para destacar o texto */
 }
 
 #history-tab .product-card .card-title {
     font-family: 'Almarai', sans-serif;
     font-size: 1.1em;
     font-weight: 700;
-    color: #3a3f44; /* Texto escuro para bom contraste */
-    text-shadow: none; /* Removemos a sombra antiga */
-    text-align: center;
+    color: #ffffff; /* Cor branca para melhor contraste com o fundo */
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); /* Sombra para legibilidade */
 }
 
-/* CAMADA 3 (TOPO): O efeito holográfico agora cobre o card inteiro */
-#history-tab .product-card::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border-radius: 15px;
-
-    background-image: 
-        repeating-linear-gradient(
-            120deg,
-            rgba(255, 255, 255, 0) 0,
-            rgba(255, 255, 255, 0) 5px,
-            rgba(255, 255, 255, 0.25) 6px,
-            rgba(255, 255, 255, 0) 7px,
-            rgba(255, 255, 255, 0) 12px
-        ),
-        linear-gradient(
-           -45deg,
-           #ff8d3d 0%, #ff3d8d 25%, #3dffff 50%,
-           #3dff8d 75%, #ff8d3d 100%
-        );
-    
-    background-size: 100%, 200% 200%;
-    background-position: 0% 0%, calc(var(--pos, 0) * 1%) 50%;
-    
-    mix-blend-mode: color-dodge;
-    opacity: 0.6;
-    
-    /* Garante que o efeito fique por cima de tudo */
-    z-index: 5;
-    /* Impede que o efeito capture eventos do mouse */
-    pointer-events: none; 
-}
-
-/* Ocultamos as actions, que não fazem parte deste design */
-#history-tab .product-card .card-actions {
-    display: none;
-}
-
-/* Ocultamos o card-content e actions, pois o foco agora é na imagem com o efeito por cima */
 #history-tab .product-card .card-content,
 #history-tab .product-card .card-actions {
     display: none;
