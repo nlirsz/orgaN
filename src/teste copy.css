@@ -429,114 +429,121 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
 .card-actions i:hover { color: var(--primary-action); }
 .card-actions i:active { box-shadow: var(--shadow-inset); }
 
-
-/* === Card Colecionável (Histórico) - Efeito Pokémon em Camadas === */
-
-/* CAMADA 1 (FUNDO): O container principal do card */
+/* === Card Colecionável (Histórico) - Estilo Realista Aprimorado === */
 #history-tab .product-card {
     --w: 220px;
     --h: calc(var(--w) * 1.4);
+    --scale: 1; /* Nova variável para o efeito de escala */
     
     width: var(--w);
     height: var(--h);
-    position: relative; /* Essencial para o z-index e posicionamento das camadas */
-    border-radius: 15px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
-    background-color: #ffffff; /* Fundo branco sólido, conforme pedido */
-    border: 1px solid rgba(0,0,0,0.1);
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
     
-    /* O JavaScript controla estas variáveis para o efeito de TILT */
     transform-style: preserve-3d;
     transform: 
         perspective(1000px) 
+        translateX(calc(var(--tx, 0) * 1px)) 
+        translateY(calc(var(--ty, 0) * 1px)) 
         rotateX(calc(var(--rx, 0) * 1deg)) 
-        rotateY(calc(var(--ry, 0) * 1deg));
-    transition: transform 0.1s ease-out;
+        rotateY(calc(var(--ry, 0) * 1deg))
+        scale(var(--scale)); /* Adicionamos a escala aqui */
     
-    /* Garante que o conteúdo interno se organize corretamente */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden; /* Esconde qualquer coisa que saia das bordas arredondadas */
+    /* Transição mais suave para todos os efeitos */
+    transition: transform 0.2s ease-out;
+
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
-/* Os pseudo-elementos são removidos daqui e aplicados ao container da imagem */
-#history-tab .product-card::before,
-#history-tab .product-card::after {
-    content: none;
+/* Efeito de "saltar" para frente no hover */
+#history-tab .product-card:hover {
+    --scale: 1.05; /* Aumenta a escala em 5% */
+    z-index: 10; /* Garante que o card em hover fique sobre os outros */
 }
 
-/* CAMADA 2 (MEIO): A imagem do produto */
-#history-tab .product-card .card-image-container {
-    width: 100%;
-    height: 100%;
-    position: absolute; /* Permite que ocupe o mesmo espaço que o card pai */
-    top: 0;
-    left: 0;
-    
-    /* Removemos estilos desnecessários para esta nova lógica */
-    background: transparent;
-    padding: 0;
-    box-shadow: none;
-    
-    /* A imagem dentro do container preenche todo o espaço */
-    display: flex;
-}
 
-#history-tab .product-card .card-image-container .card-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* A imagem cobre todo o card, sem distorcer */
-    border-radius: 15px;
-}
-
-/* CAMADA 3 (TOPO): O efeito holográfico Pokémon */
-#history-tab .product-card .card-image-container::after {
+/* CAMADA 1 (FUNDO): Textura Holográfica mais Nítida */
+#history-tab .product-card::before {
     content: "";
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border-radius: 15px;
-
-    /* A textura holográfica com gradiente e linhas diagonais */
+    inset: 0;
+    border-radius: 20px;
+    
     background-image: 
         repeating-linear-gradient(
-            120deg,
+            110deg,
             rgba(255, 255, 255, 0) 0,
-            rgba(255, 255, 255, 0) 5px,
-            rgba(255, 255, 255, 0.25) 6px,
-            rgba(255, 255, 255, 0) 7px,
-            rgba(255, 255, 255, 0) 12px
+            rgba(255, 255, 255, 0) 4px,
+            rgba(255, 255, 255, 0.2) 5px, /* Linhas mais visíveis */
+            rgba(255, 255, 255, 0) 6px,
+            rgba(255, 255, 255, 0) 10px
         ),
         linear-gradient(
            -45deg,
-           #ff8d3d 0%, #ff3d8d 25%, #3dffff 50%,
-           #3dff8d 75%, #ff8d3d 100%
+           #ffc93d 0%, #a23dff 25%, #3ddaff 50%,
+           #ff3d3d 75%, #ffc93d 100%
         );
-    
+
     background-size: 100%, 200% 200%;
-    /* A posição do fundo é controlada pela variável --pos do JavaScript */
     background-position: 0% 0%, calc(var(--pos, 0) * 1%) 50%;
     
-    /* AQUI ESTÁ O SEGREDO: Mistura esta camada com a imagem abaixo */
-    mix-blend-mode: color-dodge;
+    /* Menos blur e mais brilho para um efeito mais nítido */
+    filter: brightness(1.1) blur(0.5px);
+    mix-blend-mode: screen;
+    opacity: 0.8; /* Mais opaco */
+    z-index: 1; 
+}
+
+/* CAMADA 3 (TOPO): Reflexo de Luz mais Intenso */
+#history-tab .product-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 20px;
+
+    background: linear-gradient(
+        110deg,
+        transparent 30%,
+        rgba(255, 255, 255, 0.8) 50%, /* Faixa de luz mais brilhante */
+        transparent 70%
+    );
+
+    background-size: 300% 300%;
+    background-position: calc(var(--pos, 0) * 1% + 20%) 50%;
     
-    opacity: 0.6; /* Ajuste a opacidade para controlar a intensidade do efeito */
+    mix-blend-mode: color-dodge; /* 'color-dodge' cria um efeito de brilho mais forte e colorido */
+    opacity: 0.9;
+    z-index: 3;
 }
 
-/* Ocultamos o card-content e actions, pois o foco agora é na imagem com o efeito por cima */
-#history-tab .product-card .card-content,
-#history-tab .product-card .card-actions {
-    display: none;
+/* CAMADA 2 (MEIO): O conteúdo do seu card (sem alterações) */
+#history-tab .product-card .card-image-container,
+#history-tab .product-card .card-content {
+    position: relative; z-index: 2; background: transparent;
+    width: 100%; height: 100%; display: flex; flex-direction: column;
+    box-sizing: border-box;
 }
-
+#history-tab .product-card .card-image-container {
+    flex-grow: 1; justify-content: center; align-items: center; padding: 10px;
+    background: rgba(255, 255, 255, 0.15); box-shadow: none; border-radius: 0;
+    height: 65%;
+}
+#history-tab .product-card .card-content {
+    height: 35%; padding: 15px; justify-content: center; text-align: center;
+}
+#history-tab .product-card .card-title {
+    color: #ffffff; font-weight: 600; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+}
 
 /* === Correção para o Fundo do Modal de Detalhes do Produto === */
+
+/* Força o fundo branco para o conteúdo principal do modal de detalhes */
 #product-details-modal .modal-content {
     background-color: #ffffff; /* Fundo branco sólido */
     color: #3a3f44;           /* Cor de texto escura para garantir contraste */
+    overflow: auto;
 }
 
 /* Garante que o container da imagem dentro do modal também tenha fundo branco */
@@ -550,7 +557,7 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
 #product-details-modal .modal-product-info p strong,
 #product-details-modal #modal-product-name,
 #product-details-modal .modal-product-price {
-    color: var(--text-primary);
+    color: var(--text-primary); /* Usa a variável de texto primário do tema claro */
 }
 
 /* Ajusta a borda inferior dos detalhes para ser visível no fundo branco */
@@ -558,8 +565,16 @@ body[data-theme="dark"] #product-details-modal .modal-product-info p {
     border-bottom: 1px solid rgba(0,0,0,0.08);
 }
 
-/* Oculta elementos desnecessários, como já estava no CSS original */
-#history-tab .product-card .card-price {
+/* Ajustes no texto para melhor legibilidade sobre o efeito */
+#history-tab .product-card .card-title {
+    color: #1c1c1c;
+    font-weight: 700;
+    text-shadow: 1px 1px 2px rgba(255,255,255,0.6);
+}
+
+/* Oculta elementos desnecessários, mantendo a lógica original */
+#history-tab .product-card .card-price,
+#history-tab .product-card .card-actions {
     display: none;
 }
 
@@ -656,23 +671,34 @@ body[data-theme="dark"] #product-details-modal .modal-product-info p {
     padding: 20px; /* Adiciona espaçamento ao redor do modal */
     overflow-y: auto; /* Permite rolagem se o conteúdo for maior que a tela */
     overflow-x: hidden; /* Garante que não haja rolagem horizontal */
+    /* Garante que o modal não se sobreponha ao conteúdo principal */
+    z-index: 1001; /* Garante que fique acima de outros elementos */
     transition: opacity 0.3s ease, visibility 0.3s ease;
+    /* Garante que o modal não se sobreponha ao conteúdo principal */
+    
 }
-.modal-overlay.active { opacity: 1; visibility: visible; pointer-events: auto; }
+.modal-overlay.active { opacity: 1; visibility: visible; pointer-events: auto; 
+    
+
+}
 
 .modal-product-description {
    display: none; /* Esconde a descrição do produto por padrão */
 }
 
+
 .modal-content {
     background: var(--c-primary);
     box-shadow: var(--shadow);
+
     color: var(--text-primary);
     border-radius: 20px;
+    box-shadow: var(--shadow);
     max-width: 500px;
     padding: 25px;
     position: relative;
     max-height: 90vh;
+    overflow-y: auto;
     width: 90%;
     display: flex;
     flex-direction: column;
@@ -721,13 +747,13 @@ body[data-theme="dark"] #product-details-modal .modal-product-info p {
     margin-bottom: 20px;
 }
 .modal-product-info {
-    flex-grow: 1;
-    overflow-y: auto;
-    min-height: 0;
+    flex-grow: 1;      /* Faz esta seção ocupar todo o espaço vertical disponível */
+    overflow-y: auto;  /* Adiciona a barra de rolagem APENAS quando o conteúdo for maior que a área */
+    min-height: 0;     /* CORREÇÃO ESSENCIAL: Permite que o container encolha e o overflow funcione */
     line-height: 1.7;
     text-align: left;
     margin-bottom: 20px;
-    padding-right: 10px;
+    padding-right: 10px; /* Espaço para a barra de rolagem não sobrepor o texto */
 }
 
 .modal-product-info p {

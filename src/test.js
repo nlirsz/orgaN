@@ -1,226 +1,228 @@
+// --- CONFIGURAÇÃO DO RECAPTCHA ---
+let recaptchaRegisterWidgetId = null;
+const RECAPTCHA_SITE_KEY = '6Lfin1MrAAAAAKoExa3uVksnMFHyJasKJbj8htsA'; // A sua Site Key
+
+// Função para renderizar o reCAPTCHA de registo. Chamada pelo 'onload' da API do Google.
+window.renderRegistrationRecaptcha = () => {
+    console.log('API do reCAPTCHA carregada, a renderizar o widget de registo...');
+    
+    const registerContainer = document.getElementById('recaptcha-register-container');
+    if (registerContainer && recaptchaRegisterWidgetId === null) {
+        recaptchaRegisterWidgetId = grecaptcha.render('recaptcha-register-container', {
+            'sitekey' : RECAPTCHA_SITE_KEY
+        });
+        console.log('Widget reCAPTCHA de Registo renderizado com ID:', recaptchaRegisterWidgetId);
+    }
+};
+
+
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- VARIÁVEIS GLOBAIS E CONFIGURAÇÃO ---
-    const API_BASE_URL = '/api';  //
-    let currentUserId = null; //
-    let authToken = null; //
-    let scrapedProductData = null; //
-    let financeChartInstance = null; //
-    let financeOverviewChart = null; //
-    let categoryDistributionChart = null; //
-    let editingFinanceId = null; //
+    const API_BASE_URL = '/api';
+    let currentUserId = null;
+    let authToken = null;
+    let scrapedProductData = null;
+    let financeChartInstance = null;
+    let financeOverviewChart = null;
+    let categoryDistributionChart = null;
+    let financialLineChart = null;
+    let editingFinanceId = null;
 
     // --- SELETORES DE ELEMENTOS ---
-    const getElem = (id) => document.getElementById(id); //
+    const getElem = (id) => document.getElementById(id);
 
     // Seção de Autenticação
-    const authSection = getElem('auth-section'); //
-    const dashboardLayout = document.querySelector('.dashboard-layout'); //
-    const authTabButtons = document.querySelectorAll('.auth-tab-btn'); //
-    const authTabContents = document.querySelectorAll('.auth-tab-content'); //
-    const loginForm = getElem('login-form'); //
-    const registerForm = getElem('register-form'); //
-    const loginUsernameInput = getElem('login-username'); //
-    const loginPasswordInput = getElem('login-password'); //
-    const registerUsernameInput = getElem('register-username'); //
-    const registerPasswordInput = getElem('register-password'); //
-    const loginMessage = getElem('login-message'); //
-    const registerMessage = getElem('register-message'); //
-    const logoutBtn = getElem('logout-btn'); //
-    const rememberMeCheckbox = getElem('remember-me-checkbox'); //
-
-    // --- NOVO: Seletor para feedback de força da senha ---
-    const passwordStrengthIndicator = getElem('password-strength-indicator'); // Crie um <div id="password-strength-indicator"></div> no seu HTML abaixo do input de senha do registro
-
-    // ... (outros seletores permanecem os mesmos) ...
-    const loadingOverlay = getElem('loading-overlay'); //
-    const sidebar = document.querySelector('.sidebar'); //
-    const tabButtons = document.querySelectorAll('.nav-btn'); //
-    const tabContents = document.querySelectorAll('.tab-content'); //
-    const productsTab = getElem('products-tab'); //
-    const pendingList = getElem('pending-products-list'); //
-    const purchasedList = getElem('purchased-products-list'); //
-    const goToAddProductTabBtn = getElem('go-to-add-product-tab-btn'); //
-    const addProductTab = getElem('add-product-tab'); //
-    const productUrlInputAddTab = getElem('productUrlInput-add-tab'); //
-    const verifyUrlBtnAddTab = getElem('verifyUrlBtn-add-tab'); //
-    const verifiedProductInfoDivAddTab = getElem('verifiedProductInfo-add-tab'); //
-    const addProductMessageAddTab = getElem('add-product-message-add-tab'); //
-    const saveProductBtnAddTab = getElem('save-product-btn-add-tab'); //
-    const manualProductNameInput = getElem('manual-product-name'); //
-    const manualProductPriceInput = getElem('manual-product-price'); //
-    const manualProductUrlInput = getElem('manual-product-url'); //
-    const manualProductImageUrlInput = getElem('manual-product-image-url'); //
-    const manualProductCategorySelect = getElem('manual-product-category'); //
-    const manualProductBrandInput = getElem('manual-product-brand'); //
-    const manualProductDescriptionTextarea = getElem('manual-product-description'); //
-    const productUrlInputProductsTab = getElem('productUrlInput-products-tab'); //
-    const verifyUrlBtnProductsTab = getElem('verifyUrlBtn-products-tab'); //
-    const verifiedProductInfoDivProductsTab = getElem('verifiedProductInfo-products-tab'); //
-    const addProductMessageProductsTab = getElem('add-product-message-products-tab'); //
-    const saveProductBtnProductsTab = getElem('save-product-btn-products-tab'); //
-    const financeMonthInput = getElem('financeMonth'); //
-    const financeRevenueInput = getElem('financeRevenue'); //
-    const financeExpensesInput = getElem('financeExpenses'); //
-    const addFinanceEntryBtn = getElem('add-finance-entry-btn'); //
-    const cancelFinanceEditBtn = getElem('cancel-finance-edit-btn'); //
-    const financeList = getElem('finance-list'); //
-    const totalBalanceElem = getElem('finance-total-balance'); //
-    const financeChartCanvas = getElem('financialLineChart'); //
-    const financeEntryMessage = getElem('finance-entry-message'); //
-    const financeFormContainer = document.querySelector('.finance-form-container');  //
-    const financeOverviewChartCanvasEl = getElem('financeOverviewChart'); //
-    const categoryDistributionChartCanvasEl = getElem('categoryDistributionChart'); //
-    const detailsModal = getElem('product-details-modal'); //
-    const modalProductImage = getElem('modal-product-image'); //
-    const modalProductName = getElem('modal-product-name'); //
-    const modalProductPrice = getElem('modal-product-price'); //
-    const modalProductStatus = getElem('modal-product-status'); //
-    const modalProductCategory = getElem('modal-product-category'); //
-    const modalProductBrand = getElem('modal-product-brand'); //
-    const modalProductAddedDate = getElem('modal-product-addedDate'); //
-    const modalProductDescription = getElem('modal-product-description'); //
-    const modalProductTags = getElem('modal-product-tags'); //
-    const modalProductPriority = getElem('modal-product-priority'); //
-    const modalProductNotes = getElem('modal-product-notes'); //
-    const modalProductLink = getElem('modal-product-link'); //
-    const modalActionPurchaseBtn = getElem('modal-action-purchase'); //
-    const modalActionEditBtn = getElem('modal-action-edit'); //
-    const modalActionDeleteBtn = getElem('modal-action-delete'); //
-    const editModal = getElem('edit-product-modal'); //
-    const editForm = getElem('edit-product-form'); //
-    const editProductIdInput = getElem('edit-product-id'); //
-    const editProductNameInput = getElem('edit-product-name'); //
-    const editProductPriceInput = getElem('edit-product-price'); //
-    const editProductUrlInput = getElem('edit-product-url'); //
-    const editProductImageUrlInput = getElem('edit-product-image-url'); //
-    const editProductCategorySelect = getElem('edit-product-category'); //
-    const editProductStatusSelect = getElem('edit-product-status'); //
-    const editProductTagsInput = getElem('edit-product-tags'); //
-    const editProductDescriptionTextarea = getElem('edit-product-description'); //
-    const editProductPreviewImage = getElem('edit-product-preview-image'); //
-    const editProductPrioritySelect = getElem('edit-product-priority'); //
-    const editProductNotesTextarea = getElem('edit-product-notes'); //
-    const editProductMessage = getElem('edit-product-message'); //
-    const imageModal = getElem('image-modal'); //
-    const modalImageContent = getElem('modal-image-content'); //
+    const authSection = getElem('auth-section');
+    const dashboardLayout = document.querySelector('.dashboard-layout');
+    const authTabButtons = document.querySelectorAll('.auth-tab-btn');
+    const authTabContents = document.querySelectorAll('.auth-tab-content');
+    const loginForm = getElem('login-form');
+    const registerForm = getElem('register-form');
+    const loginUsernameInput = getElem('login-username');
+    const loginPasswordInput = getElem('login-password');
+    const registerUsernameInput = getElem('register-username');
+    const registerPasswordInput = getElem('register-password');
+    const loginMessage = getElem('login-message');
+    const registerMessage = getElem('register-message');
+    const logoutBtn = getElem('logout-btn');
+    const rememberMeCheckbox = getElem('remember-me-checkbox');
+    const passwordStrengthIndicator = getElem('password-strength-indicator');
+    const loadingOverlay = getElem('loading-overlay');
+    const sidebar = document.querySelector('.sidebar');
+    const tabButtons = document.querySelectorAll('.nav-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+    const pendingList = getElem('pending-products-list');
+    const purchasedList = getElem('purchased-products-list');
+    const productUrlInputAddTab = getElem('productUrlInput-add-tab');
+    const verifyUrlBtnAddTab = getElem('verifyUrlBtn-add-tab');
+    const verifiedProductInfoDivAddTab = getElem('verifiedProductInfo-add-tab');
+    const addProductMessageAddTab = getElem('add-product-message-add-tab');
+    const saveProductBtnAddTab = getElem('save-product-btn-add-tab');
+    const manualProductNameInput = getElem('manual-product-name');
+    const manualProductPriceInput = getElem('manual-product-price');
+    const manualProductUrlInput = getElem('manual-product-url');
+    const manualProductImageUrlInput = getElem('manual-product-image-url');
+    const manualProductCategorySelect = getElem('manual-product-category');
+    const manualProductBrandInput = getElem('manual-product-brand');
+    const manualProductDescriptionTextarea = getElem('manual-product-description');
+    const productUrlInputProductsTab = getElem('productUrlInput-products-tab');
+    const verifyUrlBtnProductsTab = getElem('verifyUrlBtn-products-tab');
+    const verifiedProductInfoDivProductsTab = getElem('verifiedProductInfo-products-tab');
+    const addProductMessageProductsTab = getElem('add-product-message-products-tab');
+    const saveProductBtnProductsTab = getElem('save-product-btn-products-tab');
+    const financeMonthInput = getElem('financeMonth');
+    const financeRevenueInput = getElem('financeRevenue');
+    const financeExpensesInput = getElem('financeExpenses');
+    const addFinanceEntryBtn = getElem('add-finance-entry-btn');
+    const cancelFinanceEditBtn = getElem('cancel-finance-edit-btn');
+    const financeList = getElem('finance-list');
+    const totalBalanceElem = getElem('finance-total-balance');
+    const financeChartCanvas = getElem('financialLineChart');
+    const financeEntryMessage = getElem('finance-entry-message');
+    const financeFormContainer = document.querySelector('.finance-form-container');
+    const financeOverviewChartCanvasEl = getElem('financeOverviewChart');
+    const categoryDistributionChartCanvasEl = getElem('categoryDistributionChart');
+    const detailsModal = getElem('product-details-modal');
+    const modalProductImage = getElem('modal-product-image');
+    const modalProductName = getElem('modal-product-name');
+    const modalProductPrice = getElem('modal-product-price');
+    const modalProductStatus = getElem('modal-product-status');
+    const modalProductCategory = getElem('modal-product-category');
+    const modalProductBrand = getElem('modal-product-brand');
+    const modalProductAddedDate = getElem('modal-product-addedDate');
+    const modalProductTags = getElem('modal-product-tags');
+    const modalProductPriority = getElem('modal-product-priority');
+    const modalProductNotes = getElem('modal-product-notes');
+    const modalProductLink = getElem('modal-product-link');
+    const modalActionPurchaseBtn = getElem('modal-action-purchase');
+    const modalActionEditBtn = getElem('modal-action-edit');
+    const modalActionDeleteBtn = getElem('modal-action-delete');
+    const editModal = getElem('edit-product-modal');
+    const editForm = getElem('edit-product-form');
+    const editProductIdInput = getElem('edit-product-id');
+    const editProductNameInput = getElem('edit-product-name');
+    const editProductPriceInput = getElem('edit-product-price');
+    const editProductUrlInput = getElem('edit-product-url');
+    const editProductImageUrlInput = getElem('edit-product-image-url');
+    const editProductCategorySelect = getElem('edit-product-category');
+    const editProductStatusSelect = getElem('edit-product-status');
+    const editProductTagsInput = getElem('edit-product-tags');
+    const editProductDescriptionTextarea = getElem('edit-product-description');
+    const editProductPreviewImage = getElem('edit-product-preview-image');
+    const editProductPrioritySelect = getElem('edit-product-priority');
+    const editProductNotesTextarea = getElem('edit-product-notes');
+    const editProductMessage = getElem('edit-product-message');
+    const imageModal = getElem('image-modal');
+    const modalImageContent = getElem('modal-image-content');
     const pendingTotalValueEl = getElem('pending-total-value');
     const purchasedTotalValueEl = getElem('purchased-total-value');
     const pendingEmptyState = getElem('pending-empty-state');
     const purchasedEmptyState = getElem('purchased-empty-state');
     const goToBtnFromEmpty = getElem('go-to-add-product-tab-btn-from-empty');
-    // No topo de renderer.js, na seção de seletores
-// ...
-    // ...
-
-
     const changePasswordForm = getElem('change-password-form');
     const currentPasswordInput = getElem('current-password');
     const newPasswordInput = getElem('new-password');
     const confirmNewPasswordInput = getElem('confirm-new-password');
     const changePasswordMessage = getElem('change-password-message');
-    const financeEmptyState = getElem('finance-empty-state'); // <-- ADICIONE ESTA LINHA
+    const financeEmptyState = getElem('finance-empty-state');
+    const themeSwitch = document.getElementById('theme-switch');
 
 
     // --- FUNÇÕES DE UTILIDADE ---
-    // ... (authenticatedFetch, showAuthMessage, showTabMessage, showModal, hideModalWithDelay, showAuthSection, showDashboard permanecem as mesmas) ...
-
-    async function authenticatedFetch(url, options = {}) { //
-        if (!authToken) { //
-            console.error("Token de autenticação não disponível. Redirecionando para login."); //
-            showAuthSection(); //
-            throw new Error("Não autenticado."); //
+    async function authenticatedFetch(url, options = {}) {
+        if (!authToken) {
+            console.error("Token de autenticação não disponível. A redirecionar para o login.");
+            showAuthSection();
+            throw new Error("Não autenticado.");
         }
-        const headers = { //
-            'Content-Type': 'application/json', //
-            'x-auth-token': authToken, //
-            ...options.headers, //
+        const headers = {
+            'Content-Type': 'application/json',
+            'x-auth-token': authToken,
+            ...options.headers,
         };
-        const response = await fetch(url, { ...options, headers }); //
+        const response = await fetch(url, { ...options, headers });
 
-        if (response.status === 401 || response.status === 403) { //
-            showAuthMessage(loginMessage, 'Sessão expirada ou não autorizado. Por favor, faça login novamente.', false); //
-            logoutUser(); //
-            throw new Error("Não autorizado ou sessão expirada."); //
+        if (response.status === 401 || response.status === 403) {
+            showAuthMessage(loginMessage, 'Sessão expirada ou não autorizado. Por favor, faça o login novamente.', false);
+            logoutUser();
+            throw new Error("Não autorizado ou sessão expirada.");
         }
-        return response; //
+        return response;
     }
 
-    function showAuthMessage(element, message, isSuccess = false) { //
-        if (element) { // Adicionado para segurança
-            element.textContent = message; //
-            element.className = 'auth-message ' + (isSuccess ? 'success' : 'error'); //
-            setTimeout(() => { //
-                element.textContent = ''; //
-                element.className = 'auth-message'; //
-            }, 5000); //
-        }
-    }
-
-    function showTabMessage(element, message, isSuccess = false) { //
-         if (element) { // Adicionado para segurança
-            element.textContent = message; //
-            element.className = 'tab-message ' + (isSuccess ? 'success' : 'error'); //
-            setTimeout(() => { //
-                element.textContent = ''; //
-                element.className = 'tab-message'; //
-            }, 5000); //
+    function showAuthMessage(element, message, isSuccess = false) {
+        if (element) {
+            element.textContent = message;
+            element.className = 'auth-message ' + (isSuccess ? 'success' : 'error');
+            setTimeout(() => {
+                element.textContent = '';
+                element.className = 'auth-message';
+            }, 5000);
         }
     }
 
-    function showModal(modalElement) { //
-        if (modalElement) { //
-            modalElement.classList.remove('hidden'); //
-            modalElement.classList.add('active'); //
+    function showTabMessage(element, message, isSuccess = false) {
+         if (element) {
+            element.textContent = message;
+            element.className = 'tab-message ' + (isSuccess ? 'success' : 'error');
+            setTimeout(() => {
+                element.textContent = '';
+                element.className = 'tab-message';
+            }, 5000);
         }
     }
 
-    function hideModalWithDelay(modalElement, messageElement = null) { //
-        if (modalElement) { //
-            modalElement.classList.remove('active'); //
-            setTimeout(() => { //
-                modalElement.classList.add('hidden'); //
-                if (messageElement) messageElement.textContent = ''; //
-            }, 300); //
+    function showModal(modalElement) {
+        if (modalElement) {
+            modalElement.classList.remove('hidden');
+            modalElement.classList.add('active');
         }
     }
 
-    function showAuthSection() { //
-        if(authSection) authSection.classList.remove('hidden'); //
-        if(dashboardLayout) dashboardLayout.classList.add('hidden'); //
-        if(loadingOverlay) loadingOverlay.classList.add('hidden'); //
-
-        currentUserId = null; //
-        authToken = null; //
-        localStorage.removeItem('authToken'); //
-        localStorage.removeItem('userId'); //
-
-        if(loginUsernameInput) loginUsernameInput.value = ''; //
-        if(loginPasswordInput) loginPasswordInput.value = ''; //
-        if(registerUsernameInput) registerUsernameInput.value = ''; //
-        if(registerPasswordInput) registerPasswordInput.value = ''; //
-
-        if(authTabButtons) authTabButtons.forEach(btn => btn.classList.remove('active')); //
-        const loginTabBtn = document.querySelector('[data-auth-tab="login"]'); //
-        if(loginTabBtn) loginTabBtn.classList.add('active'); //
-
-        if(authTabContents) authTabContents.forEach(tabContent => tabContent.classList.remove('active')); //
-        const loginTabContent = getElem('login-tab-content'); //
-        if(loginTabContent) loginTabContent.classList.add('active'); //
-
-        if(loginMessage) loginMessage.textContent = ''; //
-        if(registerMessage) registerMessage.textContent = ''; //
-            if(loadingOverlay) loadingOverlay.classList.add('hidden'); // Esconde a tela de carregamento
-
+    function hideModalWithDelay(modalElement, messageElement = null) {
+        if (modalElement) {
+            modalElement.classList.remove('active');
+            setTimeout(() => {
+                modalElement.classList.add('hidden');
+                if (messageElement) messageElement.textContent = '';
+            }, 300);
+        }
     }
-    const togglePasswordVisibilityBtn = getElem('toggle-password-visibility'); //
-    // registerPasswordInput já foi definido anteriormente
 
-    if (togglePasswordVisibilityBtn && registerPasswordInput) { //
+    function showAuthSection() {
+        if(authSection) authSection.classList.remove('hidden');
+        if(dashboardLayout) dashboardLayout.classList.add('hidden');
+        if(loadingOverlay) loadingOverlay.classList.add('hidden');
+
+        currentUserId = null;
+        authToken = null;
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('userId');
+
+        if(loginUsernameInput) loginUsernameInput.value = '';
+        if(loginPasswordInput) loginPasswordInput.value = '';
+        if(registerUsernameInput) registerUsernameInput.value = '';
+        if(registerPasswordInput) registerPasswordInput.value = '';
+
+        if(authTabButtons) authTabButtons.forEach(btn => btn.classList.remove('active'));
+        const loginTabBtn = document.querySelector('[data-auth-tab="login"]');
+        if(loginTabBtn) loginTabBtn.classList.add('active');
+
+        if(authTabContents) authTabContents.forEach(tabContent => tabContent.classList.remove('active'));
+        const loginTabContent = getElem('login-tab-content');
+        if(loginTabContent) loginTabContent.classList.add('active');
+
+        if(loginMessage) loginMessage.textContent = '';
+        if(registerMessage) registerMessage.textContent = '';
+        if(loadingOverlay) loadingOverlay.classList.add('hidden');
+    }
+    const togglePasswordVisibilityBtn = getElem('toggle-password-visibility');
+
+    if (togglePasswordVisibilityBtn && registerPasswordInput) {
         togglePasswordVisibilityBtn.addEventListener('click', () => {
             const type = registerPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
             registerPasswordInput.setAttribute('type', type);
-            // Altera o ícone do botão
             const icon = togglePasswordVisibilityBtn.querySelector('i');
             if (icon) {
                 icon.classList.toggle('fa-eye');
@@ -229,60 +231,48 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    async function showDashboard() {
+        if (authSection) authSection.classList.add('hidden');
+        if (dashboardLayout) dashboardLayout.classList.add('hidden'); 
+        if (loadingOverlay) loadingOverlay.classList.remove('hidden');
 
-// Em renderer.js
+        try {
+            await Promise.all([
+                fetchAndRenderDashboardStats(),
+                fetchAndRenderProducts(),
+                fetchAndRenderFinances()
+            ]);
+            document.body.classList.add('app-logged-in');
+            if (dashboardLayout) dashboardLayout.classList.remove('hidden');
 
-async function showDashboard() {
-    // Garante que a tela de auth esteja escondida e o layout do dashboard preparado
-    if (authSection) authSection.classList.add('hidden');
-    if (dashboardLayout) dashboardLayout.classList.add('hidden'); // Mantém escondido até os dados carregarem
-    
-    // Mostra a nova tela de carregamento com a logo
-    if (loadingOverlay) loadingOverlay.classList.remove('hidden');
-
-    try {
-        // Usa Promise.all para buscar todos os dados iniciais em paralelo, melhorando a performance
-        await Promise.all([
-            fetchAndRenderDashboardStats(),
-            fetchAndRenderProducts(),
-            fetchAndRenderFinances()
-        ]);
-
-        // Após todos os dados carregarem com sucesso, mostra o dashboard
-        document.body.classList.add('app-logged-in'); // Adiciona a classe para controle de layout
-        if (dashboardLayout) dashboardLayout.classList.remove('hidden');
-
-    } catch (error) {
-        console.error("Erro ao carregar dados iniciais do dashboard:", error);
-        showAuthMessage(loginMessage, 'Erro ao carregar dados. Tente fazer login novamente.', false);
-        logoutUser(); // Desloga o usuário se houver erro crítico
-    } finally {
-        // No final, independente de sucesso ou falha, esconde a tela de carregamento
-        if (loadingOverlay) loadingOverlay.classList.add('hidden');
+        } catch (error) {
+            console.error("Erro ao carregar dados iniciais do dashboard:", error);
+            showAuthMessage(loginMessage, 'Erro ao carregar dados. Tente fazer o login novamente.', false);
+            logoutUser();
+        } finally {
+            if (loadingOverlay) loadingOverlay.classList.add('hidden');
+        }
     }
-}
-
 
     // --- LÓGICA DE AUTENTICAÇÃO ---
-    if (authTabButtons) authTabButtons.forEach(button => { //
-        button.addEventListener('click', () => { //
-            authTabButtons.forEach(btn => btn.classList.remove('active')); //
-            button.classList.add('active'); //
+    if (authTabButtons) authTabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            authTabButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
 
-            authTabContents.forEach(tabContent => tabContent.classList.remove('active')); //
-            const tabContentElement = getElem(`${button.dataset.authTab}-tab-content`); //
-            if (tabContentElement) tabContentElement.classList.add('active'); //
+            authTabContents.forEach(tabContent => tabContent.classList.remove('active'));
+            const tabContentElement = getElem(`${button.dataset.authTab}-tab-content`);
+            if (tabContentElement) tabContentElement.classList.add('active');
 
-            if(loginUsernameInput) loginUsernameInput.value = ''; //
-            if(loginPasswordInput) loginPasswordInput.value = ''; //
-            if(registerUsernameInput) registerUsernameInput.value = ''; //
-            if(registerPasswordInput) registerPasswordInput.value = ''; //
-            if(loginMessage) loginMessage.textContent = ''; //
-            if(registerMessage) registerMessage.textContent = ''; //
+            if(loginUsernameInput) loginUsernameInput.value = '';
+            if(loginPasswordInput) loginPasswordInput.value = '';
+            if(registerUsernameInput) registerUsernameInput.value = '';
+            if(registerPasswordInput) registerPasswordInput.value = '';
+            if(loginMessage) loginMessage.textContent = '';
+            if(registerMessage) registerMessage.textContent = '';
         });
     });
 
-    // --- NOVO: Listener para feedback de força de senha ---
     if (registerPasswordInput && passwordStrengthIndicator) {
         registerPasswordInput.addEventListener('input', () => {
             const password = registerPasswordInput.value;
@@ -290,13 +280,12 @@ async function showDashboard() {
             let strengthColor = 'grey';
             let score = 0;
 
-            // Critérios de Exemplo - AJUSTE CONFORME O NECESSÁRIO
             if (password.length >= 8) score++;
-            if (password.length >= 10) score++; // Bônus por comprimento maior
-            if (/[A-Z]/.test(password)) score++; // Letra maiúscula
-            if (/[a-z]/.test(password)) score++; // Letra minúscula
-            if (/[0-9]/.test(password)) score++; // Número
-            if (/[^A-Za-z0-9]/.test(password)) score++; // Caractere especial
+            if (password.length >= 10) score++;
+            if (/[A-Z]/.test(password)) score++;
+            if (/[a-z]/.test(password)) score++;
+            if (/[0-9]/.test(password)) score++;
+            if (/[^A-Za-z0-9]/.test(password)) score++;
 
             switch (score) {
                 case 0: case 1: case 2:
@@ -320,335 +309,481 @@ async function showDashboard() {
         });
     }
 
+    // Formulário de Login (SEM reCAPTCHA)
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = loginUsernameInput.value.trim();
+            const password = loginPasswordInput.value.trim();
 
-// Em renderer.js
-
-if (loginForm) {
-    loginForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const username = loginUsernameInput.value.trim();
-        const password = loginPasswordInput.value.trim();
-
-        if (!username || !password) {
-            showAuthMessage(loginMessage, 'Por favor, preencha todos os campos.');
-            return;
-        }
-
-        // Mostra a tela de carregamento com a logo ASSIM que o usuário clica em Entrar
-        if (loadingOverlay) loadingOverlay.classList.remove('hidden');
-
-        try {
-            const response = await fetch(`${API_BASE_URL}/auth/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password }),
-            });
+            if (!username || !password) {
+                showAuthMessage(loginMessage, 'Por favor, preencha todos os campos.');
+                return;
+            }
             
-            const data = await response.json();
+            if (loadingOverlay) loadingOverlay.classList.remove('hidden');
 
-            if (response.ok) {
-                authToken = data.token;
-                currentUserId = data.userId;
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password }),
+                });
                 
-                if (rememberMeCheckbox && rememberMeCheckbox.checked) {
-                    localStorage.setItem('authToken', authToken);
-                    localStorage.setItem('userId', currentUserId);
+                const data = await response.json();
+
+                if (response.ok) {
+                    authToken = data.token;
+                    currentUserId = data.userId;
+                    
+                    if (rememberMeCheckbox && rememberMeCheckbox.checked) {
+                        localStorage.setItem('authToken', authToken);
+                        localStorage.setItem('userId', currentUserId);
+                    } else {
+                        localStorage.removeItem('authToken');
+                        localStorage.removeItem('userId');
+                    }
+                    
+                    await showDashboard();
+
                 } else {
-                    localStorage.removeItem('authToken');
-                    localStorage.removeItem('userId');
+                    if (loadingOverlay) loadingOverlay.classList.add('hidden');
+                    showAuthMessage(loginMessage, data.message || 'Erro ao fazer o login.');
                 }
-                
-                // Chama a showDashboard, que já tem a lógica de esconder o loading no final.
-                await showDashboard();
-
-            } else {
-                // Se o login falhar (ex: senha errada), esconde o loading e mostra o erro.
+            } catch (error) {
                 if (loadingOverlay) loadingOverlay.classList.add('hidden');
-                showAuthMessage(loginMessage, data.message || 'Erro ao fazer login.');
-                if (typeof grecaptcha !== 'undefined') grecaptcha.reset(0);
+                console.error('Erro de rede ao fazer o login:', error);
+                showAuthMessage(loginMessage, 'Erro de conexão com o servidor.');
             }
-        } catch (error) {
-            // Se der erro de rede, esconde o loading e mostra o erro.
-            if (loadingOverlay) loadingOverlay.classList.add('hidden');
-            console.error('Erro de rede ao fazer login:', error);
-            showAuthMessage(loginMessage, 'Erro de conexão com o servidor.');
-            if (typeof grecaptcha !== 'undefined') grecaptcha.reset(0);
-        }
-        // O bloco 'finally' foi removido, pois a lógica de esconder o overlay
-        // agora é tratada nos cenários de sucesso e falha, tornando o controle mais explícito.
-    });
-}
+        });
+    }
+    
+    // Formulário de Registo (COM reCAPTCHA)
+    if (registerForm) {
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
 
-if (registerForm) {
-    registerForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
+            const username = registerUsernameInput.value.trim();
+            const password = registerPasswordInput.value.trim();
 
-        // Extrai os valores dos campos do formulário
-        const username = registerUsernameInput.value.trim();
-        const password = registerPasswordInput.value.trim();
+            const recaptchaResponse = (typeof grecaptcha !== 'undefined' && recaptchaRegisterWidgetId !== null) 
+                ? grecaptcha.getResponse(recaptchaRegisterWidgetId) 
+                : '';
 
-        // Obtém o token do reCAPTCHA. O "1" assume que este é o segundo widget reCAPTCHA na página (o primeiro sendo o de login).
-        const recaptchaResponse = (typeof grecaptcha !== 'undefined') ? grecaptcha.getResponse(1) : '';
+            if (!username || !password) {
+                showAuthMessage(registerMessage, 'Por favor, preencha todos os campos.');
+                return;
+            }
 
-        // --- Validações no Frontend ---
-        if (!username || !password) {
-            showAuthMessage(registerMessage, 'Por favor, preencha todos os campos.');
+            const passwordMinLength = 8;
+            if (password.length < passwordMinLength) {
+                showAuthMessage(registerMessage, `A senha deve ter no mínimo ${passwordMinLength} caracteres.`);
+                return;
+            }
+
+            if (typeof grecaptcha !== 'undefined' && !recaptchaResponse) {
+                showAuthMessage(registerMessage, 'Por favor, complete o reCAPTCHA.');
+                return;
+            }
+
+            try {
+                const bodyPayload = {
+                    username,
+                    password,
+                    'g-recaptcha-response': recaptchaResponse
+                };
+
+                const response = await fetch(`${API_BASE_URL}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(bodyPayload),
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    registerForm.reset();
+                    if (passwordStrengthIndicator) {
+                        passwordStrengthIndicator.textContent = 'Força: ';
+                        passwordStrengthIndicator.style.color = 'grey';
+                    }
+
+                    showAuthMessage(registerMessage, data.message + ' A redirecionar para o login...', true);
+                    if (typeof grecaptcha !== 'undefined' && recaptchaRegisterWidgetId !== null) grecaptcha.reset(recaptchaRegisterWidgetId);
+
+                    setTimeout(() => {
+                        const loginTabButton = document.querySelector('[data-auth-tab="login"]');
+                        if (loginTabButton) loginTabButton.click();
+                        
+                        if (loginUsernameInput) loginUsernameInput.value = username;
+                        if (loginPasswordInput) loginPasswordInput.focus();
+
+                    }, 2000);
+
+                } else {
+                    showAuthMessage(registerMessage, data.message || 'Ocorreu um erro ao registar.');
+                    if (typeof grecaptcha !== 'undefined' && recaptchaRegisterWidgetId !== null) grecaptcha.reset(recaptchaRegisterWidgetId);
+                }
+            } catch (error) {
+                console.error('Erro de rede ao registar:', error);
+                showAuthMessage(registerMessage, 'Não foi possível ligar ao servidor. Tente novamente.');
+                if (typeof grecaptcha !== 'undefined' && recaptchaRegisterWidgetId !== null) grecaptcha.reset(recaptchaRegisterWidgetId);
+            }
+        });
+    }
+    
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', logoutUser);
+    }
+
+    function logoutUser() {
+        authToken = null;
+        currentUserId = null;
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('userId');
+        showAuthSection();
+    }
+
+    // --- LÓGICA DE NAVEGAÇÃO ---
+    if (sidebar && tabButtons.length > 0) {
+        sidebar.addEventListener('click', (e) => {
+            const navBtn = e.target.closest('.nav-btn');
+            if (!navBtn || navBtn.id === 'logout-btn') return;
+            const tabId = navBtn.dataset.tab;
+
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            navBtn.classList.add('active');
+
+            tabContents.forEach(tabContent => {
+                tabContent.classList.toggle('active', tabContent.id === `${tabId}-tab`);
+            });
+
+            if (tabId === 'dashboard-main') fetchAndRenderDashboardStats();
+            if (tabId === 'products' || tabId === 'history') fetchAndRenderProducts();
+            if (tabId === 'finance') fetchAndRenderFinances();
+            if (tabId === 'add-product') clearAddProductFormAddTab();
+        });
+    }
+
+    if (goToBtnFromEmpty) {
+        goToBtnFromEmpty.addEventListener('click', () => {
+            const addProductTabButton = document.querySelector('.nav-btn[data-tab="add-product"]');
+            if (addProductTabButton) addProductTabButton.click();
+        });
+    }
+    
+    // --- LÓGICA DE PRODUTOS ---
+
+    async function handleSaveProduct(context) {
+        if (!currentUserId) {
+            showTabMessage(context.messageElement, 'Precisa de estar autenticado para adicionar produtos.', false);
             return;
         }
 
-        // Validação simples de comprimento da senha
-        const passwordMinLength = 8;
-        if (password.length < passwordMinLength) {
-            showAuthMessage(registerMessage, `A senha deve ter no mínimo ${passwordMinLength} caracteres.`);
+        let productPayload = {};
+        
+        const isScrapeSave = context.source === 'scrape' && scrapedProductData && scrapedProductData.name;
+
+        if (isScrapeSave) {
+            console.log("A guardar a partir de dados de scrape...");
+            productPayload = { ...scrapedProductData, status: 'pendente' };
+        } else {
+            console.log("A guardar a partir do formulário manual...");
+            productPayload = {
+                name: manualProductNameInput.value.trim(),
+                price: manualProductPriceInput.value.trim(),
+                urlOrigin: manualProductUrlInput.value.trim(),
+                image: manualProductImageUrlInput.value.trim(),
+                category: manualProductCategorySelect.value,
+                brand: manualProductBrandInput.value.trim(),
+                description: manualProductDescriptionTextarea.value.trim(),
+                status: 'pendente'
+            };
+        }
+
+        if (!productPayload.name || !productPayload.price || !productPayload.urlOrigin) {
+            showTabMessage(context.messageElement, 'Nome, preço e URL de origem são obrigatórios!', false);
             return;
         }
 
-        // Validação do reCAPTCHA
-        if (typeof grecaptcha !== 'undefined' && !recaptchaResponse) {
-            showAuthMessage(registerMessage, 'Por favor, complete o reCAPTCHA.');
-            return;
-        }
+        context.buttonElement.disabled = true;
+        context.buttonElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i> A Guardar...';
 
         try {
-            // Monta o corpo da requisição para a API
-            const bodyPayload = {
-                username,
-                password,
-            };
-
-            // Envia a requisição de registro para a API
-            const response = await fetch(`${API_BASE_URL}/auth/register`, {
+            const response = await authenticatedFetch(`${API_BASE_URL}/products`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(bodyPayload),
+                body: JSON.stringify(productPayload),
             });
 
             const data = await response.json();
-
-            if (response.ok) {
-                // --- Ações de UX para registro bem-sucedido ---
-
-                // 1. Limpa o formulário de registro e o indicador de força da senha
-                registerForm.reset();
-                if (passwordStrengthIndicator) {
-                    passwordStrengthIndicator.textContent = 'Força: ';
-                    passwordStrengthIndicator.style.color = 'grey';
-                }
-
-                // 2. Exibe uma mensagem de sucesso clara e informativa
-                showAuthMessage(registerMessage, data.message + ' Redirecionando para o login...', true);
-                if (typeof grecaptcha !== 'undefined') grecaptcha.reset(1); // Reseta o reCAPTCHA
-
-                // 3. Após um breve intervalo, muda para a aba de login e prepara para o usuário logar
-                setTimeout(() => {
-                    // Simula o clique na aba de login
-                    const loginTabButton = document.querySelector('[data-auth-tab="login"]');
-                    if (loginTabButton) loginTabButton.click();
-                    
-                    // Preenche o campo de usuário e foca no campo de senha
-                    if (loginUsernameInput) loginUsernameInput.value = username;
-                    if (loginPasswordInput) loginPasswordInput.focus();
-
-                }, 2000); // Espera 2 segundos para o usuário ler a mensagem de sucesso
-
-            } else {
-                // Se a API retornar um erro (ex: usuário já existe)
-                showAuthMessage(registerMessage, data.message || 'Ocorreu um erro ao registrar.');
-                if (typeof grecaptcha !== 'undefined') grecaptcha.reset(1);
+            if (!response.ok) {
+                throw new Error(data.message || `Erro HTTP ${response.status}`);
             }
+
+            showTabMessage(context.messageElement, "Produto guardado com sucesso!", true);
+            
+            if (isScrapeSave) {
+                scrapedProductData = null; 
+            }
+            clearAddProductFormAddTab();
+            clearProductScrapeFormProductsTab();
+            
+            fetchAndRenderProducts();
+            fetchAndRenderDashboardStats();
+
         } catch (error) {
-            // Se ocorrer um erro de rede
-            console.error('Erro de rede ao registrar:', error);
-            showAuthMessage(registerMessage, 'Não foi possível conectar ao servidor. Tente novamente.');
-            if (typeof grecaptcha !== 'undefined') grecaptcha.reset(1);
+            console.error("Erro ao guardar o produto:", error);
+            showTabMessage(context.messageElement, `Erro ao guardar: ${error.message}`, false);
+        } finally {
+            context.buttonElement.disabled = false;
+            context.buttonElement.innerHTML = '<i class="fas fa-save"></i> Guardar Produto';
         }
-    });
-}
-
-// ... (logoutUser, lógica de navegação, funções de produto, dashboard, finanças, modais permanecem em grande parte as mesmas) ...
-    // A função createProductCard, fetchAndRenderProducts, fetchAndRenderDashboardStats, renderGenericChart, 
-    // fetchAndRenderFinances, clearFinanceForm, setupFinanceEdit, setupScrapeEventListeners,
-    // handleSaveProduct, clearAddProductFormAddTab, clearProductScrapeFormProductsTab,
-    // e todos os event listeners para modais e ações de card devem funcionar como antes.
-
-    // --- FUNÇÃO DE LOGOUT ---
-    if (logoutBtn) { //
-        logoutBtn.addEventListener('click', logoutUser); //
     }
-
-    function logoutUser() { //
-        authToken = null; //
-        currentUserId = null; //
-        localStorage.removeItem('authToken'); //
-        localStorage.removeItem('userId'); //
-        showAuthSection(); //
-    }
-
-    // --- LÓGICA DE NAVEGAÇÃO (ABAS DO DASHBOARD) ---
-    if (sidebar && tabButtons.length > 0) { //
-        sidebar.addEventListener('click', (e) => { //
-            const navBtn = e.target.closest('.nav-btn'); //
-            if (!navBtn || navBtn.id === 'logout-btn') return; //
-            const tabId = navBtn.dataset.tab; //
-
-            tabButtons.forEach(btn => btn.classList.remove('active')); //
-            navBtn.classList.add('active'); //
-
-            tabContents.forEach(tabContent => { //
-                tabContent.classList.toggle('active', tabContent.id === `${tabId}-tab`); //
-            });
-
-            if (tabId === 'finance') { //
-                fetchAndRenderFinances(); //
-            }
-            if (tabId === 'dashboard-main') { //
-                fetchAndRenderDashboardStats(); //
-            }
-            if (tabId === 'products') { //
-                fetchAndRenderProducts(); //
-                clearProductScrapeFormProductsTab(); //
-            }
-            if (tabId === 'history') { //
-                fetchAndRenderProducts(); //
-            }
-            if (tabId === 'add-product') { //
-                clearAddProductFormAddTab(); //
-            }
-        });
-    }
-
-    if (goToAddProductTabBtn) { //
-        goToAddProductTabBtn.addEventListener('click', () => { //
-            const addProductNavBtn = document.querySelector('.nav-btn[data-tab="add-product"]'); //
-            if (addProductNavBtn) { //
-                addProductNavBtn.click(); //
-            }
-        });
-    }
-
-    // Em renderer.js, após a seção de seletores
-
-if (goToBtnFromEmpty) {
-    goToBtnFromEmpty.addEventListener('click', () => {
-        // Encontra o botão da aba "Adicionar Produto" e simula um clique nele
-        const addProductTabButton = document.querySelector('.nav-btn[data-tab="add-product"]');
-        if (addProductTabButton) {
-            addProductTabButton.click();
-        }
-    });
-}
     
-// Em src/renderer.js
+    if (saveProductBtnAddTab) {
+        saveProductBtnAddTab.addEventListener('click', () => {
+            const source = (scrapedProductData && scrapedProductData.name) ? 'scrape' : 'manual';
+            handleSaveProduct({
+                buttonElement: saveProductBtnAddTab,
+                messageElement: addProductMessageAddTab,
+                source: source
+            });
+        });
+    }
 
+    if (saveProductBtnProductsTab) {
+        saveProductBtnProductsTab.addEventListener('click', () => {
+            handleSaveProduct({
+                buttonElement: saveProductBtnProductsTab,
+                messageElement: addProductMessageProductsTab,
+                source: 'scrape'
+            });
+        });
+    }
+
+
+    const createProductCard = (product) => {
+        const card = document.createElement('li');
+        card.className = 'product-card';
+        card.dataset.productId = product._id;
+        card.dataset.productJson = JSON.stringify(product);
+
+        card.setAttribute('data-tilt', '');
+        card.setAttribute('data-tilt-glare', '');
+        
+        card.innerHTML = `
+            <div class="card-image-container">
+                <img src="${product.image || 'https://via.placeholder.com/200x150?text=Indisponível'}" alt="${product.name || 'Produto'}" class="card-image">
+            </div>
+            <div class="card-content">
+                <span class="card-title">${product.name || 'Nome Indisponível'}</span>
+                <span class="card-price">${product.price ? `R$ ${parseFloat(product.price).toFixed(2)}` : 'Preço Indisponível'}</span>
+            </div>
+            <div class="card-actions">
+                ${product.status === 'pendente' ? '<i class="fas fa-check-circle action-purchase" title="Marcar como Comprado"></i>' : ''}
+                <i class="fas fa-edit action-edit" title="Editar"></i>
+                <i class="fab fa-google action-search" title="Pesquisar produto na web"></i>
+                <i class="fas fa-trash-alt action-delete" title="Excluir"></i>
+            </div>
+        `;
+        return card;
+    };
+
+    // Função para obter a cor do texto principal do CSS
+    const getTextColor = () => getComputedStyle(document.body).getPropertyValue('--text-primary').trim();
+
+    // Função para atualizar a cor dos gráficos
 // Em renderer.js
 
-const createProductCard = (product) => {
-    const card = document.createElement('li');
-    card.className = 'product-card';
-    card.dataset.productId = product._id;
-    card.dataset.productJson = JSON.stringify(product);
+// Função para atualizar a cor dos gráficos
+const updateChartColors = () => {
+    const textColor = getTextColor();
+    const chartInstances = [financeOverviewChart, categoryDistributionChart, financialLineChart];
+    
+    chartInstances.forEach(chart => {
+        // ▼▼▼ INÍCIO DA CORREÇÃO ▼▼▼
+        if (chart) {
+            // Atualiza a cor da legenda (todos os gráficos têm)
+            if (chart.options.plugins.legend) {
+                chart.options.plugins.legend.labels.color = textColor;
+            }
 
-    // ADICIONE ESTAS 2 LINHAS AQUI
-    card.setAttribute('data-tilt', ''); // Ativa o efeito de inclinação
-    card.setAttribute('data-tilt-glare', ''); // Ativa o efeito de brilho
-    
-    const formattedPrice = `R$ ${parseFloat(product.price || 0).toFixed(2)}`;
-    
-    // O resto da sua função continua igual...
-    card.innerHTML = `
-        <div class="card-image-container">
-            <img src="${product.image || 'https://via.placeholder.com/200x150?text=Indisponível'}" alt="${product.name || 'Produto'}" class="card-image">
-        </div>
-        <div class="card-content">
-            <span class="card-title">${product.name || 'Nome Indisponível'}</span>
-            <span class="card-price">${product.price ? `R$ ${parseFloat(product.price).toFixed(2)}` : 'Preço Indisponível'}</span>
-        </div>
-        <div class="card-actions">
-            ${product.status === 'pendente' ? '<i class="fas fa-check-circle action-purchase" title="Marcar como Comprado"></i>' : ''}
-            <i class="fas fa-edit action-edit" title="Editar"></i>
-            <i class="fab fa-google action-search" title="Pesquisar produto na web"></i>
-            <i class="fas fa-trash-alt action-delete" title="Excluir"></i>
-        </div>
-    `;
-    return card;
+            // ATUALIZA OS EIXOS APENAS SE ELES EXISTIREM
+            if (chart.options.scales) {
+                if (chart.options.scales.x) {
+                    chart.options.scales.x.ticks.color = textColor;
+                    chart.options.scales.x.grid.color = 'rgba(128, 128, 128, 0.1)';
+                }
+                if (chart.options.scales.y) {
+                    chart.options.scales.y.ticks.color = textColor;
+                    chart.options.scales.y.grid.color = 'rgba(128, 128, 128, 0.1)';
+                }
+            }
+            chart.update();
+        }
+        // ▲▲▲ FIM DA CORREÇÃO ▲▲▲
+    });
 };
 
-
-// Em renderer.js, substitua a função inteira por esta:
-
-// Em renderer.js, substitua sua função fetchAndRenderProducts por esta:
-
-// Em renderer.js, substitua mais uma vez a função fetchAndRenderProducts
-
-const fetchAndRenderProducts = async () => {
-    // A primeira parte da função permanece a mesma...
-    if (!pendingList || !purchasedList || !pendingTotalValueEl || !purchasedTotalValueEl) return;
-    if (!currentUserId) return;
-
-    pendingTotalValueEl.textContent = 'R$ 0,00';
-    purchasedTotalValueEl.textContent = 'R$ 0,00';
-
-    try {
-        const response = await authenticatedFetch(`${API_BASE_URL}/products?userId=${currentUserId}`);
-        if (!response.ok) throw new Error(`Erro ao buscar produtos: ${response.statusText}`);
-        
-        const products = await response.json();
-
-        const pendingProducts = products.filter(p => p.status === 'pendente');
-        const purchasedProducts = products.filter(p => p.status === 'comprado');
-        const historyProducts = products.filter(p => p.status === 'comprado' || p.status === 'descartado');
-
-        pendingList.innerHTML = '';
-        purchasedList.innerHTML = '';
-
-        const pendingTotal = pendingProducts.reduce((sum, product) => sum + (product.price || 0), 0);
-        pendingTotalValueEl.textContent = `R$ ${pendingTotal.toFixed(2).replace('.', ',')}`;
-
-        const purchasedTotal = purchasedProducts.reduce((sum, product) => sum + (product.price || 0), 0);
-        purchasedTotalValueEl.textContent = `R$ ${purchasedTotal.toFixed(2).replace('.', ',')}`;
-
-        // Renderiza a lista de desejos (pendentes)
-        if (pendingProducts.length === 0) {
-            if (pendingEmptyState) pendingEmptyState.style.display = 'block';
-        } else {
-            if (pendingEmptyState) pendingEmptyState.style.display = 'none';
-            pendingProducts.forEach(product => {
-                const card = createProductCard(product);
-                pendingList.appendChild(card);
-                
-                // ✨ MUDANÇA IMPORTANTE AQUI ✨
-                // Verifica se a biblioteca VanillaTilt foi carregada antes de usá-la
-                if (typeof VanillaTilt !== 'undefined') {
-                   v
-                } else {
-                    console.error('A biblioteca VanillaTilt não foi carregada a tempo.');
-                }
-            });
+    // Função para aplicar o tema salvo
+    const applySavedTheme = () => {
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.body.setAttribute('data-theme', savedTheme);
+        if (themeSwitch) {
+            themeSwitch.checked = savedTheme === 'dark';
         }
-        
-        // Renderiza a lista do histórico
-        if (historyProducts.length === 0) {
-            if (purchasedEmptyState) purchasedEmptyState.style.display = 'block';
-        } else {
-            if (purchasedEmptyState) purchasedEmptyState.style.display = 'none';
-            historyProducts.forEach(product => {
-                const card = createProductCard(product);
-                purchasedList.appendChild(card);
-                
-                // ✨ MUDANÇA IMPORTANTE AQUI TAMBÉM ✨
-                if (typeof VanillaTilt !== 'undefined') {
-                    VanillaTilt.init(card, { max: 15, speed: 300, glare: true, "max-glare": 0.5 });
-                } else {
-                    console.error('A biblioteca VanillaTilt não foi carregada a tempo.');
-                }
-            });
-        }
+        // Atraso mínimo para garantir que as variáveis CSS foram aplicadas antes de atualizar os gráficos
+        setTimeout(updateChartColors, 50);
+    };
 
-    } catch (error) {
-        // Agora o erro virá do nosso console.error, ou de outra parte do código
-        console.error("Erro em fetchAndRenderProducts:", error);
+    // Adiciona o listener para o evento de clique no botão de tema
+    if (themeSwitch) {
+        themeSwitch.addEventListener('change', () => {
+            if (themeSwitch.checked) {
+                document.body.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.body.setAttribute('data-theme', 'light');
+                localStorage.setItem('theme', 'light');
+            }
+            updateChartColors();
+        });
     }
-};
+
+    // Aplica o tema salvo quando a página carrega
+    applySavedTheme();
+
+    const fetchAndRenderProducts = async () => {
+        if (!pendingList || !purchasedList || !pendingTotalValueEl || !purchasedTotalValueEl) return;
+        if (!currentUserId) return;
+
+        pendingTotalValueEl.textContent = 'R$ 0,00';
+        purchasedTotalValueEl.textContent = 'R$ 0,00';
+
+        try {
+            const response = await authenticatedFetch(`${API_BASE_URL}/products?userId=${currentUserId}`);
+            if (!response.ok) {
+                 const errorData = await response.json().catch(() => ({ message: response.statusText }));
+                 throw new Error(errorData.message || 'Erro ao procurar produtos');
+            }
+            
+            const products = await response.json();
+
+            const pendingProducts = products.filter(p => p.status === 'pendente');
+            const historyProducts = products.filter(p => p.status === 'comprado' || p.status === 'descartado');
+
+            pendingList.innerHTML = '';
+            purchasedList.innerHTML = '';
+
+            const pendingTotal = pendingProducts.reduce((sum, product) => sum + (product.price || 0), 0);
+            pendingTotalValueEl.textContent = `R$ ${pendingTotal.toFixed(2).replace('.', ',')}`;
+
+            const purchasedTotal = products.filter(p => p.status === 'comprado').reduce((sum, product) => sum + (product.price || 0), 0);
+            purchasedTotalValueEl.textContent = `R$ ${purchasedTotal.toFixed(2).replace('.', ',')}`;
+
+            if (pendingProducts.length === 0) {
+                if (pendingEmptyState) pendingEmptyState.style.display = 'block';
+            } else {
+                if (pendingEmptyState) pendingEmptyState.style.display = 'none';
+                pendingProducts.forEach(product => {
+                    const card = createProductCard(product);
+                    pendingList.appendChild(card);
+                    if (typeof VanillaTilt !== 'undefined') {
+                       VanillaTilt.init(card, { max: 8, speed: 300, glare: true, "max-glare": 0.5 });
+                    }
+                });
+            }
+            
+            if (historyProducts.length === 0) {
+                if (purchasedEmptyState) purchasedEmptyState.style.display = 'block';
+            } else {
+                if (purchasedEmptyState) purchasedEmptyState.style.display = 'none';
+                historyProducts.forEach(product => {
+                    const card = createProductCard(product);
+                    purchasedList.appendChild(card);
+                    if (typeof VanillaTilt !== 'undefined') {
+                        VanillaTilt.init(document.querySelectorAll("#history-tab .product-card"), {
+                            max: 15,
+                            speed: 400,
+                            glare: true,
+                            "max-glare": 0.4,
+                        });
+                    }
+                });
+            }
+
+            // ===================================================================
+            // ▼▼▼ ADICIONE O CÓDIGO ABAIXO NESTE LOCAL ▼▼▼
+            // ===================================================================
+
+            // Adiciona listeners para o efeito de brilho holográfico nos cards de histórico
+// Em renderer.js, dentro da função fetchAndRenderProducts
+
+// ▼▼▼ SUBSTITUA ESTE BLOCO DE CÓDIGO JS PELO NOVO ▼▼▼
+// --- LÓGICA DO CARTÃO HOLOGRÁFICO INTERATIVO ---
+const historyCards = document.querySelectorAll("#history-tab .product-card");
+
+historyCards.forEach(card => {
+    card.addEventListener("mousemove", e => {
+        const rect = card.getBoundingClientRect();
+        const { width, height, top, left } = rect;
+        const mouseX = e.clientX - left;
+        const mouseY = e.clientY - top;
+        const xPct = mouseX / width - 0.5;
+        const yPct = mouseY / height - 0.5;
+
+        // Variáveis para o CSS
+        card.style.setProperty("--mx", mouseX);
+        card.style.setProperty("--my", mouseY);
+        card.style.setProperty("--tx", xPct * 20);
+        card.style.setProperty("--ty", yPct * 20);
+        
+        // --- LÓGICA DE ROTAÇÃO INVERTIDA ---
+        card.style.setProperty("--rx", yPct * 25);      // <-- MUDANÇA AQUI (era -25)
+        card.style.setProperty("--ry", xPct * -25);     // <-- MUDANÇA AQUI (era 25)
+
+        card.style.setProperty("--pos", (mouseX / width) * 100);
+    });
+
+    card.addEventListener("mouseleave", () => {
+        // Reseta as variáveis quando o mouse sai
+        card.style.setProperty("--tx", 0);
+        card.style.setProperty("--ty", 0);
+        card.style.setProperty("--rx", 0);
+        card.style.setProperty("--ry", 0);
+    });
+});
+// --- FIM DO BLOCO ---
+            // ===================================================================
+            // ▲▲▲ FIM DO CÓDIGO A SER ADICIONADO ▲▲▲
+            // ===================================================================
+
+        } catch (error) {
+            console.error("Erro em fetchAndRenderProducts:", error);
+            showTabMessage(addProductMessageAddTab, `Erro ao carregar produtos: ${error.message}`, false);
+        }
+    };
+
+    function clearAddProductFormAddTab() {
+        if (productUrlInputAddTab) productUrlInputAddTab.value = '';
+        if (verifiedProductInfoDivAddTab) verifiedProductInfoDivAddTab.classList.add('hidden');
+        if (manualProductNameInput) manualProductNameInput.value = '';
+        if (manualProductPriceInput) manualProductPriceInput.value = '';
+        if (manualProductUrlInput) manualProductUrlInput.value = '';
+        if (manualProductImageUrlInput) manualProductImageUrlInput.value = '';
+        if (manualProductCategorySelect) manualProductCategorySelect.value = 'Outros';
+        if (manualProductBrandInput) manualProductBrandInput.value = '';
+        if (manualProductDescriptionTextarea) manualProductDescriptionTextarea.value = '';
+        if(addProductMessageAddTab) addProductMessageAddTab.textContent = '';
+    }
+
+    function clearProductScrapeFormProductsTab() {
+        if (productUrlInputProductsTab) productUrlInputProductsTab.value = '';
+        if (verifiedProductInfoDivProductsTab) verifiedProductInfoDivProductsTab.classList.add('hidden');
+        if (saveProductBtnProductsTab) saveProductBtnProductsTab.style.display = 'none';
+        if(addProductMessageProductsTab) addProductMessageProductsTab.textContent = '';
+    }
+
 
     // Coloque isso no seu arquivo JavaScript principal (ex: renderer.js)
 const setAppHeight = () => {
@@ -1007,24 +1142,22 @@ if (productUrlInputProductsTab && verifyUrlBtnProductsTab) {
 // CORRETO: Um listener para CADA botão de salvar, em blocos separados.
 
 if (saveProductBtnAddTab) {
-    saveProductBtnAddTab.addEventListener('click', async () => {
-        // Salva o produto vindo da aba "Adicionar Produto"
-        await handleSaveProduct(addProductMessageAddTab);
+    saveProductBtnAddTab.addEventListener('click', () => {
+        // Chama a função passando o elemento de mensagem da aba "Adicionar Produto"
+        handleSaveProduct(addProductMessageAddTab);
     });
 }
 
 if (saveProductBtnProductsTab) {
-    saveProductBtnProductsTab.addEventListener('click', async () => {
-        // Salva o produto vindo da aba "Meus Produtos"
-        await handleSaveProduct(addProductMessageProductsTab);
+    saveProductBtnProductsTab.addEventListener('click', () => {
+        // Chama a função passando o elemento de mensagem da aba "Meus Produtos"
+        handleSaveProduct(addProductMessageProductsTab);
         
-        // Bônus de UX: esconde a caixa de informações após salvar.
         if (verifiedProductInfoDivProductsTab) {
             verifiedProductInfoDivProductsTab.classList.add('hidden');
         }
     });
 }
-
 
 // Em renderer.js
 
@@ -1258,7 +1391,7 @@ else if (target.classList.contains('action-search')) {
         // --- Ação: Abrir Modal de Detalhes ---
         else if (card) { // Se o clique foi em qualquer outra parte do card
             e.stopPropagation();
-            const allModalElementsFound = detailsModal && modalProductImage && modalProductName && modalProductPrice && modalProductStatus && modalProductCategory && modalProductBrand && modalProductAddedDate && modalProductDescription && modalProductTags && modalProductLink && modalProductPriority && modalProductNotes;
+            const allModalElementsFound = detailsModal && modalProductImage && modalProductName && modalProductPrice && modalProductStatus && modalProductCategory && modalProductBrand && modalProductAddedDate &&  modalProductTags && modalProductLink && modalProductPriority && modalProductNotes;
 
             if (!allModalElementsFound) {
                 console.error("Um ou mais elementos do modal de detalhes não foram encontrados. Verifique seus IDs no index.html.");
@@ -1284,7 +1417,6 @@ else if (target.classList.contains('action-search')) {
                 setDetail(modalProductCategory, productData.category, 'Não definida');
                 setDetail(modalProductBrand, productData.brand);
                 setDetail(modalProductAddedDate, productData.createdAt ? new Date(productData.createdAt).toLocaleDateString('pt-BR') : '', 'Data indisponível');
-                setDetail(modalProductDescription, productData.description, 'Nenhuma descrição.');
                 setDetail(modalProductTags, (productData.tags && productData.tags.length > 0) ? productData.tags.join(', ') : '', 'Nenhuma');
                 setDetail(modalProductPriority, productData.priority, 'Não definida');
                 setDetail(modalProductNotes, productData.notes, 'Nenhuma.');
@@ -1594,5 +1726,3 @@ else if (target.classList.contains('action-search')) {
         showAuthSection(); //
     }
 });
-
-// Em src/renderer.js
