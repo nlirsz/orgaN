@@ -567,6 +567,7 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
 #history-tab .product-card:hover .card-reflection,
 #history-tab .product-card:hover .card-sparks {
     opacity: 1;
+    display: block; /* Garante que os efeitos sejam visíveis no hover */
 }
 
 /* Camada 2: Reflexo Dourado e Prata */
@@ -1269,21 +1270,31 @@ input:checked + .slider-toggle:before {
     mix-blend-mode: screen;
 }
 
-/* Badge da categoria (regra global) */
+/* 1. Badge da Categoria (Layout Horizontal como na referência) */
 .card-category-badge {
     position: absolute;
-    top: 12px;
-    left: -35px;
-    background-color: var(--primary-action);
-    color: var(--highlight-action-text);
-    padding: 4px 30px;
+    top: 15px; /* Distância do topo */
+    left: 0;
+    background-color: var(--primary-action); /* Cor verde */
+    color: var(--highlight-action-text); /* Texto branco */
+    padding: 5px 15px; /* Espaçamento interno */
     font-size: 0.8em;
-    font-weight: bold;
+    font-weight: 700;
     text-transform: uppercase;
-    transform: rotate(-45deg);
-    z-index: 5;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    z-index: 5; /* Fica na frente da imagem */
+    border-radius: 0 4px 4px 0; /* Bordas arredondadas apenas na direita */
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
 }
+
+/* 2. Garante que os efeitos (sparks/reflection) fiquem 100% contidos */
+
+/* Esconde os elementos de efeito POR PADRÃO */
+.product-card .card-reflection,
+.product-card .card-sparks {
+    display: none;
+    opacity: 0;
+}
+
 
 /* === Media Queries === */
 @media (max-width: 1024px) {
