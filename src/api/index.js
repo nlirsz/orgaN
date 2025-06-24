@@ -4,8 +4,6 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 const mongoose = require('mongoose');
-const categoryRoutes = require('../routes/categories'); // <-- ADICIONE ESTA LINHA
-
 
 const connectDB = require('../database');
 const productRoutes = require('../routes/products'); // Caminho corrigido
@@ -101,8 +99,6 @@ app.use('/api/finances', financeRoutes);
 app.use('/api/auth/register', registerRoute);
 app.use('/api/auth/login', loginRoute);
 app.use('/api/user', userRoutes);
-app.use('/api/categories', categoryRoutes); // <-- ADICIONE ESTA LINHA
-
 
 // Para desenvolvimento local
 if (process.env.NODE_ENV !== 'production') {
