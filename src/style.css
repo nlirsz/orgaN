@@ -369,17 +369,112 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
     gap: 30px; list-style: none; padding: 0; margin: 0; 
 }
+/* --- Estilização do Card para o Efeito de Camadas --- */
+
 .product-card {
-    background: var(--c-primary);
-    border-radius: 20px;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    box-shadow: var(--shadow);
-    transition: box-shadow 0.2s ease-in-out;
-    transform-style: preserve-3d;
-    position: relative;
+  position: relative; /* Essencial para o posicionamento das camadas filhas */
+  overflow: hidden; /* Garante que os efeitos não "vazem" para fora */
+  background-color: #ffffff; /* Camada 0: Fundo branco como base */
+  border-radius: 12px; /* Bordas arredondadas para um visual moderno */
+  transform-style: preserve-3d; /* Necessário para o Vanilla Tilt funcionar bem com as camadas */
+  will-change: transform; /* Otimização de performance para animação */
 }
+
+/* Camada 1: A Imagem */
+.product-card .card-image {
+  position: relative; /* Para garantir que tenha um contexto de empilhamento */
+  z-index: 1; /* Fica acima do fundo branco */
+  width: 100%;
+  height: 150px; /* Ou a altura que você preferir */
+  object-fit: cover; /* Garante que a imagem cubra o espaço sem distorcer */
+  display: block;
+}
+
+/* Camada 2: O Reflexo Dourado e Prata */
+.product-card .card-reflection {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2; /* Fica ACIMA da imagem */
+  pointer-events: none; /* Permite cliques através dele */
+  
+  /* Gradiente radial que simula um brilho metálico */
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(255, 215, 0, 0.2),  /* Ouro translúcido no centro */
+    rgba(192, 192, 192, 0.2),  /* Prata translúcido nas bordas */
+    transparent 70%
+  );
+  
+  /* Animação e mistura para um efeito mais dinâmico */
+  opacity: 0; /* Começa invisível */
+  mix-blend-mode: color-dodge; /* Modo de mistura que cria brilhos intensos */
+  transition: opacity 0.4s ease-in-out;
+}
+
+/* O reflexo aparece quando o mouse está sobre o card */
+.product-card:hover .card-reflection {
+  opacity: 1;
+}
+
+
+/* Camada 3: As Faíscas (Sparks) */
+.product-card .card-sparks {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 3; /* Fica ACIMA de tudo */
+    pointer-events: none; /* Permite cliques através */
+    overflow: hidden; /* Garante que as faíscas não saiam do card */
+}
+
+/* Usamos pseudo-elementos para criar as faíscas com box-shadow */
+.card-sparks::before, .card-sparks::after {
+    content: '';
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: white;
+    border-radius: 50%;
+    opacity: 0;
+    
+    /* Múltiplas sombras para criar um campo de "estrelas" */
+    box-shadow: 
+        20px 50px 0 0 white, 180px 80px 0 0 white, 
+        80px 120px 0 0 white, 140px 20px 0 -1px white, 
+        40px 90px 0 1px white, 100px 30px 0 0 white,
+        160px 140px 0 0 white, 60px 10px 0 -1px white;
+    
+    animation: sparkle 3s infinite linear;
+}
+
+/* Segunda camada de faíscas com um atraso de animação */
+.card-sparks::after {
+    animation-delay: 1.5s;
+}
+
+/* Animação que faz as faíscas piscarem e se moverem */
+@keyframes sparkle {
+  0% { transform: translateY(20px); opacity: 0; }
+  20% { opacity: 0.7; }
+  80% { opacity: 0.7; }
+  100% { transform: translateY(-180px) rotate(90deg); opacity: 0; }
+}
+
+/* Ajustes finais no conteúdo para garantir que ele fique visível */
+.product-card .card-content,
+.product-card .card-actions,
+.product-card .card-category-badge {
+    position: relative; /* Garante que fiquem no fluxo normal mas... */
+    z-index: 4; /* ...acima de todas as camadas de efeito */
+}
+
+
 .product-card:hover {
     box-shadow: 6px 6px 12px var(--c-dark), -6px -6px 12px var(--c-light);
 }

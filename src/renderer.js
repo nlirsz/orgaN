@@ -477,24 +477,41 @@ document.addEventListener('DOMContentLoaded', () => {
         card.dataset.productId = product._id;
         card.dataset.productJson = JSON.stringify(product);
 
-        card.innerHTML = `
-            <div class="card-image-container">
-                <img src="${product.image || 'https://via.placeholder.com/200x150?text=Indisponível'}" alt="${product.name || 'Produto'}" class="card-image">
-            </div>
-            <div class="card-content">
-                <span class="card-title">${product.name || 'Nome Indisponível'}</span>
-                <span class="card-price">${product.price ? `R$ ${parseFloat(product.price).toFixed(2)}` : 'Preço Indisponível'}</span>
-            </div>
-            <div class="card-actions">
-                ${product.status === 'pendente' ? '<i class="fas fa-check-circle action-purchase" title="Marcar como Comprado"></i>' : ''}
-                <i class="fas fa-edit action-edit" title="Editar"></i>
-                <i class="fab fa-google action-search" title="Pesquisar produto na web"></i>
-                <i class="fas fa-trash-alt action-delete" title="Excluir"></i>
-            </div>
-        `;
-        return card;
-    };
+    card.setAttribute('data-tilt', '');
+    card.setAttribute('data-tilt-max', '15');
+    card.setAttribute('data-tilt-speed', '400');
+    card.setAttribute('data-tilt-perspective', '1000');
+    card.setAttribute('data-tilt-glare', 'true'); // Ativa o brilho padrão do tilt
+    card.setAttribute('data-tilt-max-glare', '0.3'); // Ajusta a intensidade do brilho
 
+    card.innerHTML = `
+        <img src="${product.image || 'https://via.placeholder.com/200x150?text=Indisponível'}" alt="${product.name || 'Produto'}" class="card-image">
+
+        <div class="card-reflection"></div>
+        
+        <div class="card-sparks"></div>
+
+        <div class="card-content">
+            <h3 class="card-title">${product.name || 'Nome Indisponível'}</h3>
+            <p class="card-price">${product.price ? `R$ ${parseFloat(product.price).toFixed(2)}` : 'Preço Indisponível'}</p>
+        </div>
+
+        ${product.category ? `<div class="card-category-badge">${product.category}</div>` : ''}
+        <div class="card-actions">
+            ${product.status === 'pendente' ? '<i class="fas fa-check-circle action-purchase" title="Marcar como Comprado"></i>' : ''}
+            <i class="fas fa-edit action-edit" title="Editar"></i>
+            <fab class="fab fa-google action-search" title="Pesquisar produto na web"></fab>
+            <i class="fas fa-trash-alt action-delete" title="Excluir"></i>
+        </div>
+    `;
+
+    // Inicializa o Vanilla Tilt no novo card
+    if (window.VanillaTilt) {
+        window.VanillaTilt.init(card);
+    }
+
+    return card;
+};
     const getTextColor = () => getComputedStyle(document.body).getPropertyValue('--text-primary').trim();
 
     const updateChartColors = () => {
