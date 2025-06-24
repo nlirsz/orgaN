@@ -44,62 +44,40 @@ const safetySettings = [
     { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
 ];
 
-async function scrapeProductDetails(productUrl) {
-    console.log(`[scrape-gemini.js] scrapeProductDetails chamada para URL: ${productUrl}`);
+// src/routes/api_helpers/scrape-gemini.js
 
-    if (!model) {
-        console.error("[scrape-gemini.js] Modelo Gemini não inicializado. Verifique a GEMINI_API_KEY e erros de inicialização.");
-        throw new Error("Serviço de extração indisponível: Modelo Gemini não carregado.");
-    }
-    if (!productUrl || !productUrl.startsWith('http')) {
-        console.error("[scrape-gemini.js] URL inválida fornecida:", productUrl);
-        throw new Error("URL do produto inválida ou não fornecida.");
-    }
+// ... (código existente)
+
+async function scrapeProductDetails(productUrl) {
+    // ... (código existente)
 
     try {
-        let htmlContent = '';
-        try {
-            console.log(`[scrape-gemini.js] Buscando HTML de: ${productUrl}`);
-            const response = await fetch(productUrl);
+        // ... (código para buscar o HTML)
 
-            if (!response.ok) {
-                const errorBody = await response.text();
-                throw new Error(`Falha ao buscar HTML. Status: ${response.status} - ${response.statusText}. Detalhes: ${errorBody.substring(0, 200)}`);
-            }
-
-            htmlContent = await response.text();
-            console.log(`[scrape-gemini.js] HTML obtido. Tamanho: ${htmlContent.length}`);
-        } catch (fetchError) {
-            console.error(`[scrape-gemini.js] Erro ao buscar HTML (${productUrl}):`, fetchError.message);
-            throw new Error(`Não foi possível acessar o conteúdo da URL: ${fetchError.message}`);
-        }
-
-        const maxHtmlLength = 200000;
-        if (htmlContent.length > maxHtmlLength) {
-            htmlContent = htmlContent.substring(0, maxHtmlLength);
-            console.warn(`[scrape-gemini.js] HTML truncado.`);
-        }
-
-        // PROMPT ATUALIZADO: Categoria mais detalhada e com exemplos
+        // PROMPT ATUALIZADO:
         const prompt = `Analise o HTML a seguir para extrair os detalhes de um produto.
         Retorne um objeto JSON com as seguintes propriedades:
-        - name (string): Nome completo do produto.
+        - name (string): Nome completo e conciso do produto.
         - price (number): Preço do produto. Use ponto como separador decimal.
         - image (string, opcional): URL da imagem principal do produto.
         - brand (string, opcional): Marca do produto.
-        - category (string, opcional): Categorize o produto em uma das seguintes opções, baseando-se no que melhor descreve o produto. Escolha "Outros" se nenhuma se encaixar bem.
+        - category (string, opcional): **Categorize o produto usando uma única palavra que melhor o descreva.** Escolha a partir das opções ou use "Outros" se nenhuma for ideal.
             Opções de Categoria:
-            - "Eletrônicos": Smartphones, TVs, computadores, fones de ouvido, monitores, câmeras, tablets.
-            - "Roupas e Acessórios": Camisetas, calças, vestidos, sapatos, joias, bolsas, cintos, relógios (não smartwatches).
-            - "Casa e Decoração": Móveis, eletrodomésticos (geladeira, fogão, microondas), utensílios de cozinha, itens de cama/mesa/banho, decoração, iluminação.
-            - "Livros e Mídia": Livros físicos, e-books, DVDs, CDs, jogos de videogame (mídia física ou digital).
-            - "Esportes e Lazer": Equipamentos esportivos, roupas de ginástica, itens para atividades ao ar livre, brinquedos, instrumentos musicais.
-            - "Ferramentas e Construção": Ferramentas manuais, elétricas, materiais de construção, itens de jardinagem.
-            - "Alimentos e Bebidas": Produtos alimentícios perecíveis e não perecíveis, bebidas (não alcoólicas e alcoólicas).
-            - "Saúde e Beleza": Cosméticos, maquiagem, produtos de higiene pessoal, suplementos, medicamentos sem receita, produtos para cabelo/pele.
-            - "Automotivo": Peças de carro, acessórios para veículos, produtos de limpeza automotiva.
-            - "Pet Shop": Ração, brinquedos para pets, acessórios para animais de estimação.
-            - "Outros": Para produtos que não se encaixam claramente nas categorias acima.
+            - "Eletrônicos"
+            - "Roupas"
+            - "Acessórios"
+            - "Casa"
+            - "Decoração"
+            - "Livros"
+            - "Esportes"
+            - "Ferramentas"
+            - "Alimentos"
+            - "Bebidas"
+            - "Saúde"
+            - "Beleza"
+            - "Automotivo"
+            - "Pet"
+            - "Outros"
         - description (string, opcional): Uma breve descrição do produto (máximo 200 caracteres).
         Se não encontrar alguma informação, omita a propriedade ou defina-a como null, exceto 'name' e 'price' que são obrigatórias.
 

@@ -127,6 +127,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const changePasswordMessage = getElem('change-password-message');
     const financeEmptyState = getElem('finance-empty-state');
     const themeSwitch = document.getElementById('theme-switch');
+    const addCustomCategoryBtn = getElem('add-custom-category-btn');
+    const customCategoryNameInput = getElem('custom-category-name');
+    const customCategoryList = getElem('custom-category-list');
+    const customCategoryMessage = getElem('custom-category-message');
 
 
     // --- FUNÇÕES DE UTILIDADE ---
@@ -238,6 +242,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             await Promise.all([
+                populateCategorySelects(), // <-- ADICIONE ESTA LINHA
                 fetchAndRenderDashboardStats(),
                 fetchAndRenderProducts(),
                 fetchAndRenderFinances()
@@ -460,6 +465,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (tabId === 'products' || tabId === 'history') fetchAndRenderProducts();
             if (tabId === 'finance') fetchAndRenderFinances();
             if (tabId === 'add-product') clearAddProductFormAddTab();
+            if (tabId === 'settings') {
+                renderCustomCategories();
+            }
         });
     }
 
@@ -469,6 +477,60 @@ document.addEventListener('DOMContentLoaded', () => {
             if (addProductTabButton) addProductTabButton.click();
         });
     }
+
+    async function populateCategorySelects() {
+    // Pega as opções padrão do HTML
+    const defaultOptions = Array.from(manualProductCategorySelect.options).map(option => ({
+        value: option.value,
+        text: option.textContent
+    }));
+
+    try {
+        const response = await authenticatedFetch(`${API_BASE_URL}/categories`);
+        if (!response.ok) throw new Error('Falha ao buscar categorias');
+        const customCategories = await response.json();
+
+        // Limpa os selects
+        manualProductCategorySelect.innerHTML = '';
+        editProductCategorySelect.innerHTML = '';
+
+        // Adiciona as opções padrão
+        defaultOptions.forEach(opt => {
+            manualProductCategorySelect.add(new Option(opt.text, opt.value));
+            editProductCategorySelect.add(new Option(opt.text, opt.value));
+        });
+
+        // Adiciona as categorias personalizadas
+        customCategories.forEach(cat => {
+            manualProductCategorySelect.add(new Option(cat.name, cat.name));
+            editProductCategorySelect.add(new Option(cat.name, cat.name));
+        });
+    } catch (error) {
+        console.error("Erro ao popular categorias:", error);
+    }
+}
+
+async function renderCustomCategories() {
+    if (!customCategoryList) return;
+    try {
+        const response = await authenticatedFetch(`${API_BASE_URL}/categories`);
+        if (!response.ok) throw new Error('Falha ao buscar categorias');
+        const categories = await response.json();
+
+        customCategoryList.innerHTML = ''; // Limpa a lista
+        categories.forEach(cat => {
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <span>${cat.name}</span>
+                <button class="delete-category-btn" data-id="${cat._id}">&times;</button>
+            `;
+            customCategoryList.appendChild(li);
+        });
+    } catch (error) {
+        console.error("Erro ao renderizar categorias:", error);
+        showTabMessage(customCategoryMessage, 'Erro ao carregar suas categorias.', false);
+    }
+}
     
     // --- LÓGICA DE PRODUTOS ---
     const createProductCard = (product) => {
@@ -1455,6 +1517,66 @@ document.addEventListener('DOMContentLoaded', () => {
                                     financeFormContainer.scrollIntoView({ behavior: 'smooth', block: 'start' }); 
                                 }
                             }
+    // src/renderer.js
+
+// ... (depois de todas as definições de função)
+
+// ... (seus outros event listeners existentes)
+
+//
+// ADICIONE OS DOIS BLOCOS DE CÓDIGO A SEGUIR
+//
+// Adiciona o listener para o botão de adicionar categoria
+if (addCustomCategoryBtn) {
+    addCustomCategoryBtn.addEventListener('click', async () => {
+        const name = customCategoryNameInput.value.trim();
+        if (!name) {
+            showTabMessage(customCategoryMessage, 'O nome não pode estar vazio.', false);
+            return;
+        }
+
+        try {
+            const response = await authenticatedFetch(`${API_BASE_URL}/categories`, {
+                method: 'POST',
+                body: JSON.stringify({ name })
+            });
+            const data = await response.json();
+
+            if (!response.ok) throw new Error(data.message || 'Erro do servidor');
+
+            showTabMessage(customCategoryMessage, `Categoria "${name}" adicionada!`, true);
+            customCategoryNameInput.value = '';
+            await renderCustomCategories();
+            await populateCategorySelects();
+        } catch (error) {
+            showTabMessage(customCategoryMessage, error.message, false);
+        }
+    });
+}
+
+// Adiciona o listener para deletar uma categoria
+if (customCategoryList) {
+    customCategoryList.addEventListener('click', async (e) => {
+        if (e.target.classList.contains('delete-category-btn')) {
+            const categoryId = e.target.dataset.id;
+            if (!confirm('Tem certeza que deseja remover esta categoria?')) return;
+
+            try {
+                const response = await authenticatedFetch(`${API_BASE_URL}/categories/${categoryId}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) throw new Error('Falha ao deletar');
+
+                await renderCustomCategories();
+                await populateCategorySelects();
+                showTabMessage(customCategoryMessage, 'Categoria removida.', true);
+            } catch (error) {
+                showTabMessage(customCategoryMessage, 'Erro ao remover categoria.', false);
+            }
+        }
+    });
+}                        
 
  } else if (deleteBtn) {
             const financeIdToDelete = deleteBtn.dataset.id;

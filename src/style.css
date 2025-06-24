@@ -430,6 +430,37 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
 .card-actions i:active { box-shadow: var(--shadow-inset); }
 
 
+/* Adicione estas regras ao seu arquivo .css principal */
+
+.product-card {
+  position: relative; /* Essencial para o posicionamento do badge */
+  overflow: hidden; /* Garante que o badge não vaze para fora do card */
+}
+
+/* Badge da categoria, inspirado na sua imagem */
+.card-category-badge {
+  position: absolute;
+  top: 10px;       /* Distância do topo */
+  left: -30px;     /* Começa fora da tela para o efeito de rotação */
+  background-color: var(--primary-action); /* Cor verde de ação */
+  color: var(--highlight-action-text); /* Texto branco */
+  padding: 5px 35px; /* Espaçamento interno (vertical, horizontal) */
+  font-size: 0.8em;
+  font-weight: bold;
+  text-transform: uppercase;
+  transform: rotate(-45deg); /* Rotaciona o badge */
+  transform-origin: center;
+  z-index: 5; /* Garante que fique acima da imagem */
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+  white-space: nowrap; /* Impede que o texto quebre */
+}
+
+/* Ajusta o título para não ser sobreposto pelo badge */
+.product-card .card-content {
+  padding-top: 20px; /* Adiciona um pouco de espaço no topo do conteúdo */
+  z-index: 2; /* Garante que o conteúdo fique sobre a imagem */
+}
+
 /* === Card Colecionável (Histórico) - Layout Final com Efeito no Hover === */
 
 /* ESTADO NORMAL (MOUSE FORA): Um card com layout de imagem e texto */
