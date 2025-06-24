@@ -470,25 +470,26 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // --- LÓGICA DE PRODUTOS ---
-    const createProductCard = (product) => {
-        const card = document.createElement('li');
-        card.className = 'product-card';
-        card.dataset.productId = product._id;
-        card.dataset.productJson = JSON.stringify(product);
+// Em src/renderer.js
 
-    card.setAttribute('data-tilt', '');
-    card.setAttribute('data-tilt-max', '15');
-    card.setAttribute('data-tilt-speed', '400');
-    card.setAttribute('data-tilt-perspective', '1000');
-    card.setAttribute('data-tilt-glare', 'true'); // Ativa o brilho padrão do tilt
-    card.setAttribute('data-tilt-max-glare', '0.3'); // Ajusta a intensidade do brilho
+const createProductCard = (product) => {
+    const card = document.createElement('li');
+    // Adiciona a classe 'product-card' e uma classe específica da aba atual
+    const currentTab = document.querySelector('.tab-content.active').id;
+    card.className = `product-card in-${currentTab}`;
+    
+    card.dataset.productId = product._id;
+    card.dataset.productJson = JSON.stringify(product);
 
+    // Estrutura HTML CORRIGIDA E FINAL do card
     card.innerHTML = `
-        <img src="${product.image || 'https://via.placeholder.com/200x150?text=Indisponível'}" alt="${product.name || 'Produto'}" class="card-image">
+        ${product.category && currentTab !== 'history-tab' ? `<div class="card-category-badge">${product.category}</div>` : ''}
+
+        <div class="card-image-container">
+            <img src="${product.image || 'https://via.placeholder.com/200x150?text=Indisponível'}" alt="${product.name || 'Produto'}" class="card-image">
+        </div>
 
         <div class="card-reflection"></div>
-        
         <div class="card-sparks"></div>
 
         <div class="card-content">
@@ -496,23 +497,26 @@ document.addEventListener('DOMContentLoaded', () => {
             <p class="card-price">${product.price ? `R$ ${parseFloat(product.price).toFixed(2)}` : 'Preço Indisponível'}</p>
         </div>
 
-        ${product.category ? `<div class="card-category-badge">${product.category}</div>` : ''}
         <div class="card-actions">
             ${product.status === 'pendente' ? '<i class="fas fa-check-circle action-purchase" title="Marcar como Comprado"></i>' : ''}
             <i class="fas fa-edit action-edit" title="Editar"></i>
-            <fab class="fab fa-google action-search" title="Pesquisar produto na web"></fab>
+            <i class="fab fa-google action-search" title="Pesquisar produto na web"></i>
             <i class="fas fa-trash-alt action-delete" title="Excluir"></i>
         </div>
     `;
 
-    // Inicializa o Vanilla Tilt no novo card
-    if (window.VanillaTilt) {
-        window.VanillaTilt.init(card);
+    // Inicializa o Vanilla Tilt APENAS nos cards que não são do histórico
+    if (currentTab !== 'history-tab' && window.VanillaTilt) {
+        window.VanillaTilt.init(card, {
+            max: 10,
+            speed: 400,
+            glare: true,
+            "max-glare": 0.2
+        });
     }
-
+    
     return card;
-};
-    const getTextColor = () => getComputedStyle(document.body).getPropertyValue('--text-primary').trim();
+};    const getTextColor = () => getComputedStyle(document.body).getPropertyValue('--text-primary').trim();
 
     const updateChartColors = () => {
         const textColor = getTextColor();

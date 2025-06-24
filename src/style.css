@@ -525,151 +525,98 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
 .card-actions i:active { box-shadow: var(--shadow-inset); }
 
 
-/* === Card Colecionável (Histórico) - Layout Final com Efeito no Hover === */
+/* ================================================================== */
+/* === Card de Histórico (Colecionável) - CÓDIGO CORRIGIDO E FINAL === */
+/* ================================================================== */
 
-/* ESTADO NORMAL (MOUSE FORA): Um card com layout de imagem e texto */
+/* Define o layout base do card na aba de histórico */
 #history-tab .product-card {
-    --w: 220px;
-    --h: calc(var(--w) * 1.4);
-    
-    width: var(--w);
-    height: var(--h);
-    position: relative;
+    background-color: #ffffff; /* 1. Fundo sempre branco */
     border-radius: 15px;
-    
-    /* Estilo base do seu tema */
-    background-color: var(--c-primary);
-    box-shadow: var(--shadow);
-    border: 1px solid rgba(0,0,0,0.05);
-
-    /* O card começa sem rotação 3D */
-    transform: perspective(1000px);
-    
-    /* Transição suave para todas as propriedades que vamos alterar */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transform-style: preserve-3d;
     transition: transform 0.4s ease-out, box-shadow 0.4s ease-out;
-
-    /* Organiza a imagem e o texto em uma coluna */
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-/* CAMADAS DE EFEITO (COMEÇAM INVISÍVEIS E FICAM NO FUNDO) */
-#history-tab .product-card::before,
-#history-tab .product-card::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: 15px;
-    
-    /* Começam invisíveis */
-    opacity: 0;
-    /* Transição suave para a opacidade */
-    transition: opacity 0.5s ease-out;
-    pointer-events: none; 
-    z-index: 1; /* Ficam atrás do conteúdo */
-}
-
-/* Camada de fundo holográfico */
-#history-tab .product-card::before {
-    background: linear-gradient(
-        135deg,
-        #ff3d3d 0%, #ffc93d 20%,
-        #3dff3d 40%, #3ddaff 60%,
-        #a23dff 80%, #ff3d3d 100%
-    );
-    background-size: 400% 400%;
-    background-position: calc(var(--pos, 0) * 1%) 50%;
-    mix-blend-mode: screen;
-    filter: brightness(0.9) contrast(1.5);
-}
-
-/* Camada de brilho e partículas */
-#history-tab .product-card::after {
-    background-image: 
-        radial-gradient(
-            circle at calc(var(--mx, 0) * 1px) calc(var(--my, 0) * 1px),
-            rgba(255, 255, 255, 0.7),
-            transparent 150px
-        ),
-        url("https://assets.codepen.io/13471/sparkles.gif");
-    background-size: auto, 100px;
-    mix-blend-mode: overlay;
-}
-
-
-/* ESTADO ATIVO (MOUSE EM CIMA) */
-#history-tab .product-card:hover {
-    box-shadow: 0 15px 40px rgba(0,0,0,0.4);
-    /* Ativa a rotação 3D usando as variáveis do JavaScript */
-    transform: 
-        perspective(1000px) 
-        translateX(calc(var(--tx, 0) * 1px)) 
-        translateY(calc(var(--ty, 0) * 1px)) 
-        rotateX(calc(var(--rx, 0) * 1deg)) 
-        rotateY(calc(var(--ry, 0) * 1deg))
-        scale(1.05);
-}
-
-/* Torna as camadas de efeito visíveis no hover */
-#history-tab .product-card:hover::before,
-#history-tab .product-card:hover::after {
-    opacity: 0.8;
-}
-
-
-/* CONTEÚDO DO CARD (IMAGEM E NOME) */
-
-/* O conteúdo fica na camada de cima, sobre os efeitos */
-#history-tab .product-card .card-image-container,
-#history-tab .product-card .card-content {
     position: relative;
-    z-index: 2;
-    background: transparent; /* Fundo transparente para ver o efeito holográfico através */
+    overflow: hidden; /* Garante que os efeitos não vazem */
 }
 
-/* Área da imagem (parte de cima do card) */
-#history-tab .product-card .card-image-container {
-    height: 65%;
+/* Camada da imagem - Fica entre o fundo branco e os efeitos */
+#history-tab .product-card .card-image {
     width: 100%;
-    padding: 10px; /* Espaço para a imagem não colar nas bordas */
-    box-sizing: border-box;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    height: 100%;
+    object-fit: contain; /* Garante que a imagem apareça inteira */
+    position: relative;
+    z-index: 1; /* Camada 1 */
 }
 
-/* A imagem do produto */
-#history-tab .product-card .card-image-container .card-image {
-    max-width: 100%;
-    max-height: 100%;
-    /* CORREÇÃO: Garante que a imagem inteira apareça, sem cortes */
-    object-fit: contain; 
+/* Camadas de EFEITO (Reflexo e Faíscas) - Começam invisíveis */
+#history-tab .product-card .card-reflection,
+#history-tab .product-card .card-sparks {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* Permite cliques "através" dos efeitos */
+    opacity: 0; /* Começam invisíveis */
+    transition: opacity 0.5s ease-in-out;
 }
 
-/* Área do texto (parte de baixo do card) */
+/* EFEITO APARECE APENAS NO HOVER (passando o mouse por cima) */
+#history-tab .product-card:hover .card-reflection,
+#history-tab .product-card:hover .card-sparks {
+    opacity: 1;
+}
+
+/* Camada 2: Reflexo Dourado e Prata */
+#history-tab .product-card .card-reflection {
+    z-index: 2; /* Fica acima da imagem */
+    /* Gradiente com as cores corretas: dourado e prata */
+    background: radial-gradient(
+        circle at 50% 50%,
+        rgba(255, 215, 0, 0.3),  /* Dourado (#FFD700) translúcido */
+        rgba(192, 192, 192, 0.3),  /* Prata (#C0C0C0) translúcido */
+        transparent 80%
+    );
+    mix-blend-mode: color-dodge; /* Efeito de brilho intenso */
+}
+
+/* Camada 3: Faíscas (Sparks) */
+#history-tab .product-card .card-sparks {
+    z-index: 3; /* Fica acima de tudo */
+    background-image: url("https://assets.codepen.io/13471/sparkles.gif");
+    background-size: 150px;
+    mix-blend-mode: screen;
+    animation: sparkle-move 5s infinite linear; /* Animação para mover as faíscas */
+}
+
+@keyframes sparkle-move {
+    0% { background-position: 0 0; }
+    100% { background-position: -200px -200px; }
+}
+
+/* Conteúdo (título, etc.) fica acima de todas as camadas para ser legível */
 #history-tab .product-card .card-content {
-    height: 35%;
+    position: absolute;
+    bottom: 0;
+    left: 0;
     width: 100%;
-    display: flex; /* Reativado */
-    align-items: center;
-    justify-content: center;
+    padding: 15px;
+    background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+    z-index: 4;
     text-align: center;
-    padding: 10px;
-    box-sizing: border-box;
-    /* Linha sutil para separar imagem e texto */
-    border-top: 1px solid rgba(255, 255, 255, 0.2); 
 }
 
 #history-tab .product-card .card-title {
-    font-family: 'Almarai', sans-serif;
-    font-size: 1.1em;
-    font-weight: 700;
     color: #ffffff;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    font-weight: 700;
+    font-size: 1em;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
 }
 
-/* Oculta as actions, que não são usadas neste design */
+/* Esconde preço e ações que não são usados neste card */
+#history-tab .product-card .card-price,
 #history-tab .product-card .card-actions {
     display: none;
 }
@@ -1053,6 +1000,74 @@ input:checked + .slider-toggle:before {
 .tab-message { margin-top: 15px; font-size: 0.9em; font-weight: 500; text-align: center; padding: 8px 12px; border-radius: 6px; }
 .tab-message.success { color: var(--highlight-action-text); background-color: var(--success-color); }
 .tab-message.error { color: var(--highlight-action-text); background-color: var(--error-color); }
+
+
+/* --- CORREÇÕES GERAIS PARA OS CARDS DE PRODUTO --- */
+
+/* 1. Imagem menos "próxima" da borda */
+.product-card .card-image-container {
+    padding: 15px; /* Aumenta o espaçamento interno ao redor da imagem */
+    height: 160px; /* Reduz um pouco a altura para dar mais respiro */
+}
+
+/* 2. Badge da Categoria (como na imagem de referência) */
+.product-card .card-category-badge {
+    position: absolute;
+    top: 12px;
+    left: -35px;
+    background-color: var(--primary-action); /* Cor verde */
+    color: var(--highlight-action-text); /* Texto branco */
+    padding: 4px 30px;
+    font-size: 0.8em;
+    font-weight: bold;
+    text-transform: uppercase;
+    transform: rotate(-45deg);
+    z-index: 5; /* Fica na frente de tudo */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* 3. Restaura o estilo dos botões de ação (círculo, sombra, etc.) */
+.product-card .card-actions {
+    padding: 10px 15px; 
+    display: flex; 
+    justify-content: space-around; 
+    align-items: center; 
+    background-color: var(--c-primary); /* Fundo igual ao do card */
+    border-top: 1px solid rgba(0,0,0,0.05); /* Linha sutil de separação */
+}
+
+.product-card .card-actions i { 
+    font-size: 1.2em; /* Tamanho do ícone */
+    color: var(--text-secondary); 
+    cursor: pointer; /* Adiciona o cursor de mãozinha */
+    transition: all 0.2s;
+    
+    /* Estilo do círculo que faltava */
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: var(--c-primary);
+    box-shadow: var(--shadow);
+}
+
+/* Efeitos de hover e active para os botões */
+.product-card .card-actions i:hover { 
+    color: var(--primary-action);
+    transform: translateY(-2px);
+}
+
+.product-card .card-actions i:active { 
+    box-shadow: var(--shadow-inset);
+    transform: translateY(0);
+}
+
+/* Garante que o ícone do Google não tenha estilos conflitantes */
+.card-actions .fa-google {
+    font-family: "Font Awesome 6 Brands"; /* Garante que a fonte correta seja usada */
+}
 
 /* === Media Queries === */
 @media (max-width: 1024px) {
