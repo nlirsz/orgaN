@@ -1069,6 +1069,222 @@ input:checked + .slider-toggle:before {
     font-family: "Font Awesome 6 Brands"; /* Garante que a fonte correta seja usada */
 }
 
+/* ======================================================= */
+/* === ESTILIZAÇÃO FINAL PARA OS CARDS DE PRODUTO === */
+/* ======================================================= */
+
+/* --- Estilo Base Comum a Todos os Cards --- */
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 30px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.product-card {
+    background: var(--c-primary);
+    border-radius: 20px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease-in-out;
+    position: relative; /* Essencial para o posicionamento do badge */
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 6px 6px 16px var(--c-dark), -6px -6px 16px var(--c-light);
+}
+
+/* --- Estilos para os Cards da Aba "Meus Produtos" --- */
+
+/* Ajusta o container da imagem para ficar igual à referência */
+.in-products-tab .card-image-container {
+    height: 150px; /* Altura menor para a imagem */
+    padding: 15px; /* Mais preenchimento ao redor da imagem */
+    box-shadow: var(--shadow-inset-light);
+    border-radius: 20px 20px 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ffffff;
+    cursor: pointer;
+}
+
+.in-products-tab .card-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.in-products-tab .card-content {
+    padding: 15px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+
+.in-products-tab .card-title {
+    font-family: 'Almarai', sans-serif;
+    font-size: 1.05em;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+    height: 2.8em;
+    overflow: hidden;
+}
+
+.in-products-tab .card-price {
+    font-size: 1.7em;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-top: auto;
+    margin-bottom: 15px;
+}
+
+.in-products-tab .card-actions {
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.in-products-tab .card-actions i {
+    font-size: 1.3em;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: var(--c-primary);
+    box-shadow: var(--shadow);
+}
+
+.in-products-tab .card-actions i:hover {
+    color: var(--primary-action);
+}
+
+.in-products-tab .card-actions i:active {
+    box-shadow: var(--shadow-inset);
+}
+
+
+/* --- Estilos para os Cards da Aba "Histórico" --- */
+
+/* O card do histórico agora ocupa o espaço da grade, sem tamanho fixo */
+#history-tab .product-card {
+    background-color: #ffffff;
+    aspect-ratio: 1 / 1.4; /* Proporção do card (largura / altura) */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+}
+
+/* O container da imagem ocupa o card todo */
+#history-tab .product-card .card-image-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+}
+
+#history-tab .product-card .card-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 10px;
+}
+
+/* O conteúdo de texto fica sobre a imagem no histórico */
+#history-tab .product-card .card-content {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+    padding: 10px;
+    background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+    border-radius: 0 0 10px 10px;
+    z-index: 4;
+    text-align: center;
+}
+
+#history-tab .product-card .card-title {
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 1.1em;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+}
+
+/* Esconde preço e ações que não são usados no card de histórico */
+#history-tab .product-card .card-price,
+#history-tab .product-card .card-actions {
+    display: none;
+}
+
+/* EFEITOS ESPECIAIS (APENAS PARA #history-tab) */
+#history-tab .product-card .card-reflection,
+#history-tab .product-card .card-sparks {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 20px;
+    pointer-events: none;
+    opacity: 0; /* Começam invisíveis */
+    transition: opacity 0.4s ease-in-out;
+}
+
+/* EFEITOS SÓ APARECEM NO HOVER */
+#history-tab .product-card:hover .card-reflection,
+#history-tab .product-card:hover .card-sparks {
+    opacity: 1;
+}
+
+#history-tab .product-card .card-reflection {
+    z-index: 2;
+    background: radial-gradient(circle at 50% 50%, rgba(255, 215, 0, 0.3), rgba(192, 192, 192, 0.3), transparent 70%);
+    mix-blend-mode: color-dodge;
+}
+
+#history-tab .product-card .card-sparks {
+    z-index: 3;
+    background-image: url("https://assets.codepen.io/13471/sparkles.gif");
+    background-size: 180px;
+    mix-blend-mode: screen;
+}
+
+/* Badge da categoria (regra global) */
+.card-category-badge {
+    position: absolute;
+    top: 12px;
+    left: -35px;
+    background-color: var(--primary-action);
+    color: var(--highlight-action-text);
+    padding: 4px 30px;
+    font-size: 0.8em;
+    font-weight: bold;
+    text-transform: uppercase;
+    transform: rotate(-45deg);
+    z-index: 5;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
 /* === Media Queries === */
 @media (max-width: 1024px) {
     .main-content-area { padding: 20px; }

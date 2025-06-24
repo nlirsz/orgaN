@@ -474,16 +474,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
 const createProductCard = (product) => {
     const card = document.createElement('li');
-    // Adiciona a classe 'product-card' e uma classe específica da aba atual
-    const currentTab = document.querySelector('.tab-content.active').id;
-    card.className = `product-card in-${currentTab}`;
+
+    // Identifica em qual aba o card está sendo criado
+    const currentTabId = document.querySelector('.tab-content.active').id;
+    const isHistoryCard = currentTabId === 'history-tab';
+
+    // Adiciona classes CSS para diferenciar os cards
+    card.className = `product-card ${isHistoryCard ? 'in-history-tab' : 'in-products-tab'}`;
     
     card.dataset.productId = product._id;
     card.dataset.productJson = JSON.stringify(product);
 
     // Estrutura HTML CORRIGIDA E FINAL do card
+    // A lógica do badge agora é mais simples e explícita
     card.innerHTML = `
-        ${product.category && currentTab !== 'history-tab' ? `<div class="card-category-badge">${product.category}</div>` : ''}
+        ${(product.category && !isHistoryCard) ? `<div class="card-category-badge">${product.category}</div>` : ''}
 
         <div class="card-image-container">
             <img src="${product.image || 'https://via.placeholder.com/200x150?text=Indisponível'}" alt="${product.name || 'Produto'}" class="card-image">
@@ -506,8 +511,8 @@ const createProductCard = (product) => {
     `;
 
     // Inicializa o Vanilla Tilt APENAS nos cards que não são do histórico
-    if (currentTab !== 'history-tab' && window.VanillaTilt) {
-        window.VanillaTilt.init(card, {
+    if (!isHistoryCard && typeof VanillaTilt !== 'undefined') {
+        VanillaTilt.init(card, {
             max: 10,
             speed: 400,
             glare: true,
@@ -516,7 +521,10 @@ const createProductCard = (product) => {
     }
     
     return card;
-};    const getTextColor = () => getComputedStyle(document.body).getPropertyValue('--text-primary').trim();
+};
+
+
+const getTextColor = () => getComputedStyle(document.body).getPropertyValue('--text-primary').trim();
 
     const updateChartColors = () => {
         const textColor = getTextColor();
