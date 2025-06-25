@@ -372,7 +372,7 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
 .product-card {
     background: var(--c-primary);
     border-radius: 20px;
-    overflow: hidden;
+    overflow: visible;
     display: flex;
     flex-direction: column;
     box-shadow: var(--shadow);
@@ -1032,6 +1032,23 @@ body[data-theme="dark"] #recent-activity-list li {
 #recent-activity-list .added { color: var(--success-color); }
 #recent-activity-list .purchased { color: var(--primary-action); }
 
+.category-badge {
+    position: absolute;
+    top: -12px; /* Posiciona a badge um pouco acima do card */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--category-color); /* Usa a cor definida pelo JS */
+    color: #FFFFFF;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.75em;
+    font-weight: 600;
+    text-align: center; /* Centraliza o nome da categoria */
+    z-index: 5;
+    white-space: nowrap;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
 /* Responsividade para as novas seções */
 @media (max-width: 992px) {
     .dashboard-extra-sections {
@@ -1095,7 +1112,16 @@ body[data-theme="dark"] #recent-activity-list li {
         overflow: hidden; 
         transform: none !important; 
         transform-style: flat;
+        border-left: 4px solid var(--category-color);
+
     }
+
+    /* Em style.css, adicione DENTRO de @media (max-width: 767px) */
+
+
+.category-badge {
+    display: none; /* Esconde a badge no mobile */
+}
     #history-tab .product-card {
         background: var(--c-primary); 
         transform: none !important;

@@ -472,8 +472,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
 // Em src/renderer.js
 
-// 1. SUBSTITUA A FUNÇÃO 'createProductCard' INTEIRA PELA VERSÃO ABAIXO
-const createProductCard = (product, cardType = 'product') => { // O padrão é 'product'
+// SUBSTITUA A SUA FUNÇÃO createProductCard INTEIRA POR ESTA VERSÃO ATUALIZADA
+
+const createProductCard = (product, cardType = 'product') => {
     const card = document.createElement('li');
 
     // Adiciona a classe correta baseada no tipo de card
@@ -483,7 +484,15 @@ const createProductCard = (product, cardType = 'product') => { // O padrão é '
     card.dataset.productId = product._id;
     card.dataset.productJson = JSON.stringify(product);
 
-    // Estrutura HTML CORRIGIDA E FINAL do card
+    // *** INÍCIO DA ATUALIZAÇÃO ***
+    // Define a cor da categoria ou uma cor padrão
+    const categoryColor = categoryColors[product.category] || categoryColors['Outros'];
+    
+    // Adiciona a cor como uma variável CSS no card para ser usada pelo CSS
+    card.style.setProperty('--category-color', categoryColor);
+    // *** FIM DA ATUALIZAÇÃO ***
+
+    // Estrutura HTML com a badge que usa a variável de cor
     card.innerHTML = `
         ${(product.category && cardType === 'product') ? `<div class="card-category-badge">${product.category}</div>` : ''}
 
@@ -496,7 +505,7 @@ const createProductCard = (product, cardType = 'product') => { // O padrão é '
 
         <div class="card-content">
             <h3 class="card-title">${product.name || 'Nome Indisponível'}</h3>
-            <p class="card-price">${product.price ? `R$ ${parseFloat(product.price).toFixed(2)}` : 'Preço Indisponível'}</p>
+            <p class="card-price">${product.price ? `R$ ${parseFloat(product.price).toFixed(2).replace('.', ',')}` : 'Preço Indisponível'}</p>
         </div>
 
         <div class="card-actions">
@@ -507,11 +516,11 @@ const createProductCard = (product, cardType = 'product') => { // O padrão é '
         </div>
     `;
 
-    // Inicializa o Vanilla Tilt APENAS nos cards de produto (e com menos delay)
+    // Inicializa o Vanilla Tilt APENAS nos cards de produto
     if (cardType === 'product' && typeof VanillaTilt !== 'undefined') {
         VanillaTilt.init(card, {
             max: 10,
-            speed: 200, // <<-- VALOR REDUZIDO PARA MENOS DELAY
+            speed: 200,
             glare: true,
             "max-glare": 0.2
         });
@@ -519,7 +528,6 @@ const createProductCard = (product, cardType = 'product') => { // O padrão é '
     
     return card;
 };
-
 
 // 2. SUBSTITUA TAMBÉM A FUNÇÃO 'fetchAndRenderProducts' PELA VERSÃO ABAIXO
 const fetchAndRenderProducts = async () => {
@@ -627,6 +635,21 @@ const getTextColor = () => getComputedStyle(document.body).getPropertyValue('--t
                 chart.update();
             }
         });
+    };
+
+    // Em renderer.js, adicione no topo junto com outras variáveis
+    const categoryColors = {
+        'Eletrônicos': '#3B82F6',
+        'Roupas e Acessórios': '#8B5CF6',
+        'Casa e Decoração': '#10B981',
+        'Livros e Mídia': '#F59E0B',
+        'Esportes e Lazer': '#EF4444',
+        'Ferramentas e Construção': '#71717A',
+        'Alimentos e Bebidas': '#F97316',
+        'Saúde e Beleza': '#EC4899',
+        'Automotivo': '#14B8A6',
+        'Pet Shop': '#A16207',
+        'Outros': '#6B7280'
     };
 
     const applySavedTheme = () => {
