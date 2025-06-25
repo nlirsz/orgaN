@@ -1134,7 +1134,23 @@ body[data-theme="dark"] #recent-activity-list li {
         transform: none !important; 
         transform-style: flat;
         border-left: 4px solid var(--category-color);
+        border-top: none; /* Remove a borda superior */
 
+    }
+
+    .product-card .card-price {
+        display: none; /* Esconde o preço no card de histórico */
+    }
+
+    .product-card .card-title {
+        font-size: 1em; /* Ajusta o tamanho da fonte do título */
+        -webkit-line-clamp: 3; /* Permite mais linhas no título do card de histórico */
+        line-clamp: 3;
+        margin-bottom: 6px; /* Aumenta o espaçamento inferior */
+        height: auto; /* Permite que o título ocupe mais espaço */
+        min-height: 0; /* Remove a altura mínima para permitir mais linhas */
+        text-align: center; /* Centraliza o texto do título */
+        
     }
 
     /* Em style.css, adicione DENTRO de @media (max-width: 767px) */
@@ -1156,7 +1172,6 @@ body[data-theme="dark"] #recent-activity-list li {
         display: flex;
         flex-direction: row;
         align-items: stretch;
-        border-left: 4px solid var(--category-color);
         
     }
     #history-tab .product-card .card-hover-actions {
