@@ -117,6 +117,28 @@ router.post('/', auth, async (req, res) => {
     }
 });
 
+// Adicione esta rota em src/routes/products.js
+
+router.get('/priority-distribution', auth, async (req, res) => {
+    const userId = req.user.userId;
+    try {
+        const priorityCounts = await Product.aggregate([
+            // Filtra apenas produtos pendentes do usuário
+            { $match: { userId: userId, status: 'pendente' } },
+            // Agrupa por prioridade e conta quantos produtos em cada grupo
+            { $group: { _id: '$priority', count: { $sum: 1 } } },
+            // Formata a saída
+            { $project: { _id: 0, priority: '$_id', count: 1 } }
+        ]);
+        const labels = priorityCounts.map(item => item.priority || 'Não Definida');
+        const data = priorityCounts.map(item => item.count);
+        res.json({ labels, data });
+    } catch (error) {
+        console.error('[API /products/priority-distribution] Erro ao buscar distribuição de prioridade:', error);
+        res.status(500).json({ message: 'Erro interno do servidor ao buscar distribuição por prioridade.' });
+    }
+});
+
 router.get('/', auth, async (req, res) => {
     const { status } = req.query;
     const userId = req.user.userId;

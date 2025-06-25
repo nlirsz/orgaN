@@ -657,176 +657,162 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('orientationchange', setAppHeight); 
     setAppHeight(); 
 
-    const fetchAndRenderDashboardStats = async () => { 
-        if (!currentUserId) return; 
+const fetchAndRenderDashboardStats = async () => {
+    if (!currentUserId) return;
 
-        if(getElem('total-products-stat')) getElem('total-products-stat').textContent = "0"; 
-        if(getElem('purchased-products-stat')) getElem('purchased-products-stat').textContent = "0"; 
-        if(getElem('pending-products-stat')) getElem('pending-products-stat').textContent = "0"; 
-        if(getElem('total-spent-stat')) getElem('total-spent-stat').textContent = "R$ 0,00"; 
+    // Seletores para os novos elementos
+    const avgSpentStatEl = getElem('avg-spent-stat');
+    const currentMonthBalanceStatEl = getElem('current-month-balance-stat');
+    const priorityDistributionChartCanvasEl = getElem('priorityDistributionChart');
+    const financeOverviewChartCanvasEl = getElem('financeOverviewChart');
+    const categoryDistributionChartCanvasEl = getElem('categoryDistributionChart');
 
-        try {
-            const statsResponse = await authenticatedFetch(`${API_BASE_URL}/products/stats?userId=${currentUserId}`); 
-            if (!statsResponse.ok) throw new Error(`Erro ao buscar estatísticas: ${statsResponse.statusText}`); 
-            const stats = await statsResponse.json(); 
+    // Reseta/inicializa os cards para o estado de carregamento
+    if(getElem('total-products-stat')) getElem('total-products-stat').textContent = "0";
+    if(getElem('purchased-products-stat')) getElem('purchased-products-stat').textContent = "0";
+    if(getElem('pending-products-stat')) getElem('pending-products-stat').textContent = "0";
+    if(getElem('total-spent-stat')) getElem('total-spent-stat').textContent = "R$ 0,00";
+    if(avgSpentStatEl) avgSpentStatEl.textContent = "R$ 0,00";
+    if(currentMonthBalanceStatEl) currentMonthBalanceStatEl.textContent = "R$ 0,00";
 
-            if(getElem('total-products-stat')) getElem('total-products-stat').textContent = stats.totalProducts; 
-            if(getElem('purchased-products-stat')) getElem('purchased-products-stat').textContent = stats.purchasedProducts; 
-            if(getElem('pending-products-stat')) getElem('pending-products-stat').textContent = stats.pendingProducts; 
-            if(getElem('total-spent-stat')) { 
-                getElem('total-spent-stat').textContent = `R$ ${stats.totalSpent.toFixed(2)}`; 
+    try {
+        // Busca todos os dados necessários em paralelo para maior eficiência
+        const [
+            statsResponse,
+            financeResponse,
+            categoryDistResponse,
+            priorityDistResponse
+        ] = await Promise.all([
+            authenticatedFetch(`${API_BASE_URL}/products/stats?userId=${currentUserId}`),
+            authenticatedFetch(`${API_BASE_URL}/finances?userId=${currentUserId}`),
+            authenticatedFetch(`${API_BASE_URL}/products/category-distribution?userId=${currentUserId}`),
+            authenticatedFetch(`${API_BASE_URL}/products/priority-distribution?userId=${currentUserId}`)
+        ]);
+
+        // --- Processa os dados recebidos ---
+
+        // 1. Processa estatísticas dos produtos
+        if (statsResponse.ok) {
+            const stats = await statsResponse.json();
+            if(getElem('total-products-stat')) getElem('total-products-stat').textContent = stats.totalProducts;
+            if(getElem('purchased-products-stat')) getElem('purchased-products-stat').textContent = stats.purchasedProducts;
+            if(getElem('pending-products-stat')) getElem('pending-products-stat').textContent = stats.pendingProducts;
+            if(getElem('total-spent-stat')) getElem('total-spent-stat').textContent = `R$ ${stats.totalSpent.toFixed(2).replace('.', ',')}`;
+            
+            if(avgSpentStatEl) {
+                const avgSpent = stats.purchasedProducts > 0 ? (stats.totalSpent / stats.purchasedProducts) : 0;
+                avgSpentStatEl.textContent = `R$ ${avgSpent.toFixed(2).replace('.', ',')}`;
             }
-        } catch(err) { console.error("Erro ao buscar produtos para stats:", err); } 
-
-        let financeOverviewData = []; 
-        try {
-            const financeOverviewResponse = await authenticatedFetch(`${API_BASE_URL}/finances?userId=${currentUserId}`); 
-            if (financeOverviewResponse.ok) { 
-                financeOverviewData = await financeOverviewResponse.json(); 
-            } else { 
-                console.warn("API de finanças não retornou dados. Usando mocks para o gráfico financeiro do dashboard."); 
-                financeOverviewData = []; 
-            }
-        } catch (err) { 
-            console.error("Erro ao buscar dados financeiros para o dashboard. Usando mocks:", err); 
-            financeOverviewData = []; 
-        }
-        renderGenericChart(financeOverviewChartCanvasEl, 'line', financeOverviewData, financeOverviewChart, 'financeOverviewChart'); 
-
-
-        let categoryData = { labels: [], data: [] }; 
-        try {
-            const categoryDistResponse = await authenticatedFetch(`${API_BASE_URL}/products/category-distribution?userId=${currentUserId}`); 
-            if (categoryDistResponse.ok) { 
-                categoryData = await categoryDistResponse.json(); 
-            } else { 
-                console.warn("API de distribuição de categoria não retornou dados. Usando mocks."); 
-                categoryData = { 
-                    labels: ['Eletrônicos', 'Roupas', 'Casa', 'Livros', 'Outros'], 
-                    data: [5, 3, 2, 1, 4] 
-                };
-            }
-        } catch (err) { 
-            console.error("Erro ao buscar dados de categoria para o dashboard. Usando mocks:", err); 
-            categoryData = { 
-                labels: ['Eletrônicos', 'Roupas', 'Casa', 'Livros', 'Outros'], 
-                data: [5, 3, 2, 1, 4] 
-            };
-        }
-        renderGenericChart(categoryDistributionChartCanvasEl, 'doughnut', categoryData, categoryDistributionChart, 'categoryDistributionChart', true); 
-    };
-    
-    const renderGenericChart = (canvasEl, type, data, chartInstanceRef, chartIdForInstanceCheck, isCategory = false) => { 
-        if (!canvasEl) { 
-            return; 
+        } else {
+            console.error("Falha ao buscar estatísticas dos produtos.");
         }
 
-        let currentChartInstance;
-        if (chartIdForInstanceCheck === 'financialLineChart') currentChartInstance = financeChartInstance;
-        else if (chartIdForInstanceCheck === 'financeOverviewChart') currentChartInstance = financeOverviewChart;
-        else if (chartIdForInstanceCheck === 'categoryDistributionChart') currentChartInstance = categoryDistributionChart;
-
-
-        if (currentChartInstance && currentChartInstance.canvas && currentChartInstance.canvas.id === canvasEl.id) { 
-            currentChartInstance.destroy(); 
+        // 2. Processa dados financeiros
+        const financeData = financeResponse.ok ? await financeResponse.json() : [];
+        if(currentMonthBalanceStatEl) {
+            const now = new Date();
+            const currentMonthStr = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
+            const currentMonthEntry = financeData.find(e => e.mes_ano === currentMonthStr);
+            const balance = currentMonthEntry ? currentMonthEntry.receita - currentMonthEntry.gastos : 0;
+            currentMonthBalanceStatEl.textContent = `R$ ${balance.toFixed(2).replace('.', ',')}`;
+            currentMonthBalanceStatEl.style.color = balance < 0 ? 'var(--error-color)' : 'var(--success-color)';
         }
+        
+        // 3. Processa dados de categoria e prioridade
+        const categoryData = categoryDistResponse.ok ? await categoryDistResponse.json() : { labels: [], data: [] };
+        const priorityData = priorityDistResponse.ok ? await priorityDistResponse.json() : { labels: [], data: [] };
 
-        let chartData, chartOptions; 
+        // --- Renderiza todos os gráficos ---
+        renderGenericChart(financeOverviewChartCanvasEl, 'line', financeData);
+        renderGenericChart(categoryDistributionChartCanvasEl, 'doughnut', categoryData, true);
+        renderGenericChart(priorityDistributionChartCanvasEl, 'pie', priorityData, true, ['#EF4444', '#F59E0B', '#10B981']);
 
-        if (isCategory) { 
-            chartData = { 
-                labels: data.labels, 
-                datasets: [{ 
-                    data: data.data, 
-                    backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#6366F1', '#14B8A6', '#F97316', '#8B5CF6'], 
-                    hoverOffset: 10 
-                }]
-            };
-            chartOptions = { 
-                responsive: true, 
-                maintainAspectRatio: false, 
-                plugins: { 
-                    legend: { 
-                        position: 'bottom', 
-                        labels: { 
-                            color: '#121212' 
-                        }
-                    },
-                    title: { 
-                        display: true, 
-                        text: isCategory ? 'Distribuição por Categoria' : 'Visão Geral Financeira', 
-                        color: '#121212' 
-                    }
-                }
-            };
-        } else { 
-            const sortedEntries = [...data].sort((a, b) => b.mes_ano.localeCompare(a.mes_ano)); 
-            const labels = sortedEntries.map(e => { 
-                const [year, month] = e.mes_ano.split('-'); 
-                const date = new Date(year, month - 1); 
-                return date.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' }); 
-            }).reverse(); 
-            const revenueData = sortedEntries.map(e => e.receita).reverse(); 
-            const expensesData = sortedEntries.map(e => e.gastos).reverse(); 
+    } catch(err) {
+        console.error("Erro ao carregar e processar dados do dashboard:", err);
+    }
+};
 
-            chartData = { 
-                labels: labels, 
-                datasets: [ 
-                    {
-                        label: 'Receita Mensal', 
-                        data: revenueData, 
-                        borderColor: 'rgb(62, 235, 103)', 
-                        backgroundColor: 'rgb(0, 255, 38)', 
-                        fill: false, 
-                        tension: 0.1 
-                    },
-                    {
-                        label: 'Gastos Mensais', 
-                        data: expensesData, 
-                        borderColor: 'rgba(255, 99, 132, 1)', 
-                        backgroundColor: 'rgba(255, 99, 132, 0.2)', 
-                        fill: false, 
-                        tension: 0.1 
-                    }
-                ]
-            };
-            chartOptions = { 
-                responsive: true, 
-                maintainAspectRatio: false, 
-                scales: { 
-                    x: { 
-                        ticks: { color: '#121212' }, 
-                        grid: { color: 'rgba(224, 224, 224, 0.1)' } 
-                    },
-                    y: { 
-                        beginAtZero: true, 
-                        title: { display: true, text: 'Valor (R$)', color: '#121212' }, 
-                        ticks: { color: '#121212' }, 
-                        grid: { color: 'rgba(224, 224, 224, 0.1)' } 
-                    }
+const renderGenericChart = (canvasEl, type, data, isPieOrDoughnut = false, customColors = null) => {
+    if (!canvasEl) {
+        return;
+    }
+
+    // Se um gráfico já existe no canvas, destrói para evitar sobreposição
+    const existingChart = Chart.getChart(canvasEl);
+    if (existingChart) {
+        existingChart.destroy();
+    }
+
+    let chartData, chartOptions;
+
+    // Lógica para gráficos de Pizza/Rosca
+    if (isPieOrDoughnut) {
+        chartData = {
+            labels: data.labels,
+            datasets: [{
+                data: data.data,
+                backgroundColor: customColors || ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#6366F1', '#14B8A6', '#F97316', '#8B5CF6'],
+                hoverOffset: 10
+            }]
+        };
+        chartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { color: getTextColor() }
                 },
-                plugins: { 
-                    legend: { 
-                        position: 'top', 
-                        labels: { color: '#121212' } 
-                    },
-                    title: { 
-                        display: true, 
-                        text: isCategory ? 'Distribuição por Categoria' : 'Evolução Financeira Mensal', 
-                        color: '#121212' 
-                    }
+            }
+        };
+    // Lógica para outros gráficos (linha, etc.)
+    } else {
+        const sortedEntries = [...data].sort((a, b) => a.mes_ano.localeCompare(b.mes_ano));
+        const labels = sortedEntries.map(e => {
+            const [year, month] = e.mes_ano.split('-');
+            const date = new Date(year, month - 1);
+            return date.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' });
+        });
+        const revenueData = sortedEntries.map(e => e.receita);
+        const expensesData = sortedEntries.map(e => e.gastos);
+
+        chartData = {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Receita',
+                    data: revenueData,
+                    borderColor: 'rgb(62, 235, 103)',
+                    backgroundColor: 'rgba(62, 235, 103, 0.5)',
+                    fill: false,
+                    tension: 0.1
+                },
+                {
+                    label: 'Gastos',
+                    data: expensesData,
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                    fill: false,
+                    tension: 0.1
                 }
-            };
-        }
+            ]
+        };
+        chartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: { ticks: { color: getTextColor() }, grid: { color: 'rgba(128, 128, 128, 0.1)' } },
+                y: { beginAtZero: true, ticks: { color: getTextColor() }, grid: { color: 'rgba(128, 128, 128, 0.1)' } }
+            },
+            plugins: {
+                legend: { position: 'top', labels: { color: getTextColor() } }
+            }
+        };
+    }
 
-        const newChartInstance = new Chart(canvasEl.getContext('2d'), { type, data: chartData, options: chartOptions }); 
+    new Chart(canvasEl.getContext('2d'), { type, data: chartData, options: chartOptions });
+};
 
-        if (canvasEl.id === 'financialLineChart') financeChartInstance = newChartInstance; 
-        else if (canvasEl.id === 'financeOverviewChart') financeOverviewChart = newChartInstance; 
-        else if (canvasEl.id === 'categoryDistributionChart') categoryDistributionChart = newChartInstance; 
-    };
-    
-    let financesData = []; 
 
     const fetchAndRenderFinances = async () => {
         if (!financeList || !totalBalanceElem) return;

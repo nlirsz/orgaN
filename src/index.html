@@ -111,37 +111,68 @@
 			</div>
 		</aside>        
         <main class="main-content-area">
-            <section id="dashboard-main-tab" class="tab-content active">
-                <h2>Painel Principal</h2>
-                <div class="dashboard-summary-cards">
-                    <div class="summary-card">
-                        <h4>Total de Produtos</h4>
-                        <p id="total-products-stat">0</p>
-                    </div>
-                    <div class="summary-card">
-                        <h4>Produtos Comprados</h4>
-                        <p id="purchased-products-stat">0</p>
-                    </div>
-                    <div class="summary-card">
-                        <h4>Proutos na Lista</h4>
-                        <p id="pending-products-stat">0</p>
-                    </div>
-                    <div class="summary-card">
-                        <h4>Gasto Total (Comprados)</h4>
-                        <p id="total-spent-stat">R$ 0,00</p>
-                    </div>
-                </div>
-                <div class="dashboard-charts">
-                    <div class="chart-container" id="finance-overview-chart-container">
-                        <h3>Visão Geral Financeira (Últimos Meses)</h3>
-                        <canvas id="financeOverviewChart"></canvas>
-                    </div>
-                    <div class="chart-container" id="category-distribution-chart-container">
-                        <h3>Distribuição por Categoria</h3>
-                        <canvas id="categoryDistributionChart"></canvas>
-                    </div>
-                </div>
-            </section>
+    <section id="dashboard-main-tab" class="tab-content active">
+        <h2>Painel Principal</h2>
+
+        <div class="dashboard-summary-cards">
+            <div class="summary-card">
+                <h4>Total de Produtos</h4>
+                <p id="total-products-stat">0</p>
+            </div>
+            <div class="summary-card">
+                <h4>Produtos Comprados</h4>
+                <p id="purchased-products-stat">0</p>
+            </div>
+            <div class="summary-card">
+                <h4>Produtos na Lista</h4>
+                <p id="pending-products-stat">0</p>
+            </div>
+            <div class="summary-card">
+                <h4>Gasto Total (Comprados)</h4>
+                <p id="total-spent-stat">R$ 0,00</p>
+            </div>
+            <div class="summary-card">
+                <h4>Valor Médio por Compra</h4>
+                <p id="avg-spent-stat">R$ 0,00</p>
+            </div>
+            <div class="summary-card">
+                <h4>Balanço do Mês</h4>
+                <p id="current-month-balance-stat">R$ 0,00</p>
+            </div>
+        </div>
+
+        <div class="dashboard-charts">
+            <div class="chart-container" id="finance-overview-chart-container">
+                <h3>Visão Geral Financeira</h3>
+                <canvas id="financeOverviewChart"></canvas>
+            </div>
+            <div class="chart-container" id="category-distribution-chart-container">
+                <h3>Distribuição por Categoria</h3>
+                <canvas id="categoryDistributionChart"></canvas>
+            </div>
+            <div class="chart-container" id="priority-distribution-chart-container">
+                <h3>Prioridade dos Itens Pendentes</h3>
+                <canvas id="priorityDistributionChart"></canvas>
+            </div>
+        </div>
+
+        <div class="dashboard-extra-sections">
+            <div class="quick-access-container">
+                <h3>Foco da Semana (Alta Prioridade)</h3>
+                <ul id="high-priority-list">
+                    <li class="placeholder">Nenhum item de alta prioridade.</li>
+                </ul>
+            </div>
+
+            <div class="recent-activity-container">
+                <h3>Atividade Recente</h3>
+                <ul id="recent-activity-list">
+                    <li class="placeholder">Nenhuma atividade recente.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
 			<section id="products-tab" class="tab-content">
 				<h2>Meus Produtos</h2>
 				
