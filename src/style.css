@@ -379,6 +379,7 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
     transition: box-shadow 0.2s ease-in-out;
     transform-style: preserve-3d;
     position: relative;
+    border-top: 4px solid var(--category-color);
 }
 .product-card:hover {
     box-shadow: 6px 6px 12px var(--c-dark), -6px -6px 12px var(--c-light);
@@ -1149,12 +1150,20 @@ body[data-theme="dark"] #recent-activity-list li {
     #history-tab .product-card {
         background: var(--c-primary); 
         transform: none !important;
+        transform-style: flat;
+        border-radius: 10px;
+        box-shadow: var(--shadow);
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+        border-left: 4px solid var(--category-color);
+        
     }
     #history-tab .product-card .card-hover-actions {
         display: none;
     }
     #history-tab .product-card > .card-actions {
-        display: grid;
+        display: none; /* Esconde as ações no card de histórico */
     }
 
 
