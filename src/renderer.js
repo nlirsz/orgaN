@@ -570,6 +570,33 @@ const fetchAndRenderProducts = async () => {
                 purchasedList.appendChild(card);
             });
         }
+        // Em renderer.js, adicione este bloco NO FINAL da sua função fetchAndRenderProducts
+
+const historyCards = document.querySelectorAll("#history-tab .product-card");
+
+historyCards.forEach(card => {
+    card.addEventListener("mousemove", e => {
+        const rect = card.getBoundingClientRect();
+        const { width, height, top, left } = rect;
+        const mouseX = e.clientX - left;
+        const mouseY = e.clientY - top;
+        const xPct = mouseX / width - 0.5;
+        const yPct = mouseY / height - 0.5;
+
+        // Atualiza as variáveis CSS para a rotação 3D
+        card.style.setProperty("--rx", yPct * -25); // Rotação no eixo X
+        card.style.setProperty("--ry", xPct * 25);  // Rotação no eixo Y
+        
+        // Atualiza a posição do gradiente holográfico
+        card.style.setProperty("--pos", (mouseX / width) * 100);
+    });
+
+    card.addEventListener("mouseleave", () => {
+        // Reseta as variáveis quando o mouse sai do card
+        card.style.setProperty("--rx", 0);
+        card.style.setProperty("--ry", 0);
+    });
+});
     } catch (error) {
         console.error("Erro em fetchAndRenderProducts:", error);
         showTabMessage(addProductMessageAddTab, `Erro ao carregar produtos: ${error.message}`, false);
