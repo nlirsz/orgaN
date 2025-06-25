@@ -400,6 +400,9 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
     flex-direction: column; 
     text-align: center; 
     transform: translateZ(20px);
+    align-items: center; /* <<-- ADICIONE OU MODIFIQUE ESTA LINHA */
+    text-align: center;  /* Garante que o texto dentro dos elementos também seja centralizado */
+    
     position: relative;
     z-index: 2;
 }
@@ -479,6 +482,9 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
     position: relative;
     z-index: 2;
     background: transparent;
+    align-items: center; /* <<-- ADICIONE OU MODIFIQUE ESTA LINHA */
+    text-align: center;  /* Garante que o texto dentro dos elementos também seja centralizado */
+    
 }
 
 #history-tab .product-card .card-image-container {
@@ -499,6 +505,9 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
     justify-content: center;
     text-align: center;
     border-top: 1px solid rgba(255, 255, 255, 0.2);
+    align-items: center; /* <<-- ADICIONE OU MODIFIQUE ESTA LINHA */
+    text-align: center;  /* Garante que o texto dentro dos elementos também seja centralizado */
+    
 }
 
 #history-tab .product-card .card-title {
@@ -524,6 +533,9 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
     position: relative;
     z-index: 2;
     background: transparent; /* Fundo transparente para ver o efeito holográfico através */
+    align-items: center; /* <<-- ADICIONE OU MODIFIQUE ESTA LINHA */
+    text-align: center;  /* Garante que o texto dentro dos elementos também seja centralizado */
+    
 }
 
 /* Área da imagem (parte de cima do card) */
@@ -557,6 +569,9 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
     box-sizing: border-box;
     /* Linha sutil para separar imagem e texto */
     border-top: 1px solid rgba(255, 255, 255, 0.2); 
+    align-items: center; /* <<-- ADICIONE OU MODIFIQUE ESTA LINHA */
+    text-align: center;  /* Garante que o texto dentro dos elementos também seja centralizado */
+    
 }
 
 #history-tab .product-card .card-title {
@@ -1048,6 +1063,11 @@ body[data-theme="dark"] #recent-activity-list li {
     white-space: nowrap;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
+.card-category-badge {
+    align-items: center;
+    text-align: center;
+}
+
 
 /* Responsividade para as novas seções */
 @media (max-width: 992px) {
@@ -1122,6 +1142,10 @@ body[data-theme="dark"] #recent-activity-list li {
 .category-badge {
     display: none; /* Esconde a badge no mobile */
 }
+.card-category-badge {
+    display: none; /* Esconde a badge de categoria no card de histórico */
+}
+
     #history-tab .product-card {
         background: var(--c-primary); 
         transform: none !important;
