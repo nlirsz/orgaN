@@ -470,32 +470,113 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // --- LÓGICA DE PRODUTOS ---
-    const createProductCard = (product) => {
-        const card = document.createElement('li');
-        card.className = 'product-card';
-        card.dataset.productId = product._id;
-        card.dataset.productJson = JSON.stringify(product);
+// Em src/renderer.js
 
-        card.innerHTML = `
-            <div class="card-image-container">
-                <img src="${product.image || 'https://via.placeholder.com/200x150?text=Indisponível'}" alt="${product.name || 'Produto'}" class="card-image">
-            </div>
-            <div class="card-content">
-                <span class="card-title">${product.name || 'Nome Indisponível'}</span>
-                <span class="card-price">${product.price ? `R$ ${parseFloat(product.price).toFixed(2)}` : 'Preço Indisponível'}</span>
-            </div>
-            <div class="card-actions">
-                ${product.status === 'pendente' ? '<i class="fas fa-check-circle action-purchase" title="Marcar como Comprado"></i>' : ''}
-                <i class="fas fa-edit action-edit" title="Editar"></i>
-                <i class="fab fa-google action-search" title="Pesquisar produto na web"></i>
-                <i class="fas fa-trash-alt action-delete" title="Excluir"></i>
-            </div>
-        `;
-        return card;
-    };
+// 1. SUBSTITUA A FUNÇÃO 'createProductCard' INTEIRA PELA VERSÃO ABAIXO
+const createProductCard = (product, cardType = 'product') => { // O padrão é 'product'
+    const card = document.createElement('li');
 
-    const getTextColor = () => getComputedStyle(document.body).getPropertyValue('--text-primary').trim();
+    // Adiciona a classe correta baseada no tipo de card
+    const cardClass = (cardType === 'history') ? 'in-history-tab' : 'in-products-tab';
+    card.className = `product-card ${cardClass}`;
+    
+    card.dataset.productId = product._id;
+    card.dataset.productJson = JSON.stringify(product);
+
+    // Estrutura HTML CORRIGIDA E FINAL do card
+    card.innerHTML = `
+        ${(product.category && cardType === 'product') ? `<div class="card-category-badge">${product.category}</div>` : ''}
+
+        <div class="card-image-container">
+            <img src="${product.image || 'https://via.placeholder.com/200x150?text=Indisponível'}" alt="${product.name || 'Produto'}" class="card-image">
+        </div>
+
+        <div class="card-reflection"></div>
+        <div class="card-sparks"></div>
+
+        <div class="card-content">
+            <h3 class="card-title">${product.name || 'Nome Indisponível'}</h3>
+            <p class="card-price">${product.price ? `R$ ${parseFloat(product.price).toFixed(2)}` : 'Preço Indisponível'}</p>
+        </div>
+
+        <div class="card-actions">
+            ${product.status === 'pendente' ? '<i class="fas fa-check-circle action-purchase" title="Marcar como Comprado"></i>' : ''}
+            <i class="fas fa-edit action-edit" title="Editar"></i>
+            <i class="fab fa-google action-search" title="Pesquisar produto na web"></i>
+            <i class="fas fa-trash-alt action-delete" title="Excluir"></i>
+        </div>
+    `;
+
+    // Inicializa o Vanilla Tilt APENAS nos cards de produto (e com menos delay)
+    if (cardType === 'product' && typeof VanillaTilt !== 'undefined') {
+        VanillaTilt.init(card, {
+            max: 10,
+            speed: 200, // <<-- VALOR REDUZIDO PARA MENOS DELAY
+            glare: true,
+            "max-glare": 0.2
+        });
+    }
+    
+    return card;
+};
+
+
+// 2. SUBSTITUA TAMBÉM A FUNÇÃO 'fetchAndRenderProducts' PELA VERSÃO ABAIXO
+const fetchAndRenderProducts = async () => {
+    if (!pendingList || !purchasedList || !pendingTotalValueEl || !purchasedTotalValueEl) return;
+    if (!currentUserId) return;
+
+    pendingTotalValueEl.textContent = 'R$ 0,00';
+    purchasedTotalValueEl.textContent = 'R$ 0,00';
+
+    try {
+        const response = await authenticatedFetch(`${API_BASE_URL}/products?userId=${currentUserId}`);
+        if (!response.ok) {
+             const errorData = await response.json().catch(() => ({ message: response.statusText }));
+             throw new Error(errorData.message || 'Erro ao procurar produtos');
+        }
+        
+        const products = await response.json();
+        const pendingProducts = products.filter(p => p.status === 'pendente');
+        const historyProducts = products.filter(p => p.status === 'comprado' || p.status === 'descartado');
+
+        pendingList.innerHTML = '';
+        purchasedList.innerHTML = '';
+
+        const pendingTotal = pendingProducts.reduce((sum, product) => sum + (product.price || 0), 0);
+        pendingTotalValueEl.textContent = `R$ ${pendingTotal.toFixed(2).replace('.', ',')}`;
+
+        const purchasedTotal = products.filter(p => p.status === 'comprado').reduce((sum, product) => sum + (product.price || 0), 0);
+        purchasedTotalValueEl.textContent = `R$ ${purchasedTotal.toFixed(2).replace('.', ',')}`;
+
+        if (pendingProducts.length === 0) {
+            if (pendingEmptyState) pendingEmptyState.style.display = 'block';
+        } else {
+            if (pendingEmptyState) pendingEmptyState.style.display = 'none';
+            pendingProducts.forEach(product => {
+                // Passa o tipo 'product' explicitamente
+                const card = createProductCard(product, 'product'); 
+                pendingList.appendChild(card);
+            });
+        }
+        
+        if (historyProducts.length === 0) {
+            if (purchasedEmptyState) purchasedEmptyState.style.display = 'block';
+        } else {
+            if (purchasedEmptyState) purchasedEmptyState.style.display = 'none';
+            historyProducts.forEach(product => {
+                // Passa o tipo 'history' explicitamente
+                const card = createProductCard(product, 'history'); 
+                purchasedList.appendChild(card);
+            });
+        }
+    } catch (error) {
+        console.error("Erro em fetchAndRenderProducts:", error);
+        showTabMessage(addProductMessageAddTab, `Erro ao carregar produtos: ${error.message}`, false);
+    }
+};
+
+const getTextColor = () => getComputedStyle(document.body).getPropertyValue('--text-primary').trim();
 
     const updateChartColors = () => {
         const textColor = getTextColor();
@@ -545,85 +626,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     applySavedTheme();
 
-    const fetchAndRenderProducts = async () => {
-        if (!pendingList || !purchasedList || !pendingTotalValueEl || !purchasedTotalValueEl) return;
-        if (!currentUserId) return;
-
-        pendingTotalValueEl.textContent = 'R$ 0,00';
-        purchasedTotalValueEl.textContent = 'R$ 0,00';
-
-        try {
-            const response = await authenticatedFetch(`${API_BASE_URL}/products?userId=${currentUserId}`);
-            if (!response.ok) {
-                 const errorData = await response.json().catch(() => ({ message: response.statusText }));
-                 throw new Error(errorData.message || 'Erro ao procurar produtos');
-            }
-            
-            const products = await response.json();
-
-            const pendingProducts = products.filter(p => p.status === 'pendente');
-            const historyProducts = products.filter(p => p.status === 'comprado' || p.status === 'descartado');
-
-            pendingList.innerHTML = '';
-            purchasedList.innerHTML = '';
-
-            const pendingTotal = pendingProducts.reduce((sum, product) => sum + (product.price || 0), 0);
-            pendingTotalValueEl.textContent = `R$ ${pendingTotal.toFixed(2).replace('.', ',')}`;
-
-            const purchasedTotal = products.filter(p => p.status === 'comprado').reduce((sum, product) => sum + (product.price || 0), 0);
-            purchasedTotalValueEl.textContent = `R$ ${purchasedTotal.toFixed(2).replace('.', ',')}`;
-
-            if (pendingProducts.length === 0) {
-                if (pendingEmptyState) pendingEmptyState.style.display = 'block';
-            } else {
-                if (pendingEmptyState) pendingEmptyState.style.display = 'none';
-                pendingProducts.forEach(product => {
-                    const card = createProductCard(product);
-                    pendingList.appendChild(card);
-                    if (typeof VanillaTilt !== 'undefined') {
-                       VanillaTilt.init(card, { max: 8, speed: 300, glare: true, "max-glare": 0.5 });
-                    }
-                });
-            }
-            
-            // --- LÓGICA PARA OS CARDS DO HISTÓRICO ---
-            if (historyProducts.length === 0) {
-                if (purchasedEmptyState) purchasedEmptyState.style.display = 'block';
-            } else {
-                if (purchasedEmptyState) purchasedEmptyState.style.display = 'none';
-                historyProducts.forEach(product => {
-                    const card = createProductCard(product);
-                    purchasedList.appendChild(card);
-                });
-
-                // Adiciona os listeners de interatividade DEPOIS que todos os cards do histórico foram adicionados ao DOM
-                const interactiveCards = document.querySelectorAll("#history-tab .product-card");
-                interactiveCards.forEach(card => {
-                    card.addEventListener("mousemove", e => {
-                        const rect = card.getBoundingClientRect();
-                        const { width, height, top, left } = rect;
-                        const mouseX = e.clientX - left;
-                        const mouseY = e.clientY - top;
-                        const xPct = mouseX / width - 0.5;
-                        const yPct = mouseY / height - 0.5;
-
-                        card.style.setProperty("--rx", yPct * -25);
-                        card.style.setProperty("--ry", xPct * 25);
-                        card.style.setProperty("--pos", (mouseX / width) * 100);
-                    });
-
-                    card.addEventListener("mouseleave", () => {
-                        card.style.setProperty("--rx", 0);
-                        card.style.setProperty("--ry", 0);
-                    });
-                });
-            }
-
-        } catch (error) {
-            console.error("Erro em fetchAndRenderProducts:", error);
-            showTabMessage(addProductMessageAddTab, `Erro ao carregar produtos: ${error.message}`, false);
-        }
-    };
 
     // --- O RESTANTE DO SEU CÓDIGO (finanças, modais, etc.) ---
     // ...
