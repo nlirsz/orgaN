@@ -590,10 +590,19 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
 
 
 /* === Correção para o Fundo do Modal de Detalhes do Produto === */
+/* Em style.css, SUBSTITUA a regra #product-details-modal .modal-content por esta */
+
 #product-details-modal .modal-content {
-    background-color: #ffffff; /* Fundo branco sólido */
-    color: #3a3f44;           /* Cor de texto escura para garantir contraste */
+    max-width: 550px;
+    text-align: center;
+
+    /* --- ESTA É A PARTE IMPORTANTE --- */
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh; /* O modal nunca será maior que 90% da altura da tela */
+    overflow-y: auto;   /* Habilita o scroll para o modal INTEIRO */
 }
+
 
 /* Garante que o container da imagem dentro do modal também tenha fundo branco */
 #product-details-modal #modal-product-image-container {
@@ -1105,11 +1114,19 @@ body[data-theme="dark"] #recent-activity-list li {
 
 /* Em style.css, adicione estes novos estilos no final */
 
-/* Garante que o modal de detalhes tenha um tamanho adequado */
+/* Em style.css, SUBSTITUA a regra #product-details-modal .modal-content por esta */
+
 #product-details-modal .modal-content {
-    max-width: 550px; /* Um bom tamanho para detalhes */
-    text-align: center; /* Centraliza o conteúdo */
+    max-width: 550px;
+    text-align: center;
+
+    /* --- ESTA É A PARTE IMPORTANTE --- */
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh; /* O modal nunca será maior que 90% da altura da tela */
+    overflow-y: auto;   /* Habilita o scroll para o modal INTEIRO */
 }
+
 
 #product-details-modal #modal-product-image-container {
     height: 250px; /* Aumenta um pouco a área da imagem */
@@ -1121,16 +1138,6 @@ body[data-theme="dark"] #recent-activity-list li {
     margin-bottom: 5px;
 }
 
-#product-details-modal .modal-product-info {
-    max-height: 250px; /* Aumentei um pouco a altura máxima */
-    overflow-y: auto;
-    border-top: 1px solid rgba(0,0,0,0.1);
-    border-bottom: 1px solid rgba(0,0,0,0.1);
-    padding: 15px; /* Aumentei o padding interno */
-    margin-top: 20px;
-    text-align: left;
-    font-size: 1em; /* Garante um tamanho de fonte base razoável */
-}
 
 #product-details-modal .modal-product-info p {
     margin-bottom: 8px; /* Adicionei margem inferior entre os parágrafos */
@@ -1148,6 +1155,29 @@ body [data-theme="dark"] #product-details-modal .modal-product-info {
     border-color: rgba(255,255,255,0.1);
 }
 
+/* Em style.css, ADICIONE estes novos estilos no final do arquivo */
+
+#product-details-modal #modal-product-image-container {
+    flex-shrink: 0; /* Impede que a imagem encolha */
+}
+
+#product-details-modal .modal-product-info {
+    flex-shrink: 0; /* Impede que a área de info encolha */
+    text-align: left;
+    padding-top: 15px;
+    margin-top: 15px;
+    border-top: 1px solid rgba(0,0,0,0.1);
+}
+
+body[data-theme="dark"] #product-details-modal .modal-product-info {
+    border-color: rgba(255,255,255,0.1);
+}
+
+#product-details-modal .modal-actions {
+    flex-shrink: 0; /* Impede que a área de botões encolha */
+    margin-top: auto; /* Empurra os botões para o final */
+    padding-top: 20px;
+}
 
 
 /* Responsividade para as novas seções */
