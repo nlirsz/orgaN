@@ -1,16 +1,15 @@
-// src/routes/products.js
+// src/routes/products.js - VERSÃO FINAL CORRIGIDA
 
 const express = require('express');
 const router = express.Router();
 const Product = require('../models/Product');
 const auth = require('../middleware/auth');
 
-// Importando todos os nossos "scrapers"
+// Importando apenas os scrapers que vamos usar
 const { obterProduto: scrapeWithCheerio } = require('../price-scraper');
-const { searchProductDetails } = require('./api_helpers/scrape-via-search');
 const { scrapeProductDetails: scrapeWithGemini } = require('./api_helpers/scrape-gemini');
 
-// ROTAS DE DASHBOARD E ESTATÍSTICAS
+// --- ROTAS DE DASHBOARD E ESTATÍSTICAS ---
 router.get('/stats', auth, async (req, res) => {
     const userId = req.user.userId;
     try {
@@ -41,8 +40,8 @@ router.get('/category-distribution', auth, async (req, res) => {
         const data = categoryCounts.map(item => item.count);
         res.json({ labels, data });
     } catch (error) {
-        console.error('[API /products/category-distribution] Erro ao buscar distribuição de categoria:', error);
-        res.status(500).json({ message: 'Erro interno do servidor ao buscar distribuição por categoria.' });
+        console.error('[API /products/category-distribution] Erro:', error);
+        res.status(500).json({ message: 'Erro ao buscar distribuição por categoria.' });
     }
 });
 
@@ -58,55 +57,40 @@ router.get('/priority-distribution', auth, async (req, res) => {
         const data = priorityCounts.map(item => item.count);
         res.json({ labels, data });
     } catch (error) {
-        console.error('[API /products/priority-distribution] Erro ao buscar distribuição de prioridade:', error);
-        res.status(500).json({ message: 'Erro interno do servidor ao buscar distribuição por prioridade.' });
+        console.error('[API /products/priority-distribution] Erro:', error);
+        res.status(500).json({ message: 'Erro ao buscar distribuição por prioridade.' });
     }
 });
 
-// Em src/routes/products.js, substitua a rota /scrape-url pela versão abaixo
 
+// --- ROTA DE SCRAPE SIMPLIFICADA E ROBUSTA ---
 router.post('/scrape-url', async (req, res) => {
     const { url } = req.body;
     if (!url) { return res.status(400).json({ message: 'URL é obrigatória.' }); }
 
     let productDetails = null;
 
-    // --- TENTATIVA PRINCIPAL: IA com busca interna ---
+    // TENTATIVA 1: O método principal com IA, que é mais inteligente
     try {
-        console.log(`[Scrape Strategy] Etapa 1: Tentando com Gemini V3 para: ${url}`);
+        console.log(`[Strategy] Etapa 1: Tentando com Gemini...`);
         productDetails = await scrapeWithGemini(url);
     } catch (aiError) {
-        console.warn(`[Scrape Strategy] Gemini V3 falhou em obter os dados principais: ${aiError.message}`);
-        // Se a IA falhar completamente, tentamos o Cheerio como fallback total
+        console.warn(`[Strategy] Gemini falhou: ${aiError.message}. Tentando fallback com Cheerio...`);
+        
+        // TENTATIVA 2: Fallback para o scraper simples, caso a IA falhe
         try {
-            console.log(`[Scrape Strategy] Etapa 1.1: Fallback total para Cheerio...`);
             productDetails = await scrapeWithCheerio(url);
         } catch (cheerioError) {
-            console.error(`[Scrape Strategy] Fallback do Cheerio também falhou: ${cheerioError.message}`);
-        }
-    }
-
-    // --- LÓGICA DE FALLBACK APENAS PARA A IMAGEM ---
-    // Se tivemos sucesso com a IA mas a imagem veio nula, tentamos buscá-la com o Cheerio.
-    if (productDetails && !productDetails.image) {
-        console.log("[Scrape Strategy] IA obteve os textos, mas não a imagem. Tentando fallback de imagem com Cheerio...");
-        try {
-            const imageFallbackResult = await scrapeWithCheerio(url);
-            if (imageFallbackResult && imageFallbackResult.image) {
-                console.log("[Scrape Strategy] Sucesso! Imagem encontrada pelo Cheerio:", imageFallbackResult.image);
-                productDetails.image = imageFallbackResult.image; // Adiciona a imagem ao resultado da IA
-            }
-        } catch (imageError) {
-            console.warn("[Scrape Strategy] Fallback de imagem com Cheerio falhou:", imageError.message);
+            console.error(`[Strategy] Cheerio também falhou: ${cheerioError.message}`);
         }
     }
 
     // --- AVALIAÇÃO FINAL ---
     if (productDetails && productDetails.name && productDetails.price) {
-        console.log(`[Scrape Strategy] Sucesso! Detalhes finais extraídos:`, productDetails);
+        console.log(`[Strategy] Sucesso! Detalhes finais extraídos:`, productDetails);
         return res.status(200).json(productDetails);
     } else {
-        console.error(`[Scrape Strategy] FALHA TOTAL: Nenhum método conseguiu extrair dados para: ${url}`);
+        console.error(`[Strategy] FALHA TOTAL para a URL: ${url}`);
         return res.status(422).json({
             message: 'Não conseguimos ler os detalhes do produto nesta página. Tente adicionar as informações manualmente.'
         });
@@ -114,7 +98,7 @@ router.post('/scrape-url', async (req, res) => {
 });
 
 
-// ROTAS CRUD DE PRODUTOS
+// --- ROTAS CRUD (Criar, Ler, Atualizar, Deletar) PARA PRODUTOS ---
 router.post('/', auth, async (req, res) => {
     const userId = req.user.userId;
     const { name, price, image, brand, description, urlOrigin, status, category, tags, priority, notes } = req.body;
