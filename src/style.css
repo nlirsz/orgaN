@@ -1102,6 +1102,40 @@ body[data-theme="dark"] #recent-activity-list li {
     margin-right: 8px;
 }
 
+
+/* Em style.css, adicione estes novos estilos no final */
+
+/* Garante que o modal de detalhes tenha um tamanho adequado */
+#product-details-modal .modal-content {
+    max-width: 550px; /* Um bom tamanho para detalhes */
+    text-align: center; /* Centraliza o conteúdo */
+}
+
+#product-details-modal #modal-product-image-container {
+    height: 250px; /* Aumenta um pouco a área da imagem */
+}
+
+#product-details-modal #modal-product-name {
+    font-size: 1.6em;
+    margin-top: 15px;
+    margin-bottom: 5px;
+}
+
+/* A área de informações com scroll */
+#product-details-modal .modal-product-info {
+    max-height: 200px; /* Altura máxima antes de habilitar o scroll */
+    overflow-y: auto;
+    border-top: 1px solid rgba(0,0,0,0.1);
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    padding-top: 10px;
+    margin-top: 20px;
+    text-align: left;
+}
+
+body[data-theme="dark"] #product-details-modal .modal-product-info {
+    border-color: rgba(255,255,255,0.1);
+}
+
 /* Responsividade para as novas seções */
 @media (max-width: 992px) {
     .dashboard-extra-sections {
