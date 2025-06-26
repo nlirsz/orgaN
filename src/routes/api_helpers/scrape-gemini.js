@@ -1,8 +1,11 @@
-// src/api/scrape-gemini.js
-const { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } = require("@google/generative-ai");
-const fetch = require('node-fetch');
+// src/routes/api_helpers/scrape-gemini.js - VERSÃO COMPLETA E CORRIGIDA
 
-console.log("[scrape-gemini.js] Módulo sendo carregado...");
+const { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } = require("@google/generative-ai");
+
+// A importação do 'node-fetch' não é mais necessária, pois não vamos mais buscar o HTML manualmente.
+// const fetch = require('node-fetch'); 
+
+console.log("[scrape-gemini.js V2] Módulo sendo carregado...");
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
@@ -19,24 +22,19 @@ let model;
 
 try {
     genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+    // *** ATUALIZAÇÃO IMPORTANTE AQUI ***
+    // Habilitamos a ferramenta de busca e definimos o modelo.
     model = genAI.getGenerativeModel({
         model: "gemini-1.5-flash-latest",
+        tools: { "googleSearch": {} } // Habilita a busca interna da IA
     });
-    console.log("[scrape-gemini.js] API Gemini inicializada com sucesso.");
+    console.log("[scrape-gemini.js V2] API Gemini inicializada com a ferramenta de busca.");
 } catch (initError) {
-    console.error("[scrape-gemini.js] Erro ao inicializar a API Gemini:", initError);
+    console.error("[scrape-gemini.js V2] Erro ao inicializar a API Gemini:", initError);
     throw new Error(`Falha ao inicializar o modelo Gemini: ${initError.message}`);
 }
 
-
-const generationConfig = {
-    temperature: 0.7,
-    topP: 0.95,
-    topK: 64,
-    maxOutputTokens: 8192,
-    responseMimeType: "text/plain",
-};
-
+// Configurações de segurança que você já tinha (mantidas)
 const safetySettings = [
     { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
     { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
@@ -44,138 +42,60 @@ const safetySettings = [
     { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
 ];
 
+// *** NOVA FUNÇÃO `scrapeProductDetails` ***
+// Esta função substitui toda a sua lógica antiga de buscar HTML e analisar.
 async function scrapeProductDetails(productUrl) {
-    console.log(`[scrape-gemini.js] scrapeProductDetails chamada para URL: ${productUrl}`);
+    console.log(`[scrape-gemini V2] Iniciando extração para a URL: ${productUrl}`);
 
     if (!model) {
-        console.error("[scrape-gemini.js] Modelo Gemini não inicializado. Verifique a GEMINI_API_KEY e erros de inicialização.");
-        throw new Error("Serviço de extração indisponível: Modelo Gemini não carregado.");
+        throw new Error("Modelo Gemini não inicializado.");
     }
     if (!productUrl || !productUrl.startsWith('http')) {
-        console.error("[scrape-gemini.js] URL inválida fornecida:", productUrl);
         throw new Error("URL do produto inválida ou não fornecida.");
     }
+    
+    // O novo prompt é muito mais simples. Ele diz à IA para usar a busca.
+    const prompt = `
+        Usando sua ferramenta de busca, encontre os detalhes do produto na seguinte URL: "${productUrl}".
+        Extraia as seguintes informações:
+        - name (string): O nome completo e exato do produto.
+        - price (number): O preço principal do produto, como um número com ponto decimal.
+        - image (string, opcional): A URL da imagem principal do produto.
+        - brand (string, opcional): A marca do produto. Se não encontrar, use o nome do site (ex: "Zara", "Nike").
+        - category (string, opcional): Categorize o produto em uma das seguintes opções: Eletrônicos, Roupas e Acessórios, Casa e Decoração, Livros e Mídia, Esportes e Lazer, Ferramentas e Construção, Alimentos e Bebidas, Saúde e Beleza, Automotivo, Pet Shop, Outros.
+        - description (string, opcional): Uma breve descrição do produto (máximo de 200 caracteres).
+
+        Retorne a resposta EXCLUSIVAMENTE como um objeto JSON. Se não conseguir encontrar a URL ou os detalhes, retorne um JSON com "error": "Produto não encontrado".
+    `;
 
     try {
-        let htmlContent = '';
-        try {
-            console.log(`[scrape-gemini.js] Buscando HTML de: ${productUrl}`);
-            const response = await fetch(productUrl);
+        const result = await model.generateContent(prompt);
+        const response = result.response;
+        const responseText = response.text();
 
-            if (!response.ok) {
-                const errorBody = await response.text();
-                throw new Error(`Falha ao buscar HTML. Status: ${response.status} - ${response.statusText}. Detalhes: ${errorBody.substring(0, 200)}`);
-            }
-
-            htmlContent = await response.text();
-            console.log(`[scrape-gemini.js] HTML obtido. Tamanho: ${htmlContent.length}`);
-        } catch (fetchError) {
-            console.error(`[scrape-gemini.js] Erro ao buscar HTML (${productUrl}):`, fetchError.message);
-            throw new Error(`Não foi possível acessar o conteúdo da URL: ${fetchError.message}`);
+        // Extrai o JSON da resposta, que pode vir dentro de ```json ... ```
+        const jsonMatch = responseText.match(/```json\s*([\s\S]*?)\s*```|({[\s\S]*})/);
+        if (!jsonMatch) {
+            throw new Error("Formato de resposta da IA inesperado. JSON não encontrado.");
         }
+        
+        const jsonData = JSON.parse(jsonMatch[1] || jsonMatch[2]);
+        console.log("[scrape-gemini V2] JSON recebido:", jsonData);
 
-        const maxHtmlLength = 200000;
-        if (htmlContent.length > maxHtmlLength) {
-            htmlContent = htmlContent.substring(0, maxHtmlLength);
-            console.warn(`[scrape-gemini.js] HTML truncado.`);
+        if (jsonData.error || !jsonData.name || !jsonData.price) {
+            throw new Error(jsonData.error || "IA não conseguiu extrair nome ou preço.");
         }
-
-        // PROMPT ATUALIZADO: Categoria mais detalhada e com exemplos
-        const prompt = `Analise o HTML a seguir para extrair os detalhes de um produto.
-        Retorne um objeto JSON com as seguintes propriedades:
-        - name (string): Nome completo do produto.
-        - price (number): Preço do produto. Use ponto como separador decimal.
-        - image (string, opcional): URL da imagem principal do produto.
-        - brand (string, opcional): Marca do produto.
-        - category (string, opcional): Categorize o produto em uma das seguintes opções, baseando-se no que melhor descreve o produto. Escolha "Outros" se nenhuma se encaixar bem.
-            Opções de Categoria:
-            - "Eletrônicos": Smartphones, TVs, computadores, fones de ouvido, monitores, câmeras, tablets.
-            - "Roupas e Acessórios": Camisetas, calças, vestidos, sapatos, joias, bolsas, cintos, relógios (não smartwatches).
-            - "Casa e Decoração": Móveis, eletrodomésticos (geladeira, fogão, microondas), utensílios de cozinha, itens de cama/mesa/banho, decoração, iluminação.
-            - "Livros e Mídia": Livros físicos, e-books, DVDs, CDs, jogos de videogame (mídia física ou digital).
-            - "Esportes e Lazer": Equipamentos esportivos, roupas de ginástica, itens para atividades ao ar livre, brinquedos, instrumentos musicais.
-            - "Ferramentas e Construção": Ferramentas manuais, elétricas, materiais de construção, itens de jardinagem.
-            - "Alimentos e Bebidas": Produtos alimentícios perecíveis e não perecíveis, bebidas (não alcoólicas e alcoólicas).
-            - "Saúde e Beleza": Cosméticos, maquiagem, produtos de higiene pessoal, suplementos, medicamentos sem receita, produtos para cabelo/pele.
-            - "Automotivo": Peças de carro, acessórios para veículos, produtos de limpeza automotiva.
-            - "Pet Shop": Ração, brinquedos para pets, acessórios para animais de estimação.
-            - "Outros": Para produtos que não se encaixam claramente nas categorias acima.
-        - description (string, opcional): Uma breve descrição do produto (máximo 200 caracteres).
-        Se não encontrar alguma informação, omita a propriedade ou defina-a como null, exceto 'name' e 'price' que são obrigatórias.
-
-        Exemplo de formato de saída esperado:
-        \`\`\`json
-        {
-          "name": "Nome do Produto",
-          "price": 123.45,
-          "image": "https://example.com/image.jpg",
-          "brand": "Marca",
-          "category": "Eletrônicos",
-          "description": "Descrição breve do produto."
-        }
-        \`\`\`
-        Conteúdo HTML:
-        ${htmlContent}`;
-
-        console.log("[scrape-gemini.js] Enviando prompt para Gemini...");
-        const chatSession = model.startChat({ generationConfig, safetySettings, history: [] });
-        const result = await chatSession.sendMessage(prompt);
-        const geminiResponseText = result.response.text();
-        console.log("[scrape-gemini.js] Resposta crua da Gemini (PRIMEIROS 500 CHARS):", geminiResponseText.substring(0,500) + "...");
-        console.log("[scrape-gemini.js] Resposta CRUA COMPLETA da Gemini:", geminiResponseText);
-
-        let jsonData;
-        try {
-            const jsonMatch = geminiResponseText.match(/```json\s*([\s\S]*?)\s*```|({[\s\S]*})/);
-            if (!jsonMatch || !(jsonMatch[1] || jsonMatch[2])) {
-                console.error("JSON não encontrado na resposta da Gemini. Resposta completa:", geminiResponseText);
-                throw new Error("JSON não encontrado na resposta do modelo de IA. A resposta da IA não seguiu o formato esperado.");
-            }
-            const jsonString = jsonMatch[1] || jsonMatch[2];
-            jsonData = JSON.parse(jsonString.trim());
-            console.log("[scrape-gemini.js] JSON parseado:", jsonData);
-        } catch (parseError) {
-            console.error("[scrape-gemini.js] Erro parseando JSON da Gemini:", parseError.message, "Resposta:", geminiResponseText);
-            throw new Error(`Formato de resposta inválido do serviço de extração (AI): ${parseError.message}`);
-        }
-
-        if (jsonData.price !== null && typeof jsonData.price !== 'undefined') {
-            let priceStr = String(jsonData.price).replace(/[^\d,.]/g, '');
-            if (priceStr.includes(',') && priceStr.includes('.')) {
-                if (priceStr.indexOf(',') > priceStr.indexOf('.')) {
-                    priceStr = priceStr.replace(/\./g, '');
-                    priceStr = priceStr.replace(',', '.');
-                } else {
-                    priceStr = priceStr.replace(/,/g, '');
-                }
-            } else if (priceStr.includes(',')) {
-                priceStr = priceStr.replace(',', '.');
-            }
-
-            const priceNum = parseFloat(priceStr);
-            jsonData.price = !isNaN(priceNum) ? priceNum : null;
-            if (jsonData.price === null) console.warn(`[scrape-gemini.js] Preço "${jsonData.price}" inválido após normalização, usando null.`);
-        } else {
-             jsonData.price = null;
-        }
-
-        if (!jsonData.name || jsonData.price === null) {
-             console.warn("[scrape-gemini.js] Nome ou preço não extraídos ou inválidos pelo Gemini:", jsonData);
-        }
+        
+        jsonData.urlOrigin = productUrl; // Garante que a URL original seja mantida
         return jsonData;
 
     } catch (error) {
-        console.error("[scrape-gemini.js] Erro em scrapeProductDetails:", error.message);
-        if (!(error instanceof Error)) {
-            error = new Error(String(error));
-        }
-        error.message = `Erro no serviço de scraping (Gemini): ${error.message}`;
+        console.error(`[scrape-gemini V2] Erro ao extrair detalhes: ${error.message}`);
+        // Re-lança o erro para que a lógica de fallback em products.js possa pegá-lo
         throw error;
     }
 }
 
-console.log("[scrape-gemini.js] Definindo module.exports...");
 module.exports = {
     scrapeProductDetails
 };
-console.log("[scrape-gemini.js] module.exports definido. Conteúdo de scrapeProductDetails:", typeof scrapeProductDetails);
