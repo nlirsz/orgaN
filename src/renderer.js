@@ -1019,61 +1019,63 @@ const renderGenericChart = (canvasEl, type, data, isPieOrDoughnut = false, custo
 // 2. OS LISTENERS CORRIGIDOS PARA OS BOTÕES
 // Substitua seus listeners antigos por estes dois
 
-// Listener para o botão SALVAR na aba "ADICIONAR PRODUTO"
 if (saveProductBtnAddTab) {
-    saveProductBtnAddTab.addEventListener('click', () => {
-        let payload = {};
-        if (scrapedProductData && scrapedProductData.name) {
-            payload = { ...scrapedProductData, status: 'pendente' };
-        } else { 
-            payload = {
-                name: manualProductNameInput.value.trim(), price: manualProductPriceInput.value.trim(),
-                urlOrigin: manualProductUrlInput.value.trim(), image: manualProductImageUrlInput.value.trim(),
-                category: manualProductCategorySelect.value, brand: manualProductBrandInput.value.trim(),
-                description: manualProductDescriptionTextarea.value.trim(), status: 'pendente'
-            };
-        }
-        scrapedProductData = null;
-        saveProductToDB(payload, addProductMessageAddTab);
-    });
-}
-
-// Listener para o botão SALVAR na aba "PRODUTOS"
-if (saveProductBtnProductsTab) {
-    saveProductBtnProductsTab.addEventListener('click', () => {
-        if (scrapedProductData && scrapedProductData.name) {
-            const payload = { ...scrapedProductData, status: 'pendente' };
+        saveProductBtnAddTab.addEventListener('click', () => {
+            let payload = {};
+            if (scrapedProductData && scrapedProductData.name) {
+                payload = { ...scrapedProductData, status: 'pendente' };
+            } else {
+                payload = {
+                    name: manualProductNameInput.value.trim(), price: manualProductPriceInput.value.trim(),
+                    urlOrigin: manualProductUrlInput.value.trim(), image: manualProductImageUrlInput.value.trim(),
+                    category: manualProductCategorySelect.value, brand: manualProductBrandInput.value.trim(),
+                    description: manualProductDescriptionTextarea.value.trim(), status: 'pendente'
+                };
+            }
             scrapedProductData = null;
-            saveProductToDB(payload, addProductMessageProductsTab);
-        } else {
-            showTabMessage(addProductMessageProductsTab, 'Não há informações de produto para salvar. Verifique a URL novamente.', false);
-        }
-    });
-}// Em src/renderer.js, substitua a função handleSaveProduct inteira
+            saveProductToDB(payload, addProductMessageAddTab);
+        });
+    }
 
+    // Listener para o botão SALVAR na aba "PRODUTOS"
+    if (saveProductBtnProductsTab) {
+        saveProductBtnProductsTab.addEventListener('click', () => {
+            if (scrapedProductData && scrapedProductData.name) {
+                const payload = { ...scrapedProductData, status: 'pendente' };
+                scrapedProductData = null;
+                saveProductToDB(payload, addProductMessageProductsTab);
+            } else {
+                showTabMessage(addProductMessageProductsTab, 'Não há informações de produto para salvar. Verifique a URL novamente.', false);
+            }
+        });
+    }
+
+
+    
 // ATUALIZAÇÃO 1: APAGUE a função 'handleSaveProduct' e COLOQUE esta no lugar.
 
-// 1. A NOVA FUNÇÃO DE SALVAR
-async function saveProductToDB(productPayload, messageElement) {
-    if (!productPayload || !productPayload.name || !productPayload.price) {
-        showTabMessage(messageElement, 'Informações do produto estão incompletas para salvar.', false);
-        return;
+// ** FUNÇÃO DE SALVAR NO DB (MAIS SIMPLES) **
+    async function saveProductToDB(productPayload, messageElement) {
+        if (!productPayload || !productPayload.name || !productPayload.price) {
+            showTabMessage(messageElement, 'Informações do produto estão incompletas para salvar.', false);
+            return;
+        }
+        try {
+            await authenticatedFetch(`${API_BASE_URL}/products`, {
+                method: 'POST',
+                body: JSON.stringify(productPayload),
+            });
+            showTabMessage(messageElement, "Produto salvo com sucesso!", true);
+            clearAddProductFormAddTab();
+            clearProductScrapeFormProductsTab();
+            // Await aqui para garantir que a renderização espere a conclusão
+            await fetchAndRenderProducts();
+            await fetchAndRenderDashboardStats();
+        } catch (error) {
+            console.error("Erro em saveProductToDB:", error);
+            showTabMessage(messageElement, `Erro ao salvar: ${error.message}`, false);
+        }
     }
-    try {
-        await authenticatedFetch(`${API_BASE_URL}/products`, {
-            method: 'POST',
-            body: JSON.stringify(productPayload),
-        });
-        showTabMessage(messageElement, "Produto salvo com sucesso!", true);
-        clearAddProductFormAddTab();
-        clearProductScrapeFormProductsTab();
-        fetchAndRenderProducts();
-        fetchAndRenderDashboardStats();
-    } catch (error) {
-        showTabMessage(messageElement, `Erro ao salvar: ${error.message}`, false);
-    }
-}
-
 
 const mainContentArea = document.querySelector('.main-content-area');
 
