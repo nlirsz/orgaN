@@ -1032,74 +1032,80 @@ const renderGenericChart = (canvasEl, type, data, isPieOrDoughnut = false, custo
         });
     }
 
-    async function handleSaveProduct(messageElement) {
-        if (!currentUserId) {
-            showTabMessage(messageElement, 'Você precisa estar logado para adicionar produtos.', false);
-            return;
-        }
+// Em src/renderer.js, substitua a função handleSaveProduct inteira
 
-        let productPayload = {};
-
-        if (scrapedProductData && scrapedProductData.name) {
-            productPayload = {
-                name: scrapedProductData.name,
-                price: scrapedProductData.price,
-                urlOrigin: scrapedProductData.urlOrigin,
-                image: scrapedProductData.image,
-                category: scrapedProductData.category,
-                brand: scrapedProductData.brand,
-                description: scrapedProductData.description,
-                status: 'pendente'
-            };
-            scrapedProductData = null; 
-        
-        } else {
-            productPayload = {
-                name: manualProductNameInput.value.trim(),
-                price: manualProductPriceInput.value.trim(),
-                urlOrigin: manualProductUrlInput.value.trim(),
-                image: document.getElementById('manual-product-image-url')?.value.trim(),
-                category: document.getElementById('manual-product-category')?.value,
-                brand: document.getElementById('manual-product-brand')?.value.trim(),
-                description: document.getElementById('manual-product-description')?.value.trim(),
-                status: 'pendente'
-            };
-        }
-
-        if (!productPayload.name || !productPayload.price || !productPayload.urlOrigin) {
-            showTabMessage(messageElement, 'Nome, preço e URL de origem são obrigatórios!', false);
-            return;
-        }
-
-        try {
-            const response = await authenticatedFetch(`${API_BASE_URL}/products`, {
-                method: 'POST',
-                body: JSON.stringify(productPayload),
-            });
-
-            const data = await response.json();
-            if (!response.ok) {
-                throw new Error(data.message || `Erro HTTP ${response.status}`);
-            }
-
-            showTabMessage(messageElement, "Produto salvo com sucesso!", true);
-            
-            clearAddProductFormAddTab(); 
-            
-            const infoBoxProductsTab = document.getElementById('verifiedProductInfo-products-tab');
-            if (infoBoxProductsTab) {
-                infoBoxProductsTab.classList.add('hidden');
-            }
-           
-            fetchAndRenderProducts();
-            fetchAndRenderDashboardStats();
-
-        } catch (error) {
-            console.error("Erro ao salvar produto:", error);
-            showTabMessage(messageElement, `Erro ao salvar: ${error.message}`, false);
-        }
+async function handleSaveProduct(messageElement) {
+    if (!currentUserId) {
+        showTabMessage(messageElement, 'Você precisa estar logado para adicionar produtos.', false);
+        return;
     }
 
+    let productPayload = {};
+
+    // 1. DÁ PRIORIDADE para dados de um scrape recente.
+    if (scrapedProductData && scrapedProductData.name) {
+        console.log("Salvando a partir de dados de scrape...");
+        productPayload = {
+            ...scrapedProductData, // Pega todos os dados do scrape
+            status: 'pendente'
+        };
+        // Limpa os dados de scrape após o uso para evitar re-salvamento acidental
+        scrapedProductData = null; 
+    
+    } 
+    // 2. SE NÃO HOUVER DADOS DE SCRAPE, tenta pegar os dados do formulário manual.
+    // Esta parte só será executada com sucesso na aba "Adicionar Produto".
+    else if (manualProductNameInput && manualProductNameInput.value.trim() !== '') {
+        console.log("Salvando a partir do formulário manual...");
+        productPayload = {
+            name: manualProductNameInput.value.trim(),
+            price: manualProductPriceInput.value.trim(),
+            urlOrigin: manualProductUrlInput.value.trim(),
+            image: document.getElementById('manual-product-image-url')?.value.trim(),
+            category: document.getElementById('manual-product-category')?.value,
+            brand: document.getElementById('manual-product-brand')?.value.trim(),
+            description: document.getElementById('manual-product-description')?.value.trim(),
+            status: 'pendente'
+        };
+    } 
+    // 3. SE NENHUMA DAS CONDIÇÕES ACIMA FOR VERDADEIRA, exibe um erro.
+    else {
+        showTabMessage(messageElement, 'Não há informações do produto para salvar. Verifique a URL novamente.', false);
+        return;
+    }
+
+    // 4. Validação final dos dados essenciais
+    if (!productPayload.name || !productPayload.price || !productPayload.urlOrigin) {
+        showTabMessage(messageElement, 'Nome, preço e URL de origem são obrigatórios!', false);
+        return;
+    }
+
+    // 5. Envia os dados para a API (sem alterações aqui)
+    try {
+        const response = await authenticatedFetch(`${API_BASE_URL}/products`, {
+            method: 'POST',
+            body: JSON.stringify(productPayload),
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.message || `Erro HTTP ${response.status}`);
+        }
+
+        showTabMessage(messageElement, "Produto salvo com sucesso!", true);
+        
+        // Limpa ambos os formulários e atualiza as listas na tela
+        clearAddProductFormAddTab();
+        clearProductScrapeFormProductsTab();
+        
+        fetchAndRenderProducts();
+        fetchAndRenderDashboardStats();
+
+    } catch (error) {
+        console.error("Erro ao salvar produto:", error);
+        showTabMessage(messageElement, `Erro ao salvar: ${error.message}`, false);
+    }
+}
     const mainContentArea = document.querySelector('.main-content-area');
 
     if (mainContentArea) {

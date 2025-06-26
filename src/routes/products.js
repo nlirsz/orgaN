@@ -1,12 +1,16 @@
 // src/routes/products.js
+
 const express = require('express');
 const router = express.Router();
-const Product = require('../models/Product'); // Este já estava correto
-const auth = require('../middleware/auth'); // CORRIGIDO
-const { scrapeProductDetails } = require('./api_helpers/scrape-gemini'); // CORRIGIDO
-const { obterProduto: scrapeWithCheerio } = require('../price-scraper'); // CORRIGIDO
+const Product = require('../models/Product');
+const auth = require('../middleware/auth');
 
-// ROTAS PARA DASHBOARD
+// Importando todos os nossos "scrapers"
+const { obterProduto: scrapeWithCheerio } = require('../price-scraper');
+const { searchProductDetails } = require('./api_helpers/scrape-via-search');
+const { scrapeProductDetails: scrapeWithGemini } = require('./api_helpers/scrape-gemini');
+
+// ROTAS DE DASHBOARD E ESTATÍSTICAS
 router.get('/stats', auth, async (req, res) => {
     const userId = req.user.userId;
     try {
@@ -42,52 +46,85 @@ router.get('/category-distribution', auth, async (req, res) => {
     }
 });
 
-// Em src/routes/products.js
-
-router.post('/scrape-url', async (req, res) => {
-    const { url } = req.body;
-    if (!url) { return res.status(400).json({ message: 'URL é obrigatória.' }); }
-    
-    let productDetails = null;
-
-    // Etapa 1: Tentar com Gemini (IA)
+router.get('/priority-distribution', auth, async (req, res) => {
+    const userId = req.user.userId;
     try {
-        console.log(`[products.js /scrape-url] Etapa 1: Tentando scraping com Gemini para: ${url}`);
-        const geminiResult = await scrapeProductDetails(url);
-        // Verifica se o resultado é minimamente válido
-        if (geminiResult && geminiResult.name && geminiResult.price) {
-            productDetails = geminiResult;
-        }
-    } catch (geminiError) {
-        console.warn(`[products.js /scrape-url] Gemini falhou com erro: ${geminiError.message}. Tentando fallback.`);
-    }
-
-    // Etapa 2: Se o Gemini falhou ou retornou dados incompletos, tentar com Cheerio
-    if (!productDetails) {
-        try {
-            console.log(`[products.js /scrape-url] Etapa 2: Usando fallback com Cheerio para: ${url}`);
-            const cheerioResult = await scrapeWithCheerio(url);
-            // Verifica se o resultado é minimamente válido
-            if (cheerioResult && cheerioResult.name && cheerioResult.price) {
-                productDetails = cheerioResult;
-            }
-        } catch (cheerioError) {
-            console.error(`[products.js /scrape-url] Cheerio também falhou com erro: ${cheerioError.message}`);
-        }
-    }
-
-    // Etapa 3: Avaliar o resultado final
-    if (productDetails) {
-        // Sucesso! Enviar os detalhes encontrados.
-        console.log(`[products.js /scrape-url] Sucesso! Detalhes extraídos:`, productDetails);
-        return res.status(200).json(productDetails);
-    } else {
-        // Se ambos os métodos falharam, enviar uma mensagem de erro final amigável.
-        console.error(`[products.js /scrape-url] Falha em extrair nome/preço com ambos os métodos para: ${url}`);
-        return res.status(422).json({ message: 'Não conseguimos ler os detalhes do produto nesta página. Tente adicionar as informações manualmente.' });
+        const priorityCounts = await Product.aggregate([
+            { $match: { userId: userId, status: 'pendente' } },
+            { $group: { _id: '$priority', count: { $sum: 1 } } },
+            { $project: { _id: 0, priority: '$_id', count: 1 } }
+        ]);
+        const labels = priorityCounts.map(item => item.priority || 'Não Definida');
+        const data = priorityCounts.map(item => item.count);
+        res.json({ labels, data });
+    } catch (error) {
+        console.error('[API /products/priority-distribution] Erro ao buscar distribuição de prioridade:', error);
+        res.status(500).json({ message: 'Erro interno do servidor ao buscar distribuição por prioridade.' });
     }
 });
 
+// ROTA DE SCRAPE ATUALIZADA COM A ESTRATÉGIA DE 3 TENTATIVAS
+router.post('/scrape-url', async (req, res) => {
+    const { url } = req.body;
+    if (!url) {
+        return res.status(400).json({ message: 'URL é obrigatória.' });
+    }
+
+    let productDetails = null;
+
+    // --- TENTATIVA 1: Cheerio (Rápido e Barato) ---
+    try {
+        console.log(`[Scrape Strategy] Etapa 1: Tentando com Cheerio para: ${url}`);
+        const cheerioResult = await scrapeWithCheerio(url);
+        if (cheerioResult && cheerioResult.name && cheerioResult.price) {
+            productDetails = cheerioResult;
+        } else {
+            throw new Error("Cheerio não encontrou nome ou preço.");
+        }
+    } catch (cheerioError) {
+        console.warn(`[Scrape Strategy] Cheerio falhou: ${cheerioError.message}`);
+        
+        // --- TENTATIVA 2: Google Search (Ótimo para sites bloqueados) ---
+        try {
+            console.log(`[Scrape Strategy] Etapa 2: Tentando com Google Search para: ${url}`);
+            const searchResult = await searchProductDetails(url);
+             if (searchResult && searchResult.name && searchResult.price) {
+                productDetails = searchResult;
+            } else {
+                throw new Error("Google Search não encontrou nome ou preço.");
+            }
+        } catch (searchError) {
+            console.warn(`[Scrape Strategy] Google Search falhou: ${searchError.message}`);
+
+            // --- TENTATIVA 3: Gemini (Análise de IA como último recurso) ---
+            try {
+                console.log(`[Scrape Strategy] Etapa 3: Último recurso com Gemini para: ${url}`);
+                const geminiResult = await scrapeWithGemini(url);
+                if (geminiResult && geminiResult.name && geminiResult.price) {
+                    productDetails = geminiResult;
+                } else {
+                    throw new Error("Gemini também não conseguiu extrair os dados essenciais.");
+                }
+            } catch (geminiError) {
+                 console.error(`[Scrape Strategy] Gemini também falhou: ${geminiError.message}`);
+            }
+        }
+    }
+
+    // --- AVALIAÇÃO FINAL ---
+    if (productDetails) {
+        console.log(`[Scrape Strategy] Sucesso! Detalhes finais extraídos:`, productDetails);
+        productDetails.urlOrigin = url;
+        return res.status(200).json(productDetails);
+    } else {
+        console.error(`[Scrape Strategy] FALHA TOTAL: Nenhum método conseguiu extrair dados para: ${url}`);
+        return res.status(422).json({
+            message: 'Não conseguimos ler os detalhes do produto nesta página. Tente adicionar as informações manualmente.'
+        });
+    }
+});
+
+// ROTAS CRUD DE PRODUTOS
 router.post('/', auth, async (req, res) => {
     const userId = req.user.userId;
     const { name, price, image, brand, description, urlOrigin, status, category, tags, priority, notes } = req.body;
@@ -114,28 +151,6 @@ router.post('/', auth, async (req, res) => {
             return res.status(400).json({ message: 'Erro de validação.', details: messages });
         }
         res.status(500).json({ message: 'Erro ao salvar produto.', details: error.toString() });
-    }
-});
-
-// Adicione esta rota em src/routes/products.js
-
-router.get('/priority-distribution', auth, async (req, res) => {
-    const userId = req.user.userId;
-    try {
-        const priorityCounts = await Product.aggregate([
-            // Filtra apenas produtos pendentes do usuário
-            { $match: { userId: userId, status: 'pendente' } },
-            // Agrupa por prioridade e conta quantos produtos em cada grupo
-            { $group: { _id: '$priority', count: { $sum: 1 } } },
-            // Formata a saída
-            { $project: { _id: 0, priority: '$_id', count: 1 } }
-        ]);
-        const labels = priorityCounts.map(item => item.priority || 'Não Definida');
-        const data = priorityCounts.map(item => item.count);
-        res.json({ labels, data });
-    } catch (error) {
-        console.error('[API /products/priority-distribution] Erro ao buscar distribuição de prioridade:', error);
-        res.status(500).json({ message: 'Erro interno do servidor ao buscar distribuição por prioridade.' });
     }
 });
 
@@ -176,7 +191,7 @@ router.patch('/:id/purchase', auth, async (req, res) => {
 
 router.put('/:id', auth, async (req, res) => {
     const userId = req.user.userId;
-    const { name, price, brand, description, image, urlOrigin, category, tags, priority, notes, status } = req.body; // Adicionado status
+    const { name, price, brand, description, image, urlOrigin, category, tags, priority, notes, status } = req.body;
     const updateData = {};
     if (name !== undefined) updateData.name = name;
     if (price !== undefined) {
@@ -192,7 +207,7 @@ router.put('/:id', auth, async (req, res) => {
     if (tags !== undefined) updateData.tags = Array.isArray(tags) ? tags.map(tag => tag.trim()).filter(tag => tag) : [];
     if (priority !== undefined) updateData.priority = priority;
     if (notes !== undefined) updateData.notes = notes;
-    if (status !== undefined) updateData.status = status; // Adicionado para atualizar status
+    if (status !== undefined) updateData.status = status;
     if (Object.keys(updateData).length === 0) { return res.status(400).json({ message: "Nenhum dado para atualização."}); }
 
     try {
