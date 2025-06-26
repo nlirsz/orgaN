@@ -63,58 +63,47 @@ router.get('/priority-distribution', auth, async (req, res) => {
     }
 });
 
-// ROTA DE SCRAPE ATUALIZADA COM A ESTRATÉGIA DE 3 TENTATIVAS
+// Em src/routes/products.js, substitua a rota /scrape-url pela versão abaixo
+
 router.post('/scrape-url', async (req, res) => {
     const { url } = req.body;
-    if (!url) {
-        return res.status(400).json({ message: 'URL é obrigatória.' });
-    }
+    if (!url) { return res.status(400).json({ message: 'URL é obrigatória.' }); }
 
     let productDetails = null;
 
-    // --- TENTATIVA 1: Cheerio (Rápido e Barato) ---
+    // --- TENTATIVA PRINCIPAL: IA com busca interna ---
     try {
-        console.log(`[Scrape Strategy] Etapa 1: Tentando com Cheerio para: ${url}`);
-        const cheerioResult = await scrapeWithCheerio(url);
-        if (cheerioResult && cheerioResult.name && cheerioResult.price) {
-            productDetails = cheerioResult;
-        } else {
-            throw new Error("Cheerio não encontrou nome ou preço.");
-        }
-    } catch (cheerioError) {
-        console.warn(`[Scrape Strategy] Cheerio falhou: ${cheerioError.message}`);
-        
-        // --- TENTATIVA 2: Google Search (Ótimo para sites bloqueados) ---
+        console.log(`[Scrape Strategy] Etapa 1: Tentando com Gemini V3 para: ${url}`);
+        productDetails = await scrapeWithGemini(url);
+    } catch (aiError) {
+        console.warn(`[Scrape Strategy] Gemini V3 falhou em obter os dados principais: ${aiError.message}`);
+        // Se a IA falhar completamente, tentamos o Cheerio como fallback total
         try {
-            console.log(`[Scrape Strategy] Etapa 2: Tentando com Google Search para: ${url}`);
-            const searchResult = await searchProductDetails(url);
-             if (searchResult && searchResult.name && searchResult.price) {
-                productDetails = searchResult;
-            } else {
-                throw new Error("Google Search não encontrou nome ou preço.");
-            }
-        } catch (searchError) {
-            console.warn(`[Scrape Strategy] Google Search falhou: ${searchError.message}`);
+            console.log(`[Scrape Strategy] Etapa 1.1: Fallback total para Cheerio...`);
+            productDetails = await scrapeWithCheerio(url);
+        } catch (cheerioError) {
+            console.error(`[Scrape Strategy] Fallback do Cheerio também falhou: ${cheerioError.message}`);
+        }
+    }
 
-            // --- TENTATIVA 3: Gemini (Análise de IA como último recurso) ---
-            try {
-                console.log(`[Scrape Strategy] Etapa 3: Último recurso com Gemini para: ${url}`);
-                const geminiResult = await scrapeWithGemini(url);
-                if (geminiResult && geminiResult.name && geminiResult.price) {
-                    productDetails = geminiResult;
-                } else {
-                    throw new Error("Gemini também não conseguiu extrair os dados essenciais.");
-                }
-            } catch (geminiError) {
-                 console.error(`[Scrape Strategy] Gemini também falhou: ${geminiError.message}`);
+    // --- LÓGICA DE FALLBACK APENAS PARA A IMAGEM ---
+    // Se tivemos sucesso com a IA mas a imagem veio nula, tentamos buscá-la com o Cheerio.
+    if (productDetails && !productDetails.image) {
+        console.log("[Scrape Strategy] IA obteve os textos, mas não a imagem. Tentando fallback de imagem com Cheerio...");
+        try {
+            const imageFallbackResult = await scrapeWithCheerio(url);
+            if (imageFallbackResult && imageFallbackResult.image) {
+                console.log("[Scrape Strategy] Sucesso! Imagem encontrada pelo Cheerio:", imageFallbackResult.image);
+                productDetails.image = imageFallbackResult.image; // Adiciona a imagem ao resultado da IA
             }
+        } catch (imageError) {
+            console.warn("[Scrape Strategy] Fallback de imagem com Cheerio falhou:", imageError.message);
         }
     }
 
     // --- AVALIAÇÃO FINAL ---
-    if (productDetails) {
+    if (productDetails && productDetails.name && productDetails.price) {
         console.log(`[Scrape Strategy] Sucesso! Detalhes finais extraídos:`, productDetails);
-        productDetails.urlOrigin = url;
         return res.status(200).json(productDetails);
     } else {
         console.error(`[Scrape Strategy] FALHA TOTAL: Nenhum método conseguiu extrair dados para: ${url}`);
@@ -123,6 +112,7 @@ router.post('/scrape-url', async (req, res) => {
         });
     }
 });
+
 
 // ROTAS CRUD DE PRODUTOS
 router.post('/', auth, async (req, res) => {
