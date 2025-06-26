@@ -1121,20 +1121,34 @@ body[data-theme="dark"] #recent-activity-list li {
     margin-bottom: 5px;
 }
 
-/* A área de informações com scroll */
 #product-details-modal .modal-product-info {
-    max-height: 200px; /* Altura máxima antes de habilitar o scroll */
+    max-height: 250px; /* Aumentei um pouco a altura máxima */
     overflow-y: auto;
     border-top: 1px solid rgba(0,0,0,0.1);
     border-bottom: 1px solid rgba(0,0,0,0.1);
-    padding-top: 10px;
+    padding: 15px; /* Aumentei o padding interno */
     margin-top: 20px;
     text-align: left;
+    font-size: 1em; /* Garante um tamanho de fonte base razoável */
 }
 
-body[data-theme="dark"] #product-details-modal .modal-product-info {
+#product-details-modal .modal-product-info p {
+    margin-bottom: 8px; /* Adicionei margem inferior entre os parágrafos */
+    line-height: 1.5; /* Melhora a legibilidade do texto longo */
+}
+
+#product-details-modal .modal-product-info strong {
+    display: inline-block; /* Evita que o ":" vá para a próxima linha em telas pequenas */
+    width: 90px; /* Define uma largura mínima para os rótulos */
+    margin-right: 5px;
+    font-weight: bold;
+}
+
+body [data-theme="dark"] #product-details-modal .modal-product-info {
     border-color: rgba(255,255,255,0.1);
 }
+
+
 
 /* Responsividade para as novas seções */
 @media (max-width: 992px) {
