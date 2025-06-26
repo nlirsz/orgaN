@@ -1,56 +1,70 @@
-// src/routes/api_helpers/scrape-gemini.js - VERSÃO FINAL E DEFINITIVA
+// src/routes/api_helpers/scrape-gemini.js - VERSÃO FINAL COM DOIS MODOS
 
 const { GoogleGenerativeAI } = require("@google/generative-ai");
+const fetch = require('node-fetch');
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-if (!GEMINI_API_KEY) {
-    throw new Error("GEMINI_API_KEY não configurada.");
-}
+if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY não configurada.");
 
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
 
-async function scrapeProductDetails(productUrl) {
-    console.log(`[scrape-gemini V5] Iniciando extração para a URL: ${productUrl}`);
+const generationConfig = {
+    temperature: 0.3,
+    responseMimeType: "application/json",
+};
 
-    if (!productUrl || !productUrl.startsWith('http')) {
-        throw new Error("URL do produto inválida ou não fornecida.");
-    }
+// --- MÉTODO 1: Analisando o HTML diretamente (ótimo para imagens) ---
+async function scrapeByAnalyzingHtml(productUrl) {
+    console.log(`[Gemini HTML Mode] Iniciando para: ${productUrl}`);
     
-    const prompt = `
-        Analise o conteúdo da página web na URL "${productUrl}" para extrair os detalhes de um produto.
-        Retorne um objeto JSON com as seguintes chaves: "name", "price", "image", "brand", "category", "description".
+    const response = await fetch(productUrl, {
+        headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36' }
+    });
 
-        INSTRUÇÕES IMPORTANTES:
-        1. Para a chave "image", procure especificamente pela URL contida na meta tag 'og:image' ou 'twitter:image'. Esta é a fonte mais confiável para a imagem principal.
-        2. "price" deve ser um número (float).
-        3. Para a "category", use uma destas: Eletrônicos, Roupas e Acessórios, Casa e Decoração, Livros e Mídia, Esportes e Lazer, Ferramentas e Construção, Alimentos e Bebidas, Saúde e Beleza, Automotivo, Pet Shop, Outros.
-
-        Se não conseguir encontrar os detalhes essenciais, retorne um JSON com a chave "error".
-    `;
-
-    try {
-        const result = await model.generateContent({
-            contents: [{ role: "user", parts: [{ text: prompt }] }],
-            generationConfig: { responseMimeType: "application/json" },
-        });
-        
-        const responseText = result.response.text();
-        const jsonData = JSON.parse(responseText);
-
-        console.log("[scrape-gemini V5] JSON recebido:", jsonData);
-
-        if (jsonData.error || !jsonData.name || !jsonData.price) {
-            throw new Error(jsonData.error || "IA não conseguiu extrair nome ou preço.");
-        }
-        
-        jsonData.urlOrigin = productUrl;
-        return jsonData;
-
-    } catch (error) {
-        console.error(`[scrape-gemini V5] Erro ao extrair detalhes: ${error.message}`);
-        throw error;
+    if (!response.ok) {
+        // Se o site bloquear o acesso, esta função vai falhar, acionando o próximo método.
+        throw new Error(`Acesso bloqueado ou falha ao buscar HTML. Status: ${response.status}`);
     }
+    const htmlContent = await response.text();
+
+    const prompt = `
+        Analise o HTML fornecido para extrair os detalhes de um produto.
+        Retorne um objeto JSON com: "name", "price", "image", "brand", "category", "description".
+        - Para "image", priorize a URL na meta tag 'og:image'.
+        - "price" deve ser um número.
+        - Para a "category", use uma destas: Eletrônicos, Roupas e Acessórios, Casa e Decoração, Livros e Mídia, Esportes e Lazer, Ferramentas e Construção, Alimentos e Bebidas, Saúde e Beleza, Automotivo, Pet Shop, Outros.
+        HTML: \`\`\`html\n${htmlContent.substring(0, 150000)}\n\`\`\`
+    `;
+    
+    const result = await model.generateContent({
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        generationConfig,
+    });
+    
+    return JSON.parse(result.response.text());
 }
 
-module.exports = { scrapeProductDetails };
+// --- MÉTODO 2: Usando a busca interna da IA (ótimo para textos em sites protegidos) ---
+async function scrapeBySearching(productUrl) {
+    console.log(`[Gemini Search Mode] Iniciando para: ${productUrl}`);
+
+    const prompt = `
+        Use sua ferramenta de busca para encontrar os detalhes do produto na URL: "${productUrl}".
+        Retorne um objeto JSON com: "name", "price", "image", "brand", "category", "description".
+        - Para "image", encontre a URL da imagem principal.
+        - "price" deve ser um número.
+    `;
+    
+    const result = await model.generateContent({
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        generationConfig,
+    });
+
+    return JSON.parse(result.response.text());
+}
+
+module.exports = { 
+    scrapeByAnalyzingHtml,
+    scrapeBySearching 
+};
