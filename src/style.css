@@ -1069,6 +1069,38 @@ body[data-theme="dark"] #recent-activity-list li {
     text-align: center;
 }
 
+/* --- ESTILOS PARA CARREGAMENTO E ERRO DE CONTEÚDO --- */
+
+.content-loader {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 50px; /* Altura mínima para o spinner ter espaço */
+    padding: 10px;
+    color: var(--text-secondary);
+}
+
+.spinner {
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-left-color: var(--primary-action); /* Cor do seu tema */
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.error-message {
+    font-size: 0.9em;
+    color: var(--error-color);
+}
+
+.error-message i {
+    margin-right: 8px;
+}
 
 /* Responsividade para as novas seções */
 @media (max-width: 992px) {

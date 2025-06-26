@@ -529,87 +529,134 @@ const createProductCard = (product, cardType = 'product') => {
     return card;
 };
 
-// 2. SUBSTITUA TAMBÉM A FUNÇÃO 'fetchAndRenderProducts' PELA VERSÃO ABAIXO
+// Em renderer.js, substitua toda a sua função fetchAndRenderProducts por esta
+
 const fetchAndRenderProducts = async () => {
     if (!pendingList || !purchasedList || !pendingTotalValueEl || !purchasedTotalValueEl) return;
     if (!currentUserId) return;
 
-    pendingTotalValueEl.textContent = 'R$ 0,00';
-    purchasedTotalValueEl.textContent = 'R$ 0,00';
+    // --- Etapa 1: Mostrar estado de carregamento ---
+    const smallSpinner = '<div class="spinner" style="width: 18px; height: 18px;"></div>';
+    const listLoader = '<div class="content-loader"><div class="spinner"></div></div>';
+    
+    pendingTotalValueEl.innerHTML = smallSpinner;
+    purchasedTotalValueEl.innerHTML = smallSpinner;
+    
+    pendingList.innerHTML = listLoader;
+    purchasedList.innerHTML = ''; // Limpa a lista de histórico para evitar confusão
+
+    // Garante que as mensagens de "vazio" estejam escondidas durante o carregamento
+    if (pendingEmptyState) pendingEmptyState.style.display = 'none';
+    if (purchasedEmptyState) purchasedEmptyState.style.display = 'none';
 
     try {
+        // --- Etapa 2: Buscar os dados ---
         const response = await authenticatedFetch(`${API_BASE_URL}/products?userId=${currentUserId}`);
         if (!response.ok) {
-             const errorData = await response.json().catch(() => ({ message: response.statusText }));
-             throw new Error(errorData.message || 'Erro ao procurar produtos');
+            const errorData = await response.json().catch(() => ({ message: response.statusText }));
+            throw new Error(errorData.message || 'Erro ao buscar produtos');
         }
         
         const products = await response.json();
         const pendingProducts = products.filter(p => p.status === 'pendente');
         const historyProducts = products.filter(p => p.status === 'comprado' || p.status === 'descartado');
 
-        pendingList.innerHTML = '';
-        purchasedList.innerHTML = '';
+        // --- Etapa 3: Renderizar o conteúdo de SUCESSO ---
+        pendingList.innerHTML = ''; // Limpa o loader da lista de pendentes
+        purchasedList.innerHTML = ''; // Limpa a lista de histórico
 
+        // Atualiza os totais
         const pendingTotal = pendingProducts.reduce((sum, product) => sum + (product.price || 0), 0);
         pendingTotalValueEl.textContent = `R$ ${pendingTotal.toFixed(2).replace('.', ',')}`;
 
         const purchasedTotal = products.filter(p => p.status === 'comprado').reduce((sum, product) => sum + (product.price || 0), 0);
         purchasedTotalValueEl.textContent = `R$ ${purchasedTotal.toFixed(2).replace('.', ',')}`;
 
+        // Renderiza a lista de produtos pendentes
         if (pendingProducts.length === 0) {
             if (pendingEmptyState) pendingEmptyState.style.display = 'block';
         } else {
-            if (pendingEmptyState) pendingEmptyState.style.display = 'none';
             pendingProducts.forEach(product => {
-                // Passa o tipo 'product' explicitamente
                 const card = createProductCard(product, 'product'); 
                 pendingList.appendChild(card);
             });
         }
         
+        // Renderiza a lista de histórico
         if (historyProducts.length === 0) {
             if (purchasedEmptyState) purchasedEmptyState.style.display = 'block';
         } else {
-            if (purchasedEmptyState) purchasedEmptyState.style.display = 'none';
             historyProducts.forEach(product => {
-                // Passa o tipo 'history' explicitamente
                 const card = createProductCard(product, 'history'); 
                 purchasedList.appendChild(card);
             });
         }
-        // Em renderer.js, adicione este bloco NO FINAL da sua função fetchAndRenderProducts
-
-const historyCards = document.querySelectorAll("#history-tab .product-card");
-
-historyCards.forEach(card => {
-    card.addEventListener("mousemove", e => {
-        const rect = card.getBoundingClientRect();
-        const { width, height, top, left } = rect;
-        const mouseX = e.clientX - left;
-        const mouseY = e.clientY - top;
-        const xPct = mouseX / width - 0.5;
-        const yPct = mouseY / height - 0.5;
-
-        // Atualiza as variáveis CSS para a rotação 3D
-        card.style.setProperty("--rx", yPct * -25); // Rotação no eixo X
-        card.style.setProperty("--ry", xPct * 25);  // Rotação no eixo Y
         
-        // Atualiza a posição do gradiente holográfico
-        card.style.setProperty("--pos", (mouseX / width) * 100);
-    });
+        // Aplica o efeito holográfico nos cards de histórico após serem adicionados
+        const historyCards = document.querySelectorAll("#history-tab .product-card");
+        historyCards.forEach(card => {
+            card.addEventListener("mousemove", e => {
+                const rect = card.getBoundingClientRect();
+                const { width, height, top, left } = rect;
+                const mouseX = e.clientX - left;
+                const mouseY = e.clientY - top;
+                const xPct = mouseX / width - 0.5;
+                const yPct = mouseY / height - 0.5;
+                card.style.setProperty("--rx", yPct * -25);
+                card.style.setProperty("--ry", xPct * 25);
+                card.style.setProperty("--pos", (mouseX / width) * 100);
+            });
+            card.addEventListener("mouseleave", () => {
+                card.style.setProperty("--rx", 0);
+                card.style.setProperty("--ry", 0);
+            });
+        });
 
-    card.addEventListener("mouseleave", () => {
-        // Reseta as variáveis quando o mouse sai do card
-        card.style.setProperty("--rx", 0);
-        card.style.setProperty("--ry", 0);
-    });
-});
     } catch (error) {
         console.error("Erro em fetchAndRenderProducts:", error);
-        showTabMessage(addProductMessageAddTab, `Erro ao carregar produtos: ${error.message}`, false);
+        // --- Etapa 4: Renderizar o estado de ERRO ---
+        const errorHtml = '<span class="error-message" style="font-size: 0.9em;">Erro!</span>';
+        pendingTotalValueEl.innerHTML = errorHtml;
+        purchasedTotalValueEl.innerHTML = errorHtml;
+        
+        const listError = '<div class="content-loader"><span class="error-message"><i class="fas fa-exclamation-triangle"></i> Não foi possível carregar.</span></div>';
+        pendingList.innerHTML = listError;
+        purchasedList.innerHTML = listError;
     }
 };
+
+// Em renderer.js, adicione esta nova função de utilidade
+
+/**
+ * Controla o estado de um elemento, mostrando 'loading', 'error' ou o conteúdo final.
+ * @param {HTMLElement} wrapperElement - O elemento que contém o loader e o conteúdo.
+ * @param {HTMLElement} contentElement - O elemento que mostrará o dado final.
+ * @param {'loading' | 'error' | 'success'} state - O estado a ser exibido.
+ * @param {string} [errorMessage] - A mensagem de erro, se houver.
+ */
+function setContentState(wrapperElement, contentElement, state, errorMessage = 'Erro ao carregar.') {
+    if (!wrapperElement || !contentElement) return;
+
+    // Limpa o conteúdo anterior
+    wrapperElement.innerHTML = '';
+    contentElement.style.display = 'none';
+
+    if (state === 'loading') {
+        const loaderDiv = document.createElement('div');
+        loaderDiv.className = 'content-loader';
+        loaderDiv.innerHTML = '<div class="spinner"></div>';
+        wrapperElement.appendChild(loaderDiv);
+    } else if (state === 'error') {
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'content-loader';
+        errorDiv.innerHTML = `<span class="error-message"><i class="fas fa-exclamation-triangle"></i> ${errorMessage}</span>`;
+        wrapperElement.appendChild(errorDiv);
+    } else if (state === 'success') {
+        // Se for sucesso, o conteúdo original do elemento é mostrado
+        // A função que chama o setContentState será responsável por preencher o contentElement
+        contentElement.style.display = ''; // ou 'block', 'flex', etc.
+    }
+}
 
 const getTextColor = () => getComputedStyle(document.body).getPropertyValue('--text-primary').trim();
 
@@ -709,26 +756,37 @@ const getTextColor = () => getComputedStyle(document.body).getPropertyValue('--t
     window.addEventListener('orientationchange', setAppHeight); 
     setAppHeight(); 
 
+// Em renderer.js, substitua toda a sua função fetchAndRenderDashboardStats por esta
+
 const fetchAndRenderDashboardStats = async () => {
     if (!currentUserId) return;
 
-    // Seletores para os novos elementos
-    const avgSpentStatEl = getElem('avg-spent-stat');
-    const currentMonthBalanceStatEl = getElem('current-month-balance-stat');
-    const priorityDistributionChartCanvasEl = getElem('priorityDistributionChart');
-    const financeOverviewChartCanvasEl = getElem('financeOverviewChart');
-    const categoryDistributionChartCanvasEl = getElem('categoryDistributionChart');
+    // --- Seletores para os elementos do painel ---
+    const cardElements = {
+        totalProducts: getElem('total-products-stat'),
+        purchasedProducts: getElem('purchased-products-stat'),
+        pendingProducts: getElem('pending-products-stat'),
+        totalSpent: getElem('total-spent-stat'),
+        avgSpent: getElem('avg-spent-stat'),
+        currentMonthBalance: getElem('current-month-balance-stat')
+    };
 
-    // Reseta/inicializa os cards para o estado de carregamento
-    if(getElem('total-products-stat')) getElem('total-products-stat').textContent = "0";
-    if(getElem('purchased-products-stat')) getElem('purchased-products-stat').textContent = "0";
-    if(getElem('pending-products-stat')) getElem('pending-products-stat').textContent = "0";
-    if(getElem('total-spent-stat')) getElem('total-spent-stat').textContent = "R$ 0,00";
-    if(avgSpentStatEl) avgSpentStatEl.textContent = "R$ 0,00";
-    if(currentMonthBalanceStatEl) currentMonthBalanceStatEl.textContent = "R$ 0,00";
+    const chartCanvases = {
+        financeOverview: getElem('financeOverviewChart'),
+        categoryDistribution: getElem('categoryDistributionChart'),
+        priorityDistribution: getElem('priorityDistributionChart')
+    };
+    
+    // --- Etapa 1: Mostrar o estado de carregamento ---
+    const spinnerHtml = '<div class="spinner"></div>';
+    for (const key in cardElements) {
+        if (cardElements[key]) {
+            cardElements[key].innerHTML = spinnerHtml;
+        }
+    }
 
     try {
-        // Busca todos os dados necessários em paralelo para maior eficiência
+        // --- Etapa 2: Buscar todos os dados em paralelo ---
         const [
             statsResponse,
             financeResponse,
@@ -741,48 +799,64 @@ const fetchAndRenderDashboardStats = async () => {
             authenticatedFetch(`${API_BASE_URL}/products/priority-distribution?userId=${currentUserId}`)
         ]);
 
-        // --- Processa os dados recebidos ---
+        // --- Etapa 3: Processar e exibir os dados de SUCESSO ---
 
-        // 1. Processa estatísticas dos produtos
+        // Processa estatísticas dos produtos
         if (statsResponse.ok) {
             const stats = await statsResponse.json();
-            if(getElem('total-products-stat')) getElem('total-products-stat').textContent = stats.totalProducts;
-            if(getElem('purchased-products-stat')) getElem('purchased-products-stat').textContent = stats.purchasedProducts;
-            if(getElem('pending-products-stat')) getElem('pending-products-stat').textContent = stats.pendingProducts;
-            if(getElem('total-spent-stat')) getElem('total-spent-stat').textContent = `R$ ${stats.totalSpent.toFixed(2).replace('.', ',')}`;
-            
-            if(avgSpentStatEl) {
-                const avgSpent = stats.purchasedProducts > 0 ? (stats.totalSpent / stats.purchasedProducts) : 0;
-                avgSpentStatEl.textContent = `R$ ${avgSpent.toFixed(2).replace('.', ',')}`;
-            }
+            cardElements.totalProducts.textContent = stats.totalProducts;
+            cardElements.purchasedProducts.textContent = stats.purchasedProducts;
+            cardElements.pendingProducts.textContent = stats.pendingProducts;
+            cardElements.totalSpent.textContent = `R$ ${stats.totalSpent.toFixed(2).replace('.', ',')}`;
+            const avgSpent = stats.purchasedProducts > 0 ? (stats.totalSpent / stats.purchasedProducts) : 0;
+            if(cardElements.avgSpent) cardElements.avgSpent.textContent = `R$ ${avgSpent.toFixed(2).replace('.', ',')}`;
         } else {
-            console.error("Falha ao buscar estatísticas dos produtos.");
+            throw new Error("Falha ao buscar estatísticas dos produtos.");
         }
 
-        // 2. Processa dados financeiros
-        const financeData = financeResponse.ok ? await financeResponse.json() : [];
-        if(currentMonthBalanceStatEl) {
+        // Processa dados financeiros
+        if (financeResponse.ok) {
+            const financeData = await financeResponse.json();
             const now = new Date();
             const currentMonthStr = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
             const currentMonthEntry = financeData.find(e => e.mes_ano === currentMonthStr);
             const balance = currentMonthEntry ? currentMonthEntry.receita - currentMonthEntry.gastos : 0;
-            currentMonthBalanceStatEl.textContent = `R$ ${balance.toFixed(2).replace('.', ',')}`;
-            currentMonthBalanceStatEl.style.color = balance < 0 ? 'var(--error-color)' : 'var(--success-color)';
+            if(cardElements.currentMonthBalance) {
+                cardElements.currentMonthBalance.textContent = `R$ ${balance.toFixed(2).replace('.', ',')}`;
+                cardElements.currentMonthBalance.style.color = balance < 0 ? 'var(--error-color)' : 'var(--success-color)';
+            }
+            renderGenericChart(chartCanvases.financeOverview, 'line', financeData);
+        } else {
+            throw new Error("Falha ao buscar dados financeiros.");
         }
-        
-        // 3. Processa dados de categoria e prioridade
+
+        // Processa dados dos gráficos de pizza/rosca
         const categoryData = categoryDistResponse.ok ? await categoryDistResponse.json() : { labels: [], data: [] };
         const priorityData = priorityDistResponse.ok ? await priorityDistResponse.json() : { labels: [], data: [] };
+        renderGenericChart(chartCanvases.categoryDistribution, 'doughnut', categoryData, true);
+        renderGenericChart(chartCanvases.priorityDistribution, 'pie', priorityData, true, ['#EF4444', '#F59E0B', '#10B981']);
 
-        // --- Renderiza todos os gráficos ---
-        renderGenericChart(financeOverviewChartCanvasEl, 'line', financeData);
-        renderGenericChart(categoryDistributionChartCanvasEl, 'doughnut', categoryData, true);
-        renderGenericChart(priorityDistributionChartCanvasEl, 'pie', priorityData, true, ['#EF4444', '#F59E0B', '#10B981']);
-
-    } catch(err) {
-        console.error("Erro ao carregar e processar dados do dashboard:", err);
+    } catch (err) {
+        console.error("Erro ao carregar dados do dashboard:", err);
+        // --- Etapa 4: Exibir o estado de ERRO ---
+        const errorHtml = '<span class="error-message" title="Erro ao carregar"><i class="fas fa-times-circle"></i></span>';
+        for (const key in cardElements) {
+            if (cardElements[key]) {
+                cardElements[key].innerHTML = errorHtml;
+            }
+        }
+        // Limpa os canvases dos gráficos em caso de erro
+        for (const key in chartCanvases) {
+             const chartCanvas = chartCanvases[key];
+             if(chartCanvas) {
+                const existingChart = Chart.getChart(chartCanvas);
+                if (existingChart) existingChart.destroy();
+                const ctx = chartCanvas.getContext('2d');
+                ctx.clearRect(0, 0, chartCanvas.width, chartCanvas.height);
+             }
+        }
     }
-};
+}; // Fim da função
 
 const renderGenericChart = (canvasEl, type, data, isPieOrDoughnut = false, customColors = null) => {
     if (!canvasEl) {
@@ -1051,7 +1125,7 @@ if (saveProductBtnAddTab) {
     }
 
 
-    
+
 // ATUALIZAÇÃO 1: APAGUE a função 'handleSaveProduct' e COLOQUE esta no lugar.
 
 // ** FUNÇÃO DE SALVAR NO DB (MAIS SIMPLES) **
