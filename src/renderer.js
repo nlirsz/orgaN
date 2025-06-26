@@ -1016,81 +1016,63 @@ const renderGenericChart = (canvasEl, type, data, isPieOrDoughnut = false, custo
         setupScrapeEventListeners(productUrlInputProductsTab, verifyUrlBtnProductsTab, verifiedProductInfoDivProductsTab, addProductMessageProductsTab, saveProductBtnProductsTab);
     }
     
-// ATUALIZAÇÃO 2: Substitua o listener do botão 'saveProductBtnAddTab' por este
+// 2. OS LISTENERS CORRIGIDOS PARA OS BOTÕES
+// Substitua seus listeners antigos por estes dois
 
+// Listener para o botão SALVAR na aba "ADICIONAR PRODUTO"
 if (saveProductBtnAddTab) {
     saveProductBtnAddTab.addEventListener('click', () => {
         let payload = {};
-        // Se houver dados de um scrape recente, dê prioridade a eles
         if (scrapedProductData && scrapedProductData.name) {
             payload = { ...scrapedProductData, status: 'pendente' };
         } else { 
-            // Senão, pega os dados do formulário de adição manual
             payload = {
-                name: manualProductNameInput.value.trim(),
-                price: manualProductPriceInput.value.trim(),
-                urlOrigin: manualProductUrlInput.value.trim(),
-                image: manualProductImageUrlInput.value.trim(),
-                category: manualProductCategorySelect.value,
-                brand: manualProductBrandInput.value.trim(),
-                description: manualProductDescriptionTextarea.value.trim(),
-                status: 'pendente'
+                name: manualProductNameInput.value.trim(), price: manualProductPriceInput.value.trim(),
+                urlOrigin: manualProductUrlInput.value.trim(), image: manualProductImageUrlInput.value.trim(),
+                category: manualProductCategorySelect.value, brand: manualProductBrandInput.value.trim(),
+                description: manualProductDescriptionTextarea.value.trim(), status: 'pendente'
             };
         }
-        scrapedProductData = null; // Limpa os dados do scrape após o clique
-        saveProductToDB(payload, addProductMessageAddTab); // Chama a nova função para salvar
+        scrapedProductData = null;
+        saveProductToDB(payload, addProductMessageAddTab);
     });
 }
-// ATUALIZAÇÃO 3: Substitua o listener do botão 'saveProductBtnProductsTab' por este
 
+// Listener para o botão SALVAR na aba "PRODUTOS"
 if (saveProductBtnProductsTab) {
     saveProductBtnProductsTab.addEventListener('click', () => {
-        // Na aba "Produtos", os dados SÓ PODEM vir de um scrape
         if (scrapedProductData && scrapedProductData.name) {
             const payload = { ...scrapedProductData, status: 'pendente' };
-            scrapedProductData = null; // Limpa os dados do scrape após o clique
-            saveProductToDB(payload, addProductMessageProductsTab); // Chama a nova função para salvar
+            scrapedProductData = null;
+            saveProductToDB(payload, addProductMessageProductsTab);
         } else {
-            // Se não houver dados de scrape, informa o usuário
             showTabMessage(addProductMessageProductsTab, 'Não há informações de produto para salvar. Verifique a URL novamente.', false);
         }
     });
-}
-// Em src/renderer.js, substitua a função handleSaveProduct inteira
+}// Em src/renderer.js, substitua a função handleSaveProduct inteira
 
 // ATUALIZAÇÃO 1: APAGUE a função 'handleSaveProduct' e COLOQUE esta no lugar.
 
+// 1. A NOVA FUNÇÃO DE SALVAR
 async function saveProductToDB(productPayload, messageElement) {
-    // Validação final para garantir que os dados essenciais existem
-    if (!productPayload || !productPayload.name || !productPayload.price || !productPayload.urlOrigin) {
+    if (!productPayload || !productPayload.name || !productPayload.price) {
         showTabMessage(messageElement, 'Informações do produto estão incompletas para salvar.', false);
         return;
     }
-
     try {
-        const response = await authenticatedFetch(`${API_BASE_URL}/products`, {
+        await authenticatedFetch(`${API_BASE_URL}/products`, {
             method: 'POST',
             body: JSON.stringify(productPayload),
         });
-        const data = await response.json();
-        if (!response.ok) {
-            throw new Error(data.message || `Erro HTTP ${response.status}`);
-        }
-
         showTabMessage(messageElement, "Produto salvo com sucesso!", true);
-        
-        // Limpa os formulários e atualiza a interface
         clearAddProductFormAddTab();
         clearProductScrapeFormProductsTab();
         fetchAndRenderProducts();
         fetchAndRenderDashboardStats();
-
     } catch (error) {
-        console.error("Erro ao salvar produto:", error);
         showTabMessage(messageElement, `Erro ao salvar: ${error.message}`, false);
     }
 }
-
 
 
 const mainContentArea = document.querySelector('.main-content-area');

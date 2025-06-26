@@ -80,12 +80,12 @@ async function scrapeProductDetails(productUrl) {
             console.warn(`[scrape-gemini.js] HTML truncado.`);
         }
 
-        // PROMPT ATUALIZADO: Categoria mais detalhada e com exemplos
-        const prompt = `Analise o HTML a seguir para extrair os detalhes de um produto.
+// PROMPT ATUALIZADO: Categoria mais detalhada e com exemplos
+        const prompt = `Analise o conteúdo da página web para extrair os detalhes de um produto a partir do HTML fornecido. Se o HTML estiver vazio ou incompleto, use sua ferramenta de busca interna para encontrar as informações na URL original.
         Retorne um objeto JSON com as seguintes propriedades:
         - name (string): Nome completo do produto.
         - price (number): Preço do produto. Use ponto como separador decimal.
-        - image (string, opcional): URL da imagem principal do produto.
+        - image (string, opcional): A URL da imagem principal do produto. Dê prioridade para a URL na meta tag 'og:image'.
         - brand (string, opcional): Marca do produto.
         - category (string, opcional): Categorize o produto em uma das seguintes opções, baseando-se no que melhor descreve o produto. Escolha "Outros" se nenhuma se encaixar bem.
             Opções de Categoria:
@@ -114,9 +114,10 @@ async function scrapeProductDetails(productUrl) {
           "description": "Descrição breve do produto."
         }
         \`\`\`
-        Conteúdo HTML:
+        Conteúdo HTML (pode estar vazio):
         ${htmlContent}`;
 
+        
         console.log("[scrape-gemini.js] Enviando prompt para Gemini...");
         const chatSession = model.startChat({ generationConfig, safetySettings, history: [] });
         const result = await chatSession.sendMessage(prompt);
