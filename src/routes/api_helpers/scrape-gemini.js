@@ -87,16 +87,20 @@ async function scrapeByAnalyzingHtml(productUrl) {
 async function scrapeBySearching(productUrl) {
     console.log(`[Gemini Search Mode] Iniciando para: ${productUrl}`);
 
-    const prompt = `Use sua ferramenta de busca para encontrar os detalhes do produto na URL: "${productUrl}". Retorne um objeto JSON com: "name", "price", "image", "brand", "category", "description". Para "image", encontre uma URL de imagem pública e de alta resolução. "price" deve ser um número ou um texto que inclua o valor numérico.`;
+    const prompt = `Use sua ferramenta de busca para encontrar os detalhes do produto na URL: "${productUrl}". Retorne um objeto JSON com: "name", "price", "image", "brand", "category", "description". Para "image", encontre uma URL de imagem pública e de alta resolução.`;
     
-    const result = await model.generateContent({ contents: [{ role: "user", parts: [{ text: prompt }] }], generationConfig });
-    let jsonData = JSON.parse(result.response.text());
-
-    if (jsonData && jsonData.price) {
-        jsonData.price = normalizePrice(jsonData.price);
+    try {
+         const result = await model.generateContent({
+            contents: [{ role: "user", parts: [{ text: prompt }] }],
+            generationConfig,
+            safetySettings,
+        });
+        const responseText = result.response.text();
+        return JSON.parse(responseText);
+    } catch(e) {
+        console.error("[Gemini Search Mode] Erro ao buscar com IA:", e);
+        throw e;
     }
-
-    return jsonData;
 }
 
 // Exporta as duas funções para serem usadas no products.js
