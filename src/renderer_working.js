@@ -1016,62 +1016,77 @@ const renderGenericChart = (canvasEl, type, data, isPieOrDoughnut = false, custo
         setupScrapeEventListeners(productUrlInputProductsTab, verifyUrlBtnProductsTab, verifiedProductInfoDivProductsTab, addProductMessageProductsTab, saveProductBtnProductsTab);
     }
     
-// ATUALIZAÇÃO 2: Substitua o listener do botão 'saveProductBtnAddTab' por este
+    if (saveProductBtnAddTab) {
+        saveProductBtnAddTab.addEventListener('click', () => {
+            handleSaveProduct(addProductMessageAddTab);
+        });
+    }
 
-if (saveProductBtnAddTab) {
-    saveProductBtnAddTab.addEventListener('click', () => {
-        let payload = {};
-        // Se houver dados de um scrape recente, dê prioridade a eles
-        if (scrapedProductData && scrapedProductData.name) {
-            payload = { ...scrapedProductData, status: 'pendente' };
-        } else { 
-            // Senão, pega os dados do formulário de adição manual
-            payload = {
-                name: manualProductNameInput.value.trim(),
-                price: manualProductPriceInput.value.trim(),
-                urlOrigin: manualProductUrlInput.value.trim(),
-                image: manualProductImageUrlInput.value.trim(),
-                category: manualProductCategorySelect.value,
-                brand: manualProductBrandInput.value.trim(),
-                description: manualProductDescriptionTextarea.value.trim(),
-                status: 'pendente'
-            };
-        }
-        scrapedProductData = null; // Limpa os dados do scrape após o clique
-        saveProductToDB(payload, addProductMessageAddTab); // Chama a nova função para salvar
-    });
-}
-// ATUALIZAÇÃO 3: Substitua o listener do botão 'saveProductBtnProductsTab' por este
+    if (saveProductBtnProductsTab) {
+        saveProductBtnProductsTab.addEventListener('click', () => {
+            handleSaveProduct(addProductMessageProductsTab);
+            
+            if (verifiedProductInfoDivProductsTab) {
+                verifiedProductInfoDivProductsTab.classList.add('hidden');
+            }
+        });
+    }
 
-if (saveProductBtnProductsTab) {
-    saveProductBtnProductsTab.addEventListener('click', () => {
-        // Na aba "Produtos", os dados SÓ PODEM vir de um scrape
-        if (scrapedProductData && scrapedProductData.name) {
-            const payload = { ...scrapedProductData, status: 'pendente' };
-            scrapedProductData = null; // Limpa os dados do scrape após o clique
-            saveProductToDB(payload, addProductMessageProductsTab); // Chama a nova função para salvar
-        } else {
-            // Se não houver dados de scrape, informa o usuário
-            showTabMessage(addProductMessageProductsTab, 'Não há informações de produto para salvar. Verifique a URL novamente.', false);
-        }
-    });
-}
 // Em src/renderer.js, substitua a função handleSaveProduct inteira
 
-// ATUALIZAÇÃO 1: APAGUE a função 'handleSaveProduct' e COLOQUE esta no lugar.
-
-async function saveProductToDB(productPayload, messageElement) {
-    // Validação final para garantir que os dados essenciais existem
-    if (!productPayload || !productPayload.name || !productPayload.price || !productPayload.urlOrigin) {
-        showTabMessage(messageElement, 'Informações do produto estão incompletas para salvar.', false);
+async function handleSaveProduct(messageElement) {
+    if (!currentUserId) {
+        showTabMessage(messageElement, 'Você precisa estar logado para adicionar produtos.', false);
         return;
     }
 
+    let productPayload = {};
+
+    // 1. DÁ PRIORIDADE para dados de um scrape recente.
+    if (scrapedProductData && scrapedProductData.name) {
+        console.log("Salvando a partir de dados de scrape...");
+        productPayload = {
+            ...scrapedProductData, // Pega todos os dados do scrape
+            status: 'pendente'
+        };
+        // Limpa os dados de scrape após o uso para evitar re-salvamento acidental
+        scrapedProductData = null; 
+    
+    } 
+    // 2. SE NÃO HOUVER DADOS DE SCRAPE, tenta pegar os dados do formulário manual.
+    // Esta parte só será executada com sucesso na aba "Adicionar Produto".
+    else if (manualProductNameInput && manualProductNameInput.value.trim() !== '') {
+        console.log("Salvando a partir do formulário manual...");
+        productPayload = {
+            name: manualProductNameInput.value.trim(),
+            price: manualProductPriceInput.value.trim(),
+            urlOrigin: manualProductUrlInput.value.trim(),
+            image: document.getElementById('manual-product-image-url')?.value.trim(),
+            category: document.getElementById('manual-product-category')?.value,
+            brand: document.getElementById('manual-product-brand')?.value.trim(),
+            description: document.getElementById('manual-product-description')?.value.trim(),
+            status: 'pendente'
+        };
+    } 
+    // 3. SE NENHUMA DAS CONDIÇÕES ACIMA FOR VERDADEIRA, exibe um erro.
+    else {
+        showTabMessage(messageElement, 'Não há informações do produto para salvar. Verifique a URL novamente.', false);
+        return;
+    }
+
+    // 4. Validação final dos dados essenciais
+    if (!productPayload.name || !productPayload.price || !productPayload.urlOrigin) {
+        showTabMessage(messageElement, 'Nome, preço e URL de origem são obrigatórios!', false);
+        return;
+    }
+
+    // 5. Envia os dados para a API (sem alterações aqui)
     try {
         const response = await authenticatedFetch(`${API_BASE_URL}/products`, {
             method: 'POST',
             body: JSON.stringify(productPayload),
         });
+
         const data = await response.json();
         if (!response.ok) {
             throw new Error(data.message || `Erro HTTP ${response.status}`);
@@ -1079,9 +1094,10 @@ async function saveProductToDB(productPayload, messageElement) {
 
         showTabMessage(messageElement, "Produto salvo com sucesso!", true);
         
-        // Limpa os formulários e atualiza a interface
+        // Limpa ambos os formulários e atualiza as listas na tela
         clearAddProductFormAddTab();
         clearProductScrapeFormProductsTab();
+        
         fetchAndRenderProducts();
         fetchAndRenderDashboardStats();
 
@@ -1090,10 +1106,7 @@ async function saveProductToDB(productPayload, messageElement) {
         showTabMessage(messageElement, `Erro ao salvar: ${error.message}`, false);
     }
 }
-
-
-
-const mainContentArea = document.querySelector('.main-content-area');
+    const mainContentArea = document.querySelector('.main-content-area');
 
     if (mainContentArea) {
         mainContentArea.addEventListener('click', async (e) => {
