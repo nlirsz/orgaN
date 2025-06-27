@@ -434,199 +434,192 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
 .card-actions i:active { box-shadow: var(--shadow-inset); }
 
 
-/* Em style.css, substitua o estilo de #history-tab .product-card por este */
+/* === Card Colecionável (Histórico) - Layout Final com Efeito 3D e Reflexo === */
 
+#history-tab .product-grid {
+    perspective: 2000px; /* Adiciona perspectiva ao container para o 3D funcionar melhor */
+}
+
+/* ESTADO GERAL DO CARD */
 #history-tab .product-card {
-    --w: 220px;
-    --h: calc(var(--w) * 1.4);
+    --w: 230px; /* Largura do card */
+    --h: calc(var(--w) * 1.5); /* Altura proporcional */
+    
     width: var(--w);
     height: var(--h);
     position: relative;
-    border-radius: 15px;
-    background-color: var(--c-primary);
-    box-shadow: var(--shadow);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    transform: perspective(1000px) rotateX(calc(var(--rx, 0) * 1deg)) rotateY(calc(var(--ry, 0) * 1deg));
-    transition: transform 0.1s ease-out;
+    border-radius: 15px; /* Bordas arredondadas */
+    
+    /* Configuração do efeito 3D */
+    transform-style: preserve-3d;
+    transform: 
+        perspective(1000px) 
+        translateX(calc(var(--tx, 0) * 1px)) 
+        translateY(calc(var(--ty, 0) * 1px)) 
+        rotateX(calc(var(--rx, 0) * 1deg)) 
+        rotateY(calc(var(--ry, 0) * 1deg));
+    
+    transition: transform 0.2s ease-out;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 #history-tab .product-card:hover {
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    transform: 
+        perspective(1000px) 
+        translateX(calc(var(--tx, 0) * 1px)) 
+        translateY(calc(var(--ty, 0) * 1px)) 
+        rotateX(calc(var(--rx, 0) * 1deg)) 
+        rotateY(calc(var(--ry, 0) * 1deg))
+        scale(1.05); /* Efeito de "saltar" no hover */
     z-index: 10;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
 }
 
-/* Camada de efeito holográfico (invisível até o hover) */
-#history-tab .product-card::before {
-    content: "";
+/* CONTAINER PARA FRENTE E VERSO */
+.card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.8s cubic-bezier(0.7, 0, 0.3, 1);
+}
+
+#history-tab .product-card:hover .card-inner {
+    transform: rotateY(180deg); /* Gira o card no hover */
+}
+
+/* ESTILO COMUM PARA FRENTE E VERSO */
+.card-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility: hidden; /* Safari */
+    backface-visibility: hidden;
+    border-radius: 15px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* FRENTE DO CARD (O PRODUTO) */
+.card-face-front {
+    background-color: var(--c-primary); /* Fundo do tema */
+}
+
+/* VERSO DO CARD (EFEITO ROXO) */
+.card-face-back {
+    background-color: #0e0a14; /* Cor de fundo escura para o verso */
+    background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M11 18l4 4-4 4-4-4 4-4zm44 44l4 4-4 4-4-4 4-4zm4-44l4 4-4 4-4-4 4-4zm-44 4l4 4-4 4-4-4 4-4zm12 12l4 4-4 4-4-4 4-4zm44 44l4 4-4 4-4-4 4-4zm-4-44l4 4-4 4-4-4 4-4zm-44 4l4 4-4 4-4-4 4-4z" fill="%231a1423" fill-opacity="0.4" fill-rule="evenodd"/></svg>');
+    transform: rotateY(180deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.card-back-design {
+    width: 100%;
+    height: 100%;
+    border: 3px solid #8A2BE2; /* Roxo brilhante */
+    border-radius: 10px;
+    box-shadow: 0 0 20px #8A2BE2, inset 0 0 15px #c88dff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-back-logo {
+    width: 60px;
+    height: 60px;
+    background: #8A2BE2;
+    transform: rotate(45deg);
+    box-shadow: 0 0 15px #c88dff;
+}
+
+
+/* CAMADA DE EFEITO PLÁSTICO (IMAGEM 3) */
+.card-plastic-overlay {
     position: absolute;
     inset: 0;
-    border-radius: 15px;
-    background: linear-gradient(135deg, #ff3d3d, #ffc93d, #3dff3d, #3ddaff, #a23dff);
-    background-size: 400% 400%;
-    background-position: calc(var(--pos, 0) * 1%) 50%;
-    mix-blend-mode: screen;
-    opacity: 0;
-    transition: opacity 0.5s ease-out;
+    z-index: 3;
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAAXNSR0IArs4c6QAAAD9JREFUGFd9jEEOACAIxPz/T8/mB0iiB4wz8CgYdJ4U2yZl2YLpOF03rjeaK2a63O+1dD58AJKf13wAV28CbgAAAABJRU5ErkJggg=='); /* Imagem de textura de plástico bem sutil */
+    opacity: 0.15;
+    mix-blend-mode: overlay;
     pointer-events: none;
-    z-index: 1;
 }
 
-#history-tab .product-card:hover::before {
+
+/* CAMADA DE BRILHO REFLEXIVO */
+.card-shine-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    border-radius: 15px;
+    background: linear-gradient(
+        110deg,
+        transparent 30%,
+        rgba(255, 255, 255, 0.6) 50%,
+        transparent 70%
+    );
+    background-size: 300% 300%;
+    background-position: calc(var(--pos, 0) * 1% + 20%) 50%;
+    mix-blend-mode: color-dodge;
+    opacity: 0;
+    transition: opacity 0.4s ease-out;
+    pointer-events: none;
+}
+
+#history-tab .product-card:hover .card-shine-overlay {
     opacity: 0.8;
 }
 
-/* Conteúdo do card (imagem e texto) */
-#history-tab .product-card .card-image-container,
-#history-tab .product-card .card-content {
-    position: relative;
-    z-index: 2;
-    background: transparent;
-    align-items: center; /* <<-- ADICIONE OU MODIFIQUE ESTA LINHA */
-    text-align: center;  /* Garante que o texto dentro dos elementos também seja centralizado */
-    
+/* CAMADA DE BORDAS ARRANHADAS (IMAGEM 1) */
+.card-border-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    border-radius: 15px;
+    border: 10px solid transparent; /* Aumente a borda para o efeito ser mais visível */
+    box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.4), inset 0 0 15px rgba(0, 0, 0, 0.5);
+    background: linear-gradient(rgba(255,255,255,0), rgba(255,255,255,0)) padding-box,
+                url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAIQSURBVHhe7dpBcsIwDIDh/P+nl55QxIICKfFJPa3VpI4kaeK4v5+P4/i+T1EU32GMOU3T5FCHKAAAECBAgAABAoEXGCDi+75Sj5sQwhzH4avqfd/Lsrw49v1mWZYxpicGBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAIHCBwYYY45jmMdxlGU5rv2+p2kaxpjeGBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIEihcYYIy5rutoGqO+T6uqqsZ429siQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgMNAg4Pt+5nnevY/7vu/7vu95nncsx3Hc6w5jQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQGChQYDjOFJKaZrGMeZpmu/7WIIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQKlCwxiSnrM8fPaMcbY53me53nevU9riAABAgQIECBAgAABAoUXBpzwcL1eG2O+12sppZTSbdtY9z1tW5blOI7D5x1KgAABAgQIECBAgMDyAgMso5TSbVvLsmwY42zbbttpmobnWIIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQKFCwywxqiqKkopKaWUUkrTNE3TGGOMtY8xIECAAAECBAgQIECAQLnAN4e7E5zQyqobAAAAAElFTkSuQmCC') 50% 50% / 100% 100% no-repeat;
+    mix-blend-mode: overlay;
+    opacity: 0.5;
+    pointer-events: none;
 }
 
-#history-tab .product-card .card-image-container {
-    height: 65%;
-    width: 100%;
-    padding: 10px;
-    box-sizing: border-box;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+/* Conteúdo interno do card */
+#history-tab .card-image-container {
+    height: 60%; /* Mais espaço para a imagem */
+    box-shadow: none;
+    background: rgba(255,255,255,0.1); /* Um fundo sutil para a imagem */
+    border-radius: 0;
 }
 
-#history-tab .product-card .card-content {
-    height: 35%;
-    padding: 15px;
-    display: flex;
-    align-items: center;
+#history-tab .card-content {
+    height: 40%;
     justify-content: center;
     text-align: center;
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
-    align-items: center; /* <<-- ADICIONE OU MODIFIQUE ESTA LINHA */
-    text-align: center;  /* Garante que o texto dentro dos elementos também seja centralizado */
-    
+    border-top: 1px solid rgba(255,255,255,0.1);
+    background: rgba(0,0,0,0.2); /* Fundo escuro para o texto ter contraste */
+    backdrop-filter: blur(2px);
+    border-radius: 0 0 15px 15px;
 }
 
-#history-tab .product-card .card-title {
-    color: #ffffff;
+#history-tab .card-title {
+    color: #121212;
     font-weight: 700;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-    -webkit-line-clamp: 3; /* Permite mais linhas no título do card de histórico */
+    font-size: 1.2em;
+    text-shadow: 0 2px 5px rgba(0,0,0,0.7);
 }
 
-/* Oculta preço e ações no card de histórico */
-#history-tab .product-card .card-price,
-#history-tab .product-card .card-actions {
+/* Oculta os elementos que não queremos no card de histórico */
+#history-tab .card-price, #history-tab .card-actions {
     display: none;
 }
 
-
-
-/* CONTEÚDO DO CARD (IMAGEM E NOME) */
-
-/* O conteúdo fica na camada de cima, sobre os efeitos */
-#history-tab .product-card .card-image-container,
-#history-tab .product-card .card-content {
-    position: relative;
-    z-index: 2;
-    background: transparent; /* Fundo transparente para ver o efeito holográfico através */
-    align-items: center; /* <<-- ADICIONE OU MODIFIQUE ESTA LINHA */
-    text-align: center;  /* Garante que o texto dentro dos elementos também seja centralizado */
-    
-}
-
-/* Área da imagem (parte de cima do card) */
-#history-tab .product-card .card-image-container {
-    height: 65%;
-    width: 100%;
-    padding: 10px; /* Espaço para a imagem não colar nas bordas */
-    box-sizing: border-box;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* A imagem do produto */
-#history-tab .product-card .card-image-container .card-image {
-    max-width: 100%;
-    max-height: 100%;
-    /* CORREÇÃO: Garante que a imagem inteira apareça, sem cortes */
-    object-fit: contain; 
-}
-
-/* Área do texto (parte de baixo do card) */
-#history-tab .product-card .card-content {
-    height: 35%;
-    width: 100%;
-    display: flex; /* Reativado */
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 10px;
-    box-sizing: border-box;
-    /* Linha sutil para separar imagem e texto */
-    border-top: 1px solid rgba(255, 255, 255, 0.2); 
-    align-items: center; /* <<-- ADICIONE OU MODIFIQUE ESTA LINHA */
-    text-align: center;  /* Garante que o texto dentro dos elementos também seja centralizado */
-    
-}
-
-#history-tab .product-card .card-title {
-    font-family: 'Almarai', sans-serif;
-    font-size: 1.1em;
-    font-weight: 700;
-    color: #ffffff;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
-}
-
-/* Oculta as actions, que não são usadas neste design */
-#history-tab .product-card .card-actions {
-    display: none;
-}
-
-
-/* === Correção para o Fundo do Modal de Detalhes do Produto === */
-/* Em style.css, SUBSTITUA a regra #product-details-modal .modal-content por esta */
-
-#product-details-modal .modal-content {
-    max-width: 550px;
-    text-align: center;
-
-    /* --- ESTA É A PARTE IMPORTANTE --- */
-    display: flex;
-    flex-direction: column;
-    max-height: 90vh; /* O modal nunca será maior que 90% da altura da tela */
-    overflow-y: auto;   /* Habilita o scroll para o modal INTEIRO */
-}
-
-
-/* Garante que o container da imagem dentro do modal também tenha fundo branco */
-#product-details-modal #modal-product-image-container {
-    background-color: #ffffff;
-    box-shadow: var(--shadow-inset-light); /* Mantém uma sombra interna suave */
-}
-
-/* Garante que o texto dentro do modal de detalhes seja sempre escuro */
-#product-details-modal .modal-product-info p,
-#product-details-modal .modal-product-info p strong,
-#product-details-modal #modal-product-name,
-#product-details-modal .modal-product-price {
-    color: var(--text-primary);
-}
-
-/* Ajusta a borda inferior dos detalhes para ser visível no fundo branco */
-body[data-theme="dark"] #product-details-modal .modal-product-info p {
-    border-bottom: 1px solid rgba(0,0,0,0.08);
-}
-
-/* Oculta elementos desnecessários, como já estava no CSS original */
-#history-tab .product-card .card-price {
-    display: none;
-}
 
 /* As ações que aparecem no hover (mantidas do CSS original) */
 .card-hover-actions {

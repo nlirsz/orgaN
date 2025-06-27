@@ -472,62 +472,65 @@ document.addEventListener('DOMContentLoaded', () => {
     
 // Em src/renderer.js
 
-// SUBSTITUA A SUA FUNÇÃO createProductCard INTEIRA POR ESTA VERSÃO ATUALIZADA
-
+// Em src/renderer.js
+// SUBSTITUA a função createProductCard por esta:
 const createProductCard = (product, cardType = 'product') => {
     const card = document.createElement('li');
-
-    // Adiciona a classe correta baseada no tipo de card
-    const cardClass = (cardType === 'history') ? 'in-history-tab' : 'in-products-tab';
-    card.className = `product-card ${cardClass}`;
-    
+    card.className = 'product-card';
     card.dataset.productId = product._id;
     card.dataset.productJson = JSON.stringify(product);
 
-    // *** INÍCIO DA ATUALIZAÇÃO ***
-    // Define a cor da categoria ou uma cor padrão
-    const categoryColor = categoryColors[product.category] || categoryColors['Outros'];
-    
-    // Adiciona a cor como uma variável CSS no card para ser usada pelo CSS
-    card.style.setProperty('--category-color', categoryColor);
-    // *** FIM DA ATUALIZAÇÃO ***
-
-    // Estrutura HTML com a badge que usa a variável de cor
-    card.innerHTML = `
-        ${(product.category && cardType === 'product') ? `<div class="card-category-badge">${product.category}</div>` : ''}
-
-        <div class="card-image-container">
-            <img src="${product.image || 'https://via.placeholder.com/200x150?text=Indisponível'}" alt="${product.name || 'Produto'}" class="card-image">
-        </div>
-
-        <div class="card-reflection"></div>
-        <div class="card-sparks"></div>
-
-        <div class="card-content">
-            <h3 class="card-title">${product.name || 'Nome Indisponível'}</h3>
-            <p class="card-price">${product.price ? `R$ ${parseFloat(product.price).toFixed(2).replace('.', ',')}` : 'Preço Indisponível'}</p>
-        </div>
-
-        <div class="card-actions">
-            ${product.status === 'pendente' ? '<i class="fas fa-check-circle action-purchase" title="Marcar como Comprado"></i>' : ''}
-            <i class="fas fa-edit action-edit" title="Editar"></i>
-            <i class="fab fa-google action-search" title="Pesquisar produto na web"></i>
-            <i class="fas fa-trash-alt action-delete" title="Excluir"></i>
-        </div>
-    `;
-
-    // Inicializa o Vanilla Tilt APENAS nos cards de produto
-    if (cardType === 'product' && typeof VanillaTilt !== 'undefined') {
-        VanillaTilt.init(card, {
-            max: 10,
-            speed: 200,
-            glare: true,
-            "max-glare": 0.2
-        });
+    // Se for um card de histórico, aplica a estrutura 3D
+    if (cardType === 'history') {
+        card.innerHTML = `
+            <div class="card-inner">
+                <div class="card-face card-face-front">
+                    <div class="card-image-container">
+                        <img src="${product.image || 'https://via.placeholder.com/200x150?text=Indisponível'}" alt="${product.name || 'Produto'}" class="card-image">
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">${product.name || 'Nome Indisponível'}</h3>
+                    </div>
+                </div>
+                <div class="card-face card-face-back">
+                     <div class="card-back-design">
+                        <div class="card-back-logo"></div>
+                     </div>
+                </div>
+            </div>
+            <div class="card-plastic-overlay"></div>
+            <div class="card-shine-overlay"></div>
+            <div class="card-border-overlay"></div>
+        `;
+    } else {
+        // Lógica para os cards de produtos pendentes (mantém a original, mas pode ser estilizada também)
+        const categoryColor = categoryColors[product.category] || categoryColors['Outros'];
+        card.style.setProperty('--category-color', categoryColor);
+        card.innerHTML = `
+            ${product.category ? `<div class="card-category-badge">${product.category}</div>` : ''}
+            <div class="card-image-container">
+                <img src="${product.image || 'https://via.placeholder.com/200x150?text=Indisponível'}" alt="${product.name || 'Produto'}" class="card-image">
+            </div>
+            <div class="card-content">
+                <h3 class="card-title">${product.name || 'Nome Indisponível'}</h3>
+                <p class="card-price">${product.price ? `R$ ${parseFloat(product.price).toFixed(2).replace('.', ',')}` : 'Preço Indisponível'}</p>
+            </div>
+            <div class="card-actions">
+                 ${product.status === 'pendente' ? '<i class="fas fa-check-circle action-purchase" title="Marcar como Comprado"></i>' : ''}
+                 <i class="fas fa-edit action-edit" title="Editar"></i>
+                 <i class="fab fa-google action-search" title="Pesquisar produto na web"></i>
+                 <i class="fas fa-trash-alt action-delete" title="Excluir"></i>
+            </div>
+        `;
+        // Inicializa o vanilla-tilt para os cards normais
+        if (typeof VanillaTilt !== 'undefined') {
+            VanillaTilt.init(card, { max: 10, speed: 200, glare: true, "max-glare": 0.2 });
+        }
     }
-    
+
     return card;
 };
+
 
 // Em renderer.js, substitua toda a sua função fetchAndRenderProducts por esta
 
@@ -592,25 +595,38 @@ const fetchAndRenderProducts = async () => {
             });
         }
         
-        // Aplica o efeito holográfico nos cards de histórico após serem adicionados
-        const historyCards = document.querySelectorAll("#history-tab .product-card");
-        historyCards.forEach(card => {
-            card.addEventListener("mousemove", e => {
-                const rect = card.getBoundingClientRect();
-                const { width, height, top, left } = rect;
-                const mouseX = e.clientX - left;
-                const mouseY = e.clientY - top;
-                const xPct = mouseX / width - 0.5;
-                const yPct = mouseY / height - 0.5;
-                card.style.setProperty("--rx", yPct * -25);
-                card.style.setProperty("--ry", xPct * 25);
-                card.style.setProperty("--pos", (mouseX / width) * 100);
-            });
-            card.addEventListener("mouseleave", () => {
-                card.style.setProperty("--rx", 0);
-                card.style.setProperty("--ry", 0);
-            });
-        });
+// Em src/renderer.js, DENTRO da função fetchAndRenderProducts, no final
+
+// ... (depois do forEach de historyProducts)
+
+const historyCards = document.querySelectorAll("#history-tab .product-card");
+
+historyCards.forEach(card => {
+    card.addEventListener("mousemove", e => {
+        const rect = card.getBoundingClientRect();
+        const { width, height, top, left } = rect;
+        const mouseX = e.clientX - left;
+        const mouseY = e.clientY - top;
+        const xPct = mouseX / width - 0.5;
+        const yPct = mouseY / height - 0.5;
+
+        // Atualiza as variáveis CSS para a rotação 3D
+        card.style.setProperty("--rx", yPct * -20); // Multiplicador ajusta a intensidade
+        card.style.setProperty("--ry", xPct * 20);
+
+        // Atualiza a posição do brilho
+        card.style.setProperty("--pos", (mouseX / width) * 100);
+        card.style.setProperty("--mx", mouseX);
+        card.style.setProperty("--my", mouseY);
+    });
+
+    card.addEventListener("mouseleave", () => {
+        // Reseta as variáveis quando o mouse sai do card
+        card.style.setProperty("--rx", 0);
+        card.style.setProperty("--ry", 0);
+    });
+});
+
 
     } catch (error) {
         console.error("Erro em fetchAndRenderProducts:", error);
