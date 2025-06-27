@@ -490,11 +490,11 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
     border-radius: 35px;
     z-index: 4;
     
-    background: radial-gradient(
-        circle at calc(var(--mx, 50) * 1px) calc(var(--my, 50) * 1px),
-        rgba(255, 215, 0, 0.6) 0%, /* Gold color - Dourado */
-        rgba(255, 245, 180, 0.4) 15%,
-        transparent 40%
+    background: linear-gradient(
+        135deg,
+        rgba(255, 215, 0, 0.2) 0%,
+        rgba(255, 215, 0, 0.1) 50%,
+        rgba(255, 215, 0, 0.2) 100%
     );
     
     mix-blend-mode: color-dodge;
