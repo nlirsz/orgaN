@@ -480,30 +480,22 @@ const createProductCard = (product, cardType = 'product') => {
     card.dataset.productId = product._id;
     card.dataset.productJson = JSON.stringify(product);
 
-    // Se for um card de histórico, aplica a estrutura 3D
+    // Se for um card de histórico, aplica a nova estrutura simplificada
     if (cardType === 'history') {
         card.innerHTML = `
-            <div class="card-inner">
-                <div class="card-face card-face-front">
-                    <div class="card-image-container">
-                        <img src="${product.image || 'https://via.placeholder.com/200x150?text=Indisponível'}" alt="${product.name || 'Produto'}" class="card-image">
-                    </div>
-                    <div class="card-content">
-                        <h3 class="card-title">${product.name || 'Nome Indisponível'}</h3>
-                    </div>
-                </div>
-                <div class="card-face card-face-back">
-                     <div class="card-back-design">
-                        <div class="card-back-logo"></div>
-                     </div>
-                </div>
+            <div class="card-image-container">
+                <img src="${product.image || 'https://via.placeholder.com/200x150?text=Indisponível'}" alt="${product.name || 'Produto'}" class="card-image">
             </div>
+            <div class="card-content">
+                <h3 class="card-title">${product.name || 'Nome Indisponível'}</h3>
+            </div>
+            
             <div class="card-plastic-overlay"></div>
             <div class="card-shine-overlay"></div>
             <div class="card-border-overlay"></div>
         `;
     } else {
-        // Lógica para os cards de produtos pendentes (mantém a original, mas pode ser estilizada também)
+        // Lógica para os cards de produtos pendentes (mantém a original)
         const categoryColor = categoryColors[product.category] || categoryColors['Outros'];
         card.style.setProperty('--category-color', categoryColor);
         card.innerHTML = `
@@ -527,10 +519,9 @@ const createProductCard = (product, cardType = 'product') => {
             VanillaTilt.init(card, { max: 10, speed: 200, glare: true, "max-glare": 0.2 });
         }
     }
-
+    
     return card;
 };
-
 
 // Em renderer.js, substitua toda a sua função fetchAndRenderProducts por esta
 

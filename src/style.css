@@ -434,7 +434,7 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
 .card-actions i:active { box-shadow: var(--shadow-inset); }
 
 
-/* === Card Colecionável (Histórico) - Layout Final com Efeito 3D e Reflexo === */
+/* === Card Colecionável (Histórico) - Efeito 3D com Reflexo Dourado === */
 
 #history-tab .product-grid {
     perspective: 2000px; /* Adiciona perspectiva ao container para o 3D funcionar melhor */
@@ -448,7 +448,7 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
     width: var(--w);
     height: var(--h);
     position: relative;
-    border-radius: 15px; /* Bordas arredondadas */
+    border-radius: 15px;
     
     /* Configuração do efeito 3D */
     transform-style: preserve-3d;
@@ -459,9 +459,13 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
         rotateX(calc(var(--rx, 0) * 1deg)) 
         rotateY(calc(var(--ry, 0) * 1deg));
     
-    transition: transform 0.2s ease-out;
+    transition: transform 0.1s ease-out;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: var(--c-primary);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Garante que as camadas de efeito fiquem dentro das bordas */
 }
 
 #history-tab .product-card:hover {
@@ -476,103 +480,42 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
 }
 
-/* CONTAINER PARA FRENTE E VERSO */
-.card-inner {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    transform-style: preserve-3d;
-    transition: transform 0.8s cubic-bezier(0.7, 0, 0.3, 1);
-}
-
-#history-tab .product-card:hover .card-inner {
-    transform: rotateY(180deg); /* Gira o card no hover */
-}
-
-/* ESTILO COMUM PARA FRENTE E VERSO */
-.card-face {
+/* CAMADA DE BRILHO DOURADO (Estilo Pokémon) */
+.card-shine-overlay {
     position: absolute;
-    width: 100%;
-    height: 100%;
-    -webkit-backface-visibility: hidden; /* Safari */
-    backface-visibility: hidden;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     border-radius: 15px;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
+    z-index: 4;
+    
+    background: radial-gradient(
+        circle at calc(var(--mx, 50) * 1px) calc(var(--my, 50) * 1px),
+        rgba(255, 215, 0, 0.6) 0%, /* Gold color - Dourado */
+        rgba(255, 245, 180, 0.4) 15%,
+        transparent 40%
+    );
+    
+    mix-blend-mode: color-dodge;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    pointer-events: none; /* Permite cliques através da camada */
 }
 
-/* FRENTE DO CARD (O PRODUTO) */
-.card-face-front {
-    background-color: var(--c-primary); /* Fundo do tema */
+#history-tab .product-card:hover .card-shine-overlay {
+    opacity: 1;
 }
-
-/* VERSO DO CARD (EFEITO ROXO) */
-.card-face-back {
-    background-color: #0e0a14; /* Cor de fundo escura para o verso */
-    background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M11 18l4 4-4 4-4-4 4-4zm44 44l4 4-4 4-4-4 4-4zm4-44l4 4-4 4-4-4 4-4zm-44 4l4 4-4 4-4-4 4-4zm12 12l4 4-4 4-4-4 4-4zm44 44l4 4-4 4-4-4 4-4zm-4-44l4 4-4 4-4-4 4-4zm-44 4l4 4-4 4-4-4 4-4z" fill="%231a1423" fill-opacity="0.4" fill-rule="evenodd"/></svg>');
-    transform: rotateY(180deg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    box-sizing: border-box;
-}
-
-.card-back-design {
-    width: 100%;
-    height: 100%;
-    border: 3px solid #8A2BE2; /* Roxo brilhante */
-    border-radius: 10px;
-    box-shadow: 0 0 20px #8A2BE2, inset 0 0 15px #c88dff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.card-back-logo {
-    width: 60px;
-    height: 60px;
-    background: #8A2BE2;
-    transform: rotate(45deg);
-    box-shadow: 0 0 15px #c88dff;
-}
-
 
 /* CAMADA DE EFEITO PLÁSTICO (IMAGEM 3) */
 .card-plastic-overlay {
     position: absolute;
     inset: 0;
     z-index: 3;
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAAXNSR0IArs4c6QAAAD9JREFUGFd9jEEOACAIxPz/T8/mB0iiB4wz8CgYdJ4U2yZl2YLpOF03rjeaK2a63O+1dD58AJKf13wAV28CbgAAAABJRU5ErkJggg=='); /* Imagem de textura de plástico bem sutil */
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAAXNSR0IArs4c6QAAAD9JREFUGFd9jEEOACAIxPz/T8/mB0iiB4wz8CgYdJ4U2yZl2YLpOF03rjeaK2a63O+1dD58AJKf13wAV28CbgAAAABJRU5ErkJggg==');
     opacity: 0.15;
     mix-blend-mode: overlay;
     pointer-events: none;
-}
-
-
-/* CAMADA DE BRILHO REFLEXIVO */
-.card-shine-overlay {
-    position: absolute;
-    inset: 0;
-    z-index: 4;
-    border-radius: 15px;
-    background: linear-gradient(
-        110deg,
-        transparent 30%,
-        rgba(255, 255, 255, 0.6) 50%,
-        transparent 70%
-    );
-    background-size: 300% 300%;
-    background-position: calc(var(--pos, 0) * 1% + 20%) 50%;
-    mix-blend-mode: color-dodge;
-    opacity: 0;
-    transition: opacity 0.4s ease-out;
-    pointer-events: none;
-}
-
-#history-tab .product-card:hover .card-shine-overlay {
-    opacity: 0.8;
 }
 
 /* CAMADA DE BORDAS ARRANHADAS (IMAGEM 1) */
@@ -581,35 +524,43 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
     inset: 0;
     z-index: 5;
     border-radius: 15px;
-    border: 10px solid transparent; /* Aumente a borda para o efeito ser mais visível */
-    box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.4), inset 0 0 15px rgba(0, 0, 0, 0.5);
-    background: linear-gradient(rgba(255,255,255,0), rgba(255,255,255,0)) padding-box,
-                url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAIQSURBVHhe7dpBcsIwDIDh/P+nl55QxIICKfFJPa3VpI4kaeK4v5+P4/i+T1EU32GMOU3T5FCHKAAAECBAgAABAoEXGCDi+75Sj5sQwhzH4avqfd/Lsrw49v1mWZYxpicGBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAIHCBwYYY45jmMdxlGU5rv2+p2kaxpjeGBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIEihcYYIy5rutoGqO+T6uqqsZ429siQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgMNAg4Pt+5nnevY/7vu/7vu95nncsx3Hc6w5jQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQGChQYDjOFJKaZrGMeZpmu/7WIIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQKlCwxiSnrM8fPaMcbY53me53nevU9riAABAgQIECBAgAABAoUXBpzwcL1eG2O+12sppZTSbdtY9z1tW5blOI7D5x1KgAABAgQIECBAgMDyAgMso5TSbVvLsmwY42zbbttpmobnWIIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQKFCwywxqiqKkopKaWUUkrTNE3TGGOMtY8xIECAAAECBAgQIECAQLnAN4e7E5zQyqobAAAAAElFTkSuQmCC') 50% 50% / 100% 100% no-repeat;
+    box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.3), inset 0 0 15px rgba(0, 0, 0, 0.5);
     mix-blend-mode: overlay;
-    opacity: 0.5;
+    opacity: 0.6;
     pointer-events: none;
 }
 
 /* Conteúdo interno do card */
 #history-tab .card-image-container {
-    height: 60%; /* Mais espaço para a imagem */
+    height: 60%;
     box-shadow: none;
-    background: rgba(255,255,255,0.1); /* Um fundo sutil para a imagem */
+    background: rgba(255,255,255,0.05);
     border-radius: 0;
+    flex-shrink: 0;
+}
+
+#history-tab .card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 #history-tab .card-content {
     height: 40%;
+    display: flex;
+    flex-direction: column;
     justify-content: center;
+    align-items: center;
     text-align: center;
-    border-top: 1px solid rgba(255,255,255,0.1);
-    background: rgba(0,0,0,0.2); /* Fundo escuro para o texto ter contraste */
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0,0,0,0.2);
     backdrop-filter: blur(2px);
-    border-radius: 0 0 15px 15px;
+    padding: 10px;
+    box-sizing: border-box;
 }
 
 #history-tab .card-title {
-    color: #121212;
+    color: #ffffff;
     font-weight: 700;
     font-size: 1.2em;
     text-shadow: 0 2px 5px rgba(0,0,0,0.7);
@@ -619,6 +570,7 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
 #history-tab .card-price, #history-tab .card-actions {
     display: none;
 }
+
 
 
 /* As ações que aparecem no hover (mantidas do CSS original) */
