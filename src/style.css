@@ -1224,40 +1224,70 @@ body[data-theme="dark"] #product-details-modal .modal-product-info {
 .card-category-badge {
     display: none; /* Esconde a badge de categoria no card de histórico */
 }
+/* --- INÍCIO DA CORREÇÃO ESPECÍFICA PARA CARDS DE HISTÓRICO NO MOBILE --- */
 
-    #history-tab .product-card {
-        background: var(--c-primary); 
-        transform: none !important;
-        transform-style: flat;
-        border-radius: 10px;
-        box-shadow: var(--shadow);
-        display: flex;
-        flex-direction: row;
-        align-items: stretch;
-        
-    }
-    #history-tab .product-card .card-hover-actions {
-        display: none;
-    }
-    #history-tab .product-card > .card-actions {
-        display: none; /* Esconde as ações no card de histórico */
-    }
-        #history-tab .product-card > .card-price {
-        display: none; /* Esconde as ações no card de histórico */
+/* 1. Define a grade de 2 colunas APENAS para a aba de histórico */
+#history-tab .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px; /* Espaçamento entre os cards */
+}
 
-    }
+/* 2. Reseta e define o estilo do card de histórico para o layout vertical */
+#history-tab .product-card {
+    display: flex;
+    flex-direction: column; /* Garante que imagem e título fiquem em coluna */
+    align-items: stretch;
+    height: auto; /* Altura automática para se ajustar ao conteúdo */
+    width: auto; /* Largura automática para se ajustar à grade */
+    transform: none !important; /* Remove o efeito 3D no mobile */
+    transform-style: flat;
+    background: var(--c-primary);
+    border: none; /* Remove a borda da categoria que não existe no histórico */
+}
 
-        #history-tab .product-card > .card-title {
-        font-size: 1em; /* Ajusta o tamanho da fonte do título */
-        -webkit-line-clamp: 3; /* Permite mais linhas no título do card
-    de histórico */
-        line-clamp: 3;
-        margin-bottom: 6px; /* Aumenta o espaçamento inferior */
-        height: auto; /* Permite que o título ocupe mais espaço */
-        min-height: 0; /* Remove a altura mínima para permitir mais linhas */
-        text-align: center; /* Centraliza o texto do título */
-    }
+/* 3. Ajusta o container da imagem */
+#history-tab .product-card .card-image-container {
+    height: 120px; /* Altura fixa para a imagem para manter a proporção */
+    width: 100%;
+    padding: 0;
+    background-color: transparent;
+}
 
+/* 4. Garante que a imagem ocupe o espaço do container */
+#history-tab .product-card .card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Garante que a imagem cubra o container sem distorcer */
+}
+
+/* 5. Ajusta a área de conteúdo (título) */
+#history-tab .product-card .card-content {
+    padding: 12px 8px;
+    text-align: center;
+    background: rgba(0,0,0,0.1); /* Fundo sutil para separar do corpo do card */
+    height: auto;
+    flex-grow: 1; /* Permite que o conteúdo cresça se necessário */
+    justify-content: center;
+}
+
+/* 6. Estilo do título do produto */
+#history-tab .product-card .card-title {
+    font-size: 0.9em;
+    font-weight: 600;
+    color: var(--text-primary);
+    -webkit-line-clamp: 2; /* Limita o título a 2 linhas */
+    line-clamp: 2;
+    margin: 0;
+}
+
+/* 7. Esconde os efeitos de brilho e overlays no mobile para melhor performance */
+#history-tab .product-card .card-shine-overlay,
+#history-tab .product-card .card-plastic-overlay,
+#history-tab .product-card .card-border-overlay {
+    display: none;
+}
+
+/* --- FIM DA CORREÇÃO ESPECÍFICA --- */
 
 
 
