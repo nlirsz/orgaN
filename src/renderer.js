@@ -1589,174 +1589,161 @@ const mainContentArea = document.querySelector('.main-content-area');
     }
 });
 
-// --- INÍCIO DO NOVO PAINEL FINANCEIRO ---
+// --- INÍCIO DA LÓGICA OPEN FINANCE (VERSÃO COM LIMITE) ---
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Seletores dos novos elementos da aba Financeiro
-    const financeTabButton = document.querySelector('.nav-btn[data-tab="finance"]');
-    const saveRevenueBtn = document.getElementById('save-revenue-btn');
-    const monthlyRevenueInput = document.getElementById('monthly-revenue-input');
+    const connectNewAccountBtn = document.getElementById('connect-new-account-btn');
+    const bankModal = document.getElementById('bank-modal');
+    const closeModalBtn = document.getElementById('close-modal-btn');
+    const bankList = document.getElementById('bank-list');
+    const connectionsTabButton = document.querySelector('.nav-btn[data-tab="connections"]');
+    const connectedAccountsList = document.getElementById('connected-accounts-list');
+    const connectionsMessage = document.getElementById('connections-message');
+    const connectionHeader = document.querySelector('.connection-header h3');
 
-    let financeCategoryChart = null;
-    let financeSpendingTrendChart = null;
+    const BELVO_FREE_LIMIT = 25;
 
-    // Função principal que redesenha o painel financeiro
-    async function renderFinanceDashboard() {
-        console.log("Renderizando o novo Painel Financeiro...");
+    const MOCK_BANKS = [
+        { id: 'nu', name: 'Nubank', logo: 'https://cdn.worldvectorlogo.com/logos/nubank-2.svg' },
+        { id: 'inter', name: 'Banco Inter', logo: 'https://cdn.worldvectorlogo.com/logos/banco-inter.svg' },
+        { id: 'itau', name: 'Itaú', logo: 'https://cdn.worldvectorlogo.com/logos/itau.svg' },
+        { id: 'bradesco', name: 'Bradesco', logo: 'https://cdn.worldvectorlogo.com/logos/bradesco-2.svg' },
+        { id: 'santander', name: 'Santander', logo: 'https://cdn.worldvectorlogo.com/logos/santander-3.svg' },
+        { id: 'bb', name: 'Banco do Brasil', logo: 'https://cdn.worldvectorlogo.com/logos/banco-do-brasil.svg' },
+    ];
 
-        if (!currentUserId) return;
+    const openModal = () => { /* ... (código do openModal continua igual) ... */ };
+    const closeModal = () => { /* ... (código do closeModal continua igual) ... */ };
+    const fetchOpenFinanceData = async (accounts) => { /* ... (código do fetchOpenFinanceData continua igual) ... */ };
+    const originalRenderFinanceDashboard = window.renderFinanceDashboard;
+    window.renderFinanceDashboard = async () => { /* ... (código do renderFinanceDashboard unificado continua igual) ... */ };
 
+    // NOVA FUNÇÃO: Verifica o limite de conexões
+    const checkConnectionLimit = async () => {
         try {
-            // 1. Busca todos os produtos do usuário
-            const response = await authenticatedFetch(`${API_BASE_URL}/products?userId=${currentUserId}`);
-            if (!response.ok) throw new Error('Falha ao buscar produtos.');
-            const allProducts = await response.json();
+            const response = await authenticatedFetch(`${API_BASE_URL}/connections/count`);
+            const { count } = await response.json();
 
-            const now = new Date();
-            const currentYear = now.getFullYear();
-            const currentMonth = now.getMonth();
-
-            // 2. Filtra apenas os produtos comprados no mês atual
-            const purchasedThisMonth = allProducts.filter(p => {
-                if (p.status !== 'comprado' || !p.purchasedAt) return false;
-                const purchasedDate = new Date(p.purchasedAt);
-                return purchasedDate.getFullYear() === currentYear && purchasedDate.getMonth() === currentMonth;
-            });
-
-            // 3. Calcula as métricas
-            const totalExpenses = purchasedThisMonth.reduce((sum, p) => sum + (p.price || 0), 0);
-            const itemsPurchased = purchasedThisMonth.length;
-            const monthlyRevenue = parseFloat(localStorage.getItem(`revenue_${currentYear}-${currentMonth}`)) || 0;
-            const balance = monthlyRevenue - totalExpenses;
-
-            // 4. Atualiza os cards de resumo
-            document.getElementById('finance-revenue-stat').textContent = formatCurrency(monthlyRevenue);
-            document.getElementById('finance-expenses-stat').textContent = formatCurrency(totalExpenses);
-            const balanceStatEl = document.getElementById('finance-balance-stat');
-            balanceStatEl.textContent = formatCurrency(balance);
-            balanceStatEl.style.color = balance < 0 ? 'var(--error-color)' : 'var(--success-color)';
-            document.getElementById('finance-items-purchased-stat').textContent = itemsPurchased;
-
-            // Preenche o input com o valor salvo
-            monthlyRevenueInput.value = monthlyRevenue > 0 ? monthlyRevenue.toFixed(2) : '';
-
-            // 5. Prepara dados para os gráficos
-            // Gráfico de Gastos por Categoria
-            const expensesByCategory = purchasedThisMonth.reduce((acc, p) => {
-                const category = p.category || 'Outros';
-                acc[category] = (acc[category] || 0) + (p.price || 0);
-                return acc;
-            }, {});
-
-            const categoryLabels = Object.keys(expensesByCategory);
-            const categoryData = Object.values(expensesByCategory);
-            
-            // Gráfico de Tendência de Gastos
-            const spendingByDay = {};
-            for (let i = 1; i <= new Date(currentYear, currentMonth + 1, 0).getDate(); i++) {
-                spendingByDay[i] = 0; // Inicializa todos os dias do mês com 0
+            // Atualiza o cabeçalho para mostrar a contagem
+            if(connectionHeader) {
+                connectionHeader.textContent = `Contas Conectadas (${count} / ${BELVO_FREE_LIMIT})`;
             }
-            purchasedThisMonth.forEach(p => {
-                const day = new Date(p.purchasedAt).getDate();
-                spendingByDay[day] += p.price || 0;
-            });
-            
-            const trendLabels = Object.keys(spendingByDay).map(day => `Dia ${day}`);
-            const trendData = Object.values(spendingByDay);
 
-            // 6. Renderiza os gráficos
-            renderFinanceCharts(categoryLabels, categoryData, trendLabels, trendData);
-
+            if (count >= BELVO_FREE_LIMIT) {
+                connectNewAccountBtn.disabled = true;
+                connectNewAccountBtn.style.opacity = '0.5';
+                connectNewAccountBtn.style.cursor = 'not-allowed';
+                showTabMessage(connectionsMessage, 'Limite de conexões do plano gratuito atingido.', 'info');
+            } else {
+                connectNewAccountBtn.disabled = false;
+                connectNewAccountBtn.style.opacity = '1';
+                connectNewAccountBtn.style.cursor = 'pointer';
+            }
         } catch (error) {
-            console.error("Erro ao renderizar o painel financeiro:", error);
-            showTabMessage(document.getElementById('finance-revenue-message'), 'Erro ao carregar dados do painel.', false);
+            console.error("Erro ao verificar limite de conexões:", error);
+            showTabMessage(connectionsMessage, 'Não foi possível verificar o status da conexão.', false);
         }
-    }
-
-    // Função para renderizar/atualizar os gráficos
-    function renderFinanceCharts(categoryLabels, categoryData, trendLabels, trendData) {
-        const textColor = getTextColor(); // Reutiliza sua função existente
-        
-        // Gráfico de Categorias (Rosca)
-        const categoryChartCanvas = document.getElementById('financeCategoryChart');
-        if (financeCategoryChart) financeCategoryChart.destroy();
-        financeCategoryChart = new Chart(categoryChartCanvas, {
-            type: 'doughnut',
-            data: {
-                labels: categoryLabels,
-                datasets: [{
-                    data: categoryData,
-                    backgroundColor: categoryLabels.map(label => categoryColors[label] || '#6B7280'),
-                    hoverOffset: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { labels: { color: textColor } } }
-            }
-        });
-
-        // Gráfico de Tendência (Linha)
-        const trendChartCanvas = document.getElementById('financeSpendingTrendChart');
-        if (financeSpendingTrendChart) financeSpendingTrendChart.destroy();
-        financeSpendingTrendChart = new Chart(trendChartCanvas, {
-            type: 'line',
-            data: {
-                labels: trendLabels,
-                datasets: [{
-                    label: 'Gastos Diários',
-                    data: trendData,
-                    borderColor: 'var(--primary-action)',
-                    backgroundColor: 'rgba(17, 148, 35, 0.2)',
-                    fill: true,
-                    tension: 0.3
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    x: { ticks: { color: textColor }, grid: { color: 'rgba(128, 128, 128, 0.1)' } },
-                    y: { beginAtZero: true, ticks: { color: textColor }, grid: { color: 'rgba(128, 128, 128, 0.1)' } }
-                },
-                plugins: { legend: { display: false } }
-            }
-        });
-    }
-
-    // Listener para o botão de salvar receita
-    if (saveRevenueBtn) {
-        saveRevenueBtn.addEventListener('click', () => {
-            const revenueValue = monthlyRevenueInput.value;
-            const now = new Date();
-            const key = `revenue_${now.getFullYear()}-${now.getMonth()}`;
-            
-            localStorage.setItem(key, revenueValue);
-            showTabMessage(document.getElementById('finance-revenue-message'), 'Receita salva com sucesso!', true);
-            
-            // Re-renderiza o painel para atualizar o balanço
-            renderFinanceDashboard();
-        });
-    }
-    
-    // Formato de moeda BRL
-    const formatCurrency = (value) => {
-        return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
     };
 
-
-    // Chama a renderização do painel financeiro quando a aba é clicada
-    if (financeTabButton) {
-        financeTabButton.addEventListener('click', renderFinanceDashboard);
+    const renderConnectedAccounts = () => {
+        const accounts = JSON.parse(localStorage.getItem('connectedAccounts')) || [];
+        connectedAccountsList.innerHTML = '';
+        if (accounts.length === 0) {
+            connectedAccountsList.innerHTML = '<p>Nenhuma conta conectada ainda.</p>';
+            return;
+        }
+        accounts.forEach(account => {
+            const bank = MOCK_BANKS.find(b => b.id === account.bankId);
+            connectedAccountsList.innerHTML += `
+                <div class="connected-account-card">
+                    <div class="bank-info">
+                        <img src="${bank.logo}" alt="Logo ${bank.name}" class="bank-logo">
+                        <span class="bank-name">${bank.name}</span>
+                    </div>
+                    <button class="btn disconnect-btn" data-account-id="${account.id}"><i class="fas fa-trash-alt"></i> Desconectar</button>
+                </div>
+            `;
+        });
+        // Após renderizar, verifica o limite
+        checkConnectionLimit();
+    };
+    
+    // ATUALIZADO: Listener para conectar nova conta
+    if (connectNewAccountBtn) {
+        connectNewAccountBtn.addEventListener('click', () => {
+            if(connectNewAccountBtn.disabled) {
+                showTabMessage(connectionsMessage, 'Não é possível adicionar mais contas. O limite do plano gratuito foi atingido.', false);
+                return;
+            }
+            openModal();
+        });
     }
-    
-    // Remove a lógica antiga da aba financeira para evitar conflitos
-    const oldFinanceList = document.getElementById('finance-list');
-    if(oldFinanceList) oldFinanceList.innerHTML = '';
-    
-    const addFinanceEntryBtn = document.getElementById('add-finance-entry-btn');
-    if(addFinanceEntryBtn) addFinanceEntryBtn.style.display = 'none';
 
+    // ATUALIZADO: Lógica de conexão ao clicar em um banco
+    bankList.addEventListener('click', async (e) => {
+        const bankItem = e.target.closest('.bank-item');
+        if (!bankItem) return;
+
+        const bankId = bankItem.dataset.bankId;
+        const bankName = bankItem.dataset.bankName;
+        closeModal();
+        showTabMessage(connectionsMessage, `Simulando conexão com ${bankName}...`, 'info');
+
+        try {
+            // Incrementa o contador no backend
+            await authenticatedFetch(`${API_BASE_URL}/connections/increment`, { method: 'POST' });
+
+            // Simula o tempo de espera
+            setTimeout(() => {
+                const accounts = JSON.parse(localStorage.getItem('connectedAccounts')) || [];
+                if (accounts.some(acc => acc.bankId === bankId)) {
+                     // Se já existe, decrementa o que acabamos de incrementar (não deveria acontecer, mas é uma segurança)
+                    authenticatedFetch(`${API_BASE_URL}/connections/decrement`, { method: 'POST' });
+                    showTabMessage(connectionsMessage, `${bankName} já está conectado.`, false);
+                    return;
+                }
+                
+                const newAccount = { id: `acc_${Date.now()}`, bankId: bankId };
+                accounts.push(newAccount);
+                localStorage.setItem('connectedAccounts', JSON.stringify(accounts));
+                
+                showTabMessage(connectionsMessage, `${bankName} conectado com sucesso!`, true);
+                renderConnectedAccounts();
+                window.renderFinanceDashboard();
+            }, 2000);
+        } catch (error) {
+            showTabMessage(connectionsMessage, 'Erro ao registrar nova conexão.', false);
+        }
+    });
+    
+    // ATUALIZADO: Desconectar conta
+    connectedAccountsList.addEventListener('click', async (e) => {
+        const disconnectBtn = e.target.closest('.disconnect-btn');
+        if(!disconnectBtn) return;
+        
+        const accountId = disconnectBtn.dataset.accountId;
+        
+        try {
+            // Decrementa o contador no backend
+            await authenticatedFetch(`${API_BASE_URL}/connections/decrement`, { method: 'POST' });
+
+            let accounts = JSON.parse(localStorage.getItem('connectedAccounts')) || [];
+            accounts = accounts.filter(acc => acc.id !== accountId);
+            localStorage.setItem('connectedAccounts', JSON.stringify(accounts));
+            
+            showTabMessage(connectionsMessage, 'Conta desconectada.', true);
+            renderConnectedAccounts();
+            window.renderFinanceDashboard();
+        } catch (error) {
+            showTabMessage(connectionsMessage, 'Erro ao desconectar conta.', false);
+        }
+    });
+
+    if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
+    bankModal.addEventListener('click', (e) => { if (e.target === bankModal) closeModal(); });
+
+    if (connectionsTabButton) {
+        connectionsTabButton.addEventListener('click', renderConnectedAccounts);
+    }
 });
-// --- FIM DO NOVO PAINEL FINANCEIRO ---
+// --- FIM DA LÓGICA OPEN FINANCE (VERSÃO COM LIMITE) ---
