@@ -128,7 +128,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const financeEmptyState = getElem('finance-empty-state');
     const themeSwitch = document.getElementById('theme-switch');
 
-
     // --- FUNÇÕES DE UTILIDADE ---
     async function authenticatedFetch(url, options = {}) {
         if (!authToken) {
@@ -470,202 +469,164 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-// Em src/renderer.js
+    const createProductCard = (product, cardType = 'product') => {
+        const card = document.createElement('li');
+        card.className = 'product-card';
+        card.dataset.productId = product._id;
+        card.dataset.productJson = JSON.stringify(product);
 
-// Em src/renderer.js
-// SUBSTITUA a função createProductCard por esta:
-const createProductCard = (product, cardType = 'product') => {
-    const card = document.createElement('li');
-    card.className = 'product-card';
-    card.dataset.productId = product._id;
-    card.dataset.productJson = JSON.stringify(product);
+        if (cardType === 'history') {
+            card.innerHTML = `
+                <div class="card-image-container">
+                    <img src="${product.image || 'https://via.placeholder.com/200x150?text=Indisponível'}" alt="${product.name || 'Produto'}" class="card-image">
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">${product.name || 'Nome Indisponível'}</h3>
+                </div>
+                
+                <div class="card-plastic-overlay"></div>
+                <div class="card-shine-overlay"></div>
+                <div class="card-border-overlay"></div>
+            `;
+        } else {
+            const categoryColor = categoryColors[product.category] || categoryColors['Outros'];
+            card.style.setProperty('--category-color', categoryColor);
+            card.innerHTML = `
+                ${product.category ? `<div class="card-category-badge">${product.category}</div>` : ''}
+                <div class="card-image-container">
+                    <img src="${product.image || 'https://via.placeholder.com/200x150?text=Indisponível'}" alt="${product.name || 'Produto'}" class="card-image">
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">${product.name || 'Nome Indisponível'}</h3>
+                    <p class="card-price">${product.price ? `R$ ${parseFloat(product.price).toFixed(2).replace('.', ',')}` : 'Preço Indisponível'}</p>
+                </div>
+                <div class="card-actions">
+                     ${product.status === 'pendente' ? '<i class="fas fa-check-circle action-purchase" title="Marcar como Comprado"></i>' : ''}
+                     <i class="fas fa-edit action-edit" title="Editar"></i>
+                     <i class="fab fa-google action-search" title="Pesquisar produto na web"></i>
+                     <i class="fas fa-trash-alt action-delete" title="Excluir"></i>
+                </div>
+            `;
+            if (typeof VanillaTilt !== 'undefined') {
+                VanillaTilt.init(card, { max: 10, speed: 200, glare: true, "max-glare": 0.2 });
+            }
+        }
+        
+        return card;
+    };
 
-    // Se for um card de histórico, aplica a nova estrutura simplificada
-    if (cardType === 'history') {
-        card.innerHTML = `
-            <div class="card-image-container">
-                <img src="${product.image || 'https://via.placeholder.com/200x150?text=Indisponível'}" alt="${product.name || 'Produto'}" class="card-image">
-            </div>
-            <div class="card-content">
-                <h3 class="card-title">${product.name || 'Nome Indisponível'}</h3>
-            </div>
+    const fetchAndRenderProducts = async () => {
+        if (!pendingList || !purchasedList || !pendingTotalValueEl || !purchasedTotalValueEl) return;
+        if (!currentUserId) return;
+
+        const smallSpinner = '<div class="spinner" style="width: 18px; height: 18px;"></div>';
+        const listLoader = '<div class="content-loader"><div class="spinner"></div></div>';
+        
+        pendingTotalValueEl.innerHTML = smallSpinner;
+        purchasedTotalValueEl.innerHTML = smallSpinner;
+        
+        pendingList.innerHTML = listLoader;
+        purchasedList.innerHTML = ''; 
+
+        if (pendingEmptyState) pendingEmptyState.style.display = 'none';
+        if (purchasedEmptyState) purchasedEmptyState.style.display = 'none';
+
+        try {
+            const response = await authenticatedFetch(`${API_BASE_URL}/products?userId=${currentUserId}`);
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({ message: response.statusText }));
+                throw new Error(errorData.message || 'Erro ao buscar produtos');
+            }
             
-            <div class="card-plastic-overlay"></div>
-            <div class="card-shine-overlay"></div>
-            <div class="card-border-overlay"></div>
-        `;
-    } else {
-        // Lógica para os cards de produtos pendentes (mantém a original)
-        const categoryColor = categoryColors[product.category] || categoryColors['Outros'];
-        card.style.setProperty('--category-color', categoryColor);
-        card.innerHTML = `
-            ${product.category ? `<div class="card-category-badge">${product.category}</div>` : ''}
-            <div class="card-image-container">
-                <img src="${product.image || 'https://via.placeholder.com/200x150?text=Indisponível'}" alt="${product.name || 'Produto'}" class="card-image">
-            </div>
-            <div class="card-content">
-                <h3 class="card-title">${product.name || 'Nome Indisponível'}</h3>
-                <p class="card-price">${product.price ? `R$ ${parseFloat(product.price).toFixed(2).replace('.', ',')}` : 'Preço Indisponível'}</p>
-            </div>
-            <div class="card-actions">
-                 ${product.status === 'pendente' ? '<i class="fas fa-check-circle action-purchase" title="Marcar como Comprado"></i>' : ''}
-                 <i class="fas fa-edit action-edit" title="Editar"></i>
-                 <i class="fab fa-google action-search" title="Pesquisar produto na web"></i>
-                 <i class="fas fa-trash-alt action-delete" title="Excluir"></i>
-            </div>
-        `;
-        // Inicializa o vanilla-tilt para os cards normais
-        if (typeof VanillaTilt !== 'undefined') {
-            VanillaTilt.init(card, { max: 10, speed: 200, glare: true, "max-glare": 0.2 });
-        }
-    }
-    
-    return card;
-};
+            const products = await response.json();
+            const pendingProducts = products.filter(p => p.status === 'pendente');
+            const historyProducts = products.filter(p => p.status === 'comprado' || p.status === 'descartado');
 
-// Em renderer.js, substitua toda a sua função fetchAndRenderProducts por esta
+            pendingList.innerHTML = '';
+            purchasedList.innerHTML = '';
 
-const fetchAndRenderProducts = async () => {
-    if (!pendingList || !purchasedList || !pendingTotalValueEl || !purchasedTotalValueEl) return;
-    if (!currentUserId) return;
+            const pendingTotal = pendingProducts.reduce((sum, product) => sum + (product.price || 0), 0);
+            pendingTotalValueEl.textContent = `R$ ${pendingTotal.toFixed(2).replace('.', ',')}`;
 
-    // --- Etapa 1: Mostrar estado de carregamento ---
-    const smallSpinner = '<div class="spinner" style="width: 18px; height: 18px;"></div>';
-    const listLoader = '<div class="content-loader"><div class="spinner"></div></div>';
-    
-    pendingTotalValueEl.innerHTML = smallSpinner;
-    purchasedTotalValueEl.innerHTML = smallSpinner;
-    
-    pendingList.innerHTML = listLoader;
-    purchasedList.innerHTML = ''; // Limpa a lista de histórico para evitar confusão
+            const purchasedTotal = products.filter(p => p.status === 'comprado').reduce((sum, product) => sum + (product.price || 0), 0);
+            purchasedTotalValueEl.textContent = `R$ ${purchasedTotal.toFixed(2).replace('.', ',')}`;
 
-    // Garante que as mensagens de "vazio" estejam escondidas durante o carregamento
-    if (pendingEmptyState) pendingEmptyState.style.display = 'none';
-    if (purchasedEmptyState) purchasedEmptyState.style.display = 'none';
+            if (pendingProducts.length === 0) {
+                if (pendingEmptyState) pendingEmptyState.style.display = 'block';
+            } else {
+                pendingProducts.forEach(product => {
+                    const card = createProductCard(product, 'product'); 
+                    pendingList.appendChild(card);
+                });
+            }
+            
+            if (historyProducts.length === 0) {
+                if (purchasedEmptyState) purchasedEmptyState.style.display = 'block';
+            } else {
+                historyProducts.forEach(product => {
+                    const card = createProductCard(product, 'history'); 
+                    purchasedList.appendChild(card);
+                });
+            }
+            
+            const historyCards = document.querySelectorAll("#history-tab .product-card");
 
-    try {
-        // --- Etapa 2: Buscar os dados ---
-        const response = await authenticatedFetch(`${API_BASE_URL}/products?userId=${currentUserId}`);
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({ message: response.statusText }));
-            throw new Error(errorData.message || 'Erro ao buscar produtos');
-        }
-        
-        const products = await response.json();
-        const pendingProducts = products.filter(p => p.status === 'pendente');
-        const historyProducts = products.filter(p => p.status === 'comprado' || p.status === 'descartado');
+            historyCards.forEach(card => {
+                card.addEventListener("mousemove", e => {
+                    const rect = card.getBoundingClientRect();
+                    const { width, height, top, left } = rect;
+                    const mouseX = e.clientX - left;
+                    const mouseY = e.clientY - top;
+                    const xPct = mouseX / width - 0.5;
+                    const yPct = mouseY / height - 0.5;
 
-        // --- Etapa 3: Renderizar o conteúdo de SUCESSO ---
-        pendingList.innerHTML = ''; // Limpa o loader da lista de pendentes
-        purchasedList.innerHTML = ''; // Limpa a lista de histórico
+                    card.style.setProperty("--rx", yPct * -20);
+                    card.style.setProperty("--ry", xPct * 20);
+                    card.style.setProperty("--pos", (mouseX / width) * 100);
+                    card.style.setProperty("--mx", mouseX);
+                    card.style.setProperty("--my", mouseY);
+                });
 
-        // Atualiza os totais
-        const pendingTotal = pendingProducts.reduce((sum, product) => sum + (product.price || 0), 0);
-        pendingTotalValueEl.textContent = `R$ ${pendingTotal.toFixed(2).replace('.', ',')}`;
-
-        const purchasedTotal = products.filter(p => p.status === 'comprado').reduce((sum, product) => sum + (product.price || 0), 0);
-        purchasedTotalValueEl.textContent = `R$ ${purchasedTotal.toFixed(2).replace('.', ',')}`;
-
-        // Renderiza a lista de produtos pendentes
-        if (pendingProducts.length === 0) {
-            if (pendingEmptyState) pendingEmptyState.style.display = 'block';
-        } else {
-            pendingProducts.forEach(product => {
-                const card = createProductCard(product, 'product'); 
-                pendingList.appendChild(card);
+                card.addEventListener("mouseleave", () => {
+                    card.style.setProperty("--rx", 0);
+                    card.style.setProperty("--ry", 0);
+                });
             });
+
+        } catch (error) {
+            console.error("Erro em fetchAndRenderProducts:", error);
+            const errorHtml = '<span class="error-message" style="font-size: 0.9em;">Erro!</span>';
+            pendingTotalValueEl.innerHTML = errorHtml;
+            purchasedTotalValueEl.innerHTML = errorHtml;
+            
+            const listError = '<div class="content-loader"><span class="error-message"><i class="fas fa-exclamation-triangle"></i> Não foi possível carregar.</span></div>';
+            pendingList.innerHTML = listError;
+            purchasedList.innerHTML = listError;
         }
-        
-        // Renderiza a lista de histórico
-        if (historyProducts.length === 0) {
-            if (purchasedEmptyState) purchasedEmptyState.style.display = 'block';
-        } else {
-            historyProducts.forEach(product => {
-                const card = createProductCard(product, 'history'); 
-                purchasedList.appendChild(card);
-            });
+    };
+
+    function setContentState(wrapperElement, contentElement, state, errorMessage = 'Erro ao carregar.') {
+        if (!wrapperElement || !contentElement) return;
+
+        wrapperElement.innerHTML = '';
+        contentElement.style.display = 'none';
+
+        if (state === 'loading') {
+            const loaderDiv = document.createElement('div');
+            loaderDiv.className = 'content-loader';
+            loaderDiv.innerHTML = '<div class="spinner"></div>';
+            wrapperElement.appendChild(loaderDiv);
+        } else if (state === 'error') {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'content-loader';
+            errorDiv.innerHTML = `<span class="error-message"><i class="fas fa-exclamation-triangle"></i> ${errorMessage}</span>`;
+            wrapperElement.appendChild(errorDiv);
+        } else if (state === 'success') {
+            contentElement.style.display = '';
         }
-        
-// Em src/renderer.js, DENTRO da função fetchAndRenderProducts, no final
-
-// ... (depois do forEach de historyProducts)
-
-const historyCards = document.querySelectorAll("#history-tab .product-card");
-
-historyCards.forEach(card => {
-    card.addEventListener("mousemove", e => {
-        const rect = card.getBoundingClientRect();
-        const { width, height, top, left } = rect;
-        const mouseX = e.clientX - left;
-        const mouseY = e.clientY - top;
-        const xPct = mouseX / width - 0.5;
-        const yPct = mouseY / height - 0.5;
-
-        // Atualiza as variáveis CSS para a rotação 3D
-        card.style.setProperty("--rx", yPct * -20); // Multiplicador ajusta a intensidade
-        card.style.setProperty("--ry", xPct * 20);
-
-        // Atualiza a posição do brilho
-        card.style.setProperty("--pos", (mouseX / width) * 100);
-        card.style.setProperty("--mx", mouseX);
-        card.style.setProperty("--my", mouseY);
-    });
-
-    card.addEventListener("mouseleave", () => {
-        // Reseta as variáveis quando o mouse sai do card
-        card.style.setProperty("--rx", 0);
-        card.style.setProperty("--ry", 0);
-    });
-});
-
-
-    } catch (error) {
-        console.error("Erro em fetchAndRenderProducts:", error);
-        // --- Etapa 4: Renderizar o estado de ERRO ---
-        const errorHtml = '<span class="error-message" style="font-size: 0.9em;">Erro!</span>';
-        pendingTotalValueEl.innerHTML = errorHtml;
-        purchasedTotalValueEl.innerHTML = errorHtml;
-        
-        const listError = '<div class="content-loader"><span class="error-message"><i class="fas fa-exclamation-triangle"></i> Não foi possível carregar.</span></div>';
-        pendingList.innerHTML = listError;
-        purchasedList.innerHTML = listError;
     }
-};
 
-// Em renderer.js, adicione esta nova função de utilidade
-
-/**
- * Controla o estado de um elemento, mostrando 'loading', 'error' ou o conteúdo final.
- * @param {HTMLElement} wrapperElement - O elemento que contém o loader e o conteúdo.
- * @param {HTMLElement} contentElement - O elemento que mostrará o dado final.
- * @param {'loading' | 'error' | 'success'} state - O estado a ser exibido.
- * @param {string} [errorMessage] - A mensagem de erro, se houver.
- */
-function setContentState(wrapperElement, contentElement, state, errorMessage = 'Erro ao carregar.') {
-    if (!wrapperElement || !contentElement) return;
-
-    // Limpa o conteúdo anterior
-    wrapperElement.innerHTML = '';
-    contentElement.style.display = 'none';
-
-    if (state === 'loading') {
-        const loaderDiv = document.createElement('div');
-        loaderDiv.className = 'content-loader';
-        loaderDiv.innerHTML = '<div class="spinner"></div>';
-        wrapperElement.appendChild(loaderDiv);
-    } else if (state === 'error') {
-        const errorDiv = document.createElement('div');
-        errorDiv.className = 'content-loader';
-        errorDiv.innerHTML = `<span class="error-message"><i class="fas fa-exclamation-triangle"></i> ${errorMessage}</span>`;
-        wrapperElement.appendChild(errorDiv);
-    } else if (state === 'success') {
-        // Se for sucesso, o conteúdo original do elemento é mostrado
-        // A função que chama o setContentState será responsável por preencher o contentElement
-        contentElement.style.display = ''; // ou 'block', 'flex', etc.
-    }
-}
-
-const getTextColor = () => getComputedStyle(document.body).getPropertyValue('--text-primary').trim();
+    const getTextColor = () => getComputedStyle(document.body).getPropertyValue('--text-primary').trim();
 
     const updateChartColors = () => {
         const textColor = getTextColor();
@@ -691,7 +652,6 @@ const getTextColor = () => getComputedStyle(document.body).getPropertyValue('--t
         });
     };
 
-    // Em renderer.js, adicione no topo junto com outras variáveis
     const categoryColors = {
         'Eletrônicos': '#3B82F6',
         'Roupas e Acessórios': '#8B5CF6',
@@ -730,11 +690,6 @@ const getTextColor = () => getComputedStyle(document.body).getPropertyValue('--t
 
     applySavedTheme();
 
-
-    // --- O RESTANTE DO SEU CÓDIGO (finanças, modais, etc.) ---
-    // ...
-    // ... (cole o restante do seu arquivo renderer.js aqui, sem alterações) ...
-    // ...
     function clearAddProductFormAddTab() {
         if (productUrlInputAddTab) productUrlInputAddTab.value = '';
         if (verifiedProductInfoDivAddTab) verifiedProductInfoDivAddTab.classList.add('hidden');
@@ -763,190 +718,175 @@ const getTextColor = () => getComputedStyle(document.body).getPropertyValue('--t
     window.addEventListener('orientationchange', setAppHeight); 
     setAppHeight(); 
 
-// Em renderer.js, substitua toda a sua função fetchAndRenderDashboardStats por esta
+    const fetchAndRenderDashboardStats = async () => {
+        if (!currentUserId) return;
 
-const fetchAndRenderDashboardStats = async () => {
-    if (!currentUserId) return;
+        const cardElements = {
+            totalProducts: getElem('total-products-stat'),
+            purchasedProducts: getElem('purchased-products-stat'),
+            pendingProducts: getElem('pending-products-stat'),
+            totalSpent: getElem('total-spent-stat'),
+            avgSpent: getElem('avg-spent-stat'),
+            currentMonthBalance: getElem('current-month-balance-stat')
+        };
 
-    // --- Seletores para os elementos do painel ---
-    const cardElements = {
-        totalProducts: getElem('total-products-stat'),
-        purchasedProducts: getElem('purchased-products-stat'),
-        pendingProducts: getElem('pending-products-stat'),
-        totalSpent: getElem('total-spent-stat'),
-        avgSpent: getElem('avg-spent-stat'),
-        currentMonthBalance: getElem('current-month-balance-stat')
-    };
-
-    const chartCanvases = {
-        financeOverview: getElem('financeOverviewChart'),
-        categoryDistribution: getElem('categoryDistributionChart'),
-        priorityDistribution: getElem('priorityDistributionChart')
-    };
-    
-    // --- Etapa 1: Mostrar o estado de carregamento ---
-    const spinnerHtml = '<div class="spinner"></div>';
-    for (const key in cardElements) {
-        if (cardElements[key]) {
-            cardElements[key].innerHTML = spinnerHtml;
-        }
-    }
-
-    try {
-        // --- Etapa 2: Buscar todos os dados em paralelo ---
-        const [
-            statsResponse,
-            financeResponse,
-            categoryDistResponse,
-            priorityDistResponse
-        ] = await Promise.all([
-            authenticatedFetch(`${API_BASE_URL}/products/stats?userId=${currentUserId}`),
-            authenticatedFetch(`${API_BASE_URL}/finances?userId=${currentUserId}`),
-            authenticatedFetch(`${API_BASE_URL}/products/category-distribution?userId=${currentUserId}`),
-            authenticatedFetch(`${API_BASE_URL}/products/priority-distribution?userId=${currentUserId}`)
-        ]);
-
-        // --- Etapa 3: Processar e exibir os dados de SUCESSO ---
-
-        // Processa estatísticas dos produtos
-        if (statsResponse.ok) {
-            const stats = await statsResponse.json();
-            cardElements.totalProducts.textContent = stats.totalProducts;
-            cardElements.purchasedProducts.textContent = stats.purchasedProducts;
-            cardElements.pendingProducts.textContent = stats.pendingProducts;
-            cardElements.totalSpent.textContent = `R$ ${stats.totalSpent.toFixed(2).replace('.', ',')}`;
-            const avgSpent = stats.purchasedProducts > 0 ? (stats.totalSpent / stats.purchasedProducts) : 0;
-            if(cardElements.avgSpent) cardElements.avgSpent.textContent = `R$ ${avgSpent.toFixed(2).replace('.', ',')}`;
-        } else {
-            throw new Error("Falha ao buscar estatísticas dos produtos.");
-        }
-
-        // Processa dados financeiros
-        if (financeResponse.ok) {
-            const financeData = await financeResponse.json();
-            const now = new Date();
-            const currentMonthStr = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
-            const currentMonthEntry = financeData.find(e => e.mes_ano === currentMonthStr);
-            const balance = currentMonthEntry ? currentMonthEntry.receita - currentMonthEntry.gastos : 0;
-            if(cardElements.currentMonthBalance) {
-                cardElements.currentMonthBalance.textContent = `R$ ${balance.toFixed(2).replace('.', ',')}`;
-                cardElements.currentMonthBalance.style.color = balance < 0 ? 'var(--error-color)' : 'var(--success-color)';
-            }
-            renderGenericChart(chartCanvases.financeOverview, 'line', financeData);
-        } else {
-            throw new Error("Falha ao buscar dados financeiros.");
-        }
-
-        // Processa dados dos gráficos de pizza/rosca
-        const categoryData = categoryDistResponse.ok ? await categoryDistResponse.json() : { labels: [], data: [] };
-        const priorityData = priorityDistResponse.ok ? await priorityDistResponse.json() : { labels: [], data: [] };
-        renderGenericChart(chartCanvases.categoryDistribution, 'doughnut', categoryData, true);
-        renderGenericChart(chartCanvases.priorityDistribution, 'pie', priorityData, true, ['#EF4444', '#F59E0B', '#10B981']);
-
-    } catch (err) {
-        console.error("Erro ao carregar dados do dashboard:", err);
-        // --- Etapa 4: Exibir o estado de ERRO ---
-        const errorHtml = '<span class="error-message" title="Erro ao carregar"><i class="fas fa-times-circle"></i></span>';
+        const chartCanvases = {
+            financeOverview: getElem('financeOverviewChart'),
+            categoryDistribution: getElem('categoryDistributionChart'),
+            priorityDistribution: getElem('priorityDistributionChart')
+        };
+        
+        const spinnerHtml = '<div class="spinner"></div>';
         for (const key in cardElements) {
             if (cardElements[key]) {
-                cardElements[key].innerHTML = errorHtml;
+                cardElements[key].innerHTML = spinnerHtml;
             }
         }
-        // Limpa os canvases dos gráficos em caso de erro
-        for (const key in chartCanvases) {
-             const chartCanvas = chartCanvases[key];
-             if(chartCanvas) {
-                const existingChart = Chart.getChart(chartCanvas);
-                if (existingChart) existingChart.destroy();
-                const ctx = chartCanvas.getContext('2d');
-                ctx.clearRect(0, 0, chartCanvas.width, chartCanvas.height);
-             }
-        }
-    }
-}; // Fim da função
 
-const renderGenericChart = (canvasEl, type, data, isPieOrDoughnut = false, customColors = null) => {
-    if (!canvasEl) {
-        return;
-    }
+        try {
+            const [
+                statsResponse,
+                financeResponse,
+                categoryDistResponse,
+                priorityDistResponse
+            ] = await Promise.all([
+                authenticatedFetch(`${API_BASE_URL}/products/stats?userId=${currentUserId}`),
+                authenticatedFetch(`${API_BASE_URL}/finances?userId=${currentUserId}`),
+                authenticatedFetch(`${API_BASE_URL}/products/category-distribution?userId=${currentUserId}`),
+                authenticatedFetch(`${API_BASE_URL}/products/priority-distribution?userId=${currentUserId}`)
+            ]);
 
-    // Se um gráfico já existe no canvas, destrói para evitar sobreposição
-    const existingChart = Chart.getChart(canvasEl);
-    if (existingChart) {
-        existingChart.destroy();
-    }
-
-    let chartData, chartOptions;
-
-    // Lógica para gráficos de Pizza/Rosca
-    if (isPieOrDoughnut) {
-        chartData = {
-            labels: data.labels,
-            datasets: [{
-                data: data.data,
-                backgroundColor: customColors || ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#6366F1', '#14B8A6', '#F97316', '#8B5CF6'],
-                hoverOffset: 10
-            }]
-        };
-        chartOptions = {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: { color: getTextColor() }
-                },
+            if (statsResponse.ok) {
+                const stats = await statsResponse.json();
+                cardElements.totalProducts.textContent = stats.totalProducts;
+                cardElements.purchasedProducts.textContent = stats.purchasedProducts;
+                cardElements.pendingProducts.textContent = stats.pendingProducts;
+                cardElements.totalSpent.textContent = `R$ ${stats.totalSpent.toFixed(2).replace('.', ',')}`;
+                const avgSpent = stats.purchasedProducts > 0 ? (stats.totalSpent / stats.purchasedProducts) : 0;
+                if(cardElements.avgSpent) cardElements.avgSpent.textContent = `R$ ${avgSpent.toFixed(2).replace('.', ',')}`;
+            } else {
+                throw new Error("Falha ao buscar estatísticas dos produtos.");
             }
-        };
-    // Lógica para outros gráficos (linha, etc.)
-    } else {
-        const sortedEntries = [...data].sort((a, b) => a.mes_ano.localeCompare(b.mes_ano));
-        const labels = sortedEntries.map(e => {
-            const [year, month] = e.mes_ano.split('-');
-            const date = new Date(year, month - 1);
-            return date.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' });
-        });
-        const revenueData = sortedEntries.map(e => e.receita);
-        const expensesData = sortedEntries.map(e => e.gastos);
 
-        chartData = {
-            labels: labels,
-            datasets: [
-                {
-                    label: 'Receita',
-                    data: revenueData,
-                    borderColor: 'rgb(62, 235, 103)',
-                    backgroundColor: 'rgba(62, 235, 103, 0.5)',
-                    fill: false,
-                    tension: 0.1
-                },
-                {
-                    label: 'Gastos',
-                    data: expensesData,
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    backgroundColor: 'rgba(255, 99, 132, 0.5)',
-                    fill: false,
-                    tension: 0.1
+            if (financeResponse.ok) {
+                const financeData = await financeResponse.json();
+                const now = new Date();
+                const currentMonthStr = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
+                const currentMonthEntry = financeData.find(e => e.mes_ano === currentMonthStr);
+                const balance = currentMonthEntry ? currentMonthEntry.receita - currentMonthEntry.gastos : 0;
+                if(cardElements.currentMonthBalance) {
+                    cardElements.currentMonthBalance.textContent = `R$ ${balance.toFixed(2).replace('.', ',')}`;
+                    cardElements.currentMonthBalance.style.color = balance < 0 ? 'var(--error-color)' : 'var(--success-color)';
                 }
-            ]
-        };
-        chartOptions = {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                x: { ticks: { color: getTextColor() }, grid: { color: 'rgba(128, 128, 128, 0.1)' } },
-                y: { beginAtZero: true, ticks: { color: getTextColor() }, grid: { color: 'rgba(128, 128, 128, 0.1)' } }
-            },
-            plugins: {
-                legend: { position: 'top', labels: { color: getTextColor() } }
+                renderGenericChart(chartCanvases.financeOverview, 'line', financeData);
+            } else {
+                throw new Error("Falha ao buscar dados financeiros.");
             }
-        };
-    }
 
-    new Chart(canvasEl.getContext('2d'), { type, data: chartData, options: chartOptions });
-};
+            const categoryData = categoryDistResponse.ok ? await categoryDistResponse.json() : { labels: [], data: [] };
+            const priorityData = priorityDistResponse.ok ? await priorityDistResponse.json() : { labels: [], data: [] };
+            renderGenericChart(chartCanvases.categoryDistribution, 'doughnut', categoryData, true);
+            renderGenericChart(chartCanvases.priorityDistribution, 'pie', priorityData, true, ['#EF4444', '#F59E0B', '#10B981']);
 
+        } catch (err) {
+            console.error("Erro ao carregar dados do dashboard:", err);
+            const errorHtml = '<span class="error-message" title="Erro ao carregar"><i class="fas fa-times-circle"></i></span>';
+            for (const key in cardElements) {
+                if (cardElements[key]) {
+                    cardElements[key].innerHTML = errorHtml;
+                }
+            }
+            for (const key in chartCanvases) {
+                 const chartCanvas = chartCanvases[key];
+                 if(chartCanvas) {
+                    const existingChart = Chart.getChart(chartCanvas);
+                    if (existingChart) existingChart.destroy();
+                    const ctx = chartCanvas.getContext('2d');
+                    ctx.clearRect(0, 0, chartCanvas.width, chartCanvas.height);
+                 }
+            }
+        }
+    };
 
+    const renderGenericChart = (canvasEl, type, data, isPieOrDoughnut = false, customColors = null) => {
+        if (!canvasEl) {
+            return;
+        }
+
+        const existingChart = Chart.getChart(canvasEl);
+        if (existingChart) {
+            existingChart.destroy();
+        }
+
+        let chartData, chartOptions;
+
+        if (isPieOrDoughnut) {
+            chartData = {
+                labels: data.labels,
+                datasets: [{
+                    data: data.data,
+                    backgroundColor: customColors || ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#6366F1', '#14B8A6', '#F97316', '#8B5CF6'],
+                    hoverOffset: 10
+                }]
+            };
+            chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { color: getTextColor() }
+                    },
+                }
+            };
+        } else {
+            const sortedEntries = [...data].sort((a, b) => a.mes_ano.localeCompare(b.mes_ano));
+            const labels = sortedEntries.map(e => {
+                const [year, month] = e.mes_ano.split('-');
+                const date = new Date(year, month - 1);
+                return date.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' });
+            });
+            const revenueData = sortedEntries.map(e => e.receita);
+            const expensesData = sortedEntries.map(e => e.gastos);
+
+            chartData = {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Receita',
+                        data: revenueData,
+                        borderColor: 'rgb(62, 235, 103)',
+                        backgroundColor: 'rgba(62, 235, 103, 0.5)',
+                        fill: false,
+                        tension: 0.1
+                    },
+                    {
+                        label: 'Gastos',
+                        data: expensesData,
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                        fill: false,
+                        tension: 0.1
+                    }
+                ]
+            };
+            chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { ticks: { color: getTextColor() }, grid: { color: 'rgba(128, 128, 128, 0.1)' } },
+                    y: { beginAtZero: true, ticks: { color: getTextColor() }, grid: { color: 'rgba(128, 128, 128, 0.1)' } }
+                },
+                plugins: {
+                    legend: { position: 'top', labels: { color: getTextColor() } }
+                }
+            };
+        }
+
+        new Chart(canvasEl.getContext('2d'), { type, data: chartData, options: chartOptions });
+    };
+
+    let financesData = [];
     const fetchAndRenderFinances = async () => {
         if (!financeList || !totalBalanceElem) return;
         if (!currentUserId) return;
@@ -1004,7 +944,7 @@ const renderGenericChart = (canvasEl, type, data, isPieOrDoughnut = false, custo
             if (totalBalanceElem) totalBalanceElem.textContent = `R$ ${totalBalance.toFixed(2).replace('.', ',')}`;
         }
 
-        renderGenericChart(financeChartCanvas, 'line', financesData, financeChartInstance, 'financialLineChart');
+        renderGenericChart(financeChartCanvas, 'line', financesData, false, null);
     };
 
     const clearFinanceForm = () => { 
@@ -1097,10 +1037,7 @@ const renderGenericChart = (canvasEl, type, data, isPieOrDoughnut = false, custo
         setupScrapeEventListeners(productUrlInputProductsTab, verifyUrlBtnProductsTab, verifiedProductInfoDivProductsTab, addProductMessageProductsTab, saveProductBtnProductsTab);
     }
     
-// 2. OS LISTENERS CORRIGIDOS PARA OS BOTÕES
-// Substitua seus listeners antigos por estes dois
-
-if (saveProductBtnAddTab) {
+    if (saveProductBtnAddTab) {
         saveProductBtnAddTab.addEventListener('click', () => {
             let payload = {};
             if (scrapedProductData && scrapedProductData.name) {
@@ -1118,7 +1055,6 @@ if (saveProductBtnAddTab) {
         });
     }
 
-    // Listener para o botão SALVAR na aba "PRODUTOS"
     if (saveProductBtnProductsTab) {
         saveProductBtnProductsTab.addEventListener('click', () => {
             if (scrapedProductData && scrapedProductData.name) {
@@ -1131,11 +1067,6 @@ if (saveProductBtnAddTab) {
         });
     }
 
-
-
-// ATUALIZAÇÃO 1: APAGUE a função 'handleSaveProduct' e COLOQUE esta no lugar.
-
-// ** FUNÇÃO DE SALVAR NO DB (MAIS SIMPLES) **
     async function saveProductToDB(productPayload, messageElement) {
         if (!productPayload || !productPayload.name || !productPayload.price) {
             showTabMessage(messageElement, 'Informações do produto estão incompletas para salvar.', false);
@@ -1149,7 +1080,6 @@ if (saveProductBtnAddTab) {
             showTabMessage(messageElement, "Produto salvo com sucesso!", true);
             clearAddProductFormAddTab();
             clearProductScrapeFormProductsTab();
-            // Await aqui para garantir que a renderização espere a conclusão
             await fetchAndRenderProducts();
             await fetchAndRenderDashboardStats();
         } catch (error) {
@@ -1158,7 +1088,7 @@ if (saveProductBtnAddTab) {
         }
     }
 
-const mainContentArea = document.querySelector('.main-content-area');
+    const mainContentArea = document.querySelector('.main-content-area');
 
     if (mainContentArea) {
         mainContentArea.addEventListener('click', async (e) => {
@@ -1587,163 +1517,127 @@ const mainContentArea = document.querySelector('.main-content-area');
     } else { 
         showAuthSection(); 
     }
-});
 
-// --- INÍCIO DA LÓGICA OPEN FINANCE (VERSÃO COM LIMITE) ---
-
-document.addEventListener('DOMContentLoaded', () => {
+    // --- INÍCIO DA LÓGICA OPEN FINANCE (VERSÃO CORRIGIDA E SEGURA) ---
+    // Seleciona os elementos da página de forma segura
     const connectNewAccountBtn = document.getElementById('connect-new-account-btn');
-    const bankModal = document.getElementById('bank-modal');
-    const closeModalBtn = document.getElementById('close-modal-btn');
-    const bankList = document.getElementById('bank-list');
     const connectionsTabButton = document.querySelector('.nav-btn[data-tab="connections"]');
-    const connectedAccountsList = document.getElementById('connected-accounts-list');
-    const connectionsMessage = document.getElementById('connections-message');
-    const connectionHeader = document.querySelector('.connection-header h3');
+    const financeTabButton = document.querySelector('.nav-btn[data-tab="finance"]');
+    
+    // --- Funções da Belvo ---
 
-    const BELVO_FREE_LIMIT = 25;
-
-    const MOCK_BANKS = [
-        { id: 'nu', name: 'Nubank', logo: 'https://cdn.worldvectorlogo.com/logos/nubank-2.svg' },
-        { id: 'inter', name: 'Banco Inter', logo: 'https://cdn.worldvectorlogo.com/logos/banco-inter.svg' },
-        { id: 'itau', name: 'Itaú', logo: 'https://cdn.worldvectorlogo.com/logos/itau.svg' },
-        { id: 'bradesco', name: 'Bradesco', logo: 'https://cdn.worldvectorlogo.com/logos/bradesco-2.svg' },
-        { id: 'santander', name: 'Santander', logo: 'https://cdn.worldvectorlogo.com/logos/santander-3.svg' },
-        { id: 'bb', name: 'Banco do Brasil', logo: 'https://cdn.worldvectorlogo.com/logos/banco-do-brasil.svg' },
-    ];
-
-    const openModal = () => { /* ... (código do openModal continua igual) ... */ };
-    const closeModal = () => { /* ... (código do closeModal continua igual) ... */ };
-    const fetchOpenFinanceData = async (accounts) => { /* ... (código do fetchOpenFinanceData continua igual) ... */ };
-    const originalRenderFinanceDashboard = window.renderFinanceDashboard;
-    window.renderFinanceDashboard = async () => { /* ... (código do renderFinanceDashboard unificado continua igual) ... */ };
-
-    // NOVA FUNÇÃO: Verifica o limite de conexões
-    const checkConnectionLimit = async () => {
-        try {
-            const response = await authenticatedFetch(`${API_BASE_URL}/connections/count`);
-            const { count } = await response.json();
-
-            // Atualiza o cabeçalho para mostrar a contagem
-            if(connectionHeader) {
-                connectionHeader.textContent = `Contas Conectadas (${count} / ${BELVO_FREE_LIMIT})`;
-            }
-
-            if (count >= BELVO_FREE_LIMIT) {
-                connectNewAccountBtn.disabled = true;
-                connectNewAccountBtn.style.opacity = '0.5';
-                connectNewAccountBtn.style.cursor = 'not-allowed';
-                showTabMessage(connectionsMessage, 'Limite de conexões do plano gratuito atingido.', 'info');
-            } else {
-                connectNewAccountBtn.disabled = false;
-                connectNewAccountBtn.style.opacity = '1';
-                connectNewAccountBtn.style.cursor = 'pointer';
-            }
-        } catch (error) {
-            console.error("Erro ao verificar limite de conexões:", error);
-            showTabMessage(connectionsMessage, 'Não foi possível verificar o status da conexão.', false);
-        }
-    };
-
-    const renderConnectedAccounts = () => {
-        const accounts = JSON.parse(localStorage.getItem('connectedAccounts')) || [];
-        connectedAccountsList.innerHTML = '';
-        if (accounts.length === 0) {
-            connectedAccountsList.innerHTML = '<p>Nenhuma conta conectada ainda.</p>';
+    const startBelvoConnection = async () => {
+        const connectionsMessage = document.getElementById('connections-message');
+        if (!currentUserId) {
+            if (connectionsMessage) showTabMessage(connectionsMessage, 'Você precisa estar logado para conectar uma conta.', false);
             return;
         }
-        accounts.forEach(account => {
-            const bank = MOCK_BANKS.find(b => b.id === account.bankId);
-            connectedAccountsList.innerHTML += `
-                <div class="connected-account-card">
-                    <div class="bank-info">
-                        <img src="${bank.logo}" alt="Logo ${bank.name}" class="bank-logo">
-                        <span class="bank-name">${bank.name}</span>
-                    </div>
-                    <button class="btn disconnect-btn" data-account-id="${account.id}"><i class="fas fa-trash-alt"></i> Desconectar</button>
-                </div>
-            `;
-        });
-        // Após renderizar, verifica o limite
-        checkConnectionLimit();
+
+        try {
+            // 1. Pede um token de acesso para o widget ao nosso backend
+            const tokenResponse = await authenticatedFetch(`${API_BASE_URL}/belvo/get-widget-token`, { method: 'POST' });
+            if (!tokenResponse.ok) throw new Error('Falha ao obter token do widget.');
+            const { access } = await tokenResponse.json();
+
+            // 2. Configura e abre o widget
+            const belvoWidget = window.belvo.createWidget(access, {
+                locale: 'pt-BR',
+                country_codes: ['BR'],
+            });
+
+            belvoWidget.build({
+                onSuccess: async (link) => {
+                    await authenticatedFetch(`${API_BASE_URL}/belvo/register-link`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ linkId: link.id, userId: currentUserId })
+                    });
+                    
+                    if (connectionsMessage) showTabMessage(connectionsMessage, 'Conta conectada com sucesso!', true);
+                    if (window.renderFinanceDashboard) window.renderFinanceDashboard(); // Atualiza o painel
+                    belvoWidget.destroy();
+                },
+                onExit: () => {
+                    console.log('Usuário fechou o widget.');
+                    belvoWidget.destroy();
+                },
+                onEvent: (event) => console.log('Evento do Widget:', event)
+            });
+
+        } catch (error) {
+            console.error("Erro ao iniciar conexão Belvo:", error);
+            if (connectionsMessage) showTabMessage(connectionsMessage, 'Não foi possível iniciar a conexão. Tente novamente.', false);
+        }
+    };
+
+    // Função principal que redesenha o painel financeiro com dados reais
+    const renderFinanceDashboardWithBelvo = async () => {
+        console.log("A renderizar o Painel Financeiro com dados da Belvo...");
+        if (!currentUserId) return;
+
+        try {
+            // 1. Busca dados dos produtos comprados (lógica antiga)
+            const productsResponse = await authenticatedFetch(`${API_BASE_URL}/products?userId=${currentUserId}`);
+            const allProducts = await productsResponse.json();
+            const purchasedThisMonth = allProducts.filter(p => p.status === 'comprado' && new Date(p.purchasedAt).getMonth() === new Date().getMonth());
+            const productExpenses = purchasedThisMonth.reduce((sum, p) => sum + (p.price || 0), 0);
+
+            // 2. Busca dados financeiros da Belvo através do nosso backend
+            const belvoResponse = await authenticatedFetch(`${API_BASE_URL}/belvo/financial-data?userId=${currentUserId}`);
+            const belvoData = await belvoResponse.json();
+            
+            // 3. Calcula totais
+            const totalBalance = belvoData.accounts.reduce((sum, acc) => sum + acc.balance.current, 0);
+            const belvoExpenses = belvoData.transactions
+                .filter(t => t.amount < 0 && t.type === 'OUTFLOW')
+                .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+            const belvoRevenue = belvoData.transactions
+                .filter(t => t.amount > 0 && t.type === 'INFLOW')
+                .reduce((sum, t) => sum + t.amount, 0);
+            
+            const totalExpenses = productExpenses + belvoExpenses;
+            
+            // 4. Atualiza os cards de resumo
+            const revenueStatEl = document.getElementById('finance-revenue-stat');
+            if (revenueStatEl) revenueStatEl.textContent = formatCurrency(belvoRevenue);
+            
+            const expensesStatEl = document.getElementById('finance-expenses-stat');
+            if (expensesStatEl) expensesStatEl.textContent = formatCurrency(totalExpenses);
+
+            const balanceStatEl = document.getElementById('finance-balance-stat');
+            if (balanceStatEl) {
+                balanceStatEl.textContent = formatCurrency(totalBalance);
+                balanceStatEl.style.color = totalBalance < 0 ? 'var(--error-color)' : 'var(--success-color)';
+            }
+            
+            const itemsPurchasedStatEl = document.getElementById('finance-items-purchased-stat');
+            if (itemsPurchasedStatEl) itemsPurchasedStatEl.textContent = purchasedThisMonth.length;
+            
+            // Aqui seria o local para atualizar os gráficos com os novos dados combinados
+            
+        } catch (error) {
+            console.error("Erro ao renderizar painel financeiro:", error);
+        }
     };
     
-    // ATUALIZADO: Listener para conectar nova conta
-    if (connectNewAccountBtn) {
-        connectNewAccountBtn.addEventListener('click', () => {
-            if(connectNewAccountBtn.disabled) {
-                showTabMessage(connectionsMessage, 'Não é possível adicionar mais contas. O limite do plano gratuito foi atingido.', false);
-                return;
-            }
-            openModal();
-        });
-    }
+    // Substitui a função global para usar a nova lógica com Belvo
+    window.renderFinanceDashboard = renderFinanceDashboardWithBelvo;
 
-    // ATUALIZADO: Lógica de conexão ao clicar em um banco
-    bankList.addEventListener('click', async (e) => {
-        const bankItem = e.target.closest('.bank-item');
-        if (!bankItem) return;
-
-        const bankId = bankItem.dataset.bankId;
-        const bankName = bankItem.dataset.bankName;
-        closeModal();
-        showTabMessage(connectionsMessage, `Simulando conexão com ${bankName}...`, 'info');
-
-        try {
-            // Incrementa o contador no backend
-            await authenticatedFetch(`${API_BASE_URL}/connections/increment`, { method: 'POST' });
-
-            // Simula o tempo de espera
-            setTimeout(() => {
-                const accounts = JSON.parse(localStorage.getItem('connectedAccounts')) || [];
-                if (accounts.some(acc => acc.bankId === bankId)) {
-                     // Se já existe, decrementa o que acabamos de incrementar (não deveria acontecer, mas é uma segurança)
-                    authenticatedFetch(`${API_BASE_URL}/connections/decrement`, { method: 'POST' });
-                    showTabMessage(connectionsMessage, `${bankName} já está conectado.`, false);
-                    return;
-                }
-                
-                const newAccount = { id: `acc_${Date.now()}`, bankId: bankId };
-                accounts.push(newAccount);
-                localStorage.setItem('connectedAccounts', JSON.stringify(accounts));
-                
-                showTabMessage(connectionsMessage, `${bankName} conectado com sucesso!`, true);
-                renderConnectedAccounts();
-                window.renderFinanceDashboard();
-            }, 2000);
-        } catch (error) {
-            showTabMessage(connectionsMessage, 'Erro ao registrar nova conexão.', false);
-        }
-    });
+    // --- Adiciona os Event Listeners de forma segura ---
     
-    // ATUALIZADO: Desconectar conta
-    connectedAccountsList.addEventListener('click', async (e) => {
-        const disconnectBtn = e.target.closest('.disconnect-btn');
-        if(!disconnectBtn) return;
-        
-        const accountId = disconnectBtn.dataset.accountId;
-        
-        try {
-            // Decrementa o contador no backend
-            await authenticatedFetch(`${API_BASE_URL}/connections/decrement`, { method: 'POST' });
-
-            let accounts = JSON.parse(localStorage.getItem('connectedAccounts')) || [];
-            accounts = accounts.filter(acc => acc.id !== accountId);
-            localStorage.setItem('connectedAccounts', JSON.stringify(accounts));
-            
-            showTabMessage(connectionsMessage, 'Conta desconectada.', true);
-            renderConnectedAccounts();
-            window.renderFinanceDashboard();
-        } catch (error) {
-            showTabMessage(connectionsMessage, 'Erro ao desconectar conta.', false);
-        }
-    });
-
-    if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
-    bankModal.addEventListener('click', (e) => { if (e.target === bankModal) closeModal(); });
-
-    if (connectionsTabButton) {
-        connectionsTabButton.addEventListener('click', renderConnectedAccounts);
+    // Adiciona o listener ao botão "Conectar Conta" apenas se ele existir
+    if (connectNewAccountBtn) {
+        connectNewAccountBtn.addEventListener('click', startBelvoConnection);
     }
+
+    // Adiciona o listener à aba "Financeiro" apenas se ela existir
+    if (financeTabButton) {
+        financeTabButton.addEventListener('click', renderFinanceDashboardWithBelvo);
+    }
+    
+    // Função para formatar moeda
+    const formatCurrency = (value) => {
+        return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
+    };
+    // --- FIM DA LÓGICA OPEN FINANCE ---
 });
-// --- FIM DA LÓGICA OPEN FINANCE (VERSÃO COM LIMITE) ---
