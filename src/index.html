@@ -297,44 +297,48 @@
             </section>
 
             <section id="finance-tab" class="tab-content">
-                <h2>Minhas Finanças</h2>
-                <div class="finance-form-container">
-                    <h3>Novo Registro Mensal</h3>
-                     <div class="form-group">
-                        <label for="financeMonth">Mês/Ano:</label>
-                        <input type="month" id="financeMonth" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="financeRevenue">Receita (R$):</label>
-                        <input type="number" id="financeRevenue" placeholder="Ex: 5000.00" step="0.01">
-                    </div>
-                    <div class="form-group">
-                        <label for="financeExpenses">Gastos (R$):</label>
-                         <input type="number" id="financeExpenses" placeholder="Ex: 3500.00" step="0.01">
-                    </div>
-                    <p class="tab-message" id="finance-entry-message"></p>
-                    <div class="form-group action-buttons">
-                        <button id="add-finance-entry-btn"><i class="fas fa-save"></i> Salvar Registro</button>
-                        <button id="cancel-finance-edit-btn" class="hidden"><i class="fas fa-ban"></i> Cancelar</button>
-                    </div>
-                </div>
-                <div class="finance-summary">
-                    <h3>Resumo Geral</h3>
-                    <p>Balanço Total: <strong id="finance-total-balance">R$ 0.00</strong></p>
-                </div>
-                <div class="chart-container finance-detail-chart">
-                    <canvas id="financialLineChart"></canvas>
-                </div>
-                <div class="finance-list-container">
-                    <h3>Histórico de Registros</h3>
-                    <ul id="finance-list"></ul>
-                    <div id="finance-empty-state" class="empty-state-message" style="display: none; text-align: center; padding: 40px; color: #6c757d;">
-                        <i class="fas fa-search-dollar fa-3x" style="margin-bottom: 15px;"></i>
-                        <p>Você ainda não possui registros financeiros.</p>
-                        <p style="font-size: 0.9em; margin-top: 5px;">Use o formulário acima para começar.</p>
-                    </div>
-                </div>
-            </section>
+    <h2>Painel Financeiro</h2>
+
+    <div class="dashboard-summary-cards" id="finance-summary-cards">
+        <div class="summary-card">
+            <h4>Receita do Mês</h4>
+            <p id="finance-revenue-stat">R$ 0,00</p>
+        </div>
+        <div class="summary-card">
+            <h4>Gastos com Compras</h4>
+            <p id="finance-expenses-stat">R$ 0,00</p>
+        </div>
+        <div class="summary-card">
+            <h4>Balanço Mensal</h4>
+            <p id="finance-balance-stat">R$ 0,00</p>
+        </div>
+        <div class="summary-card">
+            <h4>Itens Comprados</h4>
+            <p id="finance-items-purchased-stat">0</p>
+        </div>
+    </div>
+
+    <div class="finance-form-container" style="max-width: 500px; margin-left: auto; margin-right: auto;">
+        <h3>Definir Receita Mensal</h3>
+        <div class="form-group">
+            <label for="monthly-revenue-input">Informe sua receita para este mês:</label>
+            <input type="number" id="monthly-revenue-input" step="0.01" placeholder="Ex: 5000.00">
+        </div>
+        <p class="tab-message" id="finance-revenue-message"></p>
+        <button id="save-revenue-btn" class="primary-btn"><i class="fas fa-save"></i> Salvar Receita</button>
+    </div>
+
+    <div class="dashboard-charts">
+        <div class="chart-container" id="finance-category-chart-container">
+            <h3>Gastos por Categoria (Itens Comprados)</h3>
+            <canvas id="financeCategoryChart"></canvas>
+        </div>
+        <div class="chart-container" id="finance-spending-trend-chart-container">
+            <h3>Evolução dos Gastos no Mês</h3>
+            <canvas id="financeSpendingTrendChart"></canvas>
+        </div>
+    </div>
+</section>
 
             <section id="settings-tab" class="tab-content">
                 <h2>Configurações da Conta</h2>

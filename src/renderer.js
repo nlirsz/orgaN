@@ -1588,3 +1588,175 @@ const mainContentArea = document.querySelector('.main-content-area');
         showAuthSection(); 
     }
 });
+
+// --- INÍCIO DO NOVO PAINEL FINANCEIRO ---
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Seletores dos novos elementos da aba Financeiro
+    const financeTabButton = document.querySelector('.nav-btn[data-tab="finance"]');
+    const saveRevenueBtn = document.getElementById('save-revenue-btn');
+    const monthlyRevenueInput = document.getElementById('monthly-revenue-input');
+
+    let financeCategoryChart = null;
+    let financeSpendingTrendChart = null;
+
+    // Função principal que redesenha o painel financeiro
+    async function renderFinanceDashboard() {
+        console.log("Renderizando o novo Painel Financeiro...");
+
+        if (!currentUserId) return;
+
+        try {
+            // 1. Busca todos os produtos do usuário
+            const response = await authenticatedFetch(`${API_BASE_URL}/products?userId=${currentUserId}`);
+            if (!response.ok) throw new Error('Falha ao buscar produtos.');
+            const allProducts = await response.json();
+
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            const currentMonth = now.getMonth();
+
+            // 2. Filtra apenas os produtos comprados no mês atual
+            const purchasedThisMonth = allProducts.filter(p => {
+                if (p.status !== 'comprado' || !p.purchasedAt) return false;
+                const purchasedDate = new Date(p.purchasedAt);
+                return purchasedDate.getFullYear() === currentYear && purchasedDate.getMonth() === currentMonth;
+            });
+
+            // 3. Calcula as métricas
+            const totalExpenses = purchasedThisMonth.reduce((sum, p) => sum + (p.price || 0), 0);
+            const itemsPurchased = purchasedThisMonth.length;
+            const monthlyRevenue = parseFloat(localStorage.getItem(`revenue_${currentYear}-${currentMonth}`)) || 0;
+            const balance = monthlyRevenue - totalExpenses;
+
+            // 4. Atualiza os cards de resumo
+            document.getElementById('finance-revenue-stat').textContent = formatCurrency(monthlyRevenue);
+            document.getElementById('finance-expenses-stat').textContent = formatCurrency(totalExpenses);
+            const balanceStatEl = document.getElementById('finance-balance-stat');
+            balanceStatEl.textContent = formatCurrency(balance);
+            balanceStatEl.style.color = balance < 0 ? 'var(--error-color)' : 'var(--success-color)';
+            document.getElementById('finance-items-purchased-stat').textContent = itemsPurchased;
+
+            // Preenche o input com o valor salvo
+            monthlyRevenueInput.value = monthlyRevenue > 0 ? monthlyRevenue.toFixed(2) : '';
+
+            // 5. Prepara dados para os gráficos
+            // Gráfico de Gastos por Categoria
+            const expensesByCategory = purchasedThisMonth.reduce((acc, p) => {
+                const category = p.category || 'Outros';
+                acc[category] = (acc[category] || 0) + (p.price || 0);
+                return acc;
+            }, {});
+
+            const categoryLabels = Object.keys(expensesByCategory);
+            const categoryData = Object.values(expensesByCategory);
+            
+            // Gráfico de Tendência de Gastos
+            const spendingByDay = {};
+            for (let i = 1; i <= new Date(currentYear, currentMonth + 1, 0).getDate(); i++) {
+                spendingByDay[i] = 0; // Inicializa todos os dias do mês com 0
+            }
+            purchasedThisMonth.forEach(p => {
+                const day = new Date(p.purchasedAt).getDate();
+                spendingByDay[day] += p.price || 0;
+            });
+            
+            const trendLabels = Object.keys(spendingByDay).map(day => `Dia ${day}`);
+            const trendData = Object.values(spendingByDay);
+
+            // 6. Renderiza os gráficos
+            renderFinanceCharts(categoryLabels, categoryData, trendLabels, trendData);
+
+        } catch (error) {
+            console.error("Erro ao renderizar o painel financeiro:", error);
+            showTabMessage(document.getElementById('finance-revenue-message'), 'Erro ao carregar dados do painel.', false);
+        }
+    }
+
+    // Função para renderizar/atualizar os gráficos
+    function renderFinanceCharts(categoryLabels, categoryData, trendLabels, trendData) {
+        const textColor = getTextColor(); // Reutiliza sua função existente
+        
+        // Gráfico de Categorias (Rosca)
+        const categoryChartCanvas = document.getElementById('financeCategoryChart');
+        if (financeCategoryChart) financeCategoryChart.destroy();
+        financeCategoryChart = new Chart(categoryChartCanvas, {
+            type: 'doughnut',
+            data: {
+                labels: categoryLabels,
+                datasets: [{
+                    data: categoryData,
+                    backgroundColor: categoryLabels.map(label => categoryColors[label] || '#6B7280'),
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { labels: { color: textColor } } }
+            }
+        });
+
+        // Gráfico de Tendência (Linha)
+        const trendChartCanvas = document.getElementById('financeSpendingTrendChart');
+        if (financeSpendingTrendChart) financeSpendingTrendChart.destroy();
+        financeSpendingTrendChart = new Chart(trendChartCanvas, {
+            type: 'line',
+            data: {
+                labels: trendLabels,
+                datasets: [{
+                    label: 'Gastos Diários',
+                    data: trendData,
+                    borderColor: 'var(--primary-action)',
+                    backgroundColor: 'rgba(17, 148, 35, 0.2)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { ticks: { color: textColor }, grid: { color: 'rgba(128, 128, 128, 0.1)' } },
+                    y: { beginAtZero: true, ticks: { color: textColor }, grid: { color: 'rgba(128, 128, 128, 0.1)' } }
+                },
+                plugins: { legend: { display: false } }
+            }
+        });
+    }
+
+    // Listener para o botão de salvar receita
+    if (saveRevenueBtn) {
+        saveRevenueBtn.addEventListener('click', () => {
+            const revenueValue = monthlyRevenueInput.value;
+            const now = new Date();
+            const key = `revenue_${now.getFullYear()}-${now.getMonth()}`;
+            
+            localStorage.setItem(key, revenueValue);
+            showTabMessage(document.getElementById('finance-revenue-message'), 'Receita salva com sucesso!', true);
+            
+            // Re-renderiza o painel para atualizar o balanço
+            renderFinanceDashboard();
+        });
+    }
+    
+    // Formato de moeda BRL
+    const formatCurrency = (value) => {
+        return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
+    };
+
+
+    // Chama a renderização do painel financeiro quando a aba é clicada
+    if (financeTabButton) {
+        financeTabButton.addEventListener('click', renderFinanceDashboard);
+    }
+    
+    // Remove a lógica antiga da aba financeira para evitar conflitos
+    const oldFinanceList = document.getElementById('finance-list');
+    if(oldFinanceList) oldFinanceList.innerHTML = '';
+    
+    const addFinanceEntryBtn = document.getElementById('add-finance-entry-btn');
+    if(addFinanceEntryBtn) addFinanceEntryBtn.style.display = 'none';
+
+});
+// --- FIM DO NOVO PAINEL FINANCEIRO ---
