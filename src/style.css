@@ -1329,7 +1329,7 @@ body[data-theme="dark"] #product-details-modal .modal-product-info {
 }
 
 /* ======================================================= */
-/* === ESTILO DOS CARDS - SEPARADO POR ABA === */
+/* === AJUSTES FINAIS PARA OS CARDS DE PRODUTOS === */
 /* ======================================================= */
 
 /* --- 1. ESTILOS GERAIS (COMUM A TODOS OS CARDS) --- */
@@ -1340,41 +1340,22 @@ body[data-theme="dark"] #product-details-modal .modal-product-info {
     position: relative;
     display: flex;
     flex-direction: column;
-    overflow: visible; /* Necessário para a badge */
+    
+    /* CORREÇÃO PARA O FLICKER DO CURSOR: Prepara o card para o 3D */
+    transform-style: preserve-3d; 
 }
-
-.card-actions { 
-    display: flex; 
-    justify-content: space-around; 
-    align-items: center; 
-    padding: 10px 15px; 
-    border-top: 1px solid rgba(0,0,0,0.05);
-}
-body[data-theme="dark"] .card-actions {
-    border-top-color: rgba(255,255,255,0.08);
-}
-.card-actions i { 
-    font-size: 1.2em; 
-    color: var(--text-secondary); 
-    cursor: pointer; 
-    transition: color 0.2s ease, transform 0.2s ease;
-}
-.card-actions i:hover { 
-    color: var(--primary-action);
-    transform: translateY(-2px);
-}
-
 
 /* --- 2. ESTILO DOS CARDS DA ABA PRODUTOS --- */
-/* (Usamos :not(.history-card) para aplicar só neles) */
 .product-card:not(.history-card) {
     transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
     border-top: 5px solid var(--category-color, var(--text-secondary));
+    overflow: visible; /* Necessário para a badge */
 }
 .product-card:not(.history-card):hover {
     box-shadow: 8px 8px 16px var(--c-dark), -8px -8px 16px var(--c-light);
     transform: scale(1.03); 
 }
+
 .card-category-badge {
     position: absolute;
     top: -15px;
@@ -1386,10 +1367,11 @@ body[data-theme="dark"] .card-actions {
     border-radius: 12px;
     font-size: 0.75em;
     font-weight: 700;
-    z-index: 5;
+    z-index: 10; /* Garante que fique acima de tudo */
     white-space: nowrap;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
+
 .product-card:not(.history-card) .card-image-container { 
     width: 100%; 
     height: 180px; 
@@ -1401,22 +1383,44 @@ body[data-theme="dark"] .card-actions {
     max-height: 100%; 
     object-fit: contain; 
 }
+
 .product-card:not(.history-card) .card-content { 
     padding: 15px; 
     flex-grow: 1; 
     text-align: left;
 }
+
+/* CORREÇÃO PARA O TEXTO CORTADO */
 .product-card:not(.history-card) .card-title {
-    font-size: 1.05em; 
-    height: 2.6em; /* 2 linhas */
+    font-size: 1.0em; /* Fonte um pouco menor para caber melhor */
+    font-weight: 700;
+    line-height: 1.4; /* Espaçamento entre linhas mais adequado */
+    height: 2.8em; /* Garante espaço para EXATAMENTE 2 linhas (1.4em * 2) */
     overflow: hidden;
     text-overflow: ellipsis;
-}
-.product-card:not(.history-card) .card-price { 
-    font-size: 1.6em; 
-    margin-top: auto;
+    /* As propriedades abaixo forçam o corte em duas linhas */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
 }
 
+.product-card:not(.history-card) .card-price { 
+    font-size: 1.6em; 
+    margin-top: auto; /* Empurra o preço para baixo */
+}
+
+/* CORREÇÃO PARA O FLICKER DO CURSOR */
+.product-card:not(.history-card) .card-actions { 
+    display: flex; 
+    justify-content: space-around; 
+    align-items: center; 
+    padding: 10px 15px; 
+    border-top: 1px solid rgba(0,0,0,0.05);
+    /* "Levanta" a secção de ações num plano 3D para que não seja afetada pelo tilt do card principal */
+    transform: translateZ(40px);
+}
+
+/* (O restante do seu CSS de .history-card pode continuar igual) */
 
 /* --- 3. ESTILO DOS CARDS DA ABA HISTÓRICO --- */
 .history-card {
