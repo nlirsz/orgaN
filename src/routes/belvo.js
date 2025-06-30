@@ -8,7 +8,8 @@ const User = require('../models/User');
 
 // --- Configuração das credenciais da Belvo a partir do .env ---
 // CORREÇÃO: A URL agora é uma string de texto válida.
-const BELVO_API_URL = '[https://sandbox.belvo.com](https://sandbox.belvo.com)';
+// A linha DEVE ser uma string simples, sem parênteses ou formatação de link.
+const BELVO_API_URL = 'https://sandbox.belvo.com';
 
 // O Node.js lê as variáveis do .env e as coloca em 'process.env'
 const BELVO_SECRET_ID = process.env.BELVO_SECRET_ID;
