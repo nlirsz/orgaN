@@ -469,141 +469,124 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    const createProductCard = (product, cardType = 'product') => {
-        const card = document.createElement('li');
-        card.className = 'product-card';
-        card.dataset.productId = product._id;
-        card.dataset.productJson = JSON.stringify(product);
+// SUBSTITUA A SUA FUNÇÃO ANTIGA POR ESTA
 
-        if (cardType === 'history') {
-            card.innerHTML = `
-                <div class="card-image-container">
-                    <img src="${product.image || 'https://via.placeholder.com/200x150?text=Indisponível'}" alt="${product.name || 'Produto'}" class="card-image">
-                </div>
-                <div class="card-content">
-                    <h3 class="card-title">${product.name || 'Nome Indisponível'}</h3>
-                </div>
-                
-                <div class="card-plastic-overlay"></div>
-                <div class="card-shine-overlay"></div>
-                <div class="card-border-overlay"></div>
-            `;
+const createProductCard = (product) => {
+    const card = document.createElement('li');
+    card.className = 'product-card';
+    card.dataset.productId = product._id;
+    card.dataset.productJson = JSON.stringify(product);
+
+    const categoryColor = categoryColors[product.category] || categoryColors['Outros'];
+    card.style.setProperty('--category-color', categoryColor);
+
+    // Estrutura HTML UNIFICADA para TODOS os cards
+    card.innerHTML = `
+        ${product.category ? `<div class="card-category-badge">${product.category}</div>` : ''}
+        <div class="card-image-container">
+            <img src="${product.image || 'https://via.placeholder.com/200x150?text=Indisponível'}" alt="${product.name || 'Produto'}" class="card-image">
+        </div>
+        <div class="card-content">
+            <h3 class="card-title">${product.name || 'Nome Indisponível'}</h3>
+            <p class="card-price">${product.price ? `R$ ${parseFloat(product.price).toFixed(2).replace('.', ',')}` : 'Preço Indisponível'}</p>
+        </div>
+        <div class="card-actions">
+            ${product.status === 'pendente' ? '<i class="fas fa-check-circle action-purchase" title="Marcar como Comprado"></i>' : ''}
+            <i class="fas fa-edit action-edit" title="Editar"></i>
+            <i class="fab fa-google action-search" title="Pesquisar produto na web"></i>
+            <i class="fas fa-trash-alt action-delete" title="Excluir"></i>
+        </div>
+    `;
+
+    // Aplica o VanillaTilt a TODOS os cards, sem distinção
+    if (typeof VanillaTilt !== 'undefined') {
+        VanillaTilt.init(card, {
+            max: 10,
+            speed: 200,
+            glare: true,
+            "max-glare": 0.2
+        });
+    }
+    
+    return card;
+};
+
+
+// SUBSTITUA A SUA FUNÇÃO ANTIGA POR ESTA
+
+const fetchAndRenderProducts = async () => {
+    if (!pendingList || !purchasedList || !pendingTotalValueEl || !purchasedTotalValueEl) return;
+    if (!currentUserId) return;
+
+    const smallSpinner = '<div class="spinner" style="width: 18px; height: 18px;"></div>';
+    const listLoader = '<div class="content-loader"><div class="spinner"></div></div>';
+    
+    pendingTotalValueEl.innerHTML = smallSpinner;
+    purchasedTotalValueEl.innerHTML = smallSpinner;
+    
+    pendingList.innerHTML = listLoader;
+    purchasedList.innerHTML = ''; 
+
+    if (pendingEmptyState) pendingEmptyState.style.display = 'none';
+    if (purchasedEmptyState) purchasedEmptyState.style.display = 'none';
+
+    try {
+        const response = await authenticatedFetch(`${API_BASE_URL}/products?userId=${currentUserId}`);
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ message: response.statusText }));
+            throw new Error(errorData.message || 'Erro ao buscar produtos');
+        }
+        
+        const products = await response.json();
+        const pendingProducts = products.filter(p => p.status === 'pendente');
+        const historyProducts = products.filter(p => p.status === 'comprado' || p.status === 'descartado');
+
+        pendingList.innerHTML = '';
+        purchasedList.innerHTML = '';
+
+        const pendingTotal = pendingProducts.reduce((sum, product) => sum + (product.price || 0), 0);
+        pendingTotalValueEl.textContent = `R$ ${pendingTotal.toFixed(2).replace('.', ',')}`;
+
+        const purchasedTotal = products.filter(p => p.status === 'comprado').reduce((sum, product) => sum + (product.price || 0), 0);
+        purchasedTotalValueEl.textContent = `R$ ${purchasedTotal.toFixed(2).replace('.', ',')}`;
+
+        if (pendingProducts.length === 0) {
+            if (pendingEmptyState) pendingEmptyState.style.display = 'block';
         } else {
-            const categoryColor = categoryColors[product.category] || categoryColors['Outros'];
-            card.style.setProperty('--category-color', categoryColor);
-            card.innerHTML = `
-                ${product.category ? `<div class="card-category-badge">${product.category}</div>` : ''}
-                <div class="card-image-container">
-                    <img src="${product.image || 'https://via.placeholder.com/200x150?text=Indisponível'}" alt="${product.name || 'Produto'}" class="card-image">
-                </div>
-                <div class="card-content">
-                    <h3 class="card-title">${product.name || 'Nome Indisponível'}</h3>
-                    <p class="card-price">${product.price ? `R$ ${parseFloat(product.price).toFixed(2).replace('.', ',')}` : 'Preço Indisponível'}</p>
-                </div>
-                <div class="card-actions">
-                     ${product.status === 'pendente' ? '<i class="fas fa-check-circle action-purchase" title="Marcar como Comprado"></i>' : ''}
-                     <i class="fas fa-edit action-edit" title="Editar"></i>
-                     <i class="fab fa-google action-search" title="Pesquisar produto na web"></i>
-                     <i class="fas fa-trash-alt action-delete" title="Excluir"></i>
-                </div>
-            `;
-            if (typeof VanillaTilt !== 'undefined') {
-                VanillaTilt.init(card, { max: 10, speed: 200, glare: true, "max-glare": 0.2 });
-            }
-        }
-        
-        return card;
-    };
-
-    const fetchAndRenderProducts = async () => {
-        if (!pendingList || !purchasedList || !pendingTotalValueEl || !purchasedTotalValueEl) return;
-        if (!currentUserId) return;
-
-        const smallSpinner = '<div class="spinner" style="width: 18px; height: 18px;"></div>';
-        const listLoader = '<div class="content-loader"><div class="spinner"></div></div>';
-        
-        pendingTotalValueEl.innerHTML = smallSpinner;
-        purchasedTotalValueEl.innerHTML = smallSpinner;
-        
-        pendingList.innerHTML = listLoader;
-        purchasedList.innerHTML = ''; 
-
-        if (pendingEmptyState) pendingEmptyState.style.display = 'none';
-        if (purchasedEmptyState) purchasedEmptyState.style.display = 'none';
-
-        try {
-            const response = await authenticatedFetch(`${API_BASE_URL}/products?userId=${currentUserId}`);
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({ message: response.statusText }));
-                throw new Error(errorData.message || 'Erro ao buscar produtos');
-            }
-            
-            const products = await response.json();
-            const pendingProducts = products.filter(p => p.status === 'pendente');
-            const historyProducts = products.filter(p => p.status === 'comprado' || p.status === 'descartado');
-
-            pendingList.innerHTML = '';
-            purchasedList.innerHTML = '';
-
-            const pendingTotal = pendingProducts.reduce((sum, product) => sum + (product.price || 0), 0);
-            pendingTotalValueEl.textContent = `R$ ${pendingTotal.toFixed(2).replace('.', ',')}`;
-
-            const purchasedTotal = products.filter(p => p.status === 'comprado').reduce((sum, product) => sum + (product.price || 0), 0);
-            purchasedTotalValueEl.textContent = `R$ ${purchasedTotal.toFixed(2).replace('.', ',')}`;
-
-            if (pendingProducts.length === 0) {
-                if (pendingEmptyState) pendingEmptyState.style.display = 'block';
-            } else {
-                pendingProducts.forEach(product => {
-                    const card = createProductCard(product, 'product'); 
-                    pendingList.appendChild(card);
-                });
-            }
-            
-            if (historyProducts.length === 0) {
-                if (purchasedEmptyState) purchasedEmptyState.style.display = 'block';
-            } else {
-                historyProducts.forEach(product => {
-                    const card = createProductCard(product, 'history'); 
-                    purchasedList.appendChild(card);
-                });
-            }
-            
-            const historyCards = document.querySelectorAll("#history-tab .product-card");
-
-            historyCards.forEach(card => {
-                card.addEventListener("mousemove", e => {
-                    const rect = card.getBoundingClientRect();
-                    const { width, height, top, left } = rect;
-                    const mouseX = e.clientX - left;
-                    const mouseY = e.clientY - top;
-                    const xPct = mouseX / width - 0.5;
-                    const yPct = mouseY / height - 0.5;
-
-                    card.style.setProperty("--rx", yPct * -20);
-                    card.style.setProperty("--ry", xPct * 20);
-                    card.style.setProperty("--pos", (mouseX / width) * 100);
-                    card.style.setProperty("--mx", mouseX);
-                    card.style.setProperty("--my", mouseY);
-                });
-
-                card.addEventListener("mouseleave", () => {
-                    card.style.setProperty("--rx", 0);
-                    card.style.setProperty("--ry", 0);
-                });
+            pendingProducts.forEach(product => {
+                // Chamada simplificada, sem o segundo argumento
+                const card = createProductCard(product); 
+                pendingList.appendChild(card);
             });
-
-        } catch (error) {
-            console.error("Erro em fetchAndRenderProducts:", error);
-            const errorHtml = '<span class="error-message" style="font-size: 0.9em;">Erro!</span>';
-            pendingTotalValueEl.innerHTML = errorHtml;
-            purchasedTotalValueEl.innerHTML = errorHtml;
-            
-            const listError = '<div class="content-loader"><span class="error-message"><i class="fas fa-exclamation-triangle"></i> Não foi possível carregar.</span></div>';
-            pendingList.innerHTML = listError;
-            purchasedList.innerHTML = listError;
         }
-    };
+        
+        if (historyProducts.length === 0) {
+            if (purchasedEmptyState) purchasedEmptyState.style.display = 'block';
+        } else {
+            historyProducts.forEach(product => {
+                // Chamada simplificada, sem o segundo argumento
+                const card = createProductCard(product); 
+                purchasedList.appendChild(card);
+            });
+        }
+
+        // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        // O BLOCO DE CÓDIGO DO EFEITO 3D FOI REMOVIDO DAQUI.
+        // O VANILLA TILT JÁ CUIDA DE TUDO DENTRO DE createProductCard.
+        // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        
+    } catch (error) {
+        console.error("Erro em fetchAndRenderProducts:", error);
+        const errorHtml = '<span class="error-message" style="font-size: 0.9em;">Erro!</span>';
+        pendingTotalValueEl.innerHTML = errorHtml;
+        purchasedTotalValueEl.innerHTML = errorHtml;
+        
+        const listError = '<div class="content-loader"><span class="error-message"><i class="fas fa-exclamation-triangle"></i> Não foi possível carregar.</span></div>';
+        pendingList.innerHTML = listError;
+        purchasedList.innerHTML = listError;
+    }
+};
+
 
     function setContentState(wrapperElement, contentElement, state, errorMessage = 'Erro ao carregar.') {
         if (!wrapperElement || !contentElement) return;
