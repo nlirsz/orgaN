@@ -20,8 +20,10 @@ const userSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
-    belvoLinks: { type: String } // <--- ADICIONE ESTE CAMPO
-
+    // CORREÇÃO: O campo deve ser um array de Strings, indicado pelos colchetes [].
+    belvoLinks: [{
+        type: String
+    }]
 });
 
 // Middleware para hash da senha antes de salvar
@@ -29,9 +31,13 @@ userSchema.pre('save', async function(next) {
     if (!this.isModified('password')) {
         return next();
     }
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
+    try {
+        const salt = await bcrypt.genSalt(10);
+        this.password = await bcrypt.hash(this.password, salt);
+        next();
+    } catch (error) {
+        next(error);
+    }
 });
 
 // Método para comparar a senha fornecida com a senha hashed

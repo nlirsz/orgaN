@@ -18,19 +18,19 @@
         <div class="auth-container">
             <div class="auth-tabs">
                 <button class="auth-tab-btn active" data-auth-tab="login">Login</button>
-                <button class="auth-tab-btn" data-auth-tab="register">Registrar</button>
+                <button class="auth-tab-btn" data-auth-tab="register">Registar</button>
             </div>
 
             <div id="login-tab-content" class="auth-tab-content active">
                 <h2>Bem-vindo de volta!</h2>
                 <form id="login-form" class="auth-form">
                     <div class="form-group">
-                        <label for="login-username">Usuário</label>
-                        <input type="text" id="login-username" placeholder="Seu nome de usuário" required>
+                        <label for="login-username">Utilizador</label>
+                        <input type="text" id="login-username" placeholder="O seu nome de utilizador" required>
                     </div>
                     <div class="form-group">
                         <label for="login-password">Senha</label>
-                        <input type="password" id="login-password" placeholder="Sua senha" required>
+                        <input type="password" id="login-password" placeholder="A sua senha" required>
                     </div>
                     <div class="form-group remember-me-group">
                         <input type="checkbox" id="remember-me-checkbox">
@@ -42,15 +42,15 @@
             </div>
 
             <div id="register-tab-content" class="auth-tab-content">
-                <h2>Crie sua conta</h2>
+                <h2>Crie a sua conta</h2>
                 <form id="register-form" class="auth-form">
                     <div class="form-group">
-                        <label for="register-username">Usuário</label>
-                        <input type="text" id="register-username" placeholder="Escolha um nome de usuário" required>
+                        <label for="register-username">Utilizador</label>
+                        <input type="text" id="register-username" placeholder="Escolha um nome de utilizador" required>
                     </div>
                     <div class="form-group">
                         <label for="register-email">E-mail*</label>
-                        <input type="email" id="register-email" placeholder="Seu endereço de e-mail" required>
+                        <input type="email" id="register-email" placeholder="O seu endereço de e-mail" required>
                     </div>
                     <div class="form-group">
                         <label for="register-password">Senha</label>
@@ -67,7 +67,7 @@
                     <div class="form-group">
                          <div id="recaptcha-register-container"></div>
                     </div>
-                    <button type="submit" class="auth-submit-btn primary-btn">Registrar</button>
+                    <button type="submit" class="auth-submit-btn primary-btn">Registar</button>
                     <p class="auth-message" id="register-message"></p>
                 </form>
             </div>
@@ -78,7 +78,7 @@
 		<div class="loading-logo">
 			<img src="/logo.png" alt="OrgaN Logo">
 		</div>
-		<p class="loading-text">Carregando...</p>
+		<p class="loading-text">A carregar...</p>
 	</div>
 
     <div class="dashboard-layout hidden">
@@ -102,8 +102,8 @@
 				<button class="nav-btn" data-tab="finance" title="Finanças">
 					<i class="fas fa-chart-pie"></i>
 				</button>
-                <button class="nav-btn" data-tab="connections">
-                    <i class="fas fa-university"></i> Conexões
+                <button class="nav-btn" data-tab="connections" title="Conexões">
+                    <i class="fas fa-university"></i> 
                 </button>
 
 			</div>
@@ -118,67 +118,67 @@
 			</div>
 		</aside>        
         <main class="main-content-area">
-    <section id="dashboard-main-tab" class="tab-content active">
-        <h2>Painel Principal</h2>
+            <section id="dashboard-main-tab" class="tab-content active">
+                <h2>Painel Principal</h2>
 
-        <div class="dashboard-summary-cards">
-            <div class="summary-card">
-                <h4>Total de Produtos</h4>
-                <p id="total-products-stat">0</p>
-            </div>
-            <div class="summary-card">
-                <h4>Produtos Comprados</h4>
-                <p id="purchased-products-stat">0</p>
-            </div>
-            <div class="summary-card">
-                <h4>Produtos na Lista</h4>
-                <p id="pending-products-stat">0</p>
-            </div>
-            <div class="summary-card">
-                <h4>Gasto Total (Comprados)</h4>
-                <p id="total-spent-stat">R$ 0,00</p>
-            </div>
-            <div class="summary-card">
-                <h4>Valor Médio por Compra</h4>
-                <p id="avg-spent-stat">R$ 0,00</p>
-            </div>
-            <div class="summary-card">
-                <h4>Balanço do Mês</h4>
-                <p id="current-month-balance-stat">R$ 0,00</p>
-            </div>
-        </div>
+                <div class="dashboard-summary-cards">
+                    <div class="summary-card">
+                        <h4>Total de Produtos</h4>
+                        <p id="total-products-stat">0</p>
+                    </div>
+                    <div class="summary-card">
+                        <h4>Produtos Comprados</h4>
+                        <p id="purchased-products-stat">0</p>
+                    </div>
+                    <div class="summary-card">
+                        <h4>Produtos na Lista</h4>
+                        <p id="pending-products-stat">0</p>
+                    </div>
+                    <div class="summary-card">
+                        <h4>Gasto Total (Comprados)</h4>
+                        <p id="total-spent-stat">R$ 0,00</p>
+                    </div>
+                    <div class="summary-card">
+                        <h4>Valor Médio por Compra</h4>
+                        <p id="avg-spent-stat">R$ 0,00</p>
+                    </div>
+                    <div class="summary-card">
+                        <h4>Balanço do Mês</h4>
+                        <p id="current-month-balance-stat">R$ 0,00</p>
+                    </div>
+                </div>
 
-        <div class="dashboard-charts">
-            <div class="chart-container" id="finance-overview-chart-container">
-                <h3>Visão Geral Financeira</h3>
-                <canvas id="financeOverviewChart"></canvas>
-            </div>
-            <div class="chart-container" id="category-distribution-chart-container">
-                <h3>Distribuição por Categoria</h3>
-                <canvas id="categoryDistributionChart"></canvas>
-            </div>
-            <div class="chart-container" id="priority-distribution-chart-container">
-                <h3>Prioridade dos Itens Pendentes</h3>
-                <canvas id="priorityDistributionChart"></canvas>
-            </div>
-        </div>
+                <div class="dashboard-charts">
+                    <div class="chart-container" id="finance-overview-chart-container">
+                        <h3>Visão Geral Financeira</h3>
+                        <canvas id="financeOverviewChart"></canvas>
+                    </div>
+                    <div class="chart-container" id="category-distribution-chart-container">
+                        <h3>Distribuição por Categoria</h3>
+                        <canvas id="categoryDistributionChart"></canvas>
+                    </div>
+                    <div class="chart-container" id="priority-distribution-chart-container">
+                        <h3>Prioridade dos Itens Pendentes</h3>
+                        <canvas id="priorityDistributionChart"></canvas>
+                    </div>
+                </div>
 
-        <div class="dashboard-extra-sections">
-            <div class="quick-access-container">
-                <h3>Foco da Semana (Alta Prioridade)</h3>
-                <ul id="high-priority-list">
-                    <li class="placeholder">Nenhum item de alta prioridade.</li>
-                </ul>
-            </div>
+                <div class="dashboard-extra-sections">
+                    <div class="quick-access-container">
+                        <h3>Foco da Semana (Alta Prioridade)</h3>
+                        <ul id="high-priority-list">
+                            <li class="placeholder">Nenhum item de alta prioridade.</li>
+                        </ul>
+                    </div>
 
-            <div class="recent-activity-container">
-                <h3>Atividade Recente</h3>
-                <ul id="recent-activity-list">
-                    <li class="placeholder">Nenhuma atividade recente.</li>
-                </ul>
-            </div>
-        </div>
-    </section>
+                    <div class="recent-activity-container">
+                        <h3>Atividade Recente</h3>
+                        <ul id="recent-activity-list">
+                            <li class="placeholder">Nenhuma atividade recente.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
 
 			<section id="products-tab" class="tab-content">
 				<h2>Meus Produtos</h2>
@@ -196,12 +196,12 @@
 						<p><strong>Preço:</strong> <span id="verifiedProductPrice-products-tab"></span></p>
 					</div>
 					<p class="tab-message" id="add-product-message-products-tab"></p>
-					<button id="save-product-btn-products-tab" class="primary-btn" style="display: none;"><i class="fas fa-save"></i> Salvar Produto</button>
+					<button id="save-product-btn-products-tab" class="primary-btn" style="display: none;"><i class="fas fa-save"></i> Guardar Produto</button>
 				</div>
 
 				<div id="products-error-display" class="error-display hidden">
 					<i class="fas fa-exclamation-triangle"></i>
-					<p>Não foi possível carregar seus produtos.</p>
+					<p>Não foi possível carregar os seus produtos.</p>
 					<button class="primary-btn">Tentar Novamente</button>
 				</div>
 
@@ -213,7 +213,7 @@
 					<ul id="pending-products-list" class="product-grid"></ul>
 					<div id="pending-empty-state" class="empty-state-message" style="display: none;">
 						 <i class="fas fa-dolly-flatbed fa-3x"></i>
-						 <p>Sua lista de desejos está vazia.</p>
+						 <p>A sua lista de desejos está vazia.</p>
 						 <button id="go-to-add-product-tab-btn-from-empty" class="primary-btn">Adicionar primeiro item</button>
 					</div>
 				</div>
@@ -261,16 +261,16 @@
                             <label for="manual-product-category">Categoria</label>
                             <select id="manual-product-category">
                                 <option value="Outros">Outros</option>
-                                <option value="Eletrônicos">Eletrônicos</option>
+                                <option value="Eletrônicos">Eletrónicos</option>
                                 <option value="Roupas e Acessórios">Roupas e Acessórios</option>
                                 <option value="Casa e Decoração">Casa e Decoração</option>
                                 <option value="Livros e Mídia">Livros e Mídia</option>
-                                <option value="Esportes e Lazer">Esportes e Lazer</option>
+                                <option value="Esportes e Lazer">Desportos e Lazer</option>
                                 <option value="Ferramentas e Construção">Ferramentas e Construção</option>
                                 <option value="Alimentos e Bebidas">Alimentos e Bebidas</option>
                                 <option value="Saúde e Beleza">Saúde e Beleza</option>
-                                <option value="Automotivo">Automotivo</option>
-                                <option value="Pet Shop">Pet Shop</option>
+                                <option value="Automotivo">Automóvel</option>
+                                <option value="Pet Shop">Loja de Animais</option>
                             </select>
                         </div>
                          <div class="form-group">
@@ -283,7 +283,7 @@
                         <textarea id="manual-product-description" rows="3" placeholder="Breve descrição do produto"></textarea>
                     </div>
                     <p class="tab-message" id="add-product-message-add-tab"></p>
-                    <button id="save-product-btn-add-tab" class="primary-btn"><i class="fas fa-save"></i> Salvar Produto</button>
+                    <button id="save-product-btn-add-tab" class="primary-btn"><i class="fas fa-save"></i> Guardar Produto</button>
                 </div>
             </section>
 
@@ -304,48 +304,48 @@
             </section>
 
             <section id="finance-tab" class="tab-content">
-    <h2>Painel Financeiro</h2>
+                <h2>Painel Financeiro</h2>
 
-    <div class="dashboard-summary-cards" id="finance-summary-cards">
-        <div class="summary-card">
-            <h4>Receita do Mês</h4>
-            <p id="finance-revenue-stat">R$ 0,00</p>
-        </div>
-        <div class="summary-card">
-            <h4>Gastos com Compras</h4>
-            <p id="finance-expenses-stat">R$ 0,00</p>
-        </div>
-        <div class="summary-card">
-            <h4>Balanço Mensal</h4>
-            <p id="finance-balance-stat">R$ 0,00</p>
-        </div>
-        <div class="summary-card">
-            <h4>Itens Comprados</h4>
-            <p id="finance-items-purchased-stat">0</p>
-        </div>
-    </div>
+                <div class="dashboard-summary-cards" id="finance-summary-cards">
+                    <div class="summary-card">
+                        <h4>Receita do Mês</h4>
+                        <p id="finance-revenue-stat">R$ 0,00</p>
+                    </div>
+                    <div class="summary-card">
+                        <h4>Gastos com Compras</h4>
+                        <p id="finance-expenses-stat">R$ 0,00</p>
+                    </div>
+                    <div class="summary-card">
+                        <h4>Balanço Mensal</h4>
+                        <p id="finance-balance-stat">R$ 0,00</p>
+                    </div>
+                    <div class="summary-card">
+                        <h4>Itens Comprados</h4>
+                        <p id="finance-items-purchased-stat">0</p>
+                    </div>
+                </div>
 
-    <div class="finance-form-container" style="max-width: 500px; margin-left: auto; margin-right: auto;">
-        <h3>Definir Receita Mensal</h3>
-        <div class="form-group">
-            <label for="monthly-revenue-input">Informe sua receita para este mês:</label>
-            <input type="number" id="monthly-revenue-input" step="0.01" placeholder="Ex: 5000.00">
-        </div>
-        <p class="tab-message" id="finance-revenue-message"></p>
-        <button id="save-revenue-btn" class="primary-btn"><i class="fas fa-save"></i> Salvar Receita</button>
-    </div>
+                <div class="finance-form-container" style="max-width: 500px; margin-left: auto; margin-right: auto;">
+                    <h3>Definir Receita Mensal</h3>
+                    <div class="form-group">
+                        <label for="monthly-revenue-input">Informe a sua receita para este mês:</label>
+                        <input type="number" id="monthly-revenue-input" step="0.01" placeholder="Ex: 5000.00">
+                    </div>
+                    <p class="tab-message" id="finance-revenue-message"></p>
+                    <button id="save-revenue-btn" class="primary-btn"><i class="fas fa-save"></i> Guardar Receita</button>
+                </div>
 
-    <div class="dashboard-charts">
-        <div class="chart-container" id="finance-category-chart-container">
-            <h3>Gastos por Categoria (Itens Comprados)</h3>
-            <canvas id="financeCategoryChart"></canvas>
-        </div>
-        <div class="chart-container" id="finance-spending-trend-chart-container">
-            <h3>Evolução dos Gastos no Mês</h3>
-            <canvas id="financeSpendingTrendChart"></canvas>
-        </div>
-    </div>
-</section>
+                <div class="dashboard-charts">
+                    <div class="chart-container" id="finance-category-chart-container">
+                        <h3>Gastos por Categoria (Itens Comprados)</h3>
+                        <canvas id="financeCategoryChart"></canvas>
+                    </div>
+                    <div class="chart-container" id="finance-spending-trend-chart-container">
+                        <h3>Evolução dos Gastos no Mês</h3>
+                        <canvas id="financeSpendingTrendChart"></canvas>
+                    </div>
+                </div>
+            </section>
 
             <section id="settings-tab" class="tab-content">
                 <h2>Configurações da Conta</h2>
@@ -367,7 +367,7 @@
                     <form id="change-password-form">
                         <div class="form-group">
                             <label for="current-password">Senha Atual</label>
-                            <input type="password" id="current-password" placeholder="Digite sua senha atual" required>
+                            <input type="password" id="current-password" placeholder="Digite a sua senha atual" required>
                         </div>
                         <div class="form-group">
                             <label for="new-password">Nova Senha</label>
@@ -378,152 +378,154 @@
                             <input type="password" id="confirm-new-password" placeholder="Digite a nova senha novamente" required>
                         </div>
                         <p class="tab-message" id="change-password-message"></p>
-                        <button type="submit" id="change-password-btn" class="primary-btn">Salvar Nova Senha</button>
+                        <button type="submit" id="change-password-btn" class="primary-btn">Guardar Nova Senha</button>
                     </form>
                 </div>
             </section>    
 
-            <div id="image-modal" class="modal-overlay hidden">
-				<div class="image-modal-content">
-					<span class="close-modal-btn" data-modal-id="image-modal">&times;</span>
-					<img id="modal-image-content" src="#" alt="Imagem do Produto Ampliada">
-				</div>
-			</div>
-
-			<div id="product-details-modal" class="modal-overlay hidden">
-                <div class="modal-content"> <span class="close-modal-btn">&times;</span>
-                    <div id="modal-product-image-container">
-                        <img id="modal-product-image" src="#" alt="Imagem do Produto">
+            <!-- CORREÇÃO: A aba de conexões foi movida para DENTRO da tag <main> -->
+            <section id="connections-tab" class="tab-content">
+                <h2>Gerir Conexões Open Finance</h2>
+                <div class="connections-container">
+                    <div class="connection-header">
+                        <h3>Contas Conectadas</h3>
+                        <button id="connect-new-account-btn" class="primary-btn"><i class="fas fa-plus-circle"></i> Conectar Nova Conta</button>
                     </div>
-                    <h3 id="modal-product-name">Nome do Produto</h3>
-                    <p class="modal-product-price" id="modal-product-price">R$ 0,00</p>
-                    <div class="modal-product-info">
-                        <p><strong>Status:</strong> <span id="modal-product-status"></span></p>
-                        <p><strong>Categoria:</strong> <span id="modal-product-category"></span></p>
-                        <p><strong>Marca:</strong> <span id="modal-product-brand"></span></p>
-                        <p><strong>Adicionado em:</strong> <span id="modal-product-addedDate"></span></p>
-                        <p><strong>Tags:</strong> <span id="modal-product-tags"></span></p>
-                        <p><strong>Prioridade:</strong> <span id="modal-product-priority"></span></p>
-                        <p><strong>Notas:</strong> <span id="modal-product-notes"></span></p>
+                    <p class="tab-message" id="connections-message"></p>
+                    <div id="connected-accounts-list" class="connected-accounts-list">
+                        <!-- As contas conectadas via Belvo aparecerão aqui -->
                     </div>
-                    <a id="modal-product-link" href="#" target="_blank" rel="noopener noreferrer" class="product-link-btn">Visitar Página do Produto <i class="fas fa-external-link-alt"></i></a>
-                    <div class="modal-actions">
-                        <button id="modal-action-purchase" class="modal-action-btn primary-btn" ><i class="fas fa-check-circle"></i> Marcar como Comprado</button>
-                        <button id="modal-action-edit" class="modal-action-btn edit"><i class="fas fa-edit"></i> Editar</button>
-                        <button id="modal-action-delete" class="modal-action-btn delete"><i class="fas fa-trash-alt"></i> Excluir</button>
+                    <div class="disclaimer">
+                        <i class="fas fa-shield-alt"></i>
+                        <p>O seu ambiente é seguro. A conexão é feita através do widget oficial da Belvo, seguindo as normas do Banco Central.</p>
                     </div>
                 </div>
+            </section>
+            
+        </main>
+    </div>
+
+    <!-- Modais -->
+    <div id="image-modal" class="modal-overlay hidden">
+        <div class="image-modal-content">
+            <span class="close-modal-btn" data-modal-id="image-modal">&times;</span>
+            <img id="modal-image-content" src="#" alt="Imagem do Produto Ampliada">
+        </div>
+    </div>
+
+    <div id="product-details-modal" class="modal-overlay hidden">
+        <div class="modal-content"> <span class="close-modal-btn">&times;</span>
+            <div id="modal-product-image-container">
+                <img id="modal-product-image" src="#" alt="Imagem do Produto">
             </div>
-
-			<div id="edit-product-modal" class="modal-overlay hidden">
-				<div class="modal-content edit-product-modal-content">
-					<span class="close-modal-btn" data-modal-id="edit-product-modal">&times;</span>
-					<h3>Editar Produto</h3>
-					<form id="edit-product-form">
-						<input type="hidden" id="edit-product-id">
-
-						<div class="form-group" style="text-align: center;">
-							<img id="edit-product-preview-image" src="#" alt="Preview" class="form-image-preview hidden">
-							<label for="edit-product-image-url">URL da Imagem</label>
-							<input type="url" id="edit-product-image-url" placeholder="https://exemplo.com/imagem.png">
-						</div>
-
-						<div class="form-row">
-							<div class="form-group">
-								<label for="edit-product-name">Nome do Produto*</label>
-								<input type="text" id="edit-product-name" required>
-							</div>
-							<div class="form-group">
-								<label for="edit-product-price">Preço (R$)*</label>
-								<input type="number" id="edit-product-price" step="0.01" required>
-							</div>
-						</div>
-
-						<div class="form-group">
-							<label for="edit-product-url">URL de Origem*</label>
-							<input type="url" id="edit-product-url" required>
-						</div>
-						
-						<div class="form-row">
-							<div class="form-group">
-								<label for="edit-product-status">Status</label>
-								<select id="edit-product-status">
-									<option value="pendente">Pendente</option>
-									<option value="comprado">Comprado</option>
-									<option value="descartado">Descartado</option>
-								</select>
-							</div>
-							<div class="form-group">
-								<label for="edit-product-category">Categoria</label>
-								<select id="edit-product-category">
-									<option value="Outros">Outros</option>
-									<option value="Eletrônicos">Eletrônicos</option>
-									<option value="Roupas e Acessórios">Roupas e Acessórios</option>
-									<option value="Casa e Decoração">Casa e Decoração</option>
-									<option value="Livros e Mídia">Livros e Mídia</option>
-									<option value="Esportes e Lazer">Esportes e Lazer</option>
-									<option value="Ferramentas e Construção">Ferramentas e Construção</option>
-									<option value="Alimentos e Bebidas">Alimentos e Bebidas</option>
-									<option value="Saúde e Beleza">Saúde e Beleza</option>
-									<option value="Automotivo">Automotivo</option>
-									<option value="Pet Shop">Pet Shop</option>
-								</select>
-							</div>
-						</div>
-
-						<div class="form-row">
-							<div class="form-group">
-								<label for="edit-product-priority">Prioridade</label>
-								<select id="edit-product-priority">
-									<option value="Baixa">Baixa</option>
-									<option value="Média">Média</option>
-									<option value="Alta">Alta</option>
-								</select>
-							</div>
-							<div class="form-group">
-								<label for="edit-product-tags">Tags</label>
-								<input type="text" id="edit-product-tags" placeholder="Separadas por vírgula">
-							</div>
-						</div>
-
-						<div class="form-group">
-							<label for="edit-product-description">Descrição</label>
-							<textarea id="edit-product-description" rows="3" placeholder="Breve descrição do produto..."></textarea>
-						</div>
-						<div class="form-group">
-							<label for="edit-product-notes">Notas Adicionais</label>
-							<textarea id="edit-product-notes" rows="3" placeholder="Suas observações sobre o produto..."></textarea>
-						</div>
-						
-						<p class="tab-message" id="edit-product-message"></p>
-						<button type="submit" class="primary-btn"><i class="fas fa-save"></i> Salvar Alterações</button>
-					</form>
-				</div>
-			</div>
-    <!-- NOVA ABA DE CONEXÕES -->
-    <section id="connections-tab" class="tab-content">
-        <h2>Gerir Conexões Open Finance</h2>
-        <div class="connections-container">
-            <div class="connection-header">
-                <h3>Contas Conectadas</h3>
-                <button id="connect-new-account-btn" class="primary-btn"><i class="fas fa-plus-circle"></i> Conectar Nova Conta</button>
+            <h3 id="modal-product-name">Nome do Produto</h3>
+            <p class="modal-product-price" id="modal-product-price">R$ 0,00</p>
+            <div class="modal-product-info">
+                <p><strong>Status:</strong> <span id="modal-product-status"></span></p>
+                <p><strong>Categoria:</strong> <span id="modal-product-category"></span></p>
+                <p><strong>Marca:</strong> <span id="modal-product-brand"></span></p>
+                <p><strong>Adicionado em:</strong> <span id="modal-product-addedDate"></span></p>
+                <p><strong>Tags:</strong> <span id="modal-product-tags"></span></p>
+                <p><strong>Prioridade:</strong> <span id="modal-product-priority"></span></p>
+                <p><strong>Notas:</strong> <span id="modal-product-notes"></span></p>
             </div>
-            <p class="tab-message" id="connections-message"></p>
-            <div id="connected-accounts-list" class="connected-accounts-list">
-                <!-- As contas conectadas via Belvo aparecerão aqui -->
-            </div>
-            <div class="disclaimer">
-                <i class="fas fa-shield-alt"></i>
-                <p>O seu ambiente é seguro. A conexão é feita através do widget oficial da Belvo, seguindo as normas do Banco Central.</p>
+            <a id="modal-product-link" href="#" target="_blank" rel="noopener noreferrer" class="product-link-btn">Visitar Página do Produto <i class="fas fa-external-link-alt"></i></a>
+            <div class="modal-actions">
+                <button id="modal-action-purchase" class="modal-action-btn primary-btn" ><i class="fas fa-check-circle"></i> Marcar como Comprado</button>
+                <button id="modal-action-edit" class="modal-action-btn edit"><i class="fas fa-edit"></i> Editar</button>
+                <button id="modal-action-delete" class="modal-action-btn delete"><i class="fas fa-trash-alt"></i> Excluir</button>
             </div>
         </div>
-    </section>
-</main>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+    <div id="edit-product-modal" class="modal-overlay hidden">
+        <div class="modal-content edit-product-modal-content">
+            <span class="close-modal-btn" data-modal-id="edit-product-modal">&times;</span>
+            <h3>Editar Produto</h3>
+            <form id="edit-product-form">
+                <input type="hidden" id="edit-product-id">
+
+                <div class="form-group" style="text-align: center;">
+                    <img id="edit-product-preview-image" src="#" alt="Preview" class="form-image-preview hidden">
+                    <label for="edit-product-image-url">URL da Imagem</label>
+                    <input type="url" id="edit-product-image-url" placeholder="https://exemplo.com/imagem.png">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit-product-name">Nome do Produto*</label>
+                        <input type="text" id="edit-product-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-product-price">Preço (R$)*</label>
+                        <input type="number" id="edit-product-price" step="0.01" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-product-url">URL de Origem*</label>
+                    <input type="url" id="edit-product-url" required>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit-product-status">Status</label>
+                        <select id="edit-product-status">
+                            <option value="pendente">Pendente</option>
+                            <option value="comprado">Comprado</option>
+                            <option value="descartado">Descartado</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-product-category">Categoria</label>
+                        <select id="edit-product-category">
+                            <option value="Outros">Outros</option>
+                            <option value="Eletrônicos">Eletrónicos</option>
+                            <option value="Roupas e Acessórios">Roupas e Acessórios</option>
+                            <option value="Casa e Decoração">Casa e Decoração</option>
+                            <option value="Livros e Mídia">Livros e Mídia</option>
+                            <option value="Esportes e Lazer">Desportos e Lazer</option>
+                            <option value="Ferramentas e Construção">Ferramentas e Construção</option>
+                            <option value="Alimentos e Bebidas">Alimentos e Bebidas</option>
+                            <option value="Saúde e Beleza">Saúde e Beleza</option>
+                            <option value="Automotivo">Automóvel</option>
+                            <option value="Pet Shop">Loja de Animais</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit-product-priority">Prioridade</label>
+                        <select id="edit-product-priority">
+                            <option value="Baixa">Baixa</option>
+                            <option value="Média">Média</option>
+                            <option value="Alta">Alta</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-product-tags">Tags</label>
+                        <input type="text" id="edit-product-tags" placeholder="Separadas por vírgula">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-product-description">Descrição</label>
+                    <textarea id="edit-product-description" rows="3" placeholder="Breve descrição do produto..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="edit-product-notes">Notas Adicionais</label>
+                    <textarea id="edit-product-notes" rows="3" placeholder="As suas observações sobre o produto..."></textarea>
+                </div>
+                
+                <p class="tab-message" id="edit-product-message"></p>
+                <button type="submit" class="primary-btn"><i class="fas fa-save"></i> Guardar Alterações</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script type="text/javascript" src="https://unpkg.com/vanilla-tilt@1.8.1/dist/vanilla-tilt.min.js"></script>
-    
     <script src="renderer.js"></script>
 </body>
 </html>
