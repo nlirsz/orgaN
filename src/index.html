@@ -10,6 +10,7 @@
     <link rel="icon" href="/logo.ico">
     <script src="https://www.google.com/recaptcha/api.js?onload=renderRegistrationRecaptcha&render=explicit" async defer></script>
     <script src="https://cdn.belvo.io/belvo-widget-1-stable.js" async></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     
@@ -101,6 +102,10 @@
 				<button class="nav-btn" data-tab="finance" title="Finanças">
 					<i class="fas fa-chart-pie"></i>
 				</button>
+                <button class="nav-btn" data-tab="connections">
+                    <i class="fas fa-university"></i> Conexões
+                </button>
+
 			</div>
 			
 			<div class="sidebar-footer">
@@ -495,7 +500,25 @@
 					</form>
 				</div>
 			</div>
-		</main>
+    <!-- NOVA ABA DE CONEXÕES -->
+    <section id="connections-tab" class="tab-content">
+        <h2>Gerir Conexões Open Finance</h2>
+        <div class="connections-container">
+            <div class="connection-header">
+                <h3>Contas Conectadas</h3>
+                <button id="connect-new-account-btn" class="primary-btn"><i class="fas fa-plus-circle"></i> Conectar Nova Conta</button>
+            </div>
+            <p class="tab-message" id="connections-message"></p>
+            <div id="connected-accounts-list" class="connected-accounts-list">
+                <!-- As contas conectadas via Belvo aparecerão aqui -->
+            </div>
+            <div class="disclaimer">
+                <i class="fas fa-shield-alt"></i>
+                <p>O seu ambiente é seguro. A conexão é feita através do widget oficial da Belvo, seguindo as normas do Banco Central.</p>
+            </div>
+        </div>
+    </section>
+</main>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 

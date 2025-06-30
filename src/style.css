@@ -1134,6 +1134,75 @@ body[data-theme="dark"] #product-details-modal .modal-product-info {
     padding-top: 20px;
 }
 
+.connections-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: var(--background-alt);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+}
+
+.connection-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 1rem;
+}
+
+.connected-accounts-list {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.connected-account-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    background-color: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+}
+
+.connected-account-card .bank-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.connected-account-card .bank-logo {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+}
+
+.connected-account-card .bank-name {
+    font-weight: 500;
+}
+
+.connected-account-card .disconnect-btn {
+    background-color: var(--error-color);
+    color: white;
+    padding: 0.5rem 1rem;
+}
+
+.disclaimer {
+    margin-top: 2rem;
+    padding: 1rem;
+    background-color: var(--background-color);
+    border-left: 4px solid var(--primary-action);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+
 
 /* Responsividade para as novas seções */
 @media (max-width: 992px) {

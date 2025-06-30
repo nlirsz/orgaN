@@ -20,7 +20,7 @@ const userSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
-    belvoLinks: [{ type: String }] // <--- ADICIONE ESTE CAMPO
+    belvoLinks: { type: String } // <--- ADICIONE ESTE CAMPO
 
 });
 

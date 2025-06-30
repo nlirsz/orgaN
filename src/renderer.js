@@ -1518,14 +1518,12 @@ document.addEventListener('DOMContentLoaded', () => {
         showAuthSection(); 
     }
 
-    // --- INÍCIO DA LÓGICA OPEN FINANCE (VERSÃO CORRIGIDA E SEGURA) ---
-    // Seleciona os elementos da página de forma segura
+    // --- INÍCIO DA LÓGICA OPEN FINANCE (INTEGRAÇÃO REAL BELVO) ---
+    // =========================================================================
+    
     const connectNewAccountBtn = document.getElementById('connect-new-account-btn');
-    const connectionsTabButton = document.querySelector('.nav-btn[data-tab="connections"]');
     const financeTabButton = document.querySelector('.nav-btn[data-tab="finance"]');
     
-    // --- Funções da Belvo ---
-
     const startBelvoConnection = async () => {
         const connectionsMessage = document.getElementById('connections-message');
         if (!currentUserId) {
@@ -1534,12 +1532,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            // 1. Pede um token de acesso para o widget ao nosso backend
             const tokenResponse = await authenticatedFetch(`${API_BASE_URL}/belvo/get-widget-token`, { method: 'POST' });
             if (!tokenResponse.ok) throw new Error('Falha ao obter token do widget.');
             const { access } = await tokenResponse.json();
 
-            // 2. Configura e abre o widget
             const belvoWidget = window.belvo.createWidget(access, {
                 locale: 'pt-BR',
                 country_codes: ['BR'],
@@ -1554,11 +1550,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                     
                     if (connectionsMessage) showTabMessage(connectionsMessage, 'Conta conectada com sucesso!', true);
-                    if (window.renderFinanceDashboard) window.renderFinanceDashboard(); // Atualiza o painel
+                    if (window.renderFinanceDashboard) window.renderFinanceDashboard();
                     belvoWidget.destroy();
                 },
                 onExit: () => {
-                    console.log('Usuário fechou o widget.');
+                    console.log('Utilizador fechou o widget.');
                     belvoWidget.destroy();
                 },
                 onEvent: (event) => console.log('Evento do Widget:', event)
@@ -1570,34 +1566,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Função principal que redesenha o painel financeiro com dados reais
     const renderFinanceDashboardWithBelvo = async () => {
         console.log("A renderizar o Painel Financeiro com dados da Belvo...");
         if (!currentUserId) return;
 
         try {
-            // 1. Busca dados dos produtos comprados (lógica antiga)
             const productsResponse = await authenticatedFetch(`${API_BASE_URL}/products?userId=${currentUserId}`);
             const allProducts = await productsResponse.json();
             const purchasedThisMonth = allProducts.filter(p => p.status === 'comprado' && new Date(p.purchasedAt).getMonth() === new Date().getMonth());
             const productExpenses = purchasedThisMonth.reduce((sum, p) => sum + (p.price || 0), 0);
 
-            // 2. Busca dados financeiros da Belvo através do nosso backend
             const belvoResponse = await authenticatedFetch(`${API_BASE_URL}/belvo/financial-data?userId=${currentUserId}`);
             const belvoData = await belvoResponse.json();
             
-            // 3. Calcula totais
             const totalBalance = belvoData.accounts.reduce((sum, acc) => sum + acc.balance.current, 0);
-            const belvoExpenses = belvoData.transactions
-                .filter(t => t.amount < 0 && t.type === 'OUTFLOW')
-                .reduce((sum, t) => sum + Math.abs(t.amount), 0);
-            const belvoRevenue = belvoData.transactions
-                .filter(t => t.amount > 0 && t.type === 'INFLOW')
-                .reduce((sum, t) => sum + t.amount, 0);
+            const belvoExpenses = belvoData.transactions.filter(t => t.amount < 0 && t.type === 'OUTFLOW').reduce((sum, t) => sum + Math.abs(t.amount), 0);
+            const belvoRevenue = belvoData.transactions.filter(t => t.amount > 0 && t.type === 'INFLOW').reduce((sum, t) => sum + t.amount, 0);
             
             const totalExpenses = productExpenses + belvoExpenses;
             
-            // 4. Atualiza os cards de resumo
             const revenueStatEl = document.getElementById('finance-revenue-stat');
             if (revenueStatEl) revenueStatEl.textContent = formatCurrency(belvoRevenue);
             
@@ -1613,31 +1600,28 @@ document.addEventListener('DOMContentLoaded', () => {
             const itemsPurchasedStatEl = document.getElementById('finance-items-purchased-stat');
             if (itemsPurchasedStatEl) itemsPurchasedStatEl.textContent = purchasedThisMonth.length;
             
-            // Aqui seria o local para atualizar os gráficos com os novos dados combinados
-            
         } catch (error) {
             console.error("Erro ao renderizar painel financeiro:", error);
         }
     };
     
-    // Substitui a função global para usar a nova lógica com Belvo
     window.renderFinanceDashboard = renderFinanceDashboardWithBelvo;
 
-    // --- Adiciona os Event Listeners de forma segura ---
-    
-    // Adiciona o listener ao botão "Conectar Conta" apenas se ele existir
     if (connectNewAccountBtn) {
         connectNewAccountBtn.addEventListener('click', startBelvoConnection);
     }
 
-    // Adiciona o listener à aba "Financeiro" apenas se ela existir
     if (financeTabButton) {
         financeTabButton.addEventListener('click', renderFinanceDashboardWithBelvo);
     }
     
-    // Função para formatar moeda
     const formatCurrency = (value) => {
         return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
     };
+    // =========================================================================
     // --- FIM DA LÓGICA OPEN FINANCE ---
+    // =========================================================================
+
+        // --- INICIALIZAÇÃO DO APP ---
+    // (Removido: declarações duplicadas de storedAuthToken e storedUserId)
 });

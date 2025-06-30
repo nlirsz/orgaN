@@ -9,10 +9,9 @@ const connectDB = require('../database');
 const productRoutes = require('../routes/products'); // Caminho corrigido
 const financeRoutes = require('../routes/finances');   // Caminho corrigido
 const registerRoute = require('../routes/auth/register'); // Caminho corrigido
-const connectionsRoutes = require('../src/routes/connections');
 const loginRoute = require('../routes/auth/login');
 const userRoutes = require('../routes/user'); // <-- ADICIONE ESTA LINHA
-const belvoRoutes = require('../routes/belvo'); // A rota que usa as chaves
+const belvoRoutes = require('../routes/belvo'); // ADICIONE ESTA LINHA
 const connectionStates = mongoose.STATES || { 
   0: 'disconnected', 1: 'connected', 2: 'connecting', 3: 'disconnecting'
 };
@@ -101,8 +100,7 @@ app.use('/api/finances', financeRoutes);
 app.use('/api/auth/register', registerRoute);
 app.use('/api/auth/login', loginRoute);
 app.use('/api/user', userRoutes);
-app.use('/api/connections', connectionsRoutes);
-app.use('/api/belvo', belvoRoutes); // Usando a rota da Belvo
+app.use('/api/belvo', belvoRoutes); // ADICIONE ESTA LINHA
 
 
 
