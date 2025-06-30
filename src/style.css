@@ -365,6 +365,10 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
     gap: 30px; list-style: none; padding: 0; margin: 0; 
 }
 
+#history-tab .product-grid {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+}
+
 /* ======================================================= */
 /* === Estilos dos Cards (Produtos e Histórico) === */
 /* ======================================================= */
@@ -509,8 +513,7 @@ body[data-theme="dark"] .card-actions {
     text-shadow: none;
 }
 .history-card .card-price {
-    font-size: 1.4em;
-    margin-top: 4px;
+    display: none;
 }
 
 /* === Info do Produto Verificado === */
@@ -1006,6 +1009,9 @@ body[data-theme="dark"] #recent-activity-list li {
         background-color: #ffffff;
         box-shadow: none;
         border-right: 1px solid var(--c-dark);
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .product-card:not(.history-card) .card-content {
@@ -1030,11 +1036,13 @@ body[data-theme="dark"] #recent-activity-list li {
     
     .product-card:not(.history-card) .card-actions {
         padding: 0;
-        width: 50px; /* Reduz a largura para as ações */
+        width: 90px;
         flex-shrink: 0;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-around;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr 1fr;
+        gap: 4px;
+        place-items: center;
         border-left: 1px solid var(--c-dark);
     }
     
@@ -1045,11 +1053,16 @@ body[data-theme="dark"] #recent-activity-list li {
     }
 
     /* --- Card de Histórico no Mobile --- */
+    #history-tab .product-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+
     .history-card {
         display: flex;
         flex-direction: column; 
         align-items: stretch;
-        height: 240px;
+        height: auto; 
         width: auto; 
         transform: none !important; 
         border: none; 
@@ -1058,7 +1071,7 @@ body[data-theme="dark"] #recent-activity-list li {
     }
 
     .history-card .card-image-container {
-        height: 70%;
+        height: 160px;
         width: 100%;
         padding: 8px;
         box-sizing: border-box;
@@ -1071,19 +1084,20 @@ body[data-theme="dark"] #recent-activity-list li {
     }
 
     .history-card .card-content {
-        height: 30%;
+        height: auto;
         padding: 8px;
         text-align: center;
         background: rgba(0,0,0,0.05); 
         justify-content: center;
         display: flex;
         flex-direction: column;
+        flex-grow: 1;
     }
     
     .history-card .card-title {
-        font-size: 1em;
-        -webkit-line-clamp: 2;
-        line-clamp: 2;
+        font-size: 0.9em;
+        -webkit-line-clamp: 3;
+        line-clamp: 3;
         height: auto;
     }
 
