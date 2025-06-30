@@ -388,7 +388,7 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
     display: flex; 
     justify-content: space-around; 
     align-items: center; 
-    padding: 10px 15px; 
+    padding: 12px 15px; 
     border-top: 1px solid rgba(0,0,0,0.05);
     transform: translateZ(40px); /* Previne flicker do cursor no hover */
 }
@@ -438,6 +438,9 @@ body[data-theme="dark"] .card-actions {
     height: 180px; 
     padding: 15px;
     box-shadow: var(--shadow-inset-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .product-card:not(.history-card) .card-image { 
     max-width: 100%; 
@@ -448,13 +451,16 @@ body[data-theme="dark"] .card-actions {
 .product-card:not(.history-card) .card-content { 
     padding: 15px; 
     flex-grow: 1; 
-    text-align: left;
+    text-align: center;
     display: flex;
     flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .product-card:not(.history-card) .card-title {
-    font-size: 1.0em;
+    font-family: 'Almarai', sans-serif;
+    font-size: 1.1em;
     font-weight: 700;
     line-height: 1.4;
     height: 2.8em; /* 2 linhas */
@@ -463,10 +469,12 @@ body[data-theme="dark"] .card-actions {
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
+    margin-bottom: 8px;
 }
 
 .product-card:not(.history-card) .card-price { 
-    font-size: 1.6em; 
+    font-family: 'Almarai', sans-serif;
+    font-size: 1.8em; 
     margin-top: auto;
 }
 
