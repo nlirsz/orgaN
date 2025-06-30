@@ -626,6 +626,143 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
 }
 
 
+/* ======================================================= */
+/* === ESTILO DOS CARDS - SEPARADO POR ABA === */
+/* ======================================================= */
+
+/* --- 1. ESTILOS GERAIS (COMUM A TODOS OS CARDS) --- */
+.product-card {
+    background: var(--c-primary);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: visible; /* Necessário para a badge */
+}
+
+.card-actions { 
+    display: flex; 
+    justify-content: space-around; 
+    align-items: center; 
+    padding: 10px 15px; 
+    border-top: 1px solid rgba(0,0,0,0.05);
+}
+body[data-theme="dark"] .card-actions {
+    border-top-color: rgba(255,255,255,0.08);
+}
+.card-actions i { 
+    font-size: 1.2em; 
+    color: var(--text-secondary); 
+    cursor: pointer; 
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+.card-actions i:hover { 
+    color: var(--primary-action);
+    transform: translateY(-2px);
+}
+
+
+/* --- 2. ESTILO DOS CARDS DA ABA PRODUTOS --- */
+/* (Usamos :not(.history-card) para aplicar só neles) */
+.product-card:not(.history-card) {
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+    border-top: 5px solid var(--category-color, var(--text-secondary));
+}
+.product-card:not(.history-card):hover {
+    box-shadow: 8px 8px 16px var(--c-dark), -8px -8px 16px var(--c-light);
+    transform: scale(1.03); 
+}
+.card-category-badge {
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--category-color, var(--text-secondary));
+    color: #FFFFFF;
+    padding: 4px 14px;
+    border-radius: 12px;
+    font-size: 0.75em;
+    font-weight: 700;
+    z-index: 5;
+    white-space: nowrap;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+.product-card:not(.history-card) .card-image-container { 
+    width: 100%; 
+    height: 180px; 
+    padding: 15px;
+    box-shadow: var(--shadow-inset-light);
+}
+.product-card:not(.history-card) .card-image { 
+    max-width: 100%; 
+    max-height: 100%; 
+    object-fit: contain; 
+}
+.product-card:not(.history-card) .card-content { 
+    padding: 15px; 
+    flex-grow: 1; 
+    text-align: left;
+}
+.product-card:not(.history-card) .card-title {
+    font-size: 1.05em; 
+    height: 2.6em; /* 2 linhas */
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.product-card:not(.history-card) .card-price { 
+    font-size: 1.6em; 
+    margin-top: auto;
+}
+
+
+/* --- 3. ESTILO DOS CARDS DA ABA HISTÓRICO --- */
+.history-card {
+    transition: box-shadow 0.3s ease-in-out;
+    overflow: hidden; /* Garante que a moldura interna funcione bem */
+}
+.history-card:hover {
+    box-shadow: none; /* Remove sombra externa no hover */
+}
+.history-card::after { /* A moldura */
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    border-radius: 18px;
+    box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.1);
+    transition: box-shadow 0.3s ease-in-out;
+    pointer-events: none;
+}
+.history-card:hover::after {
+    box-shadow: inset 0 0 0 4px var(--category-color, var(--primary-action));
+}
+.history-card .card-image-container {
+    height: 220px; /* Imagem maior */
+    background: #ffffff;
+}
+.history-card .card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Garante que a imagem não seja cortada */
+}
+.history-card .card-content {
+    padding: 12px 15px;
+    text-align: center;
+    border-top: 1px solid rgba(0,0,0,0.04);
+}
+.history-card .card-title {
+    font-size: 1.0em;
+    font-weight: 600;
+    height: 2.8em; /* Permite 2 linhas, evitando cortes */
+    line-height: 1.4em;
+    overflow: hidden;
+    text-shadow: none; /* Remove a sombra estranha */
+}
+.history-card .card-price {
+    font-size: 1.4em;
+    margin-top: 4px;
+}
+
 
 
 /* === Dashboard & Finance === */

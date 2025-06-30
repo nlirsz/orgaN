@@ -469,50 +469,67 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-// EM src/renderer.js
+// EM SRC/RENDERER.JS
+// SUBSTITUA A SUA FUNÇÃO ANTIGA POR ESTA
+
 const createProductCard = (product, cardType = 'product') => {
     const card = document.createElement('li');
     card.className = 'product-card';
 
-    if (cardType === 'history') {
-        card.classList.add('history-card');
-    }
-
-    card.dataset.productId = product._id;
-    card.dataset.productJson = JSON.stringify(product);
-
     const categoryColor = categoryColors[product.category] || categoryColors['Outros'];
     card.style.setProperty('--category-color', categoryColor);
 
-    // ESTRUTURA HTML ATUALIZADA (sem a badge da categoria)
-    card.innerHTML = `
-        <div class="card-image-container">
-            <img src="${product.image || 'https://via.placeholder.com/200x150?text=Indisponível'}" alt="${product.name || 'Produto'}" class="card-image">
-        </div>
-        <div class="card-content">
-            <h3 class="card-title">${product.name || 'Nome Indisponível'}</h3>
-            <p class="card-price">${product.price ? `R$ ${parseFloat(product.price).toFixed(2).replace('.', ',')}` : 'Preço Indisponível'}</p>
-        </div>
-        <div class="card-actions">
-            ${product.status === 'pendente' ? '<i class="fas fa-check-circle action-purchase" title="Marcar como Comprado"></i>' : ''}
-            <i class="fas fa-edit action-edit" title="Editar"></i>
-            <i class="fab fa-google action-search" title="Pesquisar produto na web"></i>
-            <i class="fas fa-trash-alt action-delete" title="Excluir"></i>
-        </div>
-    `;
+    // --- LÓGICA PARA DIFERENCIAR OS CARDS ---
 
-    if (cardType !== 'history' && typeof VanillaTilt !== 'undefined') {
-        VanillaTilt.init(card, {
-            max: 8,
-            speed: 300,
-            glare: true,
-            "max-glare": 0.15
-        });
+    if (cardType === 'history') {
+        // É um card da aba HISTÓRICO
+        card.classList.add('history-card');
+        card.innerHTML = `
+            <div class="card-image-container">
+                <img src="${product.image || 'https://via.placeholder.com/200x150?text=Indisponível'}" alt="${product.name || 'Produto'}" class="card-image">
+            </div>
+            <div class="card-content">
+                <h3 class="card-title">${product.name || 'Nome Indisponível'}</h3>
+                <p class="card-price">${product.price ? `R$ ${parseFloat(product.price).toFixed(2).replace('.', ',')}` : 'Preço Indisponível'}</p>
+            </div>
+            <div class="card-actions">
+                <i class="fas fa-edit action-edit" title="Editar"></i>
+                <i class="fab fa-google action-search" title="Pesquisar produto na web"></i>
+                <i class="fas fa-trash-alt action-delete" title="Excluir"></i>
+            </div>
+        `;
+    } else {
+        // É um card da aba PRODUTOS
+        card.innerHTML = `
+            <div class="card-category-badge">${product.category || 'Outros'}</div>
+            <div class="card-image-container">
+                <img src="${product.image || 'https://via.placeholder.com/200x150?text=Indisponível'}" alt="${product.name || 'Produto'}" class="card-image">
+            </div>
+            <div class="card-content">
+                <h3 class="card-title">${product.name || 'Nome Indisponível'}</h3>
+                <p class="card-price">${product.price ? `R$ ${parseFloat(product.price).toFixed(2).replace('.', ',')}` : 'Preço Indisponível'}</p>
+            </div>
+            <div class="card-actions">
+                <i class="fas fa-check-circle action-purchase" title="Marcar como Comprado"></i>
+                <i class="fas fa-edit action-edit" title="Editar"></i>
+                <i class="fab fa-google action-search" title="Pesquisar produto na web"></i>
+                <i class="fas fa-trash-alt action-delete" title="Excluir"></i>
+            </div>
+        `;
+
+        // Aplica o VanillaTilt APENAS nos cards de produto
+        if (typeof VanillaTilt !== 'undefined') {
+            VanillaTilt.init(card, {
+                max: 8,
+                speed: 300,
+                glare: true,
+                "max-glare": 0.15
+            });
+        }
     }
     
     return card;
 };
-
 
 // SUBSTITUA A SUA FUNÇÃO ANTIGA POR ESTA
 
