@@ -27,8 +27,7 @@ if (!BELVO_SECRET_ID || !BELVO_SECRET_PASSWORD) {
 /**
  * @route   POST /api/belvo/get-widget-token
  * @desc    Obtém um token de acesso para inicializar o Widget do Belvo Connect.
- * Esta é a rota que o seu frontend chama para iniciar a conexão.
- * @access  Private (deve ser chamada por um utilizador autenticado)
+ * @access  Private
  */
 router.post('/get-widget-token', async (req, res) => {
     console.log('>>> [ROTA] Recebido pedido para /get-widget-token');
@@ -41,15 +40,15 @@ router.post('/get-widget-token', async (req, res) => {
     try {
         console.log(`>>> [DIAGNÓSTICO] A solicitar token de acesso da Belvo no ambiente: ${BELVO_API_URL}`);
         
-        const basicAuth = Buffer.from(`${BELVO_SECRET_ID}:${BELVO_SECRET_PASSWORD}`).toString('base64');
-
         const response = await fetch(`${BELVO_API_URL}/api/token/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Basic ${basicAuth}`
             },
+            // CORREÇÃO FINAL: As credenciais são enviadas no corpo (body) da requisição
             body: JSON.stringify({
+                id: BELVO_SECRET_ID,
+                password: BELVO_SECRET_PASSWORD,
                 scope: 'read_institutions,links,accounts,transactions',
                 grant_type: 'client_credentials'
             })
@@ -59,7 +58,7 @@ router.post('/get-widget-token', async (req, res) => {
 
         if (!response.ok) {
             console.error('>>> [ERRO API BELVO] Resposta ao pedir token:', data);
-            throw new Error(data.detail || 'Falha ao autenticar com a Belvo.');
+            throw new Error(data.message || 'Falha ao autenticar com a Belvo.');
         }
 
         console.log('>>> [SUCESSO] Token de acesso para o widget obtido da Belvo.');
@@ -74,7 +73,6 @@ router.post('/get-widget-token', async (req, res) => {
 /**
  * @route   POST /api/belvo/register-link
  * @desc    O widget da Belvo chama esta rota (via frontend) após uma conexão bem-sucedida.
- * Guarda o 'linkId' gerado no perfil do utilizador.
  * @access  Private
  */
 router.post('/register-link', async (req, res) => {
@@ -108,6 +106,7 @@ router.get('/financial-data', async (req, res) => {
         }
 
         const allData = { accounts: [], transactions: [] };
+        // Para estas chamadas, a autenticação volta a ser pelo cabeçalho
         const authHeader = 'Basic ' + Buffer.from(`${BELVO_SECRET_ID}:${BELVO_SECRET_PASSWORD}`).toString('base64');
 
         for (const linkId of user.belvoLinks) {
