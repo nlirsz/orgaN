@@ -19,7 +19,9 @@ const userSchema = new mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now
-    }
+    },
+    belvoLinks: [{ type: String }] // <--- ADICIONE ESTE CAMPO
+
 });
 
 // Middleware para hash da senha antes de salvar
