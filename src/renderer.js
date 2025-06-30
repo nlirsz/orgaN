@@ -148,8 +148,8 @@ document.addEventListener('DOMContentLoaded', () => {
             throw new Error("Não autorizado ou sessão expirada.");
         }
         return response;
-    }
 
+    }
     function showAuthMessage(element, message, isSuccess = false) {
         if (element) {
             element.textContent = message;

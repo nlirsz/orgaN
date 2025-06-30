@@ -16,11 +16,11 @@ const BELVO_SECRET_ID = process.env.BELVO_SECRET_ID;
 const BELVO_SECRET_PASSWORD = process.env.BELVO_SECRET_PASSWORD;
 
 // ** LOG DE DIAGNÓSTICO **
-// Esta mensagem ajuda a confirmar se o seu ficheiro .env está a ser lido.
+// Esta mensagem ajuda a confirmar se as suas variáveis de ambiente estão a ser lidas na Vercel.
 if (!BELVO_SECRET_ID || !BELVO_SECRET_PASSWORD) {
-    console.error('>>> [ERRO CRÍTICO] As credenciais BELVO_SECRET_ID ou BELVO_SECRET_PASSWORD não foram encontradas no .env!');
+    console.error('>>> [ERRO CRÍTICO] As credenciais BELVO_SECRET_ID ou BELVO_SECRET_PASSWORD não foram encontradas nas variáveis de ambiente!');
 } else {
-    console.log('>>> [DIAGNÓSTICO] Credenciais da Belvo carregadas do .env com sucesso.');
+    console.log('>>> [DIAGNÓSTICO] Credenciais da Belvo carregadas com sucesso.');
 }
 
 // Função para obter o Token de Acesso da Belvo
@@ -87,7 +87,7 @@ router.get('/financial-data', async (req, res) => {
     }
     try {
         const user = await User.findById(userId);
-        if (!user || !user.belvoLinks || user.belvoLinks.length === 0) {
+        if (!user || !user.belvoLinks || !user.belvoLinks.length === 0) {
             return res.json({ accounts: [], transactions: [] });
         }
 
