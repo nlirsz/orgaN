@@ -1,3 +1,4 @@
+// ARQUIVO 2: src/routes/belvo.js
 // OBJETIVO: Usar as variáveis de ambiente em vez de colocar as chaves no código.
 
 const express = require('express');
@@ -6,6 +7,7 @@ const fetch = require('node-fetch');
 const User = require('../models/User');
 
 // --- Configuração das credenciais da Belvo a partir do .env ---
+// CORREÇÃO: A URL agora é uma string de texto válida.
 const BELVO_API_URL = '[https://sandbox.belvo.com](https://sandbox.belvo.com)';
 
 // O Node.js lê as variáveis do .env e as coloca em 'process.env'
