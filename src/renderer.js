@@ -1507,17 +1507,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    const storedAuthToken = localStorage.getItem('authToken'); 
-    const storedUserId = localStorage.getItem('userId'); 
-
-    if (storedAuthToken && storedUserId) { 
-        authToken = storedAuthToken; 
-        currentUserId = storedUserId; 
-        showDashboard(); 
-    } else { 
-        showAuthSection(); 
-    }
-
     // =========================================================================
     // --- INÍCIO DA LÓGICA OPEN FINANCE (INTEGRAÇÃO REAL BELVO) ---
     // Esta secção agora está DENTRO do DOMContentLoaded principal.
@@ -1638,6 +1627,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // =========================================================================
     // --- FIM DA LÓGICA OPEN FINANCE ---
     // =========================================================================
+
+    const storedAuthToken = localStorage.getItem('authToken'); 
+    const storedUserId = localStorage.getItem('userId'); 
+
+    if (storedAuthToken && storedUserId) { 
+        authToken = storedAuthToken; 
+        currentUserId = storedUserId; 
+        showDashboard(); 
+    } else { 
+        showAuthSection(); 
+    }
 
 
     // --- INICIALIZAÇÃO DO APP ---
