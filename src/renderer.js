@@ -469,18 +469,24 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
+// EM SRC/RENDERER.JS
 // SUBSTITUA A SUA FUNÇÃO ANTIGA POR ESTA
 
-const createProductCard = (product) => {
+const createProductCard = (product, cardType = 'product') => { // Adicionamos o cardType de volta
     const card = document.createElement('li');
     card.className = 'product-card';
+    
+    // Adiciona uma classe específica para o card de histórico
+    if (cardType === 'history') {
+        card.classList.add('history-card');
+    }
+
     card.dataset.productId = product._id;
     card.dataset.productJson = JSON.stringify(product);
 
     const categoryColor = categoryColors[product.category] || categoryColors['Outros'];
     card.style.setProperty('--category-color', categoryColor);
 
-    // Estrutura HTML UNIFICADA para TODOS os cards
     card.innerHTML = `
         ${product.category ? `<div class="card-category-badge">${product.category}</div>` : ''}
         <div class="card-image-container">
@@ -498,8 +504,8 @@ const createProductCard = (product) => {
         </div>
     `;
 
-    // Aplica o VanillaTilt a TODOS os cards, sem distinção
-    if (typeof VanillaTilt !== 'undefined') {
+    // AGORA SÓ APLICA O TILT SE NÃO FOR UM CARD DE HISTÓRICO
+    if (cardType !== 'history' && typeof VanillaTilt !== 'undefined') {
         VanillaTilt.init(card, {
             max: 10,
             speed: 200,
@@ -510,7 +516,6 @@ const createProductCard = (product) => {
     
     return card;
 };
-
 
 // SUBSTITUA A SUA FUNÇÃO ANTIGA POR ESTA
 
@@ -555,7 +560,7 @@ const fetchAndRenderProducts = async () => {
         } else {
             pendingProducts.forEach(product => {
                 // Chamada simplificada, sem o segundo argumento
-                const card = createProductCard(product); 
+                const card = createProductCard(product, 'product'); 
                 pendingList.appendChild(card);
             });
         }
@@ -565,7 +570,7 @@ const fetchAndRenderProducts = async () => {
         } else {
             historyProducts.forEach(product => {
                 // Chamada simplificada, sem o segundo argumento
-                const card = createProductCard(product); 
+                const card = createProductCard(product, 'history'); 
                 purchasedList.appendChild(card);
             });
         }

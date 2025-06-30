@@ -524,6 +524,49 @@ button.primary-btn:active, button.auth-submit-btn:active, #add-finance-entry-btn
     display: none;
 }
 
+
+
+/* ======================================================= */
+/* === ESTILO PERSONALIZADO PARA OS CARDS DE HISTÓRICO === */
+/* ======================================================= */
+
+/* Usamos a classe .history-card que adicionámos via JS */
+.history-card {
+    /* Remove qualquer transformação de escala que possa ser herdada */
+    transform: none !important; 
+    transition: box-shadow 0.3s ease-in-out, border 0.3s ease-in-out;
+}
+
+.history-card:hover {
+    /* Remove a sombra externa no hover para focar na moldura */
+    box-shadow: none; 
+    transform: none !important; /* Garante que não há movimento */
+}
+
+/* A MOLDURA */
+.history-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 18px; /* O mesmo radius do card */
+    
+    /* Cria a moldura com uma sombra interna */
+    box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.1); 
+    
+    /* Efeito no hover: a moldura fica mais visível */
+    transition: box-shadow 0.3s ease-in-out;
+    pointer-events: none; /* Permite cliques através da moldura */
+}
+
+/* Efeito da moldura ao passar o rato */
+.history-card:hover::after {
+    /* A moldura usa a cor da categoria */
+    box-shadow: inset 0 0 0 4px var(--category-color, var(--primary-action));
+}
+
 /* As ações que aparecem no hover (mantidas do CSS original) */
 .card-hover-actions {
     position: absolute;
