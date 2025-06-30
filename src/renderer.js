@@ -1518,7 +1518,9 @@ document.addEventListener('DOMContentLoaded', () => {
         showAuthSection(); 
     }
 
+    // =========================================================================
     // --- INÍCIO DA LÓGICA OPEN FINANCE (INTEGRAÇÃO REAL BELVO) ---
+    // Esta secção agora está DENTRO do DOMContentLoaded principal.
     // =========================================================================
     
     const connectNewAccountBtn = document.getElementById('connect-new-account-btn');
@@ -1531,9 +1533,19 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        if (connectNewAccountBtn) {
+            connectNewAccountBtn.disabled = true;
+            connectNewAccountBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> A conectar...';
+        }
+
         try {
             const tokenResponse = await authenticatedFetch(`${API_BASE_URL}/belvo/get-widget-token`, { method: 'POST' });
-            if (!tokenResponse.ok) throw new Error('Falha ao obter token do widget.');
+            
+            if (!tokenResponse.ok) {
+                const errorData = await tokenResponse.json().catch(() => ({}));
+                throw new Error(errorData.message || 'Falha ao obter token do widget do servidor.');
+            }
+
             const { access } = await tokenResponse.json();
 
             const belvoWidget = window.belvo.createWidget(access, {
@@ -1562,7 +1574,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             console.error("Erro ao iniciar conexão Belvo:", error);
-            if (connectionsMessage) showTabMessage(connectionsMessage, 'Não foi possível iniciar a conexão. Tente novamente.', false);
+            if (connectionsMessage) showTabMessage(connectionsMessage, `Erro: ${error.message}`, false);
+        } finally {
+            if (connectNewAccountBtn) {
+                connectNewAccountBtn.disabled = false;
+                connectNewAccountBtn.innerHTML = '<i class="fas fa-plus-circle"></i> Conectar Nova Conta';
+            }
         }
     };
 
@@ -1622,6 +1639,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- FIM DA LÓGICA OPEN FINANCE ---
     // =========================================================================
 
-        // --- INICIALIZAÇÃO DO APP ---
-    // (Removido: declarações duplicadas de storedAuthToken e storedUserId)
+
+    // --- INICIALIZAÇÃO DO APP ---
+    // (Removido: duplicado de storedAuthToken e storedUserId)
+
+    // A inicialização já foi feita anteriormente.
+
+// --- FIM DO BLOCO ÚNICO E PRINCIPAL ---
 });
