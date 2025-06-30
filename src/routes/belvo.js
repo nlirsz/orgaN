@@ -7,30 +7,47 @@ const User = require('../models/User');
 
 console.log('>>> [ROTA] Arquivo belvo.js carregado.');
 
-const BELVO_API_URL = 'https://sandbox.belvo.com'; // Ou 'https://api.belvo.com' para produção
+// Determina a URL da API da Belvo com base no ambiente (produção ou desenvolvimento)
+const BELVO_API_URL = process.env.NODE_ENV === 'production' 
+    ? 'https://api.belvo.com' 
+    : 'https://sandbox.belvo.com';
+
 const BELVO_SECRET_ID = process.env.BELVO_SECRET_ID;
 const BELVO_SECRET_PASSWORD = process.env.BELVO_SECRET_PASSWORD;
 
+// Log de diagnóstico para confirmar o carregamento das variáveis de ambiente
 if (!BELVO_SECRET_ID || !BELVO_SECRET_PASSWORD) {
     console.error('>>> [ERRO CRÍTICO] As credenciais BELVO_SECRET_ID ou BELVO_SECRET_PASSWORD não foram encontradas!');
 } else {
     console.log('>>> [DIAGNÓSTICO] Credenciais da Belvo carregadas.');
 }
 
-// Rota para obter o token do widget
+// --- ROTAS DA API ---
+
+/**
+ * @route   POST /api/belvo/get-widget-token
+ * @desc    Obtém um token de acesso para inicializar o Widget do Belvo Connect.
+ * Esta é a rota que o seu frontend chama para iniciar a conexão.
+ * @access  Private (deve ser chamada por um utilizador autenticado)
+ */
 router.post('/get-widget-token', async (req, res) => {
     console.log('>>> [ROTA] Recebido pedido para /get-widget-token');
-    try {
-        if (!BELVO_SECRET_ID || !BELVO_SECRET_PASSWORD) {
-            throw new Error('Credenciais da Belvo não configuradas no servidor.');
-        }
+    
+    if (!BELVO_SECRET_ID || !BELVO_SECRET_PASSWORD) {
+        console.error('>>> [ERRO] Tentativa de gerar token sem as credenciais da Belvo estarem configuradas.');
+        return res.status(500).json({ message: 'Erro de configuração no servidor: credenciais da Belvo ausentes.' });
+    }
 
-        console.log('>>> [DIAGNÓSTICO] Solicitando token de acesso para o widget da Belvo...');
+    try {
+        console.log(`>>> [DIAGNÓSTICO] A solicitar token de acesso da Belvo no ambiente: ${BELVO_API_URL}`);
+        
+        const basicAuth = Buffer.from(`${BELVO_SECRET_ID}:${BELVO_SECRET_PASSWORD}`).toString('base64');
+
         const response = await fetch(`${BELVO_API_URL}/api/token/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': 'Basic ' + Buffer.from(`${BELVO_SECRET_ID}:${BELVO_SECRET_PASSWORD}`).toString('base64')
+                'Authorization': `Basic ${basicAuth}`
             },
             body: JSON.stringify({
                 scope: 'read_institutions,links,accounts,transactions',
@@ -45,7 +62,7 @@ router.post('/get-widget-token', async (req, res) => {
             throw new Error(data.detail || 'Falha ao autenticar com a Belvo.');
         }
 
-        console.log('>>> [SUCESSO] Token de acesso para o widget obtido.');
+        console.log('>>> [SUCESSO] Token de acesso para o widget obtido da Belvo.');
         res.json({ access: data.access });
 
     } catch (error) {
@@ -54,23 +71,12 @@ router.post('/get-widget-token', async (req, res) => {
     }
 });
 
-// ... (o restante do seu arquivo belvo.js pode continuar igual) ...
-
-// --- ROTAS DA API ---
-
-// Rota 1: O frontend chama esta rota para obter um token para o widget
-router.post('/get-widget-token', async (req, res) => {
-    console.log('>>> [ROTA] Recebido pedido para /get-widget-token');
-    try {
-        const belvoAccessToken = await getBelvoAccessToken();
-        res.json({ access: belvoAccessToken });
-    } catch (error) {
-        console.error('>>> [ERRO] Falha na rota /get-widget-token:', error.message);
-        res.status(500).json({ message: 'Erro no servidor ao comunicar com a Belvo.' });
-    }
-});
-
-// Rota 2: O frontend envia o link_id para o backend após o sucesso do widget
+/**
+ * @route   POST /api/belvo/register-link
+ * @desc    O widget da Belvo chama esta rota (via frontend) após uma conexão bem-sucedida.
+ * Guarda o 'linkId' gerado no perfil do utilizador.
+ * @access  Private
+ */
 router.post('/register-link', async (req, res) => {
     const { linkId, userId } = req.body;
     if (!linkId || !userId) {
@@ -85,7 +91,11 @@ router.post('/register-link', async (req, res) => {
     }
 });
 
-// Rota 3: O frontend pede os dados financeiros, e o backend busca na Belvo
+/**
+ * @route   GET /api/belvo/financial-data
+ * @desc    Busca os dados financeiros (contas, transações) de um utilizador na Belvo.
+ * @access  Private
+ */
 router.get('/financial-data', async (req, res) => {
     const { userId } = req.query;
     if (!userId) {
@@ -93,7 +103,7 @@ router.get('/financial-data', async (req, res) => {
     }
     try {
         const user = await User.findById(userId);
-        if (!user || !user.belvoLinks || !user.belvoLinks.length === 0) {
+        if (!user || !user.belvoLinks || user.belvoLinks.length === 0) {
             return res.json({ accounts: [], transactions: [] });
         }
 
@@ -101,6 +111,7 @@ router.get('/financial-data', async (req, res) => {
         const authHeader = 'Basic ' + Buffer.from(`${BELVO_SECRET_ID}:${BELVO_SECRET_PASSWORD}`).toString('base64');
 
         for (const linkId of user.belvoLinks) {
+            // Busca contas
             const accountsResponse = await fetch(`${BELVO_API_URL}/api/accounts/?link=${linkId}`, {
                 headers: { 'Authorization': authHeader }
             });
@@ -109,11 +120,12 @@ router.get('/financial-data', async (req, res) => {
                 allData.accounts.push(...accountsData.results);
             }
 
+            // Busca transações
             const transactionsResponse = await fetch(`${BELVO_API_URL}/api/transactions/?link=${linkId}`, {
                  headers: { 'Authorization': authHeader }
             });
             const transactionsData = await transactionsResponse.json();
-            if(transactionsData.results) {
+            if (transactionsData.results) {
                 allData.transactions.push(...transactionsData.results);
             }
         }
