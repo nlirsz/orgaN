@@ -469,14 +469,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-// EM SRC/RENDERER.JS
-// SUBSTITUA A SUA FUNÇÃO ANTIGA POR ESTA
-
-const createProductCard = (product, cardType = 'product') => { // Adicionamos o cardType de volta
+// EM src/renderer.js
+const createProductCard = (product, cardType = 'product') => {
     const card = document.createElement('li');
     card.className = 'product-card';
-    
-    // Adiciona uma classe específica para o card de histórico
+
     if (cardType === 'history') {
         card.classList.add('history-card');
     }
@@ -487,8 +484,8 @@ const createProductCard = (product, cardType = 'product') => { // Adicionamos o 
     const categoryColor = categoryColors[product.category] || categoryColors['Outros'];
     card.style.setProperty('--category-color', categoryColor);
 
+    // ESTRUTURA HTML ATUALIZADA (sem a badge da categoria)
     card.innerHTML = `
-        ${product.category ? `<div class="card-category-badge">${product.category}</div>` : ''}
         <div class="card-image-container">
             <img src="${product.image || 'https://via.placeholder.com/200x150?text=Indisponível'}" alt="${product.name || 'Produto'}" class="card-image">
         </div>
@@ -504,18 +501,18 @@ const createProductCard = (product, cardType = 'product') => { // Adicionamos o 
         </div>
     `;
 
-    // AGORA SÓ APLICA O TILT SE NÃO FOR UM CARD DE HISTÓRICO
     if (cardType !== 'history' && typeof VanillaTilt !== 'undefined') {
         VanillaTilt.init(card, {
-            max: 10,
-            speed: 200,
+            max: 8,
+            speed: 300,
             glare: true,
-            "max-glare": 0.2
+            "max-glare": 0.15
         });
     }
     
     return card;
 };
+
 
 // SUBSTITUA A SUA FUNÇÃO ANTIGA POR ESTA
 
