@@ -1,54 +1,60 @@
-// -----------------------------------------------------------------------------
-// ARQUIVO: src/routes/belvo.js
-// OBJETIVO: Ponto de acesso seguro para comunicar com a API da Belvo, com logs de diagnóstico.
-// -----------------------------------------------------------------------------
+// src/routes/belvo.js
 
 const express = require('express');
 const router = express.Router();
 const fetch = require('node-fetch');
 const User = require('../models/User');
 
-console.log('>>> [ROTA] Ficheiro belvo.js carregado.');
+console.log('>>> [ROTA] Arquivo belvo.js carregado.');
 
-// --- Configuração das Credenciais da Belvo ---
-const BELVO_API_URL = 'https://sandbox.belvo.com';
+const BELVO_API_URL = 'https://sandbox.belvo.com'; // Ou 'https://api.belvo.com' para produção
 const BELVO_SECRET_ID = process.env.BELVO_SECRET_ID;
 const BELVO_SECRET_PASSWORD = process.env.BELVO_SECRET_PASSWORD;
 
-// ** LOG DE DIAGNÓSTICO **
-// Esta mensagem ajuda a confirmar se as suas variáveis de ambiente estão a ser lidas na Vercel.
 if (!BELVO_SECRET_ID || !BELVO_SECRET_PASSWORD) {
-    console.error('>>> [ERRO CRÍTICO] As credenciais BELVO_SECRET_ID ou BELVO_SECRET_PASSWORD não foram encontradas nas variáveis de ambiente!');
+    console.error('>>> [ERRO CRÍTICO] As credenciais BELVO_SECRET_ID ou BELVO_SECRET_PASSWORD não foram encontradas!');
 } else {
-    console.log('>>> [DIAGNÓSTICO] Credenciais da Belvo carregadas com sucesso.');
+    console.log('>>> [DIAGNÓSTICO] Credenciais da Belvo carregadas.');
 }
 
-// Função para obter o Token de Acesso da Belvo
-const getBelvoAccessToken = async () => {
-    if (!BELVO_SECRET_ID || !BELVO_SECRET_PASSWORD) {
-        throw new Error('As credenciais da Belvo não foram configuradas no servidor.');
-    }
-    
-    console.log('>>> [DIAGNÓSTICO] A tentar obter token de acesso da Belvo...');
-    const response = await fetch(`${BELVO_API_URL}/api/token/`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Basic ' + Buffer.from(`${BELVO_SECRET_ID}:${BELVO_SECRET_PASSWORD}`).toString('base64')
-        },
-        body: JSON.stringify({ scope: 'read_institutions,links,accounts,transactions', grant_type: 'client_credentials' })
-    });
+// Rota para obter o token do widget
+router.post('/get-widget-token', async (req, res) => {
+    console.log('>>> [ROTA] Recebido pedido para /get-widget-token');
+    try {
+        if (!BELVO_SECRET_ID || !BELVO_SECRET_PASSWORD) {
+            throw new Error('Credenciais da Belvo não configuradas no servidor.');
+        }
 
-    const data = await response.json();
+        console.log('>>> [DIAGNÓSTICO] Solicitando token de acesso para o widget da Belvo...');
+        const response = await fetch(`${BELVO_API_URL}/api/token/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Basic ' + Buffer.from(`${BELVO_SECRET_ID}:${BELVO_SECRET_PASSWORD}`).toString('base64')
+            },
+            body: JSON.stringify({
+                scope: 'read_institutions,links,accounts,transactions',
+                grant_type: 'client_credentials'
+            })
+        });
 
-    if (!response.ok) {
-        console.error('>>> [ERRO API BELVO] Resposta da Belvo ao pedir token:', data);
-        throw new Error(data.detail || 'Falha ao autenticar com a Belvo. Verifique as suas credenciais.');
+        const data = await response.json();
+
+        if (!response.ok) {
+            console.error('>>> [ERRO API BELVO] Resposta ao pedir token:', data);
+            throw new Error(data.detail || 'Falha ao autenticar com a Belvo.');
+        }
+
+        console.log('>>> [SUCESSO] Token de acesso para o widget obtido.');
+        res.json({ access: data.access });
+
+    } catch (error) {
+        console.error('>>> [ERRO] Falha na rota /get-widget-token:', error.message);
+        res.status(500).json({ message: 'Erro no servidor ao comunicar com a Belvo.' });
     }
-    
-    console.log('>>> [SUCESSO] Token de acesso da Belvo obtido.');
-    return data.access;
-};
+});
+
+// ... (o restante do seu arquivo belvo.js pode continuar igual) ...
 
 // --- ROTAS DA API ---
 
