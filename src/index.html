@@ -108,16 +108,6 @@
 
 			</div>
 
-			<div class="sidebar-lists-container">
-				<div class="sidebar-lists-header">
-					<h4>Minhas Listas</h4>
-					<button id="add-new-list-btn" title="Criar Nova Lista"><i class="fas fa-plus"></i></button>
-				</div>
-				<ul id="product-lists-sidebar">
-					<!-- As listas serão inseridas aqui pelo JS -->
-				</ul>
-			</div>
-			
 			<div class="sidebar-footer">
 				<button class="nav-btn" data-tab="settings" title="Configurações">
 					<i class="fas fa-cog"></i>
@@ -192,6 +182,15 @@
 
 			<section id="products-tab" class="tab-content">
 				<h2>Meus Produtos</h2>
+
+				<div class="products-list-navigation">
+					<ul id="product-lists-sidebar">
+						<!-- As listas serão inseridas aqui pelo JS -->
+					</ul>
+					<button id="add-new-list-btn" class="secondary-btn" title="Criar Nova Lista">
+						<i class="fas fa-plus"></i> Criar Lista
+					</button>
+				</div>
 
 				<div class="products-action-bar">
 					<button id="refresh-all-prices-btn" class="secondary-btn">
