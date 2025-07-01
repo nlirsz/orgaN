@@ -1079,8 +1079,22 @@ async function renderPriceChart(productId) {
     }
 
     try {
-        // Busca os dados usando a função exposta no preload.js
-        const priceHistory = await window.db.getProductPriceHistory(productId);
+        let priceHistory = [];
+
+        // LÓGICA HÍBRIDA: Verifica se está no Electron (window.db existe) ou na Web
+        if (window.db && typeof window.db.getProductPriceHistory === 'function') {
+            // Ambiente Electron: usa a comunicação IPC exposta pelo preload.js
+            console.log("Modo Electron: Buscando histórico de preços via IPC.");
+            priceHistory = await window.db.getProductPriceHistory(productId);
+        } else {
+            // Ambiente Web (Vercel): usa o fetch autenticado para a API
+            console.log("Modo Web: Buscando histórico de preços via API Fetch.");
+            const response = await authenticatedFetch(`${API_BASE_URL}/products/${productId}/history`);
+            if (!response.ok) {
+                throw new Error(`Erro ao buscar histórico: ${response.statusText}`);
+            }
+            priceHistory = await response.json();
+        }
 
         const canvasContainer = ctx.parentElement;
         const noDataMessage = canvasContainer.querySelector('.no-data-message');
@@ -1138,6 +1152,13 @@ async function renderPriceChart(productId) {
 
     } catch (error) {
         console.error("Falha ao renderizar o gráfico:", error);
+        const chartCtx = document.getElementById('priceHistoryChart')?.getContext('2d');
+        if (chartCtx) {
+            chartCtx.clearRect(0, 0, chartCtx.canvas.width, chartCtx.canvas.height);
+            chartCtx.textAlign = 'center';
+            chartCtx.fillStyle = getTextColor();
+            chartCtx.fillText("Não foi possível carregar os dados do gráfico.", chartCtx.canvas.width / 2, 50);
+        }
     }
 }
 
