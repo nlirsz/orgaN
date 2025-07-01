@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>orgaN - Suas Compras, Mais Inteligentes</title>
     <meta name="description" content="orgaN é um gerenciador de listas de desejos que monitora preços para você, garantindo que você sempre faça a melhor compra.">
-    <link rel="icon" href="icon.ico" type="image/x-icon">
+    <link rel="icon" href="../assets/icon.ico" type="image/x-icon">
     
     <!-- Tailwind CSS via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -37,7 +37,7 @@
             overflow-x: hidden;
         }
 
-        h1, h2, h3 {
+        h1, h2, h3, h4, h5, h6 {
             font-family: 'Almarai', sans-serif;
         }
 
@@ -61,21 +61,50 @@
             transition: all 0.2s ease-in-out;
         }
         .btn-primary:hover {
+            transform: translateY(-2px);
             background-color: var(--brand-green-hover);
         }
         .btn-primary:active {
             box-shadow: inset 3px 3px 6px #0c6b17, inset -3px -3px 6px #16c330;
+            transform: translateY(1px);
         }
 
         /* Animação de Scroll */
         .reveal {
             opacity: 0;
-            transform: translateY(40px);
+            transform: translateY(50px);
             transition: opacity 0.8s cubic-bezier(0.5, 0, 0, 1), transform 0.8s cubic-bezier(0.5, 0, 0, 1);
         }
         .reveal.active {
             opacity: 1;
             transform: translateY(0);
+        }
+        
+        /* Fundo com efeito Parallax */
+        .parallax-bg {
+            background-image: url('https://www.transparenttextures.com/patterns/concrete-wall.png');
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+        
+        /* Estilo para o FAQ */
+        .faq-item .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0.5, 0, 0, 1), padding 0.5s ease;
+            padding: 0 1.5rem;
+        }
+        .faq-item.active .faq-answer {
+            max-height: 200px; /* Ajuste conforme necessário */
+            padding: 1rem 1.5rem 1.5rem;
+        }
+        .faq-item.active .faq-arrow {
+            transform: rotate(180deg);
+        }
+        .faq-arrow {
+            transition: transform 0.3s ease;
         }
     </style>
 </head>
@@ -85,16 +114,17 @@
     <header id="header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
         <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
             <a href="#" class="flex items-center gap-3">
-                <img src="logo.png" alt="Logo orgaN" class="w-10 h-10">
+                <img src="../assets/logo.png" alt="Logo orgaN" class="w-10 h-10">
                 <span class="text-2xl font-bold text-gray-700">orgaN</span>
             </a>
             <div class="hidden md:flex items-center space-x-8">
-                <a href="#sobre" class="text-gray-600 hover:text-black transition-colors">Sobre</a>
-                <a href="#recursos" class="text-gray-600 hover:text-black transition-colors">Recursos</a>
+                <a href="#sobre" class="text-gray-600 hover:text-black transition-colors">Recursos</a>
+                <a href="#como-funciona" class="text-gray-600 hover:text-black transition-colors">Como Funciona</a>
+                <a href="#faq" class="text-gray-600 hover:text-black transition-colors">FAQ</a>
                 <a href="#contato" class="text-gray-600 hover:text-black transition-colors">Contato</a>
             </div>
             <div class="hidden md:block">
-                <a href="#" class="btn-primary font-semibold py-2 px-5 rounded-lg shadow-md">
+                <a href="https://organ-nlabz.com.br" class="btn-primary font-semibold py-2 px-5 rounded-lg shadow-md">
                     Acessar App
                 </a>
             </div>
@@ -107,8 +137,9 @@
             </div>
         </nav>
         <div id="mobile-menu" class="hidden md:hidden neumorphic m-4 rounded-lg">
-            <a href="#sobre" class="block py-3 px-6 text-gray-700 hover:bg-white/50 rounded-t-lg">Sobre</a>
-            <a href="#recursos" class="block py-3 px-6 text-gray-700 hover:bg-white/50">Recursos</a>
+             <a href="#sobre" class="block py-3 px-6 text-gray-700 hover:bg-white/50 rounded-t-lg">Recursos</a>
+            <a href="#como-funciona" class="block py-3 px-6 text-gray-700 hover:bg-white/50">Como Funciona</a>
+            <a href="#faq" class="block py-3 px-6 text-gray-700 hover:bg-white/50">FAQ</a>
             <a href="#contato" class="block py-3 px-6 text-gray-700 hover:bg-white/50 rounded-b-lg">Contato</a>
         </div>
     </header>
@@ -125,7 +156,7 @@
                     <p class="text-lg md:text-xl text-gray-600 max-w-xl mx-auto md:mx-0 mb-8">
                         orgaN é a ferramenta definitiva para centralizar sua lista de desejos e garantir que você pague sempre o menor preço.
                     </p>
-                    <a href="#" class="btn-primary text-white font-bold py-3 px-8 rounded-lg inline-block">
+                    <a href="https://organ-nlabz.com.br" class="btn-primary text-white font-bold py-3 px-8 rounded-lg inline-block">
                         Comece a Usar Gratuitamente
                     </a>
                 </div>
@@ -137,12 +168,10 @@
                             <div class="flex items-center justify-between mb-4">
                                <h3 class="text-xl font-bold text-gray-700">Meus Produtos</h3>
                                <div class="w-8 h-8 neumorphic rounded-full flex items-center justify-center">
-                                   <img src="logo.png" alt="Logo orgaN" class="w-5 h-5">
+                                   <img src="../assets/logo.png" alt="Logo orgaN" class="w-5 h-5">
                                </div>
                             </div>
-                            <!-- Mockup Input -->
                             <div class="neumorphic-inset-light rounded-lg p-3 text-sm text-gray-500 mb-4">Cole uma URL para adicionar à lista...</div>
-                            <!-- Mockup Cards -->
                             <div class="grid grid-cols-2 gap-3">
                                 <div class="neumorphic rounded-lg p-2">
                                     <div class="bg-white rounded-md h-16 mb-2 flex items-center justify-center">
@@ -169,51 +198,146 @@
             </div>
         </section>
 
-        <!-- Seção Recursos -->
-        <section id="recursos" class="py-20 md:py-32 bg-white/30">
+        <!-- Seção Como Funciona -->
+        <section id="como-funciona" class="py-20 md:py-32 parallax-bg">
             <div class="container mx-auto px-6 reveal">
                 <div class="text-center mb-16">
-                    <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Recursos Principais</h2>
-                    <p class="max-w-2xl mx-auto text-gray-600">Funcionalidades pensadas para otimizar sua experiência de compra.</p>
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Como Funciona?</h2>
+                    <p class="max-w-2xl mx-auto text-gray-600">Em três passos simples, você transforma o jeito que compra online.</p>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <!-- Feature Card 1 -->
-                    <div class="neumorphic rounded-xl p-6 text-center transform hover:-translate-y-2 transition-transform duration-300">
-                        <div class="flex items-center justify-center h-20 w-20 neumorphic-inset rounded-full mx-auto mb-6">
-                            <svg class="w-10 h-10 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path></svg>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                    <!-- Passo 1 -->
+                    <div class="reveal" style="transition-delay: 100ms;">
+                        <div class="flex items-center justify-center h-24 w-24 neumorphic rounded-full mx-auto mb-6">
+                            <svg class="w-12 h-12 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" /></svg>
                         </div>
-                        <h3 class="text-xl font-bold text-gray-800 mb-3">Monitoramento Inteligente</h3>
-                        <p class="text-gray-600 text-sm">Acompanhe a flutuação de preços automaticamente e receba alertas.</p>
+                        <h3 class="text-xl font-bold text-gray-800 mb-3">1. Cole a URL</h3>
+                        <p class="text-gray-600 text-sm px-4">Encontrou um produto que amou? Copie o link da página e cole no orgaN.</p>
                     </div>
-                    <!-- Feature Card 2 -->
-                    <div class="neumorphic rounded-xl p-6 text-center transform hover:-translate-y-2 transition-transform duration-300">
-                        <div class="flex items-center justify-center h-20 w-20 neumorphic-inset rounded-full mx-auto mb-6">
-                            <svg class="w-10 h-10 text-gray-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12M8.25 17.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-                            </svg>
+                    <!-- Passo 2 -->
+                    <div class="reveal" style="transition-delay: 300ms;">
+                        <div class="flex items-center justify-center h-24 w-24 neumorphic rounded-full mx-auto mb-6">
+                           <svg class="w-12 h-12 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
                         </div>
-                        <h3 class="text-xl font-bold text-gray-800 mb-3">Lista de Desejos Unificada</h3>
-                        <p class="text-gray-600 text-sm">Centralize produtos de diversas lojas em um só lugar.</p>
+                        <h3 class="text-xl font-bold text-gray-800 mb-3">2. Adicione à Lista</h3>
+                        <p class="text-gray-600 text-sm px-4">Organize seus produtos em um dashboard unificado e intuitivo.</p>
                     </div>
-                    <!-- Feature Card 3 -->
-                    <div class="neumorphic rounded-xl p-6 text-center transform hover:-translate-y-2 transition-transform duration-300">
-                         <div class="flex items-center justify-center h-20 w-20 neumorphic-inset rounded-full mx-auto mb-6">
-                            <svg class="w-10 h-10 text-gray-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m1-3l-1-3m0 0l-1 3m1-3l1-3m0 0l1 3m-1-3l-1-3m-1.5 9h5.25m-5.25 0l-1-3m1 3l1-3M15 12l-1.5 1.5-1.5-1.5" />
-                              </svg>
+                    <!-- Passo 3 -->
+                    <div class="reveal" style="transition-delay: 500ms;">
+                        <div class="flex items-center justify-center h-24 w-24 neumorphic rounded-full mx-auto mb-6">
+                            <svg class="w-12 h-12 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                         </div>
-                        <h3 class="text-xl font-bold text-gray-800 mb-3">Histórico de Preços</h3>
-                        <p class="text-gray-600 text-sm">Analise gráficos e tome decisões de compra baseadas em dados.</p>
+                        <h3 class="text-xl font-bold text-gray-800 mb-3">3. Economize Dinheiro</h3>
+                        <p class="text-gray-600 text-sm px-4">Nós monitoramos o preço para você e avisamos a hora certa de comprar.</p>
                     </div>
-                    <!-- Feature Card 4 -->
-                    <div class="neumorphic rounded-xl p-6 text-center transform hover:-translate-y-2 transition-transform duration-300">
-                        <div class="flex items-center justify-center h-20 w-20 neumorphic-inset rounded-full mx-auto mb-6">
-                            <svg class="w-10 h-10 text-gray-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
-                              </svg>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção de Recursos Detalhada -->
+        <section id="sobre" class="py-20 md:py-32">
+            <div class="container mx-auto px-6 space-y-24">
+                <!-- Feature 1 -->
+                <div class="grid md:grid-cols-2 gap-12 items-center reveal">
+                    <div class="order-2 md:order-1">
+                        <h2 class="text-3xl font-bold text-gray-800 mb-4">Nunca mais perca uma promoção</h2>
+                        <p class="text-gray-600 mb-6">Com o nosso monitoramento em tempo real, você é o primeiro a saber quando o preço do seu produto desejado cai. Analise o histórico e tome decisões de compra mais inteligentes.</p>
+                        <ul class="space-y-2 text-gray-700">
+                            <li class="flex items-center gap-3"><svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Notificações instantâneas de queda de preço</li>
+                            <li class="flex items-center gap-3"><svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Gráficos com histórico de preços detalhado</li>
+                            <li class="flex items-center gap-3"><svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Análise de tendências para prever promoções</li>
+                        </ul>
+                    </div>
+                    <div class="order-1 md:order-2 neumorphic rounded-2xl p-4">
+                        <!-- Mockup do Gráfico -->
+                        <div class="w-full h-full neumorphic-inset p-4 rounded-xl">
+                            <div class="flex justify-between items-baseline mb-2">
+                                <h4 class="font-bold text-sm text-gray-700">Histórico de Preços</h4>
+                                <span class="text-xs text-gray-500">Últimos 30 dias</span>
+                            </div>
+                            <div class="w-full h-48 bg-white/50 rounded-lg flex items-end justify-around p-2 gap-2 neumorphic-inset-light">
+                                <div class="w-full bg-gray-300 rounded-t-md animate-pulse" style="height: 70%; animation-delay: 100ms;"></div>
+                                <div class="w-full bg-gray-300 rounded-t-md animate-pulse" style="height: 80%; animation-delay: 200ms;"></div>
+                                <div class="w-full bg-gray-300 rounded-t-md animate-pulse" style="height: 60%; animation-delay: 300ms;"></div>
+                                <div class="w-full bg-green-500 rounded-t-md" style="height: 40%;"></div>
+                                <div class="w-full bg-gray-300 rounded-t-md animate-pulse" style="height: 55%; animation-delay: 400ms;"></div>
+                                <div class="w-full bg-gray-300 rounded-t-md animate-pulse" style="height: 65%; animation-delay: 500ms;"></div>
+                            </div>
                         </div>
-                        <h3 class="text-xl font-bold text-gray-800 mb-3">Dashboard Intuitivo</h3>
-                        <p class="text-gray-600 text-sm">Uma interface moderna e tátil para uma experiência única.</p>
+                    </div>
+                </div>
+                <!-- Feature 2 -->
+                <div class="grid md:grid-cols-2 gap-12 items-center reveal">
+                    <div class="neumorphic rounded-2xl p-4">
+                        <!-- Mockup do Dashboard -->
+                         <div class="w-full h-full neumorphic-inset p-4 rounded-xl">
+                            <h4 class="font-bold text-sm text-gray-700 mb-4">Dashboard Financeiro</h4>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="neumorphic p-3 rounded-lg text-center">
+                                    <p class="text-xs text-gray-500">Total da Lista</p>
+                                    <p class="font-bold text-gray-800 text-lg">R$ 8.445</p>
+                                </div>
+                                <div class="neumorphic p-3 rounded-lg text-center">
+                                    <p class="text-xs text-gray-500">Economia Potencial</p>
+                                    <p class="font-bold text-green-600 text-lg">R$ 1.250</p>
+                                </div>
+                                <div class="neumorphic p-3 rounded-lg text-center col-span-2">
+                                    <p class="text-xs text-gray-500">Produtos Monitorados</p>
+                                    <p class="font-bold text-gray-800 text-lg">12</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-800 mb-4">Tudo em um só lugar</h2>
+                        <p class="text-gray-600 mb-6">Diga adeus a abas infinitas e anotações perdidas. O dashboard do orgaN centraliza todos os seus produtos e finanças em uma interface limpa e organizada.</p>
+                         <ul class="space-y-2 text-gray-700">
+                            <li class="flex items-center gap-3"><svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Adicione produtos de qualquer e-commerce</li>
+                            <li class="flex items-center gap-3"><svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Organize por categorias personalizadas</li>
+                            <li class="flex items-center gap-3"><svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Integre com suas contas para uma visão completa</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção FAQ -->
+        <section id="faq" class="py-20 md:py-32 parallax-bg">
+            <div class="container mx-auto px-6 reveal">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Perguntas Frequentes</h2>
+                    <p class="max-w-2xl mx-auto text-gray-600">Tirando suas dúvidas para você começar com o pé direito.</p>
+                </div>
+                <div class="max-w-3xl mx-auto space-y-4">
+                    <!-- FAQ Item 1 -->
+                    <div class="faq-item neumorphic rounded-xl overflow-hidden">
+                        <button class="faq-question w-full flex justify-between items-center text-left p-6">
+                            <span class="font-semibold text-lg text-gray-800">O orgaN é gratuito?</span>
+                            <svg class="faq-arrow w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        <div class="faq-answer text-gray-600">
+                            <p>Sim! O orgaN é totalmente gratuito para todos os usuários. Nosso objetivo é ajudar você a economizar, sem custos escondidos.</p>
+                        </div>
+                    </div>
+                    <!-- FAQ Item 2 -->
+                    <div class="faq-item neumorphic rounded-xl overflow-hidden">
+                        <button class="faq-question w-full flex justify-between items-center text-left p-6">
+                            <span class="font-semibold text-lg text-gray-800">De quais lojas posso adicionar produtos?</span>
+                            <svg class="faq-arrow w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        <div class="faq-answer text-gray-600">
+                            <p>Você pode adicionar produtos de praticamente qualquer loja online que tenha uma página de produto pública. Nosso sistema é projetado para ser compatível com a grande maioria dos e-commerces.</p>
+                        </div>
+                    </div>
+                    <!-- FAQ Item 3 -->
+                    <div class="faq-item neumorphic rounded-xl overflow-hidden">
+                        <button class="faq-question w-full flex justify-between items-center text-left p-6">
+                            <span class="font-semibold text-lg text-gray-800">Meus dados financeiros estão seguros?</span>
+                            <svg class="faq-arrow w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        <div class="faq-answer text-gray-600">
+                            <p>Absolutamente. A conexão com suas contas bancárias é feita através da Belvo, uma plataforma líder em Open Finance que utiliza criptografia de ponta e segue os mais altos padrões de segurança do mercado. Nós nunca temos acesso às suas credenciais bancárias.</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -226,7 +350,7 @@
                 <p class="max-w-2xl mx-auto text-gray-600 mb-8">
                     Comece a usar o orgaN agora mesmo, de graça. Sem complicações, só economia.
                 </p>
-                 <a href="#" class="btn-primary text-white font-bold py-3 px-8 rounded-lg inline-block">
+                 <a href="https://organ-nlabz.com.br" class="btn-primary text-white font-bold py-3 px-8 rounded-lg inline-block">
                     Acessar a Aplicação
                 </a>
             </div>
@@ -236,10 +360,14 @@
     <!-- Footer -->
     <footer class="border-t" style="border-color: rgba(163, 177, 198, 0.5)">
         <div class="container mx-auto px-6 py-8">
-            <div class="flex flex-col md:flex-row justify-between items-center">
-                <p class="text-sm text-gray-600">&copy; 2024 orgaN. Todos os direitos reservados.</p>
+            <div class="flex flex-col md:flex-row justify-between items-center text-center md:text-left">
+                <div class="text-sm text-gray-600 space-y-1">
+                    <p>&copy; 2024 orgaN. Todos os direitos reservados.</p>
+                    <p>53.464.902 NICOLAS LUHRS</p>
+                    <p>CNPJ: 53.464.902/0001-45</p>
+                </div>
                 <div class="flex items-center space-x-4 mt-4 md:mt-0">
-                    <a href="#" aria-label="GitHub" class="text-gray-500 hover:text-gray-800 transition-colors">
+                    <a href="https://github.com/nlirsz/orgaN" aria-label="GitHub" class="text-gray-500 hover:text-gray-800 transition-colors">
                         <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.168 6.839 9.49.5.092.682-.217.682-.482 0-.237-.009-.868-.014-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.031-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.03 1.595 1.03 2.688 0 3.848-2.338 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.001 10.001 0 0022 12c0-5.523-4.477-10-10-10z" clip-rule="evenodd"></path></svg>
                     </a>
                 </div>
@@ -257,10 +385,8 @@
             window.addEventListener('scroll', () => {
                 if (window.scrollY > 50) {
                     header.classList.add('neumorphic');
-                    header.classList.add('shadow-md');
                 } else {
                     header.classList.remove('neumorphic');
-                    header.classList.remove('shadow-md');
                 }
             });
 
@@ -292,6 +418,19 @@
 
             revealElements.forEach(elem => {
                 revealObserver.observe(elem);
+            });
+            
+            // Lógica para o FAQ
+            const faqItems = document.querySelectorAll('.faq-item');
+            faqItems.forEach(item => {
+                const question = item.querySelector('.faq-question');
+                question.addEventListener('click', () => {
+                    const isActive = item.classList.contains('active');
+                    faqItems.forEach(i => i.classList.remove('active'));
+                    if (!isActive) {
+                        item.classList.add('active');
+                    }
+                });
             });
         });
     </script>
