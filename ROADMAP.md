@@ -23,19 +23,19 @@ O objetivo aqui é fazer com que os usuários voltem sempre e usem o app de form
 2. Inteligência e Valor Agregado
 O objetivo é usar os dados que você já tem para oferecer insights valiosos ao usuário.
 
-[ ] a) Gráfico de Histórico de Preços
+[x] a) Gráfico de Histórico de Preços
 
-[ ] Backend: Criar uma rota na API (ex: /api/products/:id/history) que retorne a lista de preços e datas.
+[x] Backend: Criar uma rota na API (ex: /api/products/:id/history) que retorne a lista de preços e datas.
 
-[ ] Frontend: Integrar uma biblioteca de gráficos (ex: Chart.js) no modal de detalhes do produto.
+[x] Frontend: Integrar uma biblioteca de gráficos (ex: Chart.js) no modal de detalhes do produto.
 
-[ ] Frontend: Fazer a chamada à API e renderizar o gráfico com os dados recebidos.
+[x] Frontend: Fazer a chamada à API e renderizar o gráfico com os dados recebidos.
 
-[ ] b) Badge de "Melhor Preço Histórico"
+[x] b) Badge de "Melhor Preço Histórico"
 
-[ ] Backend/Frontend: Implementar a lógica para comparar o preço atual com o menor preço do histórico.
+[x] Backend: Implementar a lógica para comparar o preço atual com o menor preço do histórico.
 
-[ ] Frontend: Criar e exibir um ícone de selo/badge no card do produto quando a condição for verdadeira.
+[x] Frontend: Criar e exibir um ícone de selo/badge no card do produto quando a condição for verdadeira.
 
 3. Usabilidade e "Polimento" da Interface
 O objetivo é melhorar a experiência do dia a dia com pequenos ajustes que fazem uma grande diferença.

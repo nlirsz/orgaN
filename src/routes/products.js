@@ -133,8 +133,27 @@ router.get('/', auth, async (req, res) => {
         query.status = status;
     }
     try {
-        const products = await Product.find(query).sort({ createdAt: -1 });
-        res.json(products);
+        // Usar .lean() para performance e para poder modificar o objeto
+        const products = await Product.find(query).sort({ createdAt: -1 }).lean();
+
+        // Adicionar a flag isBestPrice
+        const productsWithBestPriceFlag = products.map(product => {
+            let isBestPrice = false;
+            // O produto deve ter um histórico para ser comparado
+            if (product.priceHistory && product.priceHistory.length > 0) {
+                // Encontra o menor preço no histórico
+                const minPriceInHistory = Math.min(...product.priceHistory.map(h => h.price));
+                // Compara com o preço atual
+                if (product.price <= minPriceInHistory) {
+                    isBestPrice = true;
+                }
+            } else {
+                isBestPrice = true; // Se não há histórico, o preço atual é o único (e melhor) preço.
+            }
+            return { ...product, isBestPrice };
+        });
+
+        res.json(productsWithBestPriceFlag);
     } catch (error) {
         res.status(500).json({ message: 'Erro interno do servidor.' });
     }

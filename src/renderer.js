@@ -502,7 +502,13 @@ const createProductCard = (product, cardType = 'product') => {
             </div>
         `;
     } else {
+        // Lógica para o badge de melhor preço
+        const bestPriceBadgeHtml = product.isBestPrice 
+            ? `<div class="best-price-badge" title="Melhor preço histórico!"><i class="fas fa-trophy"></i></div>` 
+            : '';
+
         card.innerHTML = `
+            ${bestPriceBadgeHtml}
             <div class="card-category-badge">${product.category || 'Outros'}</div>
             <div class="card-image-container">
                 <img src="${product.image || 'https://via.placeholder.com/200x150?text=Indisponível'}" alt="${product.name || 'Produto'}" class="card-image">
