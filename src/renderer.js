@@ -722,6 +722,52 @@ const fetchAndRenderProducts = async (listId = null) => {
         });
     }
 
+    if (listForm) {
+        listForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const listNameInput = getElem('list-name');
+            const listDescriptionInput = getElem('list-description');
+            const saveListBtn = getElem('save-list-btn');
+
+            if (!listNameInput || !saveListBtn) return;
+
+            const name = listNameInput.value.trim();
+            if (!name) {
+                showTabMessage(listFormMessage, 'O nome da lista é obrigatório.', false);
+                return;
+            }
+
+            const description = listDescriptionInput ? listDescriptionInput.value.trim() : '';
+            const payload = { name, description, userId: currentUserId };
+
+            saveListBtn.disabled = true;
+            saveListBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> A guardar...';
+
+            try {
+                let newList;
+                if (window.db && typeof window.db.addList === 'function') {
+                    newList = await window.db.addList(payload);
+                } else {
+                    const response = await authenticatedFetch(`${API_BASE_URL}/lists`, {
+                        method: 'POST',
+                        body: JSON.stringify(payload)
+                    });
+                    if (!response.ok) throw new Error((await response.json()).message || 'Falha ao criar a lista.');
+                    newList = await response.json();
+                }
+
+                hideModalWithDelay(listModal);
+                await fetchAndRenderLists(); // Ponto chave: Recarrega as listas na UI
+                setTimeout(() => { currentListId = newList._id; updateActiveList(); }, 300);
+            } catch (error) {
+                showTabMessage(listFormMessage, `Erro: ${error.message}`, false);
+            } finally {
+                saveListBtn.disabled = false;
+                saveListBtn.innerHTML = '<i class="fas fa-save"></i> Guardar Lista';
+            }
+        });
+    }
+
     // --- FIM DA LÓGICA DE LISTAS ---
 
 
