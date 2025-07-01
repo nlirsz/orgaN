@@ -1,6 +1,13 @@
 const mongoose = require('mongoose');
 
-const productSchema = new mongoose.Schema({
+// Price history subdocument schema
+const PriceHistorySchema = new mongoose.Schema({
+    price: { type: Number, required: true },
+    date: { type: Date, default: Date.now }
+});
+
+// Main product schema
+const ProductSchema = new mongoose.Schema({
     name: { type: String, required: [true, "Nome do produto é obrigatório"] },
     price: { type: Number, required: [true, "Preço do produto é obrigatório"], min: [0.01, "Preço deve ser positivo"] },
     image: { type: String }, // URL da imagem
@@ -24,13 +31,14 @@ const productSchema = new mongoose.Schema({
         enum: ['Baixa', 'Média', 'Alta'],
         default: 'Baixa'
     },
-    notes: { type: String }        // NOVO: Notas adicionais
+    notes: { type: String },        // NOVO: Notas adicionais
+    priceHistory: [PriceHistorySchema]
 }, {
     timestamps: true // Adiciona createdAt e updatedAt automaticamente
 });
 
 // Adicionar um índice composto pode ser útil para queries comuns
-productSchema.index({ userId: 1, status: 1 });
-productSchema.index({ userId: 1, createdAt: -1 });
+ProductSchema.index({ userId: 1, status: 1 });
+ProductSchema.index({ userId: 1, createdAt: -1 });
 
-module.exports = mongoose.model('Product', productSchema);
+module.exports = mongoose.model('Product', ProductSchema);

@@ -1062,6 +1062,101 @@ const fetchAndRenderProducts = async () => {
         });
     }
 
+    // Função para buscar dados e renderizar o gráfico
+    async function renderPriceChart(productId) {
+        const ctx = document.getElementById('priceHistoryChart');
+        if (!ctx) {
+            console.error('Elemento canvas #priceHistoryChart não encontrado.');
+            return;
+        }
+    
+        let chartInstance = Chart.getChart(ctx); // Pega a instância existente se houver
+        if (chartInstance) {
+            chartInstance.destroy(); // Destrói o gráfico anterior para renderizar um novo
+        }
+    
+        try {
+            // 1. Fazer a chamada à API
+            // Lembre-se de ajustar a URL base da sua API se necessário
+            const response = await fetch(`/api/products/${productId}/history`);
+            if (!response.ok) {
+                throw new Error(`Erro ao buscar histórico: ${response.statusText}`);
+            }
+            const priceHistory = await response.json();
+    
+            if (priceHistory.length === 0) {
+                ctx.getContext('2d').fillText("Nenhum histórico de preço disponível.", 10, 50);
+                return;
+            }
+    
+            // 2. Preparar os dados para o Chart.js
+            const labels = priceHistory.map(entry => 
+                new Date(entry.date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })
+            ).reverse(); // Reverte para mostrar do mais antigo para o mais novo
+    
+            const dataPoints = priceHistory.map(entry => entry.price).reverse(); // Reverte para corresponder aos labels
+    
+            // 3. Criar o gráfico
+            chartInstance = new Chart(ctx, {
+                type: 'line', // Tipo de gráfico
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Histórico de Preço (R$)',
+                        data: dataPoints,
+                        fill: true,
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        tension: 0.1 // Deixa a linha levemente curvada
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: false, // O eixo Y não precisa começar em zero
+                            ticks: {
+                                // Formata o tick para adicionar "R$"
+                                callback: function(value, index, ticks) {
+                                    return 'R$ ' + value.toFixed(2);
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(context.parsed.y);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+    
+        } catch (error) {
+            console.error("Falha ao renderizar o gráfico:", error);
+            ctx.getContext('2d').fillText("Não foi possível carregar os dados do gráfico.", 10, 50);
+        }
+    }
+    
+    // Exemplo de como chamar a função quando um usuário clica para ver detalhes
+    // const productId = '60d5ecb4b39e3b1e3c8b4567'; // ID do produto clicado
+    // renderPriceChart(productId);
+    
+
     async function saveProductToDB(productPayload, messageElement) {
         if (!productPayload || !productPayload.name || !productPayload.price) {
             showTabMessage(messageElement, 'Informações do produto estão incompletas para salvar.', false);
