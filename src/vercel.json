@@ -6,7 +6,7 @@
       "use": "@vercel/node"
     },
     {
-      "src": "*.@(html|css|js|png|ico)",
+      "src": "**/*.@(html|css|js|png|ico)",
       "use": "@vercel/static"
     }
   ],
