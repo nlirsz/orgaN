@@ -289,4 +289,44 @@ router.post('/refresh-prices', auth, async (req, res) => {
     }
 });
 
+router.post('/:id/refresh', auth, async (req, res) => {
+    const { id } = req.params;
+    const userId = req.user.userId;
+
+    try {
+        const product = await Product.findOne({ _id: id, userId });
+        if (!product) {
+            return res.status(404).json({ message: 'Produto não encontrado.' });
+        }
+
+        let newDetails = null;
+        try {
+            newDetails = await scrapeByAnalyzingHtml(product.urlOrigin);
+        } catch (htmlError) {
+            console.warn(`[Scrape HTML] Falhou para ${id}, tentando com busca...`);
+            try {
+                newDetails = await scrapeBySearching(product.urlOrigin);
+            } catch (searchError) {
+                console.error(`[Scrape Busca] Também falhou para ${id}`);
+                throw searchError; // Lança o erro para ser capturado abaixo
+            }
+        }
+
+        if (newDetails && newDetails.price && newDetails.price !== product.price) {
+            product.priceHistory.push({ price: product.price, date: new Date() });
+            product.price = newDetails.price;
+            if (newDetails.name) product.name = newDetails.name;
+            if (newDetails.image) product.image = newDetails.image;
+            
+            const savedProduct = await product.save();
+            return res.json({ updated: true, product: savedProduct });
+        } else {
+            return res.json({ updated: false, product: product });
+        }
+    } catch (e) {
+        console.error(`Falha no scrape para o produto ${id}:`, e.message);
+        return res.status(500).json({ message: `Falha no scrape: ${e.message}` });
+    }
+});
+
 module.exports = router;

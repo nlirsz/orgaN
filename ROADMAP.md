@@ -40,7 +40,7 @@ O objetivo é usar os dados que você já tem para oferecer insights valiosos ao
 3. Usabilidade e "Polimento" da Interface
 O objetivo é melhorar a experiência do dia a dia com pequenos ajustes que fazem uma grande diferença.
 
-[ ] a) Separação de Listas e Filtros
+[x] a) Separação de Listas e Filtros
 
 [x] Backend: Adicionar um modelo de dados List no banco de dados.
 

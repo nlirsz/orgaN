@@ -1376,20 +1376,65 @@ async function renderPriceChart(productId) {
                     showTabMessage(addProductMessageProductsTab, `Atualização concluída. ${result.updatedCount} produtos tiveram o preço alterado.`, true);
 
                 } else {
-                    // Ambiente Web: usa Fetch e atualiza tudo no final
-                    console.log("Modo Web: Atualizando preços via API Fetch.");
-                    const response = await authenticatedFetch(`${API_BASE_URL}/products/refresh-prices`, {
-                        method: 'POST',
-                        body: JSON.stringify({ productIds }),
-                    });
+                    // Ambiente Web: usa Fetch e atualiza um por um para evitar timeout
+                    console.log("Modo Web: Atualizando preços via API Fetch (sequencial).");
+                    let updatedCount = 0;
+                    const totalCount = productIds.length;
 
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        throw new Error(errorData.message || 'Falha ao atualizar preços.');
+                    for (const [index, productId] of productIds.entries()) {
+                        const card = pendingList.querySelector(`.product-card[data-product-id="${productId}"]`);
+                        
+                        if (card) {
+                            const loadingOverlay = document.createElement('div');
+                            loadingOverlay.className = 'card-loading-overlay';
+                            loadingOverlay.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                            card.appendChild(loadingOverlay);
+                        }
+                        
+                        refreshAllPricesBtn.innerHTML = `<i class="fas fa-sync-alt fa-spin"></i> Atualizando... (${index + 1}/${totalCount})`;
+
+                        try {
+                            const response = await authenticatedFetch(`${API_BASE_URL}/products/${productId}/refresh`, {
+                                method: 'POST',
+                            });
+
+                            if (!response.ok) {
+                                console.error(`Falha ao atualizar produto ${productId}:`, response.statusText);
+                                if (card) card.style.outline = '2px solid var(--error-color)';
+                                continue;
+                            }
+
+                            const result = await response.json();
+                            if (result.updated) {
+                                updatedCount++;
+                                if (card) {
+                                    card.style.transition = 'background-color 0.5s ease, transform 0.2s ease';
+                                    card.style.backgroundColor = 'var(--success-color-light)';
+                                    card.style.transform = 'scale(1.02)';
+
+                                    const priceEl = card.querySelector('.card-price');
+                                    if (priceEl) priceEl.textContent = `R$ ${result.product.price.toFixed(2).replace('.', ',')}`;
+                                    
+                                    card.dataset.productJson = JSON.stringify(result.product);
+
+                                    setTimeout(() => {
+                                        card.style.backgroundColor = '';
+                                        card.style.transform = '';
+                                        card.style.outline = '';
+                                    }, 2500);
+                                }
+                            }
+                        } catch (error) {
+                            console.error(`Erro ao processar atualização para ${productId}:`, error);
+                            if (card) card.style.outline = '2px solid var(--error-color)';
+                        } finally {
+                            if (card) {
+                                const overlay = card.querySelector('.card-loading-overlay');
+                                if (overlay) overlay.remove();
+                            }
+                        }
                     }
-                    const result = await response.json();
-                    showTabMessage(addProductMessageProductsTab, result.message, true);
-                    await fetchAndRenderProducts(currentListId);
+                    showTabMessage(addProductMessageProductsTab, `Atualização concluída. ${updatedCount} de ${totalCount} produtos tiveram o preço alterado.`, true);
                 }
             } catch (error) {
                 console.error("Erro ao atualizar preços:", error);
