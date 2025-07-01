@@ -1278,10 +1278,17 @@ if (mainContentArea) {
         }
         else if (card) { 
             e.stopPropagation();
-            const allModalElementsFound = detailsModal && modalProductImage && modalProductName && modalProductPrice && modalProductStatus && modalProductCategory && modalProductBrand && modalProductAddedDate &&  modalProductTags && modalProductLink && modalProductPriority && modalProductNotes;
 
-            if (!allModalElementsFound) {
-                console.error("Um ou mais elementos do modal de detalhes não foram encontrados. Verifique seus IDs no index.html.");
+            const modalElements = {
+                detailsModal, modalProductImage, modalProductName, modalProductPrice,
+                modalProductStatus, modalProductCategory, modalProductBrand,
+                modalProductAddedDate, modalProductTags, modalProductLink,
+                modalProductPriority, modalProductNotes
+            };
+            const missingElementKey = Object.keys(modalElements).find(key => !modalElements[key]);
+
+            if (missingElementKey) {
+                console.error(`Elemento do modal de detalhes não encontrado: '${missingElementKey}'. Verifique o ID correspondente no index.html.`);
                 return;
             }
 
