@@ -2,6 +2,8 @@
 const { app, BrowserWindow, ipcMain, shell } = require('electron'); // Adicionado 'shell'
 const path = require('path');
 const chokidar = require('chokidar');
+const mongoose = require('mongoose'); // Adicionado para validação de ObjectId
+const Product = require('./models/Product'); // Caminho corrigido
 
 let mainWindow;
 
@@ -45,6 +47,23 @@ function createWindow() {
     } else if (!app.isPackaged) {
         console.warn('Chokidar não encontrado ou app está empacotado. Live reload desativado.');
     }
+
+    ipcMain.handle('db:get-product-price-history', async (event, productId) => {
+  try {
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      return []; // Retorna array vazio se o ID for inválido
+    }
+    const product = await Product.findById(productId).select('priceHistory').lean();
+    if (!product) {
+      return [];
+    }
+    // Ordena para que o gráfico mostre a evolução cronológica corretamente
+    return product.priceHistory.sort((a, b) => new Date(a.date) - new Date(b.date));
+  } catch (error) {
+    console.error('Erro ao buscar histórico de preços:', error);
+    return []; // Retorna array vazio em caso de erro
+  }
+});
 
     mainWindow.on('closed', () => {
         mainWindow = null;

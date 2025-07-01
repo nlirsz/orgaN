@@ -3,6 +3,7 @@
 const express = require('express');
 const router = express.Router();
 const Product = require('../models/Product');
+const mongoose = require('mongoose');
 const auth = require('../middleware/auth');
 
 // Importando as duas funções do nosso novo scraper
@@ -187,6 +188,33 @@ router.get('/:id', auth, async (req, res) => {
         res.json(product);
     } catch (error) {
         res.status(500).json({ message: 'Erro interno do servidor.' });
+    }
+});
+
+// Rota para buscar o histórico de preços de um produto
+router.get('/:id/history', auth, async (req, res) => {
+    const { id } = req.params;
+    const userId = req.user.userId;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ msg: 'ID de produto inválido.' });
+    }
+
+    try {
+        // Busca o produto pelo ID e userId, selecionando apenas o histórico de preços
+        const product = await Product.findOne({ _id: id, userId: userId }).select('priceHistory');
+
+        if (!product) {
+            return res.status(404).json({ msg: 'Produto não encontrado.' });
+        }
+
+        // Ordena o histórico da data mais antiga para a mais nova, ideal para gráficos
+        const sortedHistory = product.priceHistory.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+        res.json(sortedHistory);
+    } catch (err) {
+        console.error(`Erro ao buscar histórico para o produto ${id}:`, err.message);
+        res.status(500).send('Erro no Servidor');
     }
 });
 

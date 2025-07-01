@@ -28,6 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let categoryDistributionChart = null;
     let financialLineChart = null;
     let editingFinanceId = null;
+    let priceHistoryChartInstance = null;
 
     // --- SELETORES DE ELEMENTOS ---
     const getElem = (id) => document.getElementById(id);
@@ -127,6 +128,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const changePasswordMessage = getElem('change-password-message');
     const financeEmptyState = getElem('finance-empty-state');
     const themeSwitch = document.getElementById('theme-switch');
+        const modal = document.getElementById('product-details-modal');
+
 
     // --- FUNÇÕES DE UTILIDADE ---
     async function authenticatedFetch(url, options = {}) {
@@ -1062,100 +1065,82 @@ const fetchAndRenderProducts = async () => {
         });
     }
 
-    // Função para buscar dados e renderizar o gráfico
-    async function renderPriceChart(productId) {
-        const ctx = document.getElementById('priceHistoryChart');
-        if (!ctx) {
-            console.error('Elemento canvas #priceHistoryChart não encontrado.');
+// 1. A função para renderizar o gráfico (adaptada para Electron)
+async function renderPriceChart(productId) {
+    const ctx = document.getElementById('priceHistoryChart');
+    if (!ctx) {
+        console.error('Elemento canvas #priceHistoryChart não encontrado.');
+        return;
+    }
+
+    // Destrói o gráfico anterior para evitar sobreposição de dados
+    if (priceHistoryChartInstance) {
+        priceHistoryChartInstance.destroy();
+    }
+
+    try {
+        // Busca os dados usando a função exposta no preload.js
+        const priceHistory = await window.db.getProductPriceHistory(productId);
+
+        const canvasContainer = ctx.parentElement;
+        const noDataMessage = canvasContainer.querySelector('.no-data-message');
+        if (noDataMessage) noDataMessage.remove(); // Remove mensagem antiga
+
+        if (!priceHistory || priceHistory.length < 2) {
+            const p = document.createElement('p');
+            p.textContent = 'Não há dados de histórico suficientes para exibir um gráfico.';
+            p.className = 'no-data-message'; // Para estilização
+            p.style.textAlign = 'center';
+            p.style.padding = '50px 0';
+            canvasContainer.appendChild(p);
             return;
         }
-    
-        let chartInstance = Chart.getChart(ctx); // Pega a instância existente se houver
-        if (chartInstance) {
-            chartInstance.destroy(); // Destrói o gráfico anterior para renderizar um novo
-        }
-    
-        try {
-            // 1. Fazer a chamada à API
-            // Lembre-se de ajustar a URL base da sua API se necessário
-            const response = await fetch(`/api/products/${productId}/history`);
-            if (!response.ok) {
-                throw new Error(`Erro ao buscar histórico: ${response.statusText}`);
-            }
-            const priceHistory = await response.json();
-    
-            if (priceHistory.length === 0) {
-                ctx.getContext('2d').fillText("Nenhum histórico de preço disponível.", 10, 50);
-                return;
-            }
-    
-            // 2. Preparar os dados para o Chart.js
-            const labels = priceHistory.map(entry => 
-                new Date(entry.date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })
-            ).reverse(); // Reverte para mostrar do mais antigo para o mais novo
-    
-            const dataPoints = priceHistory.map(entry => entry.price).reverse(); // Reverte para corresponder aos labels
-    
-            // 3. Criar o gráfico
-            chartInstance = new Chart(ctx, {
-                type: 'line', // Tipo de gráfico
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Histórico de Preço (R$)',
-                        data: dataPoints,
-                        fill: true,
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        tension: 0.1 // Deixa a linha levemente curvada
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: false, // O eixo Y não precisa começar em zero
-                            ticks: {
-                                // Formata o tick para adicionar "R$"
-                                callback: function(value, index, ticks) {
-                                    return 'R$ ' + value.toFixed(2);
-                                }
-                            }
+
+        // Prepara os dados para o Chart.js
+        const labels = priceHistory.map(entry => 
+            new Date(entry.date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })
+        );
+        const dataPoints = priceHistory.map(entry => entry.price);
+
+        // Cria a nova instância do gráfico
+        priceHistoryChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Histórico de Preço (R$)',
+                    data: dataPoints,
+                    fill: true,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        ticks: {
+                            callback: (value) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
                         }
-                    },
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'top',
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    let label = context.dataset.label || '';
-                                    if (label) {
-                                        label += ': ';
-                                    }
-                                    if (context.parsed.y !== null) {
-                                        label += new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(context.parsed.y);
-                                    }
-                                    return label;
-                                }
-                            }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: (context) => `Preço: ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(context.parsed.y)}`
                         }
                     }
                 }
-            });
-    
-        } catch (error) {
-            console.error("Falha ao renderizar o gráfico:", error);
-            ctx.getContext('2d').fillText("Não foi possível carregar os dados do gráfico.", 10, 50);
-        }
+            }
+        });
+
+    } catch (error) {
+        console.error("Falha ao renderizar o gráfico:", error);
     }
-    
-    // Exemplo de como chamar a função quando um usuário clica para ver detalhes
-    // const productId = '60d5ecb4b39e3b1e3c8b4567'; // ID do produto clicado
-    // renderPriceChart(productId);
-    
+}
+
 
     async function saveProductToDB(productPayload, messageElement) {
         if (!productPayload || !productPayload.name || !productPayload.price) {
@@ -1329,6 +1314,12 @@ if (mainContentArea) {
                 if (modalActionDeleteBtn) modalActionDeleteBtn.dataset.productId = productId;
 
                 showModal(detailsModal);
+
+                // ✨ AQUI É O PONTO CHAVE! ✨
+                // Chama a função para renderizar o gráfico com o ID do produto
+                if (productData._id) {
+                    renderPriceChart(productData._id);
+                }
 
             } catch (modalPopulationError) {
                 console.error("Erro ao popular ou exibir o modal de detalhes do produto:", modalPopulationError);

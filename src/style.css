@@ -937,6 +937,25 @@ body[data-theme="dark"] #recent-activity-list li {
     margin-right: 8px;
 }
 
+/* Em style.css */
+.modal-chart-container {
+    width: 100%;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+.modal-chart-container h4 {
+    text-align: center;
+    margin-bottom: 15px;
+    color: #555;
+}
+.chart-wrapper {
+    position: relative;
+    height: 250px; /* Ajuste a altura conforme necessário */
+    width: 100%;
+}
+
+
 /* ======================================================= */
 /* === Media Queries para Responsividade === */
 /* ======================================================= */
