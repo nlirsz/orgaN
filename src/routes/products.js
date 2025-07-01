@@ -103,10 +103,10 @@ router.post('/scrape-url', async (req, res) => {
 // --- ROTAS CRUD (Criar, Ler, Atualizar, Deletar) PARA PRODUTOS ---
 router.post('/', auth, async (req, res) => {
     const userId = req.user.userId;
-    const { name, price, image, brand, description, urlOrigin, status, category, tags, priority, notes } = req.body;
+    const { name, price, image, brand, description, urlOrigin, status, category, tags, priority, notes, listId } = req.body;
 
-    if (!name || !price || !urlOrigin) {
-        return res.status(400).json({ message: 'Campos obrigatórios (nome, preço, urlOrigin) faltando.' });
+    if (!name || !price || !urlOrigin || !listId) {
+        return res.status(400).json({ message: 'Campos obrigatórios (nome, preço, urlOrigin, listId) faltando.' });
     }
     if (isNaN(parseFloat(price)) || parseFloat(price) <= 0) {
         return res.status(400).json({ message: 'Preço deve ser um número positivo.' });
@@ -114,7 +114,7 @@ router.post('/', auth, async (req, res) => {
 
     try {
         const newProduct = new Product({
-            name, price: parseFloat(price), image, brand, description, urlOrigin, userId,
+            name, price: parseFloat(price), image, brand, description, urlOrigin, userId, listId,
             status: status || 'pendente', category: category || 'Outros',
             tags: tags || [], priority: priority || 'Baixa', notes
         });
@@ -126,11 +126,14 @@ router.post('/', auth, async (req, res) => {
 });
 
 router.get('/', auth, async (req, res) => {
-    const { status } = req.query;
+    const { status, listId } = req.query;
     const userId = req.user.userId;
     const query = { userId: userId };
     if (status) {
         query.status = status;
+    }
+    if (listId) {
+        query.listId = listId;
     }
     try {
         // Usar .lean() para performance e para poder modificar o objeto

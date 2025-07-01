@@ -10,6 +10,15 @@ const PriceHistorySchema = new mongoose.Schema({
 const ProductSchema = new mongoose.Schema({
     name: { type: String, required: [true, "Nome do produto é obrigatório"] },
     price: { type: Number, required: [true, "Preço do produto é obrigatório"], min: [0.01, "Preço deve ser positivo"] },
+    // Dentro do seu ficheiro src/models/Product.js
+    
+    // ... outros campos do seu ProductSchema
+        listId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'List',
+            required: [true, 'O produto deve pertencer a uma lista.']
+        },
+    
     image: { type: String }, // URL da imagem
     brand: { type: String },
     description: { type: String },

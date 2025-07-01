@@ -42,9 +42,9 @@ O objetivo é melhorar a experiência do dia a dia com pequenos ajustes que faze
 
 [ ] a) Separação de Listas e Filtros
 
-[ ] Backend: Adicionar um modelo de dados List no banco de dados.
+[x] Backend: Adicionar um modelo de dados List no banco de dados.
 
-[ ] Backend: Associar os produtos a uma List.
+[x] Backend: Associar os produtos a uma List.
 
 [ ] Frontend: Desenvolver a interface na sidebar para criar, ver e selecionar listas.
 
