@@ -46,6 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginPasswordInput = getElem('login-password');
     const registerUsernameInput = getElem('register-username');
     const registerPasswordInput = getElem('register-password');
+    const registerEmailInput = getElem('register-email');
     const loginMessage = getElem('login-message');
     const registerMessage = getElem('register-message');
     const logoutBtn = getElem('logout-btn');
@@ -376,13 +377,14 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
 
             const username = registerUsernameInput.value.trim();
+            const email = registerEmailInput.value.trim();
             const password = registerPasswordInput.value.trim();
 
             const recaptchaResponse = (typeof grecaptcha !== 'undefined' && recaptchaRegisterWidgetId !== null) 
                 ? grecaptcha.getResponse(recaptchaRegisterWidgetId) 
                 : '';
 
-            if (!username || !password) {
+            if (!username || !email || !password) {
                 showAuthMessage(registerMessage, 'Por favor, preencha todos os campos.');
                 return;
             }
@@ -401,6 +403,7 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const bodyPayload = {
                     username,
+                    email,
                     password,
                     'g-recaptcha-response': recaptchaResponse
                 };
@@ -650,7 +653,8 @@ const fetchAndRenderProducts = async (listId = null) => {
 
                 // Se nenhuma lista estiver selecionada, seleciona a primeira
                 if (!currentListId && allUserLists.length > 0) {
-                    currentListId = allUserLists[0]._id;
+                    const geralList = allUserLists.find(list => list.name.toLowerCase() === 'geral');
+                    currentListId = geralList ? geralList._id : allUserLists[0]._id;
                 }
                 updateActiveList();
             }
@@ -664,6 +668,8 @@ const fetchAndRenderProducts = async (listId = null) => {
 
     function populateListSelects() {
         const selects = [manualProductListSelect, editProductListSelect];
+        const geralList = allUserLists.find(list => list.name.toLowerCase() === 'geral');
+
         selects.forEach(select => {
             if (select) {
                 const currentValue = select.value;
@@ -674,8 +680,13 @@ const fetchAndRenderProducts = async (listId = null) => {
                     option.textContent = list.name;
                     select.appendChild(option);
                 });
-                // Tenta manter o valor selecionado anteriormente, se ainda existir
-                if (allUserLists.some(list => list._id === currentValue)) {
+
+                // Para o formulário de ADICIONAR, seleciona "Geral" por defeito
+                if (select.id === 'manual-product-list' && geralList) {
+                    select.value = geralList._id;
+                } 
+                // Para o formulário de EDITAR, mantém o valor que já estava (o do produto)
+                else if (allUserLists.some(list => list._id === currentValue)) {
                     select.value = currentValue;
                 }
             }

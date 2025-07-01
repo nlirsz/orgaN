@@ -1,63 +1,74 @@
-// src/routes/auth/register.js
 const express = require('express');
 const router = express.Router();
-require('dotenv').config();
-const User = require('../../models/User'); // CORRIGIDO
-const jwt = require('jsonwebtoken');
-const mongoose = require('mongoose');
+const fetch = require('node-fetch');
+const User = require('../../models/User');
+const List = require('../../models/List');
 
-const JWT_SECRET = process.env.JWT_SECRET;
-if (!JWT_SECRET) {
-    console.error("[register.js] ERRO: JWT_SECRET não definida nas variáveis de ambiente! O registro não funcionará.");
-}
-
+// @route   POST /api/auth/register
+// @desc    Regista um novo utilizador e cria uma lista padrão "Geral"
+// @access  Public
 router.post('/', async (req, res) => {
-    console.log(`[register.js] Rota POST / acessada (montada em /api/auth/register) com método: ${req.method}`);
-    const { username, password } = req.body;
+    const { username, email, password, 'g-recaptcha-response': recaptchaResponse } = req.body;
 
-    if (!username || !password) {
-        return res.status(400).json({ message: 'Nome de usuário e senha são obrigatórios.' });
+    // 1. (Opcional, mas recomendado) Validar reCAPTCHA no ambiente de produção
+    if (process.env.NODE_ENV === 'production') {
+        if (!recaptchaResponse) {
+            return res.status(400).json({ message: 'Por favor, complete o reCAPTCHA.' });
+        }
+        const secretKey = process.env.RECAPTCHA_SECRET_KEY;
+        if (!secretKey) {
+            console.error("ERRO: RECAPTCHA_SECRET_KEY não está definida no ambiente.");
+            return res.status(500).json({ message: 'Erro de configuração do servidor.' });
+        }
+        const verificationURL = `https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${recaptchaResponse}`;
+
+        try {
+            const recaptchaResult = await fetch(verificationURL, { method: 'POST' }).then(res => res.json());
+            if (!recaptchaResult.success) {
+                return res.status(400).json({ message: 'Falha na verificação do reCAPTCHA. Tente novamente.' });
+            }
+        } catch (error) {
+            console.error("Erro ao verificar reCAPTCHA:", error);
+            return res.status(500).json({ message: 'Erro no servidor ao verificar o reCAPTCHA.' });
+        }
+    }
+
+    // 2. Validar dados do utilizador
+    if (!username || !email || !password) {
+        return res.status(400).json({ message: 'Por favor, preencha todos os campos obrigatórios.' });
     }
 
     try {
-        console.log('[register.js] Verificando estado da conexão Mongoose antes de User.findOne(). ReadyState:', mongoose.connection.readyState, '(' + (mongoose.ConnectionStates[mongoose.connection.readyState] || 'Desconhecido') + ')');
-        let user = await User.findOne({ username });
+        // 3. Verificar se o utilizador ou e-mail já existem
+        let user = await User.findOne({ $or: [{ username }, { email }] });
         if (user) {
-            return res.status(409).json({ message: 'Usuário já existe.' });
+            return res.status(400).json({ message: 'Utilizador ou e-mail já existe.' });
         }
-        user = new User({ username, password });
+
+        // 4. Criar e guardar o novo utilizador
+        user = new User({ username, email, password });
         await user.save();
-        
-        const payload = { user: { userId: user.id } };
-        jwt.sign(
-            payload,
-            JWT_SECRET,
-            { expiresIn: '1h' },
-            (err, token) => {
-                if (err) {
-                    console.error('[register.js] Erro ao gerar token JWT:', err);
-                    return res.status(500).json({ message: 'Erro interno ao gerar token.' });
-                }
-                res.status(201).json({
-                    message: 'Usuário registrado com sucesso!',
-                    token,
-                    userId: user.id
-                });
-            }
-        );
+
+        // 5. ✨ A MÁGICA ACONTECE AQUI: Criar a lista padrão "Geral"
+        try {
+            const defaultList = new List({
+                name: 'Geral',
+                description: 'Sua lista de desejos principal.',
+                userId: user._id
+            });
+            await defaultList.save();
+            console.log(`Lista 'Geral' criada com sucesso para o utilizador ${user.username}`);
+        } catch (listError) {
+            // Se a criação da lista falhar, não impede o registo. Apenas regista o erro.
+            console.error(`Falha ao criar lista padrão para o utilizador ${user.username} (ID: ${user._id}):`, listError);
+        }
+
+        // 6. Enviar resposta de sucesso
+        res.status(201).json({ message: 'Utilizador registado com sucesso!' });
+
     } catch (error) {
-        console.error('[register.js] Erro detalhado no registro:', error.name, '-', error.message);
-        if (error.stack) {
-            console.error('[register.js] Stack do erro:', error.stack);
-        }
-        if (error.reason) {
-            console.error('[register.js] Razão do erro (Mongoose):', error.reason);
-        }
-        if (error.name === 'ValidationError') {
-            const messages = Object.values(error.errors).map(val => val.message);
-            return res.status(400).json({ message: 'Erro de validação:', details: messages, errorName: error.name });
-        }
-        res.status(500).json({ message: 'Erro interno do servidor ao registrar usuário.', errorName: error.name, errorMessage: error.message });
+        console.error('Erro no registo do utilizador:', error);
+        res.status(500).json({ message: 'Erro interno do servidor.' });
     }
 });
 
