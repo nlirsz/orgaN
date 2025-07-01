@@ -414,24 +414,26 @@
     </div>
 
     <div id="product-details-modal" class="modal-overlay hidden">
-        <div class="modal-content"> <span class="close-modal-btn">&times;</span>
+        <div class="modal-content"> <span class="close-modal-btn" data-modal-id="product-details-modal">&times;</span>
             <div id="modal-product-image-container">
                 <img id="modal-product-image" src="#" alt="Imagem do Produto">
             </div>
             <h3 id="modal-product-name">Nome do Produto</h3>
             <p class="modal-product-price" id="modal-product-price">R$ 0,00</p>
             <div class="modal-product-info">
-                <p><strong>Status:</strong> <span id="modal-product-status"></span></p>
-                <p><strong>Categoria:</strong> <span id="modal-product-category"></span></p>
-                <p><strong>Marca:</strong> <span id="modal-product-brand"></span></p>
-                <p><strong>Adicionado em:</strong> <span id="modal-product-addedDate"></span></p>
-                <p><strong>Tags:</strong> <span id="modal-product-tags"></span></p>
-                <p><strong>Prioridade:</strong> <span id="modal-product-priority"></span></p>
-                <p><strong>Notas:</strong> <span id="modal-product-notes"></span></p>
+                <p><strong>Status:</strong> <span id="modal-product-status">-</span></p>
+                <p><strong>Categoria:</strong> <span id="modal-product-category">-</span></p>
+                <p><strong>Marca:</strong> <span id="modal-product-brand">-</span></p>
+                <p><strong>Adicionado em:</strong> <span id="modal-product-addedDate">-</span></p>
+                <p><strong>Prioridade:</strong> <span id="modal-product-priority">-</span></p>
+                <p><strong>Notas:</strong> <span id="modal-product-notes">-</span></p>
             </div>
-            <!-- Canvas para o gráfico de histórico de preços -->
-            <div style="width: 100%; max-width: 600px;">
-                <canvas id="priceHistoryChart"></canvas>
+            <!-- Container do Gráfico de Histórico de Preços -->
+            <div class="modal-chart-container">
+                <h4>Histórico de Preços</h4>
+                <div class="chart-wrapper">
+                    <canvas id="priceHistoryChart"></canvas>
+                </div>
             </div>
             
             <a id="modal-product-link" href="#" target="_blank" rel="noopener noreferrer" class="product-link-btn">Visitar Página do Produto <i class="fas fa-external-link-alt"></i></a>
