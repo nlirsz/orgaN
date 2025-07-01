@@ -14,6 +14,7 @@ contextBridge.exposeInMainWorld("db", {
     updateProduct: (product) => ipcRenderer.invoke('db:update-product', product),
     deleteProduct: (productId) => ipcRenderer.invoke('db:delete-product', productId),
     getProductPriceHistory: (productId) => ipcRenderer.invoke('db:get-product-price-history', productId),
+    refreshPrices: (payload) => ipcRenderer.invoke('db:refresh-prices', payload),
 
     // Listas
     getLists: (userId) => ipcRenderer.invoke('db:get-lists', userId),

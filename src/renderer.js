@@ -134,6 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const changePasswordForm = getElem('change-password-form');
     const currentPasswordInput = getElem('current-password');
     const newPasswordInput = getElem('new-password');
+    const refreshAllPricesBtn = getElem('refresh-all-prices-btn');
     const confirmNewPasswordInput = getElem('confirm-new-password');
     const changePasswordMessage = getElem('change-password-message');
     const financeEmptyState = getElem('finance-empty-state');
@@ -1272,6 +1273,78 @@ async function renderPriceChart(productId) {
         }
     }
 }
+
+    if (refreshAllPricesBtn) {
+        refreshAllPricesBtn.addEventListener('click', async () => {
+            const pendingProductCards = pendingList.querySelectorAll('.product-card');
+            const productIds = Array.from(pendingProductCards).map(card => card.dataset.productId);
+
+            if (productIds.length === 0) {
+                showTabMessage(addProductMessageProductsTab, 'Não há produtos pendentes para atualizar.', false);
+                return;
+            }
+
+            refreshAllPricesBtn.disabled = true;
+            refreshAllPricesBtn.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Atualizando...';
+            
+            let unsubscribeFromProgress = () => {};
+
+            try {
+                if (window.db && typeof window.db.refreshPrices === 'function') {
+                    // Ambiente Electron: usa IPC e atualiza em tempo real
+                    console.log("Modo Electron: Atualizando preços via IPC.");
+
+                    unsubscribeFromProgress = window.db.receiveMessage('price-update-progress', (update) => {
+                        const card = pendingList.querySelector(`.product-card[data-product-id="${update.productId}"]`);
+                        if (card) {
+                            card.style.transition = 'background-color 0.5s ease, transform 0.2s ease';
+                            card.style.backgroundColor = 'var(--success-color-light)';
+                            card.style.transform = 'scale(1.02)';
+
+                            const priceEl = card.querySelector('.card-price');
+                            if (priceEl) priceEl.textContent = `R$ ${update.newPrice.toFixed(2).replace('.', ',')}`;
+                            
+                            const productData = JSON.parse(card.dataset.productJson);
+                            productData.price = update.newPrice;
+                            card.dataset.productJson = JSON.stringify(productData);
+
+                            setTimeout(() => {
+                                card.style.backgroundColor = '';
+                                card.style.transform = '';
+                            }, 2500);
+                        }
+                    });
+
+                    const result = await window.db.refreshPrices({ productIds, userId: currentUserId });
+                    showTabMessage(addProductMessageProductsTab, `Atualização concluída. ${result.updatedCount} produtos tiveram o preço alterado.`, true);
+
+                } else {
+                    // Ambiente Web: usa Fetch e atualiza tudo no final
+                    console.log("Modo Web: Atualizando preços via API Fetch.");
+                    const response = await authenticatedFetch(`${API_BASE_URL}/products/refresh-prices`, {
+                        method: 'POST',
+                        body: JSON.stringify({ productIds }),
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || 'Falha ao atualizar preços.');
+                    }
+                    const result = await response.json();
+                    showTabMessage(addProductMessageProductsTab, result.message, true);
+                    await fetchAndRenderProducts(currentListId);
+                }
+            } catch (error) {
+                console.error("Erro ao atualizar preços:", error);
+                showTabMessage(addProductMessageProductsTab, `Erro: ${error.message}`, false);
+            } finally {
+                unsubscribeFromProgress();
+                refreshAllPricesBtn.disabled = false;
+                refreshAllPricesBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Atualizar Preços';
+                await fetchAndRenderDashboardStats();
+            }
+        });
+    }
 
 
     async function saveProductToDB(productPayload, messageElement) {

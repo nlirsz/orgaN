@@ -50,13 +50,13 @@ O objetivo é melhorar a experiência do dia a dia com pequenos ajustes que faze
 
 [x] Frontend: Modificar a visualização principal para exibir apenas produtos da lista selecionada.
 
-[ ] b) Botão para Atualizar Preços
+[x] b) Botão para Atualizar Preços
 
-[ ] Backend: Criar uma rota na API (ex: POST /api/products/refresh) que recebe uma lista de IDs e dispara o scraping.
+[x] Backend: Criar uma rota na API (ex: POST /api/products/refresh-prices) que recebe uma lista de IDs e dispara o scraping.
 
-[ ] Frontend: Adicionar o botão "Atualizar Tudo" na interface.
+[x] Frontend: Adicionar o botão "Atualizar Tudo" na interface.
 
-[ ] Frontend: Implementar a chamada à API e um indicador de carregamento.
+[x] Frontend: Implementar a chamada à API e um indicador de carregamento.
 
 [ ] c) Animações Sutis (Micro-interações)
 

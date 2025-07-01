@@ -26,6 +26,7 @@
     --edit-color: #ffc107;
     --success-color: #28a745;
     --highlight-action-text: #FFFFFF;
+        --success-color-light: rgba(40, 167, 69, 0.15);
 
     --shadow: 3px 3px 6px var(--c-dark), -3px -3px 6px var(--c-light);
     --shadow-inset: inset 3px 3px 6px var(--c-dark), inset -3px -3px 6px var(--c-light);
@@ -953,6 +954,29 @@ body[data-theme="dark"] #recent-activity-list li {
     position: relative;
     height: 250px; /* Ajuste a altura conforme necessário */
     width: 100%;
+}
+
+button:disabled {
+    color: var(--text-secondary);
+    opacity: 0.7;
+    cursor: not-allowed;
+    box-shadow: var(--shadow-inset);
+    transform: none;
+}
+
+button .fa-spin {
+    animation: fa-spin 1s infinite linear;
+}
+
+.products-action-bar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+    padding: 0 10px;
+}
+
+#history-tab .product-grid {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
 }
 
 

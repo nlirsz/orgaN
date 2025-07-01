@@ -240,4 +240,53 @@ router.get('/:id/history', auth, async (req, res) => {
     }
 });
 
+// Rota para atualizar os preços de múltiplos produtos
+router.post('/refresh-prices', auth, async (req, res) => {
+    const { productIds } = req.body;
+    const userId = req.user.userId;
+
+    if (!Array.isArray(productIds) || productIds.length === 0) {
+        return res.status(400).json({ message: 'A lista de IDs de produtos é obrigatória.' });
+    }
+
+    try {
+        const updatedProducts = [];
+        const errors = [];
+
+        // Processa sequencialmente para não sobrecarregar os sites de destino
+        for (const id of productIds) {
+            try {
+                const product = await Product.findOne({ _id: id, userId });
+                if (!product) {
+                    errors.push({ id, error: 'Produto não encontrado.' });
+                    continue;
+                }
+
+                let newDetails = null;
+                try {
+                    newDetails = await scrapeByAnalyzingHtml(product.urlOrigin);
+                } catch (htmlError) {
+                    newDetails = await scrapeBySearching(product.urlOrigin);
+                }
+
+                if (newDetails && newDetails.price && newDetails.price !== product.price) {
+                    product.priceHistory.push({ price: product.price, date: new Date() });
+                    product.price = newDetails.price;
+                    if (newDetails.name) product.name = newDetails.name;
+                    if (newDetails.image) product.image = newDetails.image;
+                    
+                    const savedProduct = await product.save();
+                    updatedProducts.push(savedProduct);
+                }
+            } catch (e) {
+                errors.push({ id, error: `Falha no scrape: ${e.message}` });
+            }
+        }
+
+        res.json({ message: `Atualização concluída. ${updatedProducts.length} produtos atualizados.`, updatedProducts, errors });
+    } catch (error) {
+        res.status(500).json({ message: 'Erro no servidor durante a atualização.', details: error.message });
+    }
+});
+
 module.exports = router;
