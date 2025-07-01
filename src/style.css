@@ -438,6 +438,7 @@ body[data-theme="dark"] .card-actions {
     height: 180px; 
     padding: 15px;
     box-shadow: var(--shadow-inset-light);
+    border-top: 5px solid var(--category-color, var(--text-secondary));
     display: flex;
     align-items: center;
     justify-content: center;
