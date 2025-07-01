@@ -1346,6 +1346,132 @@ async function renderPriceChart(productId) {
         });
     }
 
+     // --- FUNÇÕES DE AÇÃO DO PRODUTO (Refatorado) ---
+
+    async function handleProductDelete(productId) {
+        if (!confirm('Tem certeza que deseja excluir este produto?')) return;
+        if (!currentUserId) {
+            showTabMessage(addProductMessageProductsTab, 'Você precisa estar logado para excluir produtos.', false);
+            return;
+        }
+        try {
+            const response = await authenticatedFetch(`${API_BASE_URL}/products/${productId}`, { method: 'DELETE' });
+            if (!response.ok) throw new Error(`Erro ao excluir: ${response.statusText}`);
+            showTabMessage(addProductMessageProductsTab, "Produto excluído com sucesso!", true);
+            await fetchAndRenderProducts(currentListId);
+            await fetchAndRenderDashboardStats();
+        } catch (error) {
+            showTabMessage(addProductMessageProductsTab, `Erro ao excluir: ${error.message}`, false);
+        }
+    }
+
+    async function handleProductPurchase(productId, cardElement) {
+        if (!currentUserId) {
+            showTabMessage(addProductMessageProductsTab, 'Você precisa estar logado.', false);
+            return;
+        }
+        const loadingDiv = document.createElement('div');
+        loadingDiv.className = 'card-loading-overlay';
+        loadingDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        if (cardElement) cardElement.appendChild(loadingDiv);
+
+        try {
+            const response = await authenticatedFetch(`${API_BASE_URL}/products/${productId}/purchase`, { method: 'PATCH' });
+            if (!response.ok) throw new Error(`Erro ao marcar comprado: ${response.statusText}`);
+            showTabMessage(addProductMessageProductsTab, "Produto marcado como comprado!", true);
+            await fetchAndRenderProducts(currentListId);
+            await fetchAndRenderDashboardStats();
+        } catch (error) {
+            showTabMessage(addProductMessageProductsTab, `Erro ao marcar comprado: ${error.message}`, false);
+            if (cardElement && cardElement.contains(loadingDiv)) {
+                cardElement.removeChild(loadingDiv);
+            }
+        }
+    }
+
+    function handleProductEdit(productData) {
+        if (!currentUserId) {
+            showTabMessage(addProductMessageProductsTab, 'Você precisa estar logado para editar produtos.', false);
+            return;
+        }
+        if (editModal && editForm) {
+            if (editProductIdInput) editProductIdInput.value = productData._id;
+            if (editProductNameInput) editProductNameInput.value = productData.name || '';
+            if (editProductPriceInput) editProductPriceInput.value = productData.price || '';
+            if (editProductUrlInput) editProductUrlInput.value = productData.urlOrigin || '';
+            if (editProductImageUrlInput) editProductImageUrlInput.value = productData.image || '';
+            if (editProductCategorySelect) editProductCategorySelect.value = productData.category || 'Outros';
+            if (editProductStatusSelect) editProductStatusSelect.value = productData.status || 'pendente';
+            if (editProductTagsInput) editProductTagsInput.value = (productData.tags || []).join(', ');
+            if (editProductDescriptionTextarea) editProductDescriptionTextarea.value = productData.description || '';
+            if (editProductPrioritySelect) editProductPrioritySelect.value = productData.priority || 'Baixa';
+            if (editProductNotesTextarea) editProductNotesTextarea.value = productData.notes || '';
+            if (editProductListSelect) editProductListSelect.value = productData.listId || '';
+            if (editProductPreviewImage) {
+                editProductPreviewImage.src = productData.image || '#';
+                editProductPreviewImage.classList.toggle('hidden', !productData.image);
+            }
+            showModal(editModal);
+            if (editProductMessage) editProductMessage.textContent = '';
+        }
+    }
+
+    function handleProductSearch(productData) {
+        if (productData.name) {
+            const query = encodeURIComponent(productData.name);
+            const searchUrl = `https://www.google.com/search?tbm=shop&q=${query}`;
+            if (window.electronAPI && typeof window.electronAPI.openExternalLink === 'function') {
+                window.electronAPI.openExternalLink(searchUrl);
+            } else {
+                window.open(searchUrl, '_blank', 'noopener,noreferrer');
+            }
+        }
+    }
+
+    function handleImageClick(imageSrc) {
+        if (imageSrc) {
+            openImageModal(imageSrc);
+        }
+    }
+
+    async function handleOpenDetailsModal(productData) {
+        const modalElements = { detailsModal, modalProductImage, modalProductName, modalProductPrice, modalProductStatus, modalProductCategory, modalProductBrand, modalProductAddedDate, modalProductTags, modalProductLink, modalProductPriority, modalProductNotes };
+        const missingElementKey = Object.keys(modalElements).find(key => !modalElements[key]);
+        if (missingElementKey) {
+            console.error(`Elemento do modal de detalhes não encontrado: '${missingElementKey}'. Verifique o ID correspondente no index.html.`);
+            return;
+        }
+
+        const setDetail = (element, value, defaultValue = 'Não informado') => {
+            if (element) {
+                const hasValue = value && value.toString().trim() !== '';
+                element.textContent = hasValue ? value.toString() : defaultValue;
+                element.classList.toggle('data-missing', !hasValue);
+            }
+        };
+
+        if (modalProductImage) modalProductImage.src = productData.image || 'https://via.placeholder.com/300x200?text=Sem+Imagem';
+        setDetail(modalProductName, productData.name, 'Nome Indisponível');
+        setDetail(modalProductPrice, productData.price ? `R$ ${parseFloat(productData.price).toFixed(2)}` : '', 'Preço Indisponível');
+        setDetail(modalProductStatus, (productData.status && productData.status.length > 0) ? productData.status.charAt(0).toUpperCase() + productData.status.slice(1) : '');
+        setDetail(modalProductCategory, productData.category, 'Não definida');
+        setDetail(modalProductBrand, productData.brand);
+        setDetail(modalProductAddedDate, productData.createdAt ? new Date(productData.createdAt).toLocaleDateString('pt-BR') : '', 'Data indisponível');
+        setDetail(modalProductTags, (productData.tags && productData.tags.length > 0) ? productData.tags.join(', ') : '', 'Nenhuma');
+        setDetail(modalProductPriority, productData.priority, 'Não definida');
+        setDetail(modalProductNotes, productData.notes, 'Nenhuma.');
+        if (modalProductLink) modalProductLink.href = productData.urlOrigin || '#';
+        if (modalActionPurchaseBtn) modalActionPurchaseBtn.style.display = productData.status === 'pendente' ? 'inline-flex' : 'none';
+        if (modalActionPurchaseBtn) modalActionPurchaseBtn.dataset.productId = productData._id;
+        if (modalActionEditBtn) modalActionEditBtn.dataset.productId = productData._id;
+        if (modalActionDeleteBtn) modalActionDeleteBtn.dataset.productId = productData._id;
+
+        showModal(detailsModal);
+        if (productData._id) {
+            await renderPriceChart(productData._id);
+        }
+    }
+
 
     async function saveProductToDB(productPayload, messageElement) {
         if (!productPayload || !productPayload.name || !productPayload.price) {
@@ -1361,196 +1487,13 @@ async function renderPriceChart(productId) {
             showTabMessage(messageElement, "Produto salvo com sucesso!", true);
             clearAddProductFormAddTab();
             clearProductScrapeFormProductsTab();
-            await fetchAndRenderProducts();
             await fetchAndRenderDashboardStats();
+            await fetchAndRenderProducts(currentListId);
+
         } catch (error) {
             console.error("Erro em saveProductToDB:", error);
             showTabMessage(messageElement, `Erro ao salvar: ${error.message}`, false);
         }
-    }
-
-const mainContentArea = document.querySelector('.main-content-area');
-
-if (mainContentArea) {
-    mainContentArea.addEventListener('click', async (e) => {
-        const target = e.target;
-        const card = target.closest('.product-card');
-
-        if (!card) return;
-
-        // --- INÍCIO DA CORREÇÃO ---
-        const productJson = card.dataset.productJson;
-
-        // 1. VERIFICA SE OS DADOS DO PRODUTO EXISTEM NO CARD
-        if (!productJson) {
-            console.error("Erro: Atributo 'data-product-json' não encontrado no card. Verifique se o card foi criado corretamente.", card);
-            // Adicionar aqui uma mensagem de erro visual para o utilizador, se desejar.
-            return; // Para a execução para evitar o crash.
-        }
-
-        // 2. APENAS PROCESSA O JSON SE OS DADOS FOREM VÁLIDOS
-        const productData = JSON.parse(productJson);
-        const productId = card.dataset.productId;
-        // --- FIM DA CORREÇÃO ---
-
-        if (target.classList.contains('action-delete')) {
-            e.stopPropagation();
-            if (!confirm('Tem certeza que deseja excluir este produto?')) return;
-            if (!currentUserId) { showTabMessage(addProductMessageAddTab, 'Você precisa estar logado para excluir produtos.', false); return; }
-
-            try {
-                const response = await authenticatedFetch(`${API_BASE_URL}/products/${productId}`, {
-                    method: 'DELETE',
-                });
-                if (!response.ok) throw new Error(`Erro ao excluir: ${response.statusText}`);
-                card.remove();
-                fetchAndRenderDashboardStats();
-                fetchAndRenderProducts();
-                showTabMessage(addProductMessageAddTab, "Produto excluído com sucesso!", true);
-            } catch (error) {
-                showTabMessage(addProductMessageAddTab, `Erro ao excluir: ${error.message}`, false);
-            }
-        }
-        else if (target.classList.contains('action-purchase')) {
-            e.stopPropagation();
-            if (!currentUserId) {
-                showTabMessage(addProductMessageAddTab, 'Você precisa estar logado.', false);
-                return;
-            }
-
-            const loadingDiv = document.createElement('div');
-            loadingDiv.className = 'card-loading-overlay';
-            // Adicionado 'fa-spin' para animar o ícone de carregamento
-            loadingDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-            card.appendChild(loadingDiv);
-
-            try {
-                const response = await authenticatedFetch(`${API_BASE_URL}/products/${productId}/purchase`, {
-                    method: 'PATCH',
-                });
-                if (!response.ok) throw new Error(`Erro ao marcar comprado: ${response.statusText}`);
-                
-                fetchAndRenderProducts();
-                fetchAndRenderDashboardStats();
-                showTabMessage(addProductMessageAddTab, "Produto marcado como comprado!", true);
-            } catch (error) {
-                showTabMessage(addProductMessageAddTab, `Erro ao marcar comprado: ${error.message}`, false);
-                card.removeChild(loadingDiv);
-            }
-        }
-        else if (target.classList.contains('action-edit')) {
-            e.stopPropagation();
-            if (!currentUserId) { showTabMessage(addProductMessageAddTab, 'Você precisa estar logado para editar produtos.', false); return; }
-
-            if (editModal && editForm) {
-                if (editProductIdInput) editProductIdInput.value = productData._id;
-                if (editProductNameInput) editProductNameInput.value = productData.name || '';
-                if (editProductPriceInput) editProductPriceInput.value = productData.price || '';
-                if (editProductUrlInput) editProductUrlInput.value = productData.urlOrigin || '';
-                if (editProductImageUrlInput) editProductImageUrlInput.value = productData.image || '';
-                if (editProductCategorySelect) editProductCategorySelect.value = productData.category || 'Outros';
-                if (editProductStatusSelect) editProductStatusSelect.value = productData.status || 'pendente';
-                if (editProductTagsInput) editProductTagsInput.value = (productData.tags || []).join(', ');
-                if (editProductDescriptionTextarea) editProductDescriptionTextarea.value = productData.description || '';
-                if (editProductPrioritySelect) editProductPrioritySelect.value = productData.priority || 'Baixa';
-                if (editProductNotesTextarea) editProductNotesTextarea.value = productData.notes || '';
-
-                if (editProductListSelect) editProductListSelect.value = productData.listId || '';
-                if (editProductPreviewImage) {
-                    editProductPreviewImage.src = productData.image || '#';
-                    editProductPreviewImage.classList.toggle('hidden', !productData.image);
-                }
-                showModal(editModal);
-                if (editProductMessage) editProductMessage.textContent = '';
-            }
-        }
-        else if (target.classList.contains('action-search')) {
-            e.stopPropagation();
-            if (productData.name) {
-                const query = encodeURIComponent(productData.name);
-                const searchUrl = `https://www.google.com/search?tbm=shop&q=${query}`;
-
-                if (window.electronAPI && typeof window.electronAPI.openExternalLink === 'function') {
-                    window.electronAPI.openExternalLink(searchUrl);
-                } else {
-                    window.open(searchUrl, '_blank', 'noopener,noreferrer');
-                }
-            }
-        }
-        else if (target.closest('.card-image-container')) {
-            e.stopPropagation();
-            if (productData.image) {
-                openImageModal(productData.image);
-            }
-        }
-        else if (card) { 
-            e.stopPropagation();
-
-            const modalElements = {
-                detailsModal, modalProductImage, modalProductName, modalProductPrice,
-                modalProductStatus, modalProductCategory, modalProductBrand,
-                modalProductAddedDate, modalProductTags, modalProductLink,
-                modalProductPriority, modalProductNotes
-            };
-            const missingElementKey = Object.keys(modalElements).find(key => !modalElements[key]);
-
-            if (missingElementKey) {
-                console.error(`Elemento do modal de detalhes não encontrado: '${missingElementKey}'. Verifique o ID correspondente no index.html.`);
-                return;
-            }
-
-            try {
-                const setDetail = (element, value, defaultValue = 'Não informado') => {
-                    if (element) {
-                        const hasValue = value && value.toString().trim() !== '';
-                        element.textContent = hasValue ? value.toString() : defaultValue;
-                        element.classList.toggle('data-missing', !hasValue);
-                    }
-                };
-                
-                if (modalProductImage) modalProductImage.src = productData.image || 'https://via.placeholder.com/300x200?text=Sem+Imagem';
-                
-                setDetail(modalProductName, productData.name, 'Nome Indisponível');
-                setDetail(modalProductPrice, productData.price ? `R$ ${parseFloat(productData.price).toFixed(2)}` : '', 'Preço Indisponível');
-                setDetail(modalProductStatus, (productData.status && productData.status.length > 0) ? productData.status.charAt(0).toUpperCase() + productData.status.slice(1) : '');
-                setDetail(modalProductCategory, productData.category, 'Não definida');
-                setDetail(modalProductBrand, productData.brand);
-                setDetail(modalProductAddedDate, productData.createdAt ? new Date(productData.createdAt).toLocaleDateString('pt-BR') : '', 'Data indisponível');
-                setDetail(modalProductTags, (productData.tags && productData.tags.length > 0) ? productData.tags.join(', ') : '', 'Nenhuma');
-                setDetail(modalProductPriority, productData.priority, 'Não definida');
-                setDetail(modalProductNotes, productData.notes, 'Nenhuma.');
-
-                if (modalProductLink) modalProductLink.href = productData.urlOrigin || '#';
-
-                if (modalActionPurchaseBtn) modalActionPurchaseBtn.style.display = productData.status === 'pendente' ? 'inline-flex' : 'none';
-                if (modalActionPurchaseBtn) modalActionPurchaseBtn.dataset.productId = productId;
-                if (modalActionEditBtn) modalActionEditBtn.dataset.productId = productId;
-                if (modalActionDeleteBtn) modalActionDeleteBtn.dataset.productId = productId;
-
-                showModal(detailsModal);
-
-                // ✨ AQUI É O PONTO CHAVE! ✨
-                // Chama a função para renderizar o gráfico com o ID do produto
-                if (productData._id) {
-                    renderPriceChart(productData._id);
-                }
-
-            } catch (modalPopulationError) {
-                console.error("Erro ao popular ou exibir o modal de detalhes do produto:", modalPopulationError);
-                console.error("Dados do produto que causaram o erro:", productData);
-            }
-        }
-    });
-}
-
-
-    if (detailsModal && modalProductImage) { 
-        modalProductImage.addEventListener('click', (e) => { 
-            e.stopPropagation(); 
-            if (modalProductImage.src) { 
-                openImageModal(modalProductImage.src); 
-            }
-        });
     }
 
     function openImageModal(imageSrc) { 
@@ -1561,92 +1504,86 @@ if (mainContentArea) {
         if(modalImageContent) modalImageContent.src = imageSrc; 
         showModal(imageModal); 
     }
-
-    if (imageModal) { 
-        imageModal.addEventListener('click', (e) => { 
-            if (e.target === imageModal || e.target.classList.contains('close-modal-btn')) { 
-                hideModalWithDelay(imageModal); 
-            }
-        });
-    }
     
-    if (detailsModal) { 
-        detailsModal.addEventListener('click', (e) => { 
-            if (e.target === detailsModal || e.target.classList.contains('close-modal-btn')) { 
-                hideModalWithDelay(detailsModal); 
+    // --- DELEGAÇÃO DE EVENTOS PARA AS LISTAS DE PRODUTOS (Refatorado) ---
+    function setupProductListListener(listElement) {
+        if (!listElement) return;
+        listElement.addEventListener('click', (e) => {
+            const target = e.target;
+            const card = target.closest('.product-card');
+            if (!card || !card.dataset.productJson) return;
+
+            const productData = JSON.parse(card.dataset.productJson);
+            const productId = productData._id;
+
+            if (target.closest('.action-delete')) {
+                e.stopPropagation();
+                handleProductDelete(productId);
+            } else if (target.closest('.action-purchase')) {
+                e.stopPropagation();
+                handleProductPurchase(productId, card);
+            } else if (target.closest('.action-edit')) {
+                e.stopPropagation();
+                handleProductEdit(productData);
+            } else if (target.closest('.action-search')) {
+                e.stopPropagation();
+                handleProductSearch(productData);
+            } else if (target.closest('.card-image-container')) {
+                e.stopPropagation();
+                handleImageClick(productData.image);
+            } else {
+                // Se o clique foi no card mas não em um botão de ação, abre os detalhes
+                handleOpenDetailsModal(productData);
             }
         });
     }
-    
-    const closeEditModalBtn = editModal ? editModal.querySelector('.close-modal-btn') : null; 
-    if (editModal && closeEditModalBtn) { 
-        editModal.addEventListener('click', (e) => { 
-            if (e.target === editModal || e.target === closeEditModalBtn) { 
-                hideModalWithDelay(editModal, editProductMessage); 
+
+    // --- GESTÃO DE EVENTOS DOS MODAIS (Refatorado) ---
+    function setupModalListeners() {
+        document.body.addEventListener('click', (e) => {
+            // Fecha qualquer modal aberto se o clique for no overlay ou no botão de fechar
+            if (e.target.classList.contains('modal-overlay') || e.target.classList.contains('close-modal-btn')) {
+                const modalId = e.target.dataset.modalId;
+                const modalToClose = getElem(modalId) || e.target.closest('.modal-overlay');
+                if (modalToClose) {
+                    hideModalWithDelay(modalToClose);
+                }
             }
         });
-    }
 
-    if (detailsModal) { 
-        detailsModal.addEventListener('click', async (e) => { 
-            const target = e.target.closest('.modal-action-btn'); 
-            if(!target) return; 
+        // Listener específico para ações dentro do modal de detalhes
+        if (detailsModal) {
+            detailsModal.addEventListener('click', async (e) => {
+                const target = e.target.closest('.modal-action-btn');
+                if (!target) return;
 
-            const productId = target.dataset.productId; 
-            if(!productId) return; 
-            if (!currentUserId) { showTabMessage(addProductMessageAddTab, 'Você precisa estar logado para realizar esta ação.', false); return; } 
+                const productId = target.dataset.productId;
+                if (!productId) return;
 
-            if(target.id === 'modal-action-purchase') { 
-                try {
-                    const response = await authenticatedFetch(`${API_BASE_URL}/products/${productId}/purchase`, { 
-                        method: 'PATCH', 
-                    });
-                    if (!response.ok) throw new Error(`Erro ao marcar comprado: ${response.statusText}`); 
-                    hideModalWithDelay(detailsModal); 
-                    fetchAndRenderProducts(); 
-                    fetchAndRenderDashboardStats(); 
-                    showTabMessage(addProductMessageAddTab, "Produto marcado como comprado!", true); 
-                } catch (error) { showTabMessage(addProductMessageAddTab, `Erro ao marcar comprado: ${error.message}`, false); } 
-            } else if (target.id === 'modal-action-edit') { 
-                hideModalWithDelay(detailsModal); 
-                const productCard = document.querySelector(`.product-card[data-product-id="${productId}"]`); 
-                if (productCard) { 
-                    const productData = JSON.parse(productCard.dataset.productJson); 
-                    if (editModal && editForm) { 
-                        if(editProductIdInput) editProductIdInput.value = productData._id; 
-                        if(editProductNameInput) editProductNameInput.value = productData.name || ''; 
-                        if(editProductPriceInput) editProductPriceInput.value = productData.price || ''; 
-                        if(editProductUrlInput) editProductUrlInput.value = productData.urlOrigin || ''; 
-                        if(editProductImageUrlInput) editProductImageUrlInput.value = productData.image || ''; 
-                        if(editProductCategorySelect) editProductCategorySelect.value = productData.category || 'Outros'; 
-                        if(editProductStatusSelect) editProductStatusSelect.value = productData.status || 'pendente'; 
-                        if(editProductTagsInput) editProductTagsInput.value = (productData.tags || []).join(', '); 
-                        if(editProductDescriptionTextarea) editProductDescriptionTextarea.value = productData.description || ''; 
-                        if(editProductPrioritySelect) editProductPrioritySelect.value = productData.priority || 'Baixa'; 
-                        if(editProductNotesTextarea) editProductNotesTextarea.value = productData.notes || ''; 
-                        if(editProductPreviewImage) { 
-                            editProductPreviewImage.src = productData.image || '#'; 
-                            editProductPreviewImage.classList.toggle('hidden', !productData.image); 
-                        }
-                        showModal(editModal); 
-                        if(editProductMessage) editProductMessage.textContent = ''; 
-                    }
+                const productCard = document.querySelector(`.product-card[data-product-id="${productId}"]`);
+                const productData = productCard ? JSON.parse(productCard.dataset.productJson) : null;
+
+                hideModalWithDelay(detailsModal);
+
+                if (target.id === 'modal-action-purchase') {
+                    await handleProductPurchase(productId, null); // Passa null pois o card não é necessário aqui
+                } else if (target.id === 'modal-action-edit') {
+                    if (productData) handleProductEdit(productData);
+                } else if (target.id === 'modal-action-delete') {
+                    await handleProductDelete(productId);
                 }
-            } else if (target.id === 'modal-action-delete') { 
-                if (!confirm('Tem certeza que deseja excluir este produto?')) return; 
-                try {
-                    const response = await authenticatedFetch(`${API_BASE_URL}/products/${productId}`, { 
-                        method: 'DELETE', 
-                    });
-                    if (!response.ok) throw new Error(`Erro ao excluir: ${response.statusText}`); 
-                    hideModalWithDelay(detailsModal); 
-                    fetchAndRenderProducts(); 
-                    fetchAndRenderDashboardStats(); 
-                    showTabMessage(addProductMessageAddTab, "Produto excluído com sucesso!", true); 
+            });
+        }
+
+        // Listener para a imagem dentro do modal de detalhes
+        if (modalProductImage) {
+            modalProductImage.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (modalProductImage.src && !modalProductImage.src.includes('placeholder.com')) {
+                    handleImageClick(modalProductImage.src);
                 }
-                 catch (error) { showTabMessage(addProductMessageAddTab, `Erro ao excluir: ${error.message}`, false); } 
-            }
-        });
+            });
+        }
     }
 
     if (editForm) { 
