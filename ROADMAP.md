@@ -58,11 +58,11 @@ O objetivo é melhorar a experiência do dia a dia com pequenos ajustes que faze
 
 [x] Frontend: Implementar a chamada à API e um indicador de carregamento.
 
-[ ] c) Animações Sutis (Micro-interações)
+[x] c) Animações Sutis (Micro-interações)
 
-[ ] Frontend: Aplicar transições de CSS para animar a adição de um novo produto (ex: fade-in).
+[x] Frontend: Aplicar transições de CSS para animar a adição de um novo produto (ex: fade-in).
 
-[ ] Frontend: Aplicar transições de CSS para animar a remoção de um produto (ex: slide-out e fade-out).
+[x] Frontend: Aplicar transições de CSS para animar a remoção de um produto (ex: slide-out e fade-out).
 
 4. Dashboard Principal (Painel de Controle) Aprimorado
 O objetivo é transformar a aba "Painel Principal" em um verdadeiro centro de comando com informações úteis e rápidas.

@@ -282,6 +282,37 @@ button:active, .primary-btn:active, .auth-submit-btn:active, #add-finance-entry-
     transform: translateY(0);
 }
 
+/* === Animações de Card (Micro-interações) === */
+@keyframes card-fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(15px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.card-entering {
+    animation: card-fade-in 0.4s ease-out forwards;
+}
+
+@keyframes card-fade-out {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+}
+
+.card-exiting {
+    animation: card-fade-out 0.3s ease-in forwards;
+}
+
 .primary-btn, .auth-submit-btn {
     width: 100%;
 }
@@ -603,6 +634,9 @@ body[data-theme="dark"] .card-actions {
     flex-direction: column;
     overflow-y: auto;
     text-align: center;
+    transform: scale(0.95);
+    opacity: 0;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 #modal-product-image-container {
@@ -612,7 +646,7 @@ body[data-theme="dark"] .card-actions {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     background: var(--c-primary);
     padding: 10px;
     border-radius: 15px;

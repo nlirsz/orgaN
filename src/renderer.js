@@ -1366,12 +1366,30 @@ async function renderPriceChart(productId) {
             return;
         }
         try {
-            const response = await authenticatedFetch(`${API_BASE_URL}/products/${productId}`, { method: 'DELETE' });
-            if (!response.ok) throw new Error(`Erro ao excluir: ${response.statusText}`);
+const response = await authenticatedFetch(`${API_BASE_URL}/products/${productId}`, { method: 'DELETE' }); // A API para DELETE retorna 204 No Content
+            if (response.status !== 204) {
+                const errorData = await response.json().catch(() => ({ message: 'Erro desconhecido ao excluir.' }));
+                throw new Error(errorData.message);
+            }
             showTabMessage(addProductMessageProductsTab, "Produto excluído com sucesso!", true);
-            await fetchAndRenderProducts(currentListId);
-            await fetchAndRenderDashboardStats();
-        } catch (error) {
+if (card) {
+                card.classList.add('card-exiting');
+                card.addEventListener('animationend', async () => {
+                    card.remove();
+                    const listElement = card.closest('ul');
+                    if (listElement && listElement.children.length === 0) {
+                        const emptyState = listElement.nextElementSibling;
+                        if (emptyState && emptyState.classList.contains('empty-state-message')) {
+                            emptyState.style.display = 'block';
+                        }
+                    }
+                    await fetchAndRenderDashboardStats();
+                }, { once: true });
+            } else {
+                await fetchAndRenderProducts(currentListId); // Fallback se o card não for encontrado
+                await fetchAndRenderDashboardStats();
+            }
+                } catch (error) {
             showTabMessage(addProductMessageProductsTab, `Erro ao excluir: ${error.message}`, false);
         }
     }
@@ -1491,16 +1509,20 @@ async function renderPriceChart(productId) {
         }
         if (!productPayload.listId) return showTabMessage(messageElement, 'Por favor, selecione uma lista para adicionar o produto.', false);
         try {
-            await authenticatedFetch(`${API_BASE_URL}/products`, {
+const response = await authenticatedFetch(`${API_BASE_URL}/products`, {
                 method: 'POST',
                 body: JSON.stringify(productPayload),
             });
+            const savedProduct = await response.json();
+            if (!response.ok) {
+                throw new Error(savedProduct.message || `Erro HTTP ${response.status}`);
+            }
+
             showTabMessage(messageElement, "Produto salvo com sucesso!", true);
             clearAddProductFormAddTab();
             clearProductScrapeFormProductsTab();
-            await fetchAndRenderDashboardStats();
-            await fetchAndRenderProducts(currentListId);
-
+addProductCardToDOM(savedProduct);
+            await fetchAndRenderDashboardStats(); // Atualiza os totais
         } catch (error) {
             console.error("Erro em saveProductToDB:", error);
             showTabMessage(messageElement, `Erro ao salvar: ${error.message}`, false);
