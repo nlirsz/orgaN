@@ -1586,6 +1586,13 @@ async function renderPriceChart(productId) {
         }
     }
 
+    // --- INICIALIZAÇÃO DOS OUVINTES DE EVENTOS (Refatorado) ---
+    // Configura os listeners para as listas de produtos e para os modais.
+    // Isto é feito uma única vez para evitar duplicação e conflitos.
+    setupProductListListener(pendingList);
+    setupProductListListener(purchasedList);
+    setupModalListeners();
+
     if (editForm) { 
         editForm.addEventListener('submit', async (e) => { 
             e.preventDefault(); 
