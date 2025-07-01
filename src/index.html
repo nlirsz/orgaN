@@ -107,6 +107,16 @@
                 </button>
 
 			</div>
+
+			<div class="sidebar-lists-container">
+				<div class="sidebar-lists-header">
+					<h4>Minhas Listas</h4>
+					<button id="add-new-list-btn" title="Criar Nova Lista"><i class="fas fa-plus"></i></button>
+				</div>
+				<ul id="product-lists-sidebar">
+					<!-- As listas serão inseridas aqui pelo JS -->
+				</ul>
+			</div>
 			
 			<div class="sidebar-footer">
 				<button class="nav-btn" data-tab="settings" title="Configurações">
@@ -240,6 +250,14 @@
                 <p class="form-section-title">Ou adicione manualmente</p>
                 
                 <div class="form-container add-product-form-container">
+                    <div class="form-group">
+                        <label for="manual-product-list">Adicionar à Lista*</label>
+                        <select id="manual-product-list" required>
+                            <!-- Opções de lista serão populadas pelo JS -->
+                            <option value="">Selecione uma lista...</option>
+                        </select>
+                    </div>
+
                     <div class="form-group">
                         <label for="manual-product-name">Nome do Produto*</label>
                         <input type="text" id="manual-product-name" placeholder="Nome completo do produto" required>
@@ -446,6 +464,26 @@
         </div>
     </div>
 
+    <div id="list-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <span class="close-modal-btn" data-modal-id="list-modal">&times;</span>
+            <h3 id="list-modal-title">Criar Nova Lista</h3>
+            <form id="list-form">
+                <input type="hidden" id="edit-list-id">
+                <div class="form-group">
+                    <label for="list-name">Nome da Lista*</label>
+                    <input type="text" id="list-name" placeholder="Ex: Eletrônicos para o Escritório" required>
+                </div>
+                <div class="form-group">
+                    <label for="list-description">Descrição (Opcional)</label>
+                    <textarea id="list-description" rows="3" placeholder="Uma breve descrição do propósito desta lista"></textarea>
+                </div>
+                <p class="tab-message" id="list-form-message"></p>
+                <button type="submit" id="save-list-btn" class="primary-btn"><i class="fas fa-save"></i> Salvar Lista</button>
+            </form>
+        </div>
+    </div>
+
     <div id="edit-product-modal" class="modal-overlay hidden">
         <div class="modal-content edit-product-modal-content">
             <span class="close-modal-btn" data-modal-id="edit-product-modal">&times;</span>
@@ -476,6 +514,12 @@
                 </div>
                 
                 <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit-product-list">Lista</label>
+                        <select id="edit-product-list">
+                            <!-- Opções de lista serão populadas pelo JS -->
+                        </select>
+                    </div>
                     <div class="form-group">
                         <label for="edit-product-status">Status</label>
                         <select id="edit-product-status">

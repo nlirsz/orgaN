@@ -29,6 +29,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let financialLineChart = null;
     let editingFinanceId = null;
     let priceHistoryChartInstance = null;
+    let allUserLists = [];
+    let currentListId = null;
 
     // --- SELETORES DE ELEMENTOS ---
     const getElem = (id) => document.getElementById(id);
@@ -68,6 +70,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const manualProductBrandInput = getElem('manual-product-brand');
     const manualProductDescriptionTextarea = getElem('manual-product-description');
     const productUrlInputProductsTab = getElem('productUrlInput-products-tab');
+    const manualProductListSelect = getElem('manual-product-list');
+    const editProductListSelect = getElem('edit-product-list');
+    const productListsSidebar = getElem('product-lists-sidebar');
+    const addNewListBtn = getElem('add-new-list-btn');
+    const listModal = getElem('list-modal');
+    const listForm = getElem('list-form');
+    const listModalTitle = getElem('list-modal-title');
+    const listFormMessage = getElem('list-form-message');
     const verifyUrlBtnProductsTab = getElem('verifyUrlBtn-products-tab');
     const verifiedProductInfoDivProductsTab = getElem('verifiedProductInfo-products-tab');
     const addProductMessageProductsTab = getElem('add-product-message-products-tab');
@@ -242,6 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
             await Promise.all([
                 fetchAndRenderDashboardStats(),
                 fetchAndRenderProducts(),
+                fetchAndRenderLists(),
                 fetchAndRenderFinances()
             ]);
             document.body.classList.add('app-logged-in');
@@ -535,10 +546,11 @@ const createProductCard = (product, cardType = 'product') => {
 
 // SUBSTITUA A SUA FUNÇÃO ANTIGA POR ESTA
 
-const fetchAndRenderProducts = async () => {
+const fetchAndRenderProducts = async (listId = null) => {
     if (!pendingList || !purchasedList || !pendingTotalValueEl || !purchasedTotalValueEl) return;
     if (!currentUserId) return;
 
+    const listQueryParam = listId ? `&listId=${listId}` : '';
     const smallSpinner = '<div class="spinner" style="width: 18px; height: 18px;"></div>';
     const listLoader = '<div class="content-loader"><div class="spinner"></div></div>';
     
@@ -552,7 +564,7 @@ const fetchAndRenderProducts = async () => {
     if (purchasedEmptyState) purchasedEmptyState.style.display = 'none';
 
     try {
-        const response = await authenticatedFetch(`${API_BASE_URL}/products?userId=${currentUserId}`);
+        const response = await authenticatedFetch(`${API_BASE_URL}/products?userId=${currentUserId}${listQueryParam}`);
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({ message: response.statusText }));
             throw new Error(errorData.message || 'Erro ao buscar produtos');
@@ -607,6 +619,98 @@ const fetchAndRenderProducts = async () => {
         purchasedList.innerHTML = listError;
     }
 };
+
+    // --- LÓGICA DE GESTÃO DE LISTAS ---
+
+    async function fetchAndRenderLists() {
+        if (!productListsSidebar) return;
+        productListsSidebar.innerHTML = '<div class="spinner-small"></div>';
+
+        try {
+            if (window.db && typeof window.db.getLists === 'function') {
+                allUserLists = await window.db.getLists(currentUserId);
+            } else {
+                const response = await authenticatedFetch(`${API_BASE_URL}/lists`);
+                if (!response.ok) throw new Error('Falha ao buscar listas');
+                allUserLists = await response.json();
+            }
+
+            productListsSidebar.innerHTML = '';
+            if (allUserLists.length === 0) {
+                productListsSidebar.innerHTML = '<li class="list-item-placeholder">Crie sua primeira lista!</li>';
+            } else {
+                allUserLists.forEach(list => {
+                    const li = document.createElement('li');
+                    li.className = 'list-item';
+                    li.dataset.listId = list._id;
+                    li.textContent = list.name;
+                    productListsSidebar.appendChild(li);
+                });
+
+                // Se nenhuma lista estiver selecionada, seleciona a primeira
+                if (!currentListId && allUserLists.length > 0) {
+                    currentListId = allUserLists[0]._id;
+                }
+                updateActiveList();
+            }
+            populateListSelects();
+
+        } catch (error) {
+            console.error("Erro ao buscar e renderizar listas:", error);
+            productListsSidebar.innerHTML = '<li class="list-item-placeholder error">Erro ao carregar.</li>';
+        }
+    }
+
+    function populateListSelects() {
+        const selects = [manualProductListSelect, editProductListSelect];
+        selects.forEach(select => {
+            if (select) {
+                const currentValue = select.value;
+                select.innerHTML = '<option value="">Selecione uma lista...</option>';
+                allUserLists.forEach(list => {
+                    const option = document.createElement('option');
+                    option.value = list._id;
+                    option.textContent = list.name;
+                    select.appendChild(option);
+                });
+                // Tenta manter o valor selecionado anteriormente, se ainda existir
+                if (allUserLists.some(list => list._id === currentValue)) {
+                    select.value = currentValue;
+                }
+            }
+        });
+    }
+
+    function updateActiveList() {
+        const listItems = document.querySelectorAll('#product-lists-sidebar .list-item');
+        listItems.forEach(item => {
+            item.classList.toggle('active', item.dataset.listId === currentListId);
+        });
+        // Recarrega os produtos da lista selecionada
+        fetchAndRenderProducts(currentListId);
+    }
+
+    if (productListsSidebar) {
+        productListsSidebar.addEventListener('click', (e) => {
+            const listItem = e.target.closest('.list-item');
+            if (listItem && listItem.dataset.listId) {
+                currentListId = listItem.dataset.listId;
+                updateActiveList();
+            }
+        });
+    }
+
+    if (addNewListBtn) {
+        addNewListBtn.addEventListener('click', () => {
+            if (listModal && listForm) {
+                listForm.reset();
+                listModalTitle.textContent = 'Criar Nova Lista';
+                showModal(listModal);
+            }
+        });
+    }
+
+    // --- FIM DA LÓGICA DE LISTAS ---
 
 
     function setContentState(wrapperElement, contentElement, state, errorMessage = 'Erro ao carregar.') {
@@ -1045,13 +1149,14 @@ const fetchAndRenderProducts = async () => {
         saveProductBtnAddTab.addEventListener('click', () => {
             let payload = {};
             if (scrapedProductData && scrapedProductData.name) {
-                payload = { ...scrapedProductData, status: 'pendente' };
+                payload = { ...scrapedProductData, status: 'pendente', listId: manualProductListSelect.value };
             } else {
                 payload = {
                     name: manualProductNameInput.value.trim(), price: manualProductPriceInput.value.trim(),
                     urlOrigin: manualProductUrlInput.value.trim(), image: manualProductImageUrlInput.value.trim(),
                     category: manualProductCategorySelect.value, brand: manualProductBrandInput.value.trim(),
-                    description: manualProductDescriptionTextarea.value.trim(), status: 'pendente'
+                    description: manualProductDescriptionTextarea.value.trim(), status: 'pendente',
+                    listId: manualProductListSelect.value
                 };
             }
             scrapedProductData = null;
@@ -1062,7 +1167,7 @@ const fetchAndRenderProducts = async () => {
     if (saveProductBtnProductsTab) {
         saveProductBtnProductsTab.addEventListener('click', () => {
             if (scrapedProductData && scrapedProductData.name) {
-                const payload = { ...scrapedProductData, status: 'pendente' };
+                const payload = { ...scrapedProductData, status: 'pendente', listId: currentListId }; // Adiciona à lista ativa
                 scrapedProductData = null;
                 saveProductToDB(payload, addProductMessageProductsTab);
             } else {
@@ -1174,6 +1279,7 @@ async function renderPriceChart(productId) {
             showTabMessage(messageElement, 'Informações do produto estão incompletas para salvar.', false);
             return;
         }
+        if (!productPayload.listId) return showTabMessage(messageElement, 'Por favor, selecione uma lista para adicionar o produto.', false);
         try {
             await authenticatedFetch(`${API_BASE_URL}/products`, {
                 method: 'POST',
@@ -1276,6 +1382,7 @@ if (mainContentArea) {
                 if (editProductPrioritySelect) editProductPrioritySelect.value = productData.priority || 'Baixa';
                 if (editProductNotesTextarea) editProductNotesTextarea.value = productData.notes || '';
 
+                if (editProductListSelect) editProductListSelect.value = productData.listId || '';
                 if (editProductPreviewImage) {
                     editProductPreviewImage.src = productData.image || '#';
                     editProductPreviewImage.classList.toggle('hidden', !productData.image);
@@ -1487,6 +1594,7 @@ if (mainContentArea) {
                 description: editProductDescriptionTextarea ? editProductDescriptionTextarea.value : undefined, 
                 priority: editProductPrioritySelect ? editProductPrioritySelect.value : undefined, 
                 notes: editProductNotesTextarea ? editProductNotesTextarea.value : undefined, 
+                listId: editProductListSelect ? editProductListSelect.value : undefined,
             };
             Object.keys(updatedData).forEach(key => { 
                 if (updatedData[key] === undefined || updatedData[key] === '' || (Array.isArray(updatedData[key]) && updatedData[key].length === 0)) { 

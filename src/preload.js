@@ -15,6 +15,11 @@ contextBridge.exposeInMainWorld("db", {
     deleteProduct: (productId) => ipcRenderer.invoke('db:delete-product', productId),
     getProductPriceHistory: (productId) => ipcRenderer.invoke('db:get-product-price-history', productId),
 
+    // Listas
+    getLists: (userId) => ipcRenderer.invoke('db:get-lists', userId),
+    addList: (listData) => ipcRenderer.invoke('db:add-list', listData),
+    deleteList: (listData) => ipcRenderer.invoke('db:delete-list', listData),
+
     // Histórico
     getHistory: () => ipcRenderer.invoke('db:get-history'),
     addToHistory: (product) => ipcRenderer.invoke('db:add-to-history', product),

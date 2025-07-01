@@ -4,6 +4,7 @@ const path = require('path');
 const chokidar = require('chokidar');
 const mongoose = require('mongoose'); // Adicionado para validação de ObjectId
 const Product = require('./models/Product'); // Caminho corrigido
+const List = require('./models/List'); // Importar o modelo de Lista
 
 let mainWindow;
 
@@ -26,16 +27,22 @@ function createWindow() {
         mainWindow.webContents.openDevTools();
     }
 
+    // ... seu código anterior
+
     if (!app.isPackaged && chokidar) {
         const watcher = chokidar.watch(path.join(__dirname, '..'), {
+            // AQUI ESTÁ A MUDANÇA:
             ignored: [
                 /(^|[\/\\])\../,
+                path.join(__dirname, 'main.js'), // <-- ADICIONE ESTA LINHA
                 path.join(__dirname, '..', 'node_modules', '**'),
                 path.join(__dirname, '..', '.git', '**')
             ],
             persistent: true,
             ignoreInitial: true
         });
+
+// ... resto do seu código
 
         watcher.on('change', (filePath) => {
             console.log(`Arquivo modificado: ${filePath}. Recarregando janela principal...`);
@@ -64,6 +71,46 @@ function createWindow() {
     return []; // Retorna array vazio em caso de erro
   }
 });
+
+    // --- GESTÃO DE LISTAS (IPC) ---
+
+    ipcMain.handle('db:get-lists', async (event, userId) => {
+        try {
+            if (!userId) return [];
+            return await List.find({ userId }).sort({ createdAt: 'asc' }).lean();
+        } catch (error) {
+            console.error('Erro ao buscar listas via IPC:', error);
+            return [];
+        }
+    });
+
+    ipcMain.handle('db:add-list', async (event, { name, description, userId }) => {
+        try {
+            const newList = new List({ name, description, userId });
+            await newList.save();
+            return JSON.parse(JSON.stringify(newList));
+        } catch (error) {
+            console.error('Erro ao adicionar lista via IPC:', error);
+            throw error; // Lança o erro para ser capturado no renderer
+        }
+    });
+
+    ipcMain.handle('db:delete-list', async (event, { listId, userId }) => {
+        try {
+            const list = await List.findOne({ _id: listId, userId });
+            if (!list) throw new Error('Lista não encontrada ou não autorizada.');
+
+            // Excluir produtos associados
+            await Product.deleteMany({ listId, userId });
+            // Excluir a lista
+            await List.findByIdAndDelete(listId);
+
+            return { success: true, message: 'Lista e produtos associados excluídos.' };
+        } catch (error) {
+            console.error('Erro ao excluir lista via IPC:', error);
+            throw error;
+        }
+    });
 
     mainWindow.on('closed', () => {
         mainWindow = null;

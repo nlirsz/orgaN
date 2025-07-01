@@ -46,9 +46,9 @@ O objetivo é melhorar a experiência do dia a dia com pequenos ajustes que faze
 
 [x] Backend: Associar os produtos a uma List.
 
-[ ] Frontend: Desenvolver a interface na sidebar para criar, ver e selecionar listas.
+[x] Frontend: Desenvolver a interface na sidebar para criar, ver e selecionar listas.
 
-[ ] Frontend: Modificar a visualização principal para exibir apenas produtos da lista selecionada.
+[x] Frontend: Modificar a visualização principal para exibir apenas produtos da lista selecionada.
 
 [ ] b) Botão para Atualizar Preços
 
