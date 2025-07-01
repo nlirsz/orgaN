@@ -11,9 +11,17 @@
     }
   ],
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/index.js" },
-    { "source": "/((?!api/).*)", "destination": "/index.html" },
-    { "source": "/home", "destination": "/src/home/index.html"    }
+    {
+      "source": "/home",
+      "destination": "/home/index.html"
+    },
+    { 
+      "source": "/api/(.*)", 
+      "destination": "/api/index.js" 
+    },
+    { 
+      "source": "/((?!api/).*)", 
+      "destination": "/index.html" 
+    }
   ]
 }
-
