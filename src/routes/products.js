@@ -7,7 +7,6 @@ const mongoose = require('mongoose');
 const auth = require('../middleware/auth');
 
 // Importando as duas funções do nosso novo scraper
-const { scrapeByAnalyzingHtml, scrapeBySearching } = require('./api_helpers/scrape-gemini');
 const { obterProduto: scrapeWithCheerio } = require('../price-scraper');
 
 // --- ROTAS DE DASHBOARD E ESTATÍSTICAS ---
@@ -64,6 +63,8 @@ router.get('/priority-distribution', auth, async (req, res) => {
 router.post('/scrape-url', async (req, res) => {
     const { url } = req.body;
     if (!url) { return res.status(400).json({ message: 'URL é obrigatória.' }); }
+    // LAZY LOADING: Import the scraper only when this route is called.
+    const { scrapeByAnalyzingHtml, scrapeBySearching } = require('./api_helpers/scrape-gemini');
 
     let productDetails = null;
 
@@ -244,6 +245,8 @@ router.get('/:id/history', auth, async (req, res) => {
 router.post('/refresh-prices', auth, async (req, res) => {
     const { productIds } = req.body;
     const userId = req.user.userId;
+    // LAZY LOADING: Import the scraper only when this route is called.
+    const { scrapeByAnalyzingHtml, scrapeBySearching } = require('./api_helpers/scrape-gemini');
 
     if (!Array.isArray(productIds) || productIds.length === 0) {
         return res.status(400).json({ message: 'A lista de IDs de produtos é obrigatória.' });
@@ -292,6 +295,8 @@ router.post('/refresh-prices', auth, async (req, res) => {
 router.post('/:id/refresh', auth, async (req, res) => {
     const { id } = req.params;
     const userId = req.user.userId;
+    // LAZY LOADING: Import the scraper only when this route is called.
+    const { scrapeByAnalyzingHtml, scrapeBySearching } = require('./api_helpers/scrape-gemini');
 
     try {
         const product = await Product.findOne({ _id: id, userId });
