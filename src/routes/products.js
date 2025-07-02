@@ -64,14 +64,15 @@ router.get('/dashboard-highlights', auth, async (req, res) => {
 
     try {
         const [
-            topCategories,
+            topCategoriesByCount,
+            topSellingCategories,
             lastAdded,
             lastPurchased,
             lastHighPriority,
             lastMediumPriority,
             lastLowPriority
         ] = await Promise.all([
-            // Top 3 categories by product count and their total value (for pending products)
+            // Top 3 PENDING categories by product COUNT
             Product.aggregate([
                 { $match: { userId: userId, status: 'pendente' } },
                 {
@@ -85,6 +86,17 @@ router.get('/dashboard-highlights', auth, async (req, res) => {
                 { $limit: 3 },
                 { $project: { _id: 0, category: '$_id', count: 1, totalValue: 1 } }
             ]),
+            // Top 3 SOLD categories by total VALUE
+            Product.aggregate([
+                { $match: { userId: userId, status: 'comprado' } },
+                { $group: {
+                    _id: '$category',
+                    totalValue: { $sum: '$price' }
+                } },
+                { $sort: { totalValue: -1 } },
+                { $limit: 3 },
+                { $project: { _id: 0, category: '$_id', totalValue: 1 } }
+            ]),
             Product.findOne({ userId }).sort({ createdAt: -1 }).lean(),
             Product.findOne({ userId, status: 'comprado' }).sort({ purchasedAt: -1 }).lean(),
             Product.findOne({ userId, priority: 'Alta', status: 'pendente' }).sort({ createdAt: -1 }).lean(),
@@ -92,9 +104,9 @@ router.get('/dashboard-highlights', auth, async (req, res) => {
             Product.findOne({ userId, priority: 'Baixa', status: 'pendente' }).sort({ createdAt: -1 }).lean()
         ]);
 
-        const categoryWithMostProducts = topCategories.length > 0 ? topCategories[0] : null;
+        const categoryWithMostProducts = topCategoriesByCount.length > 0 ? topCategoriesByCount[0] : null;
 
-        res.json({ categoryWithMostProducts, topCategoriesValue: topCategories, lastAdded, lastPurchased, lastHighPriority, lastMediumPriority, lastLowPriority });
+        res.json({ categoryWithMostProducts, topCategoriesValue: topCategoriesByCount, topSellingCategories, lastAdded, lastPurchased, lastHighPriority, lastMediumPriority, lastLowPriority });
     } catch (error) {
         console.error('Erro ao buscar destaques do dashboard:', error);
         res.status(500).json({ message: 'Erro ao buscar destaques do dashboard.' });

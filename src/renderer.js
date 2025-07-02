@@ -31,6 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let priceHistoryChartInstance = null;
     let allUserLists = [];
     let currentListId = null;
+    let allUserProducts = [];
 
     // --- SELETORES DE ELEMENTOS ---
     const getElem = (id) => document.getElementById(id);
@@ -141,6 +142,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const financeEmptyState = getElem('finance-empty-state');
     const themeSwitch = document.getElementById('theme-switch');
         const modal = document.getElementById('product-details-modal');
+    const defaultCategories = ['Geral', 'Casa', 'Roupas', 'Eletronicos', 'Games', 'Livros', 'Presentes'];
+
+
+    setupCategoryFilters();
+    
+    // Carrega todos os produtos do usuário ao iniciar
+    loadAllProducts(); 
+    
 
 
     // --- FUNÇÕES DE UTILIDADE ---
@@ -245,7 +254,111 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    async function showDashboard() {
+// --- PASSO 3: ADICIONAR COMO NOVAS FUNÇÕES ---
+// Adicione este bloco de novas funções ao corpo do seu ficheiro de script.
+
+/**
+ * Cria os botões de filtro para cada categoria e os adiciona à página.
+ */
+function setupCategoryFilters() {
+    const container = document.getElementById('category-buttons');
+    if (!container) return;
+
+    defaultCategories.forEach(categoryName => {
+        const button = document.createElement('button');
+        button.className = 'category-filter-btn neumorphic py-2 px-5 rounded-lg font-semibold text-gray-700 hover:text-green-600 transition-all duration-200';
+        button.textContent = categoryName;
+        button.dataset.category = categoryName; // Usa data-attribute para identificar a categoria
+
+        button.addEventListener('click', () => {
+            document.querySelectorAll('.category-filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+                btn.style.boxShadow = '6px 6px 12px #a3b1c6, -6px -6px 12px #ffffff'; // Estilo padrão
+            });
+            
+            button.classList.add('active');
+            button.style.boxShadow = 'inset 6px 6px 12px #a3b1c6, inset -6px -6px 12px #ffffff'; // Estilo "pressionado"
+
+            filterAndDisplayProducts(categoryName);
+        });
+
+        container.appendChild(button);
+    });
+
+    // Ativa o botão "Geral" por padrão ao carregar a página
+    container.querySelector('[data-category="Geral"]').click();
+}
+
+/**
+ * Busca TODOS os produtos do usuário na API e os armazena na variável global 'allUserProducts'.
+ */
+async function loadAllProducts() {
+    try {
+        const response = await fetch('/api/products'); 
+        if (!response.ok) throw new Error('Falha ao carregar produtos.');
+        
+        allUserProducts = await response.json();
+
+        // Após carregar, exibe a lista "Geral" por padrão
+        filterAndDisplayProducts('Geral');
+
+    } catch (error) {
+        console.error("Erro ao carregar produtos:", error);
+        const productGrid = document.querySelector('.product-grid');
+        productGrid.innerHTML = '<p class="text-center text-red-500 col-span-full">Não foi possível carregar os seus produtos.</p>';
+    }
+}
+
+/**
+ * Filtra a lista de produtos local e atualiza a exibição na tela.
+ * @param {string} category - A categoria selecionada para filtrar.
+ */
+function filterAndDisplayProducts(category) {
+    const productGrid = document.querySelector('.product-grid');
+    productGrid.innerHTML = ''; // Limpa a grelha
+
+    let filteredProducts;
+
+    if (category === 'Geral') {
+        filteredProducts = allUserProducts;
+    } else {
+        filteredProducts = allUserProducts.filter(product => product.category === category);
+    }
+
+    if (filteredProducts.length > 0) {
+        filteredProducts.forEach(product => {
+            // --- ATENÇÃO AQUI ---
+            // A linha abaixo chama a sua função que cria os cards.
+            // Verifique se o nome 'createProductCard' corresponde ao da sua função real.
+            const productCard = createProductCard(product); 
+            productGrid.appendChild(productCard);
+        });
+    } else {
+        productGrid.innerHTML = `<p class="text-center text-gray-500 col-span-full">Nenhum produto na categoria "${category}".</p>`;
+    }
+    
+    updateTotalValue(filteredProducts);
+}
+
+/**
+ * Calcula a soma dos preços de uma lista de produtos e atualiza a UI.
+ * @param {Array} products - A lista de produtos a ser somada.
+ */
+function updateTotalValue(products) {
+    const totalValueElement = document.getElementById('list-total-value');
+    if (!totalValueElement) return;
+
+    const total = products.reduce((sum, product) => sum + (product.currentPrice || 0), 0);
+
+    totalValueElement.textContent = new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+    }).format(total);
+}
+
+
+
+async function showDashboard() {
         if (authSection) authSection.classList.add('hidden');
         if (dashboardLayout) dashboardLayout.classList.add('hidden'); 
         if (loadingOverlay) loadingOverlay.classList.remove('hidden');
@@ -941,6 +1054,16 @@ const fetchAndRenderProducts = async (listId = null) => {
                     topCategoriesListEl.innerHTML = `<ul>${highlights.topCategoriesValue.map(cat => `<li><span>${cat.category}</span><span class="value">${formatCurrency(cat.totalValue)}</span></li>`).join('')}</ul>`;
                 } else {
                     topCategoriesListEl.innerHTML = '<span class="placeholder">Sem dados de valor.</span>';
+                }
+            }
+
+            // Card: Top Categorias por Vendas
+            const topSellingCategoriesListEl = getElem('top-selling-categories-list');
+            if (topSellingCategoriesListEl) {
+                if (highlights.topSellingCategories && highlights.topSellingCategories.length > 0) {
+                    topSellingCategoriesListEl.innerHTML = `<ul>${highlights.topSellingCategories.map(cat => `<li><span>${cat.category}</span><span class="value">${formatCurrency(cat.totalValue)}</span></li>`).join('')}</ul>`;
+                } else {
+                    topSellingCategoriesListEl.innerHTML = '<span class="placeholder">Nenhuma venda registrada.</span>';
                 }
             }
 

@@ -116,7 +116,8 @@ function createWindow() {
         try {
             const objectId = new mongoose.Types.ObjectId(userId);
             const [
-                topCategories,
+                topCategoriesByCount,
+                topSellingCategories,
                 lastAdded,
                 lastPurchased,
                 lastHighPriority,
@@ -130,6 +131,16 @@ function createWindow() {
                     { $limit: 3 },
                     { $project: { _id: 0, category: '$_id', count: 1, totalValue: 1 } }
                 ]),
+                Product.aggregate([
+                    { $match: { userId: objectId, status: 'comprado' } },
+                    { $group: {
+                        _id: '$category',
+                        totalValue: { $sum: '$price' }
+                    } },
+                    { $sort: { totalValue: -1 } },
+                    { $limit: 3 },
+                    { $project: { _id: 0, category: '$_id', totalValue: 1 } }
+                ]),
                 Product.findOne({ userId: objectId }).sort({ createdAt: -1 }).lean(),
                 Product.findOne({ userId: objectId, status: 'comprado' }).sort({ purchasedAt: -1 }).lean(),
                 Product.findOne({ userId: objectId, priority: 'Alta', status: 'pendente' }).sort({ createdAt: -1 }).lean(),
@@ -137,10 +148,10 @@ function createWindow() {
                 Product.findOne({ userId: objectId, priority: 'Baixa', status: 'pendente' }).sort({ createdAt: -1 }).lean()
             ]);
 
-            const categoryWithMostProducts = topCategories.length > 0 ? topCategories[0] : null;
+            const categoryWithMostProducts = topCategoriesByCount.length > 0 ? topCategoriesByCount[0] : null;
 
             return JSON.parse(JSON.stringify({
-                categoryWithMostProducts, topCategoriesValue: topCategories, lastAdded, lastPurchased, lastHighPriority, lastMediumPriority, lastLowPriority
+                categoryWithMostProducts, topCategoriesValue: topCategoriesByCount, topSellingCategories, lastAdded, lastPurchased, lastHighPriority, lastMediumPriority, lastLowPriority
             }));
 
         } catch (error) {
