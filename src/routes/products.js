@@ -187,7 +187,7 @@ router.get('/', auth, async (req, res) => {
     if (status) {
         query.status = status;
     }
-    if (listId) {
+    if (listId && listId !== 'all') {
         query.listId = listId;
     }
     try {

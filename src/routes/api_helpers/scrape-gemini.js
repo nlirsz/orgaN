@@ -89,7 +89,7 @@ async function scrapeBySearching(productUrl) {
 
     const prompt = 'Use sua ferramenta de busca para encontrar os detalhes do produto na URL: "' + productUrl + '".' +
         ' Retorne um objeto JSON com: "name", "price", "image", "brand", "category", "description". Priorize a precisão dos dados encontrados na busca.' +
-        ' Para "image", encontre uma URL de imagem pública e de alta resolução.' +
+        ' Para "image", extraia a URL da imagem principal do produto *diretamente do conteúdo da página*. A imagem deve ser uma URL pública e acessível, não um placeholder ou de um banco de imagens interno.' +
         ' "price" deve ser um número ou um texto que inclua o valor numérico.';
     
     const result = await model.generateContent({ contents: [{ role: "user", parts: [{ text: prompt }] }], generationConfig });

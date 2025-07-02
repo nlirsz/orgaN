@@ -1782,6 +1782,26 @@ if (card) {
     }
 
 
+    function addProductCardToDOM(product) {
+        const listElement = product.status === 'pendente' ? pendingList : purchasedList;
+        if (listElement) {
+            const card = createProductCard(product);
+            listElement.prepend(card); // Adiciona no início da lista
+            const emptyState = listElement.nextElementSibling;
+            if (emptyState && emptyState.classList.contains('empty-state-message')) {
+                emptyState.style.display = 'none';
+            }
+        }
+    }
+
+    function updateProductCardInDOM(product) {
+        const card = document.querySelector(`.product-card[data-product-id="${product._id}"]`);
+        if (card) {
+            const newCard = createProductCard(product);
+            card.replaceWith(newCard);
+        }
+    }
+
     async function saveProductToDB(productPayload, messageElement) {
         if (!productPayload || !productPayload.name || !productPayload.price) {
             showTabMessage(messageElement, 'Informações do produto estão incompletas para salvar.', false);
@@ -1912,15 +1932,18 @@ addProductCardToDOM(savedProduct);
             if (!editProductIdInput || !editProductNameInput || !editProductPriceInput) return; 
             if (!currentUserId) { showTabMessage(editProductMessage, 'Você precisa estar logado para salvar edições.', false); return; } 
 
-            const editProductCategoryModalSelect = getElem('edit-product-category-modal');
-
             const productId = editProductIdInput.value; 
+            const originalProductCard = document.querySelector(`.product-card[data-product-id="${productId}"]`);
+            const originalProductData = originalProductCard ? JSON.parse(originalProductCard.dataset.productJson) : {};
+            const originalListId = originalProductData.listId;
+
             const updatedData = { 
                 name: editProductNameInput.value, 
                 price: parseFloat(editProductPriceInput.value), 
                 urlOrigin: editProductUrlInput ? editProductUrlInput.value : undefined, 
                 image: editProductImageUrlInput ? editProductImageUrlInput.value : undefined, 
-                category: editProductCategoryModalSelect ? editProductCategoryModalSelect.value : undefined, 
+                listId: getElem('edit-product-list') ? getElem('edit-product-list').value : undefined,
+                category: editProductCategorySelect ? editProductCategorySelect.value : undefined, 
                 status: editProductStatusSelect ? editProductStatusSelect.value : undefined, 
                 tags: editProductTagsInput ? editProductTagsInput.value.split(',').map(tag => tag.trim()).filter(tag => tag) : undefined, 
                 description: editProductDescriptionTextarea ? editProductDescriptionTextarea.value : undefined, 
@@ -1942,10 +1965,31 @@ addProductCardToDOM(savedProduct);
                     const errorData = await response.json(); 
                     throw new Error(errorData.message || response.statusText); 
                 }
+                const updatedProduct = await response.json();
+
                 hideModalWithDelay(editModal, editProductMessage); 
-                fetchAndRenderProducts(); 
                 showTabMessage(addProductMessageAddTab, "Produto atualizado com sucesso!", true); 
-            } catch (error) { showTabMessage(editProductMessage, `Erro ao atualizar: ${error.message}`, false); } 
+
+                // Lógica de atualização da UI
+                if (originalListId && updatedData.listId && originalListId !== updatedData.listId) {
+                    // Remove o card da lista antiga na UI
+                    if (originalProductCard) {
+                        originalProductCard.remove();
+                    }
+                    // Adiciona o card à nova lista se ela estiver visível
+                    if (updatedData.listId === currentListId) {
+                        addProductCardToDOM(updatedProduct);
+                    }
+                } else {
+                    // Apenas atualiza o card existente se a lista não mudou
+                    updateProductCardInDOM(updatedProduct);
+                }
+
+                await fetchAndRenderDashboardStats();
+
+            } catch (error) { 
+                showTabMessage(editProductMessage, `Erro ao atualizar: ${error.message}`, false); 
+            } 
         });
     }
             if (changePasswordForm) {
