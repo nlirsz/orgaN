@@ -286,7 +286,6 @@ function setupCategoryFilters() {
     container.querySelector('[data-category="Geral"]').click();
 }
 
-/**
 function filterAndDisplayProducts(category) {
     const productGrid = document.querySelector('.product-grid');
     if (!productGrid) return;
