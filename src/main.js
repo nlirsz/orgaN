@@ -4,7 +4,6 @@ const path = require('path');
 const chokidar = require('chokidar');
 const mongoose = require('mongoose'); // Adicionado para validação de ObjectId
 const Product = require('./models/Product'); // Caminho corrigido
-const { scrapeByAnalyzingHtml, scrapeBySearching } = require('./routes/api_helpers/scrape-gemini');
 const List = require('./models/List'); // Importar o modelo de Lista
 
 let mainWindow;
@@ -114,6 +113,8 @@ function createWindow() {
     });
 
     ipcMain.handle('db:refresh-prices', async (event, { productIds, userId }) => {
+        const { scrapeByAnalyzingHtml, scrapeBySearching } = require('./routes/api_helpers/scrape-gemini');
+
         if (!Array.isArray(productIds) || productIds.length === 0) {
             return { updatedCount: 0, errors: [{ id: null, error: 'Lista de IDs vazia.' }] };
         }
