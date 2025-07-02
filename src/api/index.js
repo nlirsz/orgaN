@@ -11,11 +11,10 @@ const connectDB = require('../database'); // O seu ficheiro de conexão com o Mo
 // 3. Importa TODAS as suas rotas
 const productRoutes = require('../routes/products');
 const financeRoutes = require('../routes/finances');
-const authRoutes = require('../routes/auth'); // Importa o novo router de autenticação
+const registerRoute = require('../routes/auth/register');
+const loginRoute = require('../routes/auth/login');
 const userRoutes = require('../routes/user');
 const belvoRoutes = require('../routes/belvo'); // A nossa nova rota da Belvo
-const listRoutes = require('../routes/lists'); // 1. Importe as novas rotas
-
 
 // 4. Cria a aplicação Express
 const app = express();
@@ -30,11 +29,10 @@ app.use(express.json()); // Permite que o servidor entenda JSON
 // 7. Define as rotas da sua API
 app.use('/api/products', productRoutes);
 app.use('/api/finances', financeRoutes);
-app.use('/api/auth', authRoutes); // Usa o router de autenticação unificado
+app.use('/api/auth/register', registerRoute);
+app.use('/api/auth/login', loginRoute);
 app.use('/api/user', userRoutes);
 app.use('/api/belvo', belvoRoutes); // Diz ao servidor para usar a rota da Belvo
-app.use('/api/lists', listRoutes); // 2. Use as novas rotas
-
 
 // Rota raiz para verificar se a API está online
 app.get('/api', (req, res) => {
