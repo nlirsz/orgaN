@@ -252,17 +252,17 @@
 			<section id="products-tab" class="tab-content">
 				<h2>Meus Produtos</h2>
 
-                <!-- NOVO CONTAINER DE FILTROS DE CATEGORIA -->
-                <div id="category-filter-container" class="neumorphic p-4 rounded-xl mb-8">
-                    <!-- Os botões de categoria serão inseridos aqui pelo JavaScript -->
-                    <div id="category-buttons" class="flex flex-wrap items-center justify-center gap-3"></div>
-                    
-                    <!-- O valor total será exibido aqui -->
-                    <div id="list-total-container" class="mt-4 pt-4 border-t border-gray-200 text-center">
-                        <span class="text-lg font-semibold text-gray-700">Valor Total da Lista:</span>
-                        <span id="list-total-value" class="text-xl font-bold text-green-700 ml-2">R$ 0,00</span>
-                    </div>
-                </div>
+				<!-- No lugar do bloco que você apagou, adicione este novo container: -->
+<div id="category-filter-container" class="neumorphic p-4 rounded-xl mb-8">
+    <!-- Os botões de categoria serão inseridos aqui pelo JavaScript -->
+    <div id="category-buttons" class="flex flex-wrap items-center justify-center gap-3"></div>
+    
+    <!-- O valor total será exibido aqui -->
+    <div id="list-total-container" class="mt-4 pt-4 border-t border-gray-200 text-center">
+        <span class="text-lg font-semibold text-gray-700">Valor Total da Lista:</span>
+        <span id="list-total-value" class="text-xl font-bold text-green-700 ml-2">R$ 0,00</span>
+    </div>
+</div>
 
 				<div class="products-action-bar">
 					<button id="refresh-all-prices-btn" class="secondary-btn">
@@ -293,6 +293,10 @@
 				</div>
 
 				<div class="product-list-container">
+					<div class="list-summary">
+						<span>Total a Gastar:</span>
+						<span id="pending-total-value">R$ 0,00</span>
+					</div>
 					<ul id="pending-products-list" class="product-grid"></ul>
 					<div id="pending-empty-state" class="empty-state-message" style="display: none;">
 						 <i class="fas fa-dolly-flatbed fa-3x"></i>
@@ -323,19 +327,18 @@
                 <p class="form-section-title">Ou adicione manualmente</p>
                 
                 <div class="form-container add-product-form-container">
-                    <!-- NOVO SELECT DE CATEGORIA -->
                     <div class="form-group">
-                        <label for="add-product-category">Categoria*</label>
-                        <select id="add-product-category" name="category" required>
-                          <option value="" disabled selected>Selecione uma categoria</option>
-                          <option value="Casa">Casa</option>
-                          <option value="Roupas">Roupas</option>
-                          <option value="Eletronicos">Eletronicos</option>
-                          <option value="Games">Games</option>
-                          <option value="Livros">Livros</option>
-                          <option value="Presentes">Presentes</option>
-                        </select>
-                    </div>
+    <label for="add-product-category">Categoria*</label>
+    <select id="add-product-category" name="category" required>
+      <option value="" disabled selected>Selecione uma categoria</option>
+      <option value="Casa">Casa</option>
+      <option value="Roupas">Roupas</option>
+      <option value="Eletronicos">Eletronicos</option>
+      <option value="Games">Games</option>
+      <option value="Livros">Livros</option>
+      <option value="Presentes">Presentes</option>
+    </select>
+</div>
 
                     <div class="form-group">
                         <label for="manual-product-name">Nome do Produto*</label>
@@ -354,6 +357,22 @@
                         <input type="url" id="manual-product-image-url" placeholder="Link direto para a imagem do produto">
                     </div>
                     <div class="form-row">
+                        <div class="form-group">
+                            <label for="manual-product-category">Categoria</label>
+                            <select id="manual-product-category">
+                                <option value="Outros">Outros</option>
+                                <option value="Eletrônicos">Eletrónicos</option>
+                                <option value="Roupas e Acessórios">Roupas e Acessórios</option>
+                                <option value="Casa e Decoração">Casa e Decoração</option>
+                                <option value="Livros e Mídia">Livros e Mídia</option>
+                                <option value="Esportes e Lazer">Desportos e Lazer</option>
+                                <option value="Ferramentas e Construção">Ferramentas e Construção</option>
+                                <option value="Alimentos e Bebidas">Alimentos e Bebidas</option>
+                                <option value="Saúde e Beleza">Saúde e Beleza</option>
+                                <option value="Automotivo">Automóvel</option>
+                                <option value="Pet Shop">Loja de Animais</option>
+                            </select>
+                        </div>
                          <div class="form-group">
                             <label for="manual-product-brand">Marca</label>
                             <input type="text" id="manual-product-brand" placeholder="Marca do produto">
@@ -577,16 +596,10 @@
                 </div>
                 
                 <div class="form-row">
-                    <!-- NOVO SELECT DE CATEGORIA NO MODAL DE EDIÇÃO -->
                     <div class="form-group">
-                        <label for="edit-product-category-modal">Categoria</label>
-                        <select id="edit-product-category-modal">
-                            <option value="Casa">Casa</option>
-                            <option value="Roupas">Roupas</option>
-                            <option value="Eletronicos">Eletronicos</option>
-                            <option value="Games">Games</option>
-                            <option value="Livros">Livros</option>
-                            <option value="Presentes">Presentes</option>
+                        <label for="edit-product-list">Lista</label>
+                        <select id="edit-product-list">
+                            <!-- Opções de lista serão populadas pelo JS -->
                         </select>
                     </div>
                     <div class="form-group">
@@ -595,6 +608,22 @@
                             <option value="pendente">Pendente</option>
                             <option value="comprado">Comprado</option>
                             <option value="descartado">Descartado</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-product-category">Categoria</label>
+                        <select id="edit-product-category">
+                            <option value="Outros">Outros</option>
+                            <option value="Eletrônicos">Eletrónicos</option>
+                            <option value="Roupas e Acessórios">Roupas e Acessórios</option>
+                            <option value="Casa e Decoração">Casa e Decoração</option>
+                            <option value="Livros e Mídia">Livros e Mídia</option>
+                            <option value="Esportes e Lazer">Desportos e Lazer</option>
+                            <option value="Ferramentas e Construção">Ferramentas e Construção</option>
+                            <option value="Alimentos e Bebidas">Alimentos e Bebidas</option>
+                            <option value="Saúde e Beleza">Saúde e Beleza</option>
+                            <option value="Automotivo">Automóvel</option>
+                            <option value="Pet Shop">Loja de Animais</option>
                         </select>
                     </div>
                 </div>

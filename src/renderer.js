@@ -260,6 +260,12 @@ document.addEventListener('DOMContentLoaded', () => {
 /**
  * Cria os botões de filtro para cada categoria e os adiciona à página.
  */
+// --- PASSO 4: ADICIONAR AS NOVAS FUNÇÕES DE SUPORTE ---
+// Adicione este bloco de novas funções ao corpo do seu ficheiro.
+
+/**
+ * Cria os botões de filtro para cada categoria e os adiciona à página.
+ */
 function setupCategoryFilters() {
     const container = document.getElementById('category-buttons');
     if (!container) return;
@@ -268,34 +274,51 @@ function setupCategoryFilters() {
         const button = document.createElement('button');
         button.className = 'category-filter-btn neumorphic py-2 px-5 rounded-lg font-semibold text-gray-700 hover:text-green-600 transition-all duration-200';
         button.textContent = categoryName;
-        button.dataset.category = categoryName; // Usa data-attribute para identificar a categoria
+        button.dataset.category = categoryName;
 
         button.addEventListener('click', () => {
             document.querySelectorAll('.category-filter-btn').forEach(btn => {
                 btn.classList.remove('active');
-                btn.style.boxShadow = '6px 6px 12px #a3b1c6, -6px -6px 12px #ffffff'; // Estilo padrão
             });
-            
             button.classList.add('active');
-            button.style.boxShadow = 'inset 6px 6px 12px #a3b1c6, inset -6px -6px 12px #ffffff'; // Estilo "pressionado"
-
             filterAndDisplayProducts(categoryName);
         });
 
         container.appendChild(button);
     });
 
-    // Ativa o botão "Geral" por padrão ao carregar a página
+    // Ativa o botão "Geral" por padrão
     container.querySelector('[data-category="Geral"]').click();
 }
 
 /**
- * Busca TODOS os produtos do usuário na API e os armazena na variável global 'allUserProducts'.
+ * Calcula a soma dos preços de uma lista de produtos e atualiza a UI.
+ * @param {Array} products - A lista de produtos a ser somada.
  */
+function updateTotalValue(products) {
+    const totalValueElement = document.getElementById('list-total-value');
+    if (!totalValueElement) return;
+
+    const total = products.reduce((sum, product) => sum + (product.price || 0), 0);
+
+    totalValueElement.textContent = new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+    }).format(total);
+}
+
+
+
 async function loadAllProducts() {
+    const productGrid = document.querySelector('.product-grid');
     try {
+        // Esta rota agora deve retornar TODOS os produtos do usuário, sem filtro.
         const response = await fetch('/api/products'); 
-        if (!response.ok) throw new Error('Falha ao carregar produtos.');
+        if (!response.ok) {
+            // Se a resposta não for OK (ex: 401 Unauthorized), trata o erro.
+            const errorData = await response.json();
+            throw new Error(errorData.msg || 'Falha ao carregar produtos.');
+        }
         
         allUserProducts = await response.json();
 
@@ -303,33 +326,33 @@ async function loadAllProducts() {
         filterAndDisplayProducts('Geral');
 
     } catch (error) {
-        console.error("Erro ao carregar produtos:", error);
-        const productGrid = document.querySelector('.product-grid');
-        productGrid.innerHTML = '<p class="text-center text-red-500 col-span-full">Não foi possível carregar os seus produtos.</p>';
+        console.error("Erro em loadAllProducts:", error);
+        if (productGrid) {
+            productGrid.innerHTML = `<p class="text-center text-red-500 col-span-full">Não foi possível carregar os seus produtos. (${error.message})</p>`;
+        }
     }
 }
 
-/**
- * Filtra a lista de produtos local e atualiza a exibição na tela.
- * @param {string} category - A categoria selecionada para filtrar.
- */
 function filterAndDisplayProducts(category) {
     const productGrid = document.querySelector('.product-grid');
+    if (!productGrid) return;
+    
     productGrid.innerHTML = ''; // Limpa a grelha
 
     let filteredProducts;
 
     if (category === 'Geral') {
+        // "Geral" mostra todos os produtos
         filteredProducts = allUserProducts;
     } else {
+        // Filtra os produtos pela categoria correspondente
         filteredProducts = allUserProducts.filter(product => product.category === category);
     }
 
     if (filteredProducts.length > 0) {
         filteredProducts.forEach(product => {
-            // --- ATENÇÃO AQUI ---
             // A linha abaixo chama a sua função que cria os cards.
-            // Verifique se o nome 'createProductCard' corresponde ao da sua função real.
+            // Ela deve funcionar sem alterações.
             const productCard = createProductCard(product); 
             productGrid.appendChild(productCard);
         });
@@ -337,6 +360,7 @@ function filterAndDisplayProducts(category) {
         productGrid.innerHTML = `<p class="text-center text-gray-500 col-span-full">Nenhum produto na categoria "${category}".</p>`;
     }
     
+    // Após exibir os produtos, calcula e atualiza o valor total
     updateTotalValue(filteredProducts);
 }
 
@@ -355,6 +379,8 @@ function updateTotalValue(products) {
         currency: 'BRL'
     }).format(total);
 }
+
+
 
 
 
