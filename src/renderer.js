@@ -668,6 +668,8 @@ const fetchAndRenderProducts = async (listId = null) => {
         }
         
         const products = await response.json();
+        allUserProducts = products; // <<-- ADICIONADO: Atualiza a lista principal
+
         const pendingProducts = products.filter(p => p.status === 'pendente');
         const historyProducts = products.filter(p => p.status === 'comprado' || p.status === 'descartado');
 
@@ -793,6 +795,12 @@ const fetchAndRenderProducts = async (listId = null) => {
         });
         // Recarrega os produtos da lista selecionada
         fetchAndRenderProducts(currentListId);
+
+        // <<-- ADICIONADO: Reseta o filtro de categoria para "Geral"
+        const geralButton = document.querySelector('.category-filter-btn[data-category="Geral"]');
+        if (geralButton) {
+            geralButton.click();
+        }
     }
 
     if (productListsSidebar) {
@@ -1394,16 +1402,16 @@ const fetchAndRenderProducts = async (listId = null) => {
     
     if (saveProductBtnAddTab) {
         saveProductBtnAddTab.addEventListener('click', () => {
-            const manualProductCategorySelect = getElem('manual-product-category'); // Alterado para o novo ID
+            const manualProductListSelect = getElem('manual-product-list');
             let payload = {};
             if (scrapedProductData && scrapedProductData.name) {
-                payload = { ...scrapedProductData, status: 'pendente', category: manualProductCategorySelect.value }; // Alterado para category
+                payload = { ...scrapedProductData, status: 'pendente', listId: manualProductListSelect.value };
             } else {
                 payload = {
                     name: manualProductNameInput.value.trim(), price: manualProductPriceInput.value.trim(),
                     urlOrigin: manualProductUrlInput.value.trim(), image: manualProductImageUrlInput.value.trim(), category: manualProductCategorySelect.value, brand: manualProductBrandInput.value.trim(),
                     description: manualProductDescriptionTextarea.value.trim(), status: 'pendente',
-                    category: manualProductCategorySelect.value // Alterado para category
+                    listId: manualProductListSelect.value
                 };
             }
             scrapedProductData = null;
