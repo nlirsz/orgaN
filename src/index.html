@@ -330,7 +330,7 @@
                     <div class="form-group">
     <label for="add-product-category">Categoria*</label>
     <select id="add-product-category" name="category" required>
-      <option value="" disabled selected>Selecione uma categoria</option>
+      <option value="Geral" >Geral</option>
       <option value="Casa">Casa</option>
       <option value="Roupas">Roupas</option>
       <option value="Eletronicos">Eletronicos</option>
@@ -595,13 +595,20 @@
                     <input type="url" id="edit-product-url" required>
                 </div>
                 
-                <div class="form-row">
+                                <!-- NOVO SELECT DE CATEGORIA PARA O MODAL DE EDIÇÃO -->
                     <div class="form-group">
-                        <label for="edit-product-list">Lista</label>
-                        <select id="edit-product-list">
-                            <!-- Opções de lista serão populadas pelo JS -->
+                        <label for="edit-product-category-modal">Categoria</label>
+                        <select id="edit-product-category-modal">
+                           <option value="Geral">Geral</option>
+                           <option value="Casa">Casa</option>
+                            <option value="Roupas">Roupas</option>
+                            <option value="Eletronicos">Eletronicos</option>
+                            <option value="Games">Games</option>
+                            <option value="Livros">Livros</option>
+                            <option value="Presentes">Presentes</option>
                         </select>
                     </div>
+
                     <div class="form-group">
                         <label for="edit-product-status">Status</label>
                         <select id="edit-product-status">
