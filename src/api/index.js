@@ -2,6 +2,7 @@
 
 // 1. Carrega as variáveis de ambiente do ficheiro .env
 require('dotenv').config();
+const mongoose = require('mongoose'); // Import mongoose to check connection state
 
 // 2. Importa as bibliotecas necessárias
 const express = require('express');
@@ -26,6 +27,29 @@ connectDB();
 // 6. Aplica os middlewares essenciais
 app.use(cors()); // Permite que o seu frontend comunique com o backend
 app.use(express.json()); // Permite que o servidor entenda JSON
+
+// --- ROTAS DE VERIFICAÇÃO DE SAÚDE (HEALTH CHECK) ---
+
+// Rota de verificação de saúde básica da API
+app.get('/api/health', (req, res) => {
+    res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Rota de verificação de saúde do banco de dados
+app.get('/api/db-health', async (req, res) => {
+    try {
+        const state = mongoose.connection.readyState;
+        const stateName = mongoose.ConnectionStates[state];
+        
+        if (state === 1) { // 1 === connected
+            res.status(200).json({ status: 'ok', dbState: stateName, dbStateCode: state });
+        } else {
+            res.status(503).json({ status: 'error', message: 'Database not connected.', dbState: stateName, dbStateCode: state });
+        }
+    } catch (error) {
+        res.status(500).json({ status: 'error', message: 'Failed to check database status.', error: error.message });
+    }
+});
 
 // 7. Define as rotas da sua API
 app.use('/api/products', productRoutes);
