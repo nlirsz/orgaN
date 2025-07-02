@@ -112,6 +112,43 @@ function createWindow() {
         }
     });
 
+    ipcMain.handle('db:get-dashboard-highlights', async (event, userId) => {
+        try {
+            const objectId = new mongoose.Types.ObjectId(userId);
+            const [
+                topCategories,
+                lastAdded,
+                lastPurchased,
+                lastHighPriority,
+                lastMediumPriority,
+                lastLowPriority
+            ] = await Promise.all([
+                Product.aggregate([
+                    { $match: { userId: objectId, status: 'pendente' } },
+                    { $group: { _id: '$category', count: { $sum: 1 }, totalValue: { $sum: '$price' } } },
+                    { $sort: { count: -1 } },
+                    { $limit: 3 },
+                    { $project: { _id: 0, category: '$_id', count: 1, totalValue: 1 } }
+                ]),
+                Product.findOne({ userId: objectId }).sort({ createdAt: -1 }).lean(),
+                Product.findOne({ userId: objectId, status: 'comprado' }).sort({ purchasedAt: -1 }).lean(),
+                Product.findOne({ userId: objectId, priority: 'Alta', status: 'pendente' }).sort({ createdAt: -1 }).lean(),
+                Product.findOne({ userId: objectId, priority: 'Média', status: 'pendente' }).sort({ createdAt: -1 }).lean(),
+                Product.findOne({ userId: objectId, priority: 'Baixa', status: 'pendente' }).sort({ createdAt: -1 }).lean()
+            ]);
+
+            const categoryWithMostProducts = topCategories.length > 0 ? topCategories[0] : null;
+
+            return JSON.parse(JSON.stringify({
+                categoryWithMostProducts, topCategoriesValue: topCategories, lastAdded, lastPurchased, lastHighPriority, lastMediumPriority, lastLowPriority
+            }));
+
+        } catch (error) {
+            console.error('Erro ao buscar destaques do dashboard via IPC:', error);
+            return null;
+        }
+    });
+
     ipcMain.handle('db:refresh-prices', async (event, { productIds, userId }) => {
         // LAZY LOADING: Import the scraper only when this handler is called.
         const { scrapeByAnalyzingHtml, scrapeBySearching } = require('./routes/api_helpers/scrape-gemini');

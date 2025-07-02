@@ -253,6 +253,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             await Promise.all([
                 fetchAndRenderDashboardStats(),
+                fetchAndRenderDashboardHighlights(),
                 fetchAndRenderProducts(),
                 fetchAndRenderLists(),
                 fetchAndRenderFinances()
@@ -883,6 +884,92 @@ const fetchAndRenderProducts = async (listId = null) => {
     window.addEventListener('resize', setAppHeight);
     window.addEventListener('orientationchange', setAppHeight); 
     setAppHeight(); 
+
+ async function fetchAndRenderDashboardHighlights() {
+        if (!currentUserId) return;
+
+        const formatCurrency = (value) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
+
+        const renderProductSnippet = (containerId, product) => {
+            const container = getElem(containerId);
+            if (!container) return;
+            const contentEl = container.querySelector('.highlight-card-content-product');
+            if (!contentEl) return;
+
+            if (product) {
+                contentEl.innerHTML = `
+                    <img src="${product.image || 'https://via.placeholder.com/100'}" alt="${product.name}">
+                    <div>
+                        <p>${product.name}</p>
+                        <span class="details-span">${formatCurrency(product.price)}</span>
+                    </div>
+                `;
+            } else {
+                contentEl.innerHTML = '<span class="placeholder">Nenhum produto encontrado.</span>';
+            }
+        };
+
+        try {
+            let highlights;
+            if (window.db && typeof window.db.getDashboardHighlights === 'function') {
+                highlights = await window.db.getDashboardHighlights(currentUserId);
+            } else {
+                const response = await authenticatedFetch(`${API_BASE_URL}/products/dashboard-highlights`);
+                if (!response.ok) throw new Error('Falha ao buscar destaques');
+                highlights = await response.json();
+            }
+
+            if (!highlights) throw new Error('Dados de destaques não recebidos.');
+
+            // Card: Top Categoria
+            const topCategoryNameEl = getElem('top-category-name');
+            const topCategoryDetailsEl = getElem('top-category-details');
+            if (topCategoryNameEl && topCategoryDetailsEl) {
+                if (highlights.categoryWithMostProducts) {
+                    topCategoryNameEl.textContent = highlights.categoryWithMostProducts.category;
+                    topCategoryDetailsEl.textContent = `${highlights.categoryWithMostProducts.count} produtos`;
+                } else {
+                    topCategoryNameEl.textContent = 'Nenhuma';
+                    topCategoryDetailsEl.textContent = '0 produtos';
+                }
+            }
+
+            // Card: Valor por Top Categoria
+            const topCategoriesListEl = getElem('top-categories-list');
+            if (topCategoriesListEl) {
+                if (highlights.topCategoriesValue && highlights.topCategoriesValue.length > 0) {
+                    topCategoriesListEl.innerHTML = `<ul>${highlights.topCategoriesValue.map(cat => `<li><span>${cat.category}</span><span class="value">${formatCurrency(cat.totalValue)}</span></li>`).join('')}</ul>`;
+                } else {
+                    topCategoriesListEl.innerHTML = '<span class="placeholder">Sem dados de valor.</span>';
+                }
+            }
+
+            // Card: Últimos Produtos
+            renderProductSnippet('last-added-card', highlights.lastAdded);
+            renderProductSnippet('last-purchased-card', highlights.lastPurchased);
+
+            // Card: Foco por Prioridade
+            const lastPriorityListEl = getElem('last-priority-list');
+            if (lastPriorityListEl) {
+                const priorityItems = [
+                    { label: 'Alta', product: highlights.lastHighPriority },
+                    { label: 'Média', product: highlights.lastMediumPriority },
+                    { label: 'Baixa', product: highlights.lastLowPriority }
+                ].filter(item => item.product);
+
+                if (priorityItems.length > 0) {
+                    lastPriorityListEl.innerHTML = `<ul>${priorityItems.map(item => `<li><span>${item.label}</span><span class="value">${item.product.name}</span></li>`).join('')}</ul>`;
+                } else {
+                    lastPriorityListEl.innerHTML = '<span class="placeholder">Nenhum item pendente.</span>';
+                }
+            }
+
+        } catch (error) {
+            console.error("Erro ao renderizar destaques do dashboard:", error);
+            // Lidar com o estado de erro na UI, se necessário
+        }
+    }
+    
 
     const fetchAndRenderDashboardStats = async () => {
         if (!currentUserId) return;

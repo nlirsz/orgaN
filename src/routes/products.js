@@ -59,6 +59,48 @@ router.get('/priority-distribution', auth, async (req, res) => {
     }
 });
 
+router.get('/dashboard-highlights', auth, async (req, res) => {
+    const userId = new mongoose.Types.ObjectId(req.user.userId);
+
+    try {
+        const [
+            topCategories,
+            lastAdded,
+            lastPurchased,
+            lastHighPriority,
+            lastMediumPriority,
+            lastLowPriority
+        ] = await Promise.all([
+            // Top 3 categories by product count and their total value (for pending products)
+            Product.aggregate([
+                { $match: { userId: userId, status: 'pendente' } },
+                {
+                    $group: {
+                        _id: '$category',
+                        count: { $sum: 1 },
+                        totalValue: { $sum: '$price' }
+                    }
+                },
+                { $sort: { count: -1 } },
+                { $limit: 3 },
+                { $project: { _id: 0, category: '$_id', count: 1, totalValue: 1 } }
+            ]),
+            Product.findOne({ userId }).sort({ createdAt: -1 }).lean(),
+            Product.findOne({ userId, status: 'comprado' }).sort({ purchasedAt: -1 }).lean(),
+            Product.findOne({ userId, priority: 'Alta', status: 'pendente' }).sort({ createdAt: -1 }).lean(),
+            Product.findOne({ userId, priority: 'Média', status: 'pendente' }).sort({ createdAt: -1 }).lean(),
+            Product.findOne({ userId, priority: 'Baixa', status: 'pendente' }).sort({ createdAt: -1 }).lean()
+        ]);
+
+        const categoryWithMostProducts = topCategories.length > 0 ? topCategories[0] : null;
+
+        res.json({ categoryWithMostProducts, topCategoriesValue: topCategories, lastAdded, lastPurchased, lastHighPriority, lastMediumPriority, lastLowPriority });
+    } catch (error) {
+        console.error('Erro ao buscar destaques do dashboard:', error);
+        res.status(500).json({ message: 'Erro ao buscar destaques do dashboard.' });
+    }
+});
+
 // --- ROTA DE SCRAPE COM A LÓGICA EM CASCATA ---
 router.post('/scrape-url', async (req, res) => {
     const { url } = req.body;
