@@ -1,6 +1,7 @@
 // src/routes/api_helpers/scrape-gemini.js - VERSÃO FORMATADA E CORRIGIDA
 
 const { GoogleGenerativeAI } = require("@google/generative-ai");
+const { HarmBlockThreshold, HarmCategory } = require("@google/generative-ai");
 const fetch = require('node-fetch');
 
 console.log("[scrape-gemini.js V-Final-Corrigido] Módulo sendo carregado...");
@@ -27,7 +28,19 @@ function getClientAndModel() {
     genAI = new GoogleGenerativeAI(apiKey);
     console.log('[scrape-gemini.js] Cliente Gemini inicializado com sucesso.');
   }
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }); // Usando o modelo mais recente
+  const model = genAI.getGenerativeModel({
+    model: "gemini-1.5-flash", // Usando o modelo mais recente e eficiente
+    safetySettings: [ // Adicionando configurações de segurança para evitar bloqueios desnecessários
+      {
+        category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+        threshold: HarmBlockThreshold.BLOCK_NONE,
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+        threshold: HarmBlockThreshold.BLOCK_NONE,
+      },
+    ],
+  });
   return { model };
 }
 
@@ -53,7 +66,7 @@ async function scrapeByAnalyzingHtml(productUrl) {
     const htmlContent = await response.text();
 
     const prompt = 'Analise o HTML a seguir para extrair os detalhes de um produto.' +
-        ' Retorne um objeto JSON com: "name", "price", "image", "brand", "category", "description".' +
+        ' Retorne um objeto JSON com: "name", "price", "image", "brand", "category", "description". Priorize a extração de dados do HTML em vez de inferências.' +
         ' - Para "image", priorize a URL na meta tag \'og:image\'.' +
         ' - "price" deve ser um número ou um texto que inclua o valor numérico.' +
         ' - Categoria: Eletrônicos, Roupas e Acessórios, Casa e Decoração, Livros e Mídia, Esportes e Lazer, Ferramentas e Construção, Alimentos e Bebidas, Saúde e Beleza, Automotivo, Pet Shop, Outros.' +
@@ -75,7 +88,7 @@ async function scrapeBySearching(productUrl) {
     const { model } = getClientAndModel(); // 2. Obtém o modelo aqui também
 
     const prompt = 'Use sua ferramenta de busca para encontrar os detalhes do produto na URL: "' + productUrl + '".' +
-        ' Retorne um objeto JSON com: "name", "price", "image", "brand", "category", "description".' +
+        ' Retorne um objeto JSON com: "name", "price", "image", "brand", "category", "description". Priorize a precisão dos dados encontrados na busca.' +
         ' Para "image", encontre uma URL de imagem pública e de alta resolução.' +
         ' "price" deve ser um número ou um texto que inclua o valor numérico.';
     

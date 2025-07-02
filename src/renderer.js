@@ -293,7 +293,7 @@ function filterAndDisplayProducts(category) {
     productGrid.innerHTML = ''; // Limpa a grelha
 
     let filteredProducts;
-
+    
     if (category === 'Geral') {
         // "Geral" mostra todos os produtos
         filteredProducts = allUserProducts;
@@ -1394,23 +1394,22 @@ const fetchAndRenderProducts = async (listId = null) => {
     
     if (saveProductBtnAddTab) {
         saveProductBtnAddTab.addEventListener('click', () => {
-            const manualProductListSelect = getElem('manual-product-list');
+            const manualProductCategorySelect = getElem('manual-product-category'); // Alterado para o novo ID
             let payload = {};
             if (scrapedProductData && scrapedProductData.name) {
-                payload = { ...scrapedProductData, status: 'pendente', listId: manualProductListSelect.value };
+                payload = { ...scrapedProductData, status: 'pendente', category: manualProductCategorySelect.value }; // Alterado para category
             } else {
                 payload = {
                     name: manualProductNameInput.value.trim(), price: manualProductPriceInput.value.trim(),
                     urlOrigin: manualProductUrlInput.value.trim(), image: manualProductImageUrlInput.value.trim(), category: manualProductCategorySelect.value, brand: manualProductBrandInput.value.trim(),
                     description: manualProductDescriptionTextarea.value.trim(), status: 'pendente',
-                    listId: manualProductListSelect.value
+                    category: manualProductCategorySelect.value // Alterado para category
                 };
             }
             scrapedProductData = null;
             saveProductToDB(payload, addProductMessageAddTab);
         });
     }
-
     if (saveProductBtnProductsTab) {
         saveProductBtnProductsTab.addEventListener('click', () => {
             if (scrapedProductData && scrapedProductData.name) {
@@ -1913,19 +1912,20 @@ addProductCardToDOM(savedProduct);
             if (!editProductIdInput || !editProductNameInput || !editProductPriceInput) return; 
             if (!currentUserId) { showTabMessage(editProductMessage, 'Você precisa estar logado para salvar edições.', false); return; } 
 
+            const editProductCategoryModalSelect = getElem('edit-product-category-modal');
+
             const productId = editProductIdInput.value; 
             const updatedData = { 
                 name: editProductNameInput.value, 
                 price: parseFloat(editProductPriceInput.value), 
                 urlOrigin: editProductUrlInput ? editProductUrlInput.value : undefined, 
                 image: editProductImageUrlInput ? editProductImageUrlInput.value : undefined, 
-                category: editProductCategorySelect ? editProductCategorySelect.value : undefined, 
+                category: editProductCategoryModalSelect ? editProductCategoryModalSelect.value : undefined, 
                 status: editProductStatusSelect ? editProductStatusSelect.value : undefined, 
                 tags: editProductTagsInput ? editProductTagsInput.value.split(',').map(tag => tag.trim()).filter(tag => tag) : undefined, 
                 description: editProductDescriptionTextarea ? editProductDescriptionTextarea.value : undefined, 
                 priority: editProductPrioritySelect ? editProductPrioritySelect.value : undefined, 
                 notes: editProductNotesTextarea ? editProductNotesTextarea.value : undefined, 
-                listId: editProductListSelect ? editProductListSelect.value : undefined,
             };
             Object.keys(updatedData).forEach(key => { 
                 if (updatedData[key] === undefined || updatedData[key] === '' || (Array.isArray(updatedData[key]) && updatedData[key].length === 0)) { 
