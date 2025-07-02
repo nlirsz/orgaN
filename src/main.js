@@ -112,50 +112,6 @@ function createWindow() {
         }
     });
 
-    ipcMain.handle('db:refresh-prices', async (event, { productIds, userId }) => {
-        const { scrapeByAnalyzingHtml, scrapeBySearching } = require('./routes/api_helpers/scrape-gemini');
-
-        if (!Array.isArray(productIds) || productIds.length === 0) {
-            return { updatedCount: 0, errors: [{ id: null, error: 'Lista de IDs vazia.' }] };
-        }
-
-        let updatedCount = 0;
-        const errors = [];
-
-        for (const id of productIds) {
-            try {
-                const product = await Product.findOne({ _id: id, userId });
-                if (!product) {
-                    errors.push({ id, error: 'Produto não encontrado.' });
-                    continue;
-                }
-
-                let newDetails = null;
-                try {
-                    newDetails = await scrapeByAnalyzingHtml(product.urlOrigin);
-                } catch (scrapeError) {
-                    newDetails = await scrapeBySearching(product.urlOrigin);
-                }
-
-                if (newDetails && newDetails.price && newDetails.price !== product.price) {
-                    product.priceHistory.push({ price: product.price, date: new Date() });
-                    product.price = newDetails.price;
-                    if (newDetails.name) product.name = newDetails.name;
-                    if (newDetails.image) product.image = newDetails.image;
-
-                    await product.save();
-                    updatedCount++;
-                    if (mainWindow && !mainWindow.isDestroyed()) {
-                        mainWindow.webContents.send('price-update-progress', { productId: id, newPrice: newDetails.price, name: newDetails.name, image: newDetails.image });
-                    }
-                }
-            } catch (e) {
-                errors.push({ id, error: `Falha no scrape: ${e.message}` });
-            }
-        }
-        return { updatedCount, errors };
-    });
-
     mainWindow.on('closed', () => {
         mainWindow = null;
     });
