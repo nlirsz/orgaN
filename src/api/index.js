@@ -2,6 +2,7 @@
 
 // 1. Carrega as variáveis de ambiente do ficheiro .env
 require('dotenv').config();
+const mongoose = require('mongoose'); // Import mongoose to check connection state
 
 // 2. Importa as bibliotecas necessárias
 const express = require('express');
@@ -11,10 +12,11 @@ const connectDB = require('../database'); // O seu ficheiro de conexão com o Mo
 // 3. Importa TODAS as suas rotas
 const productRoutes = require('../routes/products');
 const financeRoutes = require('../routes/finances');
-const registerRoute = require('../routes/auth/register');
-const loginRoute = require('../routes/auth/login');
+const authRoutes = require('../routes/auth'); // Importa o novo router de autenticação
 const userRoutes = require('../routes/user');
 const belvoRoutes = require('../routes/belvo'); // A nossa nova rota da Belvo
+const listRoutes = require('../routes/lists'); // 1. Importe as novas rotas
+
 
 // 4. Cria a aplicação Express
 const app = express();
@@ -26,13 +28,37 @@ connectDB();
 app.use(cors()); // Permite que o seu frontend comunique com o backend
 app.use(express.json()); // Permite que o servidor entenda JSON
 
+// --- ROTAS DE VERIFICAÇÃO DE SAÚDE (HEALTH CHECK) ---
+
+// Rota de verificação de saúde básica da API
+app.get('/api/health', (req, res) => {
+    res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Rota de verificação de saúde do banco de dados
+app.get('/api/db-health', async (req, res) => {
+    try {
+        const state = mongoose.connection.readyState;
+        const stateName = mongoose.ConnectionStates[state];
+        
+        if (state === 1) { // 1 === connected
+            res.status(200).json({ status: 'ok', dbState: stateName, dbStateCode: state });
+        } else {
+            res.status(503).json({ status: 'error', message: 'Database not connected.', dbState: stateName, dbStateCode: state });
+        }
+    } catch (error) {
+        res.status(500).json({ status: 'error', message: 'Failed to check database status.', error: error.message });
+    }
+});
+
 // 7. Define as rotas da sua API
 app.use('/api/products', productRoutes);
 app.use('/api/finances', financeRoutes);
-app.use('/api/auth/register', registerRoute);
-app.use('/api/auth/login', loginRoute);
+app.use('/api/auth', authRoutes); // Usa o router de autenticação unificado
 app.use('/api/user', userRoutes);
 app.use('/api/belvo', belvoRoutes); // Diz ao servidor para usar a rota da Belvo
+app.use('/api/lists', listRoutes); // 2. Use as novas rotas
+
 
 // Rota raiz para verificar se a API está online
 app.get('/api', (req, res) => {
