@@ -72,8 +72,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const manualProductBrandInput = getElem('manual-product-brand');
     const manualProductDescriptionTextarea = getElem('manual-product-description');
     const productUrlInputProductsTab = getElem('productUrlInput-products-tab');
-    const manualProductListSelect = getElem('manual-product-list');
-    const editProductListSelect = getElem('edit-product-list');
     const productListsSidebar = getElem('product-lists-sidebar');
     const addNewListBtn = getElem('add-new-list-btn');
     const listModal = getElem('list-modal');
@@ -146,9 +144,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     setupCategoryFilters();
-    
-    // Carrega todos os produtos do usuário ao iniciar
-    loadAllProducts(); 
     
 
 
@@ -292,47 +287,6 @@ function setupCategoryFilters() {
 }
 
 /**
- * Calcula a soma dos preços de uma lista de produtos e atualiza a UI.
- * @param {Array} products - A lista de produtos a ser somada.
- */
-function updateTotalValue(products) {
-    const totalValueElement = document.getElementById('list-total-value');
-    if (!totalValueElement) return;
-
-    const total = products.reduce((sum, product) => sum + (product.price || 0), 0);
-
-    totalValueElement.textContent = new Intl.NumberFormat('pt-BR', {
-        style: 'currency',
-        currency: 'BRL'
-    }).format(total);
-}
-
-
-
-async function loadAllProducts() {
-    const productGrid = document.querySelector('.product-grid');
-    try {
-        // Esta rota agora deve retornar TODOS os produtos do usuário, sem filtro.
-        const response = await fetch('/api/products'); 
-        if (!response.ok) {
-            // Se a resposta não for OK (ex: 401 Unauthorized), trata o erro.
-            const errorData = await response.json();
-            throw new Error(errorData.msg || 'Falha ao carregar produtos.');
-        }
-        
-        allUserProducts = await response.json();
-
-        // Após carregar, exibe a lista "Geral" por padrão
-        filterAndDisplayProducts('Geral');
-
-    } catch (error) {
-        console.error("Erro em loadAllProducts:", error);
-        if (productGrid) {
-            productGrid.innerHTML = `<p class="text-center text-red-500 col-span-full">Não foi possível carregar os seus produtos. (${error.message})</p>`;
-        }
-    }
-}
-
 function filterAndDisplayProducts(category) {
     const productGrid = document.querySelector('.product-grid');
     if (!productGrid) return;
@@ -807,7 +761,7 @@ const fetchAndRenderProducts = async (listId = null) => {
     }
 
     function populateListSelects() {
-        const selects = [manualProductListSelect, editProductListSelect];
+        const selects = [getElem('manual-product-list'), getElem('edit-product-list')];
         const geralList = allUserLists.find(list => list.name.toLowerCase() === 'geral');
 
         selects.forEach(select => {
@@ -1441,14 +1395,14 @@ const fetchAndRenderProducts = async (listId = null) => {
     
     if (saveProductBtnAddTab) {
         saveProductBtnAddTab.addEventListener('click', () => {
+            const manualProductListSelect = getElem('manual-product-list');
             let payload = {};
             if (scrapedProductData && scrapedProductData.name) {
                 payload = { ...scrapedProductData, status: 'pendente', listId: manualProductListSelect.value };
             } else {
                 payload = {
                     name: manualProductNameInput.value.trim(), price: manualProductPriceInput.value.trim(),
-                    urlOrigin: manualProductUrlInput.value.trim(), image: manualProductImageUrlInput.value.trim(),
-                    category: manualProductCategorySelect.value, brand: manualProductBrandInput.value.trim(),
+                    urlOrigin: manualProductUrlInput.value.trim(), image: manualProductImageUrlInput.value.trim(), category: manualProductCategorySelect.value, brand: manualProductBrandInput.value.trim(),
                     description: manualProductDescriptionTextarea.value.trim(), status: 'pendente',
                     listId: manualProductListSelect.value
                 };
@@ -1750,6 +1704,7 @@ if (card) {
             showTabMessage(addProductMessageProductsTab, 'Você precisa estar logado para editar produtos.', false);
             return;
         }
+        const editProductListSelect = getElem('edit-product-list');
         if (editModal && editForm) {
             if (editProductIdInput) editProductIdInput.value = productData._id;
             if (editProductNameInput) editProductNameInput.value = productData.name || '';
