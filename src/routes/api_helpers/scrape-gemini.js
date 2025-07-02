@@ -5,16 +5,31 @@ const fetch = require('node-fetch');
 
 console.log("[scrape-gemini.js V-Final-Corrigido] Módulo sendo carregado...");
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY não está definida!");
-
-const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-
 const generationConfig = {
     temperature: 0.3,
     responseMimeType: "application/json",
 };
+
+let genAI; // 1. Declare a variável do cliente, mas não a inicialize.
+
+/**
+ * Inicializa e retorna o cliente do Gemini, garantindo que seja criado apenas uma vez.
+ * Esta é uma prática de "lazy initialization" e "singleton" para ambientes serverless.
+ * @returns {{model: import("@google/generative-ai").GenerativeModel}}
+ */
+function getClientAndModel() {
+  if (!genAI) {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      // Este erro será muito mais claro nos logs da Vercel.
+      throw new Error("A variável de ambiente GEMINI_API_KEY não está definida no ambiente de produção.");
+    }
+    genAI = new GoogleGenerativeAI(apiKey);
+    console.log('[scrape-gemini.js] Cliente Gemini inicializado com sucesso.');
+  }
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }); // Usando o modelo mais recente
+  return { model };
+}
 
 function normalizePrice(price) {
     if (typeof price === 'number') return price;
@@ -27,6 +42,7 @@ function normalizePrice(price) {
 // --- MÉTODO 1: Analisa o HTML diretamente ---
 async function scrapeByAnalyzingHtml(productUrl) {
     console.log(`[Gemini HTML Mode] Iniciando para: ${productUrl}`);
+    const { model } = getClientAndModel(); // 2. Obtém o modelo aqui
     
     const response = await fetch(productUrl, {
         headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36' }
@@ -56,6 +72,7 @@ async function scrapeByAnalyzingHtml(productUrl) {
 // --- MÉTODO 2: Usa a busca interna da IA ---
 async function scrapeBySearching(productUrl) {
     console.log(`[Gemini Search Mode] Iniciando para: ${productUrl}`);
+    const { model } = getClientAndModel(); // 2. Obtém o modelo aqui também
 
     const prompt = 'Use sua ferramenta de busca para encontrar os detalhes do produto na URL: "' + productUrl + '".' +
         ' Retorne um objeto JSON com: "name", "price", "image", "brand", "category", "description".' +

@@ -58,7 +58,7 @@ router.post('/', async (req, res) => {
             { $set: { listId: geralList._id } }
         );
 
-        if (migrationResult.modifiedCount > 0) {
+        if (migrationResult.modifiedCount > 0) { // CORREÇÃO: use 'modifiedCount' em vez de 'nModified'
             console.log(`${migrationResult.modifiedCount} produtos órfãos foram migrados para a lista 'Geral' para o utilizador ${user.username}.`);
         }
 
